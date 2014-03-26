@@ -1,0 +1,44 @@
+<h1><%= _('Oauth Client Settings') %></h1>
+
+<%= form_for(:settings) do |f| %>
+  <div class="providers">
+    <h3><%= _('Providers') %></h3>
+  <%= f.fields_for :providers, OpenStruct.new(@providers) do |p| %>
+
+    <% OauthClientPlugin::PROVIDERS.each do |available_provider, options| %>
+      <% provider = OpenStruct.new(@providers[available_provider]) %>
+
+      <%= p.fields_for available_provider, provider do |o| %>
+        <div class="provider">
+          <div class="name">
+            <h4><%= o.check_box :enabled, {:class => 'enable', :checked => provider.enabled=='true'}, true, false %>
+            <%= options[:name] %></h4>
+          </div>
+          <div class="options" style="<%= provider.enabled=='true' ? '':'display:none' %>">
+            <div class="client-id">
+              <span class="label"><%= _('Client ID') %></span>
+              <span class="value"><%= o.text_field :client_id %></span>
+            </div>
+            <div class="client-secret">
+              <span class="label"><%= _('Client Secret') %></span>
+              <span class="value"><%= o.text_field :client_secret %></span>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% button_bar do %>
+    <%= submit_button(:save, _('Save'), :cancel => {:controller => 'plugins', :action => 'index'}) %>
+  <% end %>
+  </div>
+<% end %>
+
+<script>
+  jQuery(document).ready(function($) {
+    $('.providers .provider .enable').on('click', function() {
+      $(this).parents('.provider').find('.options').toggle('fast');
+    });
+  });
+</script>

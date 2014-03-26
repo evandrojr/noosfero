@@ -1,0 +1,22 @@
+.oauth-login .provider a {
+  min-width: 20px;
+  min-height: 20px;
+  background-size: 20px;
+  display: inline-block;
+  text-decoration: none;
+  background-repeat: no-repeat;
+  padding-left: 22px;
+  line-height: 20px;
+}
+
+.oauth-login .provider .facebook {
+  background-image: url(images/facebook-icon.png);
+}
+
+.oauth-login .provider .google_oauth2 {
+  background-image: url(images/google-icon.png);
+}
+
+.oauth-login .provider .developer {
+  display: none;
+}

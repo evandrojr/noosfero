@@ -1,0 +1,11 @@
+<%= hidden_field_tag 'user[oauth_providers][][provider]', @user.oauth_providers.first[:provider] %>
+<%= hidden_field_tag 'user[oauth_providers][][uid]', @user.oauth_providers.first[:uid] %>
+
+<style>
+  #signup-password {
+    display: none;
+  }
+  #signup-password-confirmation {
+    display: none;
+  }
+</style>
