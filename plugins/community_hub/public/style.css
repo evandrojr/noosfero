@@ -1,0 +1,27 @@
+.icon-newcommunity-hub,
+.icon-community-hub {
+  background-image: url(/plugins/community_hub/icons/community-hub.png)
+}
+
+#hub{
+	border:1px solid red;
+}
+
+#hub .body{
+	border:1px solid green;
+}
+
+#hub .live{
+	border:1px solid yellow;
+	float: left;
+	width: 50%;
+}
+
+#hub .mediation{
+	border:1px solid black;
+	width: 50%;
+}
+
+#hub-posting-area td {
+	padding: 0px;
+}
