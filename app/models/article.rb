@@ -643,6 +643,11 @@ class Article < ActiveRecord::Base
     author ? author.id : nil
   end
 
+  #FIXME make this test
+  def author_custom_image(size = :icon)
+    author ? author.profile_custom_image(size) : nil
+  end
+
   def version_license(version_number = nil)
     return license if version_number.nil?
     profile.environment.licenses.find_by_id(versions.find_by_version(version_number).license_id)
