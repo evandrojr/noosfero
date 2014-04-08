@@ -1,3 +1,5 @@
+var $ = jQuery;
+
 function send_message_for_stream(button) {
   var $ = jQuery;
   open_loading(DEFAULT_LOADING_MESSAGE);
@@ -21,10 +23,6 @@ function send_message_for_stream(button) {
     $button.removeClass('stream-post-button-loading');
     $button.enable();
   }, 'json');
-}
-
-function teste() {
-  alert('teste');
 }
 
 function send_post_for_mediation(button) {
@@ -54,9 +52,64 @@ function send_post_for_mediation(button) {
 
 function clearMediationForm(element) {
   alert(element);
-  //var $field = $(field);
-  //$field.value = '';
 }
 
+function setMediationTimestamp() {
+  var now = new Date().getTime();
+  var timestamp = 'hub-mediation-' + now.toString();
+  $("article_name").value = timestamp;
+}
 
-//setInterval(teste, 2000);
+function loadPosts(section) {
+
+  var url;
+  var container; 
+
+  switch(section) {
+    case 'live':
+      url = '/plugin/community_hub/public/newer_comments';
+      container = $("#live-posts");
+      break;
+    case 'mediation':
+      url = '/plugin/community_hub/public/newer_articles';
+      container = $("#mediation-posts");
+      break;
+  }
+
+  $.ajax({
+    url: url,
+    success: function(data) { 
+      container.append(data);
+    },
+    error: function(ajax, stat, errorThrown) {
+      console.log(stat);
+    }
+  });
+
+}
+
+function hub() {
+  loadPosts('live');
+  loadPosts('mediation');
+}
+
+function checkNewPosts() {
+  var agora = new Date();
+  console.log( 'checking news posts...' );
+}
+
+function toogleAutoScrolling() {
+  alert($("#auto_scrolling").attr('checked'));
+}
+
+$(document).ready(function(){
+
+  $("#auto_scrolling").click(function(){
+    toogleAutoScrolling();
+  });
+
+  hub();
+  checkNewPosts('live');
+
+});
+

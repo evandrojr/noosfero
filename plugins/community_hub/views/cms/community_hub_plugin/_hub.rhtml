@@ -1,0 +1,17 @@
+<div class='hub'>
+
+	<h1><%= _("HUB Settings") %></h1>
+
+	<%= required_fields_message %>
+
+  <div>
+    <%= required labelled_form_field(_('Title'), text_field(:article, 'name', :size => '64', :maxlength => 150)) %>
+  </div>
+
+  <div>
+    <%= required labelled_form_field(_('Description'), text_area(:article, 'body', :style => 'width: 99%;')) %>
+  </div>
+
+  <span><%= labelled_form_field(_('Hashtags (TWITTER)'), text_field(:article, 'hashtags_twitter')) %></span>
+
+</div>

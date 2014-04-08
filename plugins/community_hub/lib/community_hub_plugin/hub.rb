@@ -1,5 +1,7 @@
 class CommunityHubPlugin::Hub < Folder
 
+  settings_items :hashtags_twitter, :type => :string, :default => ""
+
   def self.icon_name(article = nil)
     'community-hub'
   end
@@ -12,16 +14,12 @@ class CommunityHubPlugin::Hub < Folder
     _('Defines a hub.')
   end
 
-  def view_page
-    "content_viewer/hub.rhtml"
-  end
-
-  def bli
-    "bli"
-  end
-
   def accept_comments?
     true
+  end
+
+  def view_page
+    "content_viewer/hub.rhtml"
   end
 
 end

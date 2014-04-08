@@ -3,25 +3,40 @@
   background-image: url(/plugins/community_hub/icons/community-hub.png)
 }
 
-#hub{
+.hub {
 	border:1px solid red;
 }
 
-#hub .body{
+.hub .title {}
+
+.hub .description {}
+
+.hub .live {
+	border:1px solid red;
+}
+
+.hub .live .title {}
+
+.hub .live .on-air {}
+
+.hub .live .off-air {}
+
+.hub .mediation {
 	border:1px solid green;
 }
 
-#hub .live{
-	border:1px solid yellow;
-	float: left;
-	width: 50%;
+.hub .mediation .title {}
+
+.hub .mediation .expand {}
+
+.hub .form {}
+
+.hub .settings {
+	border:1px solid red;
 }
 
-#hub .mediation{
-	border:1px solid black;
-	width: 50%;
-}
-
-#hub-posting-area td {
-	padding: 0px;
+.hub .settings .twitter,
+.hub .settings .facebook,
+.hub .settings .general {
+	border:1px solid red;	
 }
