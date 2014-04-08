@@ -1,0 +1,82 @@
+    <% if user_role == 'visitor' %>
+
+      <% remote_form_for( :comment, 
+                          CommunityHubPlugin::HubStreamPost.new, 
+                          :url => {
+                            :profile => profile.identifier, 
+                            :controller => 'comment', 
+                            :action => 'create', 
+                            :id => @page.id
+                          }, 
+                          :html => { :class => 'comment_form' } ) do |f| %>
+
+      <div>
+        <span><%= _("Streaming") %></span>
+      </div>
+      <div>
+      <%= f.text_area(:body, 
+                      :style => 'width: 99%;', 
+                      :placeholder => _('Type your message here')) %>
+      </div>
+      <div>
+        <%= submit_button('add', _('Post'), :onclick => "send_message_for_stream(this); return false;") %>
+      </div>
+
+      <% end %>
+
+    <% end %>
+
+    <% if user_role == 'admin' %>
+
+      <%= render :file => 'shared/tiny_mce' %>
+
+      <% category_ids = [] %>
+
+      <% remote_form_for( :article, 
+                          TinyMceArticle.new, 
+                          :url => {
+                            :profile => profile.identifier, 
+                            :controller => 'cms', 
+                            :action => 'new',
+                            :type => 'TinyMceArticle',
+                            :success_back_to => "",
+                            :q => "",
+                            :parent_id => @page.id,
+                            :back_to => "" 
+                          }, 
+                          :before => "tinymce.triggerSave(); setMediationTimestamp()",
+                          :loading => "alert('loading...')",
+                          :complete => "tinymce.get('article_body').setContent('')",
+                          :html => { :class => 'comment_form' } ) do |f| %>
+
+      <%= f.hidden_field :moderate_comments, :value => 0 %> 
+      <%= f.hidden_field :translation_of_id, :value => "" %>
+      <%= f.hidden_field :notify_comments, :value => 0 %>
+      <%= f.hidden_field :accept_comments, :value => 1 %>
+      <%= f.hidden_field :tag_list, :value => "" %>
+      <%= f.hidden_field :display_versions, :value => 0 %>
+      <%= f.hidden_field :allow_members_to_edit, :value => 0 %>
+      <%= f.hidden_field :abstract, :value => "" %>
+      <%= f.hidden_field :display_hits, :value => 0 %> 
+      <%= f.hidden_field :parent_id, :value => @page.id %>
+      <%= f.hidden_field :name %>
+      <%= f.hidden_field :published, :value => true %>
+      <%= f.hidden_field :license_id, :value => "" %>
+      <%= hidden_field_tag "article[category_ids][]", "" %> 
+      <%= f.hidden_field :language, :value => "en"   %>
+
+      <div>
+        <div>
+        <%= f.text_area(:body, 
+                        :style => 'width: 99%;', 
+                        :class => 'mceEditor',
+                        :placeholder => _('Type your message for mediation here')) %>
+        </div>
+        <div>
+          <%= submit_button('add', _('Post'))%>
+        </div>
+      </div>       
+
+      <% end %>
+
+    <% end %>

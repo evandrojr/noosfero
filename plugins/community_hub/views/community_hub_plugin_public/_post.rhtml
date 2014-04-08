@@ -1,0 +1,39 @@
+<li class="post" style="border:1px solid black;"> 
+
+    <ul style="border:1px solid red;">
+      <li class="time" style="border:1px solid red;">
+        <%= show_time(post.created_at) %>
+      </li>
+      <li class="avatar" style="border:1px solid red;">
+
+        <% if false %>
+          <%= image_tag(profile_icon(post.author, :minor)) %>
+        <% end %>
+
+        image
+
+      </li>
+      <li class="message" style="border:1px solid red;">
+        <%= txt2html post.body %>
+      </li>
+      <li class="mediation-bar" style="border:1px solid red;">
+
+        <ul style="border:1px solid red;">
+          <li class="remove">
+          	<%= link_to 'excluir', :controller => 'community_hub_plugin_public', :action => 'destroy', :id => post.id %>
+          </li>
+          <li class="promote">
+          	<%= link_to 'promover', :controller => 'community_hub_plugin_public', :action => 'destroy', :id => post.id %>
+          </li>
+          <li class="likes-dislikes">
+          	<%= link_to 'gostei', :controller => 'community_hub_plugin_public', :action => 'destroy', :id => post.id %> | <%= link_to 'não gostei', :controller => 'community_hub_plugin_public', :action => 'destroy', :id => post.id %>
+          </li>
+          <li class="pin">
+          	<%= link_to 'fixar', :controller => 'community_hub_plugin_public', :action => 'destroy', :id => post.id %>
+          </li>
+        </ul>
+
+      </li>
+    </ul>
+
+</li>

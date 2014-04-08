@@ -13,7 +13,7 @@ class CommunityHubPlugin < Noosfero::Plugin
   end
 
   def js_files
-    'javascripts/stream_post_form.js'
+    'javascripts/community_hub.js'
   end
 
   def content_types
@@ -26,10 +26,6 @@ class CommunityHubPlugin < Noosfero::Plugin
        [CommunityHubPlugin::Hub]
     end
   end
-
-  #def self.extra_blocks
-  #  { CommunityHubPlugin::HubBlock => {:position => 1} }
-  #end
 
   def content_remove_new(page)
     page.kind_of?(CommunityHubPlugin::Hub)
