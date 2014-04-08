@@ -1,0 +1,16 @@
+#!/bin/bash
+  STREAMEXEC=/home/93274300500/projetos/noosfero/plugins/community_hub/twitter-stream-listener/stream.rb
+  RUBY=/usr/bin/ruby
+  
+ case $1 in
+    start)
+       echo $$ > /var/run/twitter_stream.pid;
+       exec 2>&1 ruby ${STREAMEXEC}  1>/tmp/stream.out 
+       ;;
+     stop)  
+       kill `cat /var/run/twitter_stream.pid` ;;
+     *)  
+       echo "usage: stream_monitor {start|stop}" ;;
+ esac
+ exit 0
+
