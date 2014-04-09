@@ -100,6 +100,16 @@ class Article < ActiveRecord::Base
     {:include => 'categories_including_virtual', :conditions => { 'categories.id' => category.id }}
   }
 
+  #FIXME make this test
+  named_scope :newer_than, lambda { |reference_id|
+    {:conditions => ["articles.id > #{reference_id}"]}
+  }
+
+  #FIXME make this test
+  named_scope :older_than, lambda { |reference_id|
+    {:conditions => ["articles.id < #{reference_id}"]}
+  }
+
   named_scope :by_range, lambda { |range| {
     :conditions => [
       'published_at BETWEEN :start_date AND :end_date', { :start_date => range.first, :end_date => range.last }
