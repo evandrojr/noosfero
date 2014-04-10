@@ -4,39 +4,230 @@
 }
 
 .hub {
-	border:1px solid red;
+    /*border: 1px solid red;*/
 }
 
-.hub .title {}
+.hub ul {padding-left: 0px; margin-top: 0;}
 
-.hub .description {}
+#content .hub h1{
+	margin-bottom: 0;
+}
+
+
+#content .hub .title {
+    font-size: 33px;
+    font-weight: normal;
+    padding-right: 70px;
+	 color: #4b7421;
+	 font-variant: normal;
+}
+
+.hub .description {
+	font-size: 14px;
+}
+
+.hub .post{
+	border-bottom: 1px solid #ddd !important;
+	background: url("images/hub-time-bg.gif") repeat-y	left top #fff;
+}
+
+.hub .time{
+    display: inline-block;
+    font-size: 8px;
+    padding-top: 10px;
+    text-align: center;
+    vertical-align: top;
+    width: 35px;
+}
+
+.hub .avatar{
+    background-color: lightGray;
+    display: inline-block;
+    height: 43px;
+    margin: 0 10px;
+    vertical-align: top;
+    width: 43px;
+}
+
+.hub .message{
+    display: inline-block;
+    width: 70%;
+}
+
+.hub .mediation-bar{
+    display: inline-block;
+    margin: 10px 0 10px 104px;
+    width: 70%;
+
+}
+
+.hub .mediation-bar ul {}
+
+.hub .mediation-bar ul li {
+    display: inline-block;
+    margin-right: 5px;
+    overflow: hidden;
+    text-indent: -1000px;
+    width: 16px;
+}
+
+.hub .mediation-bar ul li.likes-dislikes{
+    overflow: visible;
+    text-indent: 0px;
+    width: auto;
+	 vertical-align: top;
+}
+
+.hub .mediation-bar ul li.pin{
+	height: 25px;
+}
+
+.hub .remove{}
+
+.hub .mediation-bar ul li a{
+	text-indent: -10000px;
+}
+
+.hub .promote{
+	background: url("images/hub-promote-icon.png") no-repeat center center #fff;
+}
+
+.hub .pin{
+	background: url("images/hub-pin-icon.png") no-repeat center center #fff;
+}
+
+.hub .mediation-bar ul li.pin {
+	float: right;
+}
+
+/**/
 
 .hub .live {
-	border:1px solid red;
+    border: 0px solid lightGray;
+    display: inline-block;
+    float: left;
+    width: 49%;
+	margin-bottom: 2em;
 }
 
-.hub .live .title {}
+.hub ul#live-posts, .hub ul#mediation-posts{
+    height: 500px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+	border-width: 0 1px 1px;
+	border-style: solid;
+	border-color: lightGray;
+	padding-top: 10px;
+}
 
-.hub .live .on-air {}
 
-.hub .live .off-air {}
+#content .main-block .hub .live h1{
+	 background-color: #f4f4f4;
+	 border: 1px solid lightGray
+}
+
+#content .hub .live .title {
+    color: #656565;
+    display: inline-block;
+    font-size: 20px;
+	 font-family: Arial Black, arial, sans-serif;
+    padding-right: 0;
+    width: 70%;
+}
+#content .hub .live .on-air {
+    background-color: #d40000;
+    border-radius: 10px 10px 10px 10px;
+    color: white;
+    display: inline-block;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 0 0.5em;
+    text-align: center;
+    text-transform: uppercase;
+    vertical-align: top;
+    width: 20%;
+
+}
+#content .hub .live .off-air {
+    background-color: gray;
+    border-radius: 10px 10px 10px 10px;
+    color: black;
+    display: inline-block;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 0 0.5em;
+    text-align: center;
+    text-transform: uppercase;
+    vertical-align: top;
+    width: 20%;
+}
+
 
 .hub .mediation {
-	border:1px solid green;
+	border: 0px solid lightGray;
+	display: inline-block;
+	clear: right;
+	float: none;
+	margin-left: 1%;
+	width: 50%;
+	margin-bottom: 2em;
 }
 
-.hub .mediation .title {}
+#content .main-block .hub .mediation h1{
+    background-color: #ed8e01;
+	 border: 1px solid lightGray
+}
 
-.hub .mediation .expand {}
-
-.hub .form {}
-
+#content .hub .mediation .title {
+    color: white;
+    display: inline-block;
+    font-size: 20px;
+	 font-family: Arial Black, arial, sans-serif;
+    padding-right: 0;
+    width: 100%;
+	/*font-variant: normal;*/
+}
+.hub .mediation .expand {
+    float: right;
+    padding-right: 1em;
+}
+.hub .form {
+    clear: left;
+    float: left;
+    width: 49%;
+}
 .hub .settings {
-	border:1px solid red;
+   /* border: 1px solid red;*/
 }
 
-.hub .settings .twitter,
-.hub .settings .facebook,
-.hub .settings .general {
-	border:1px solid red;	
+.hub div.settings {
+    float: right;
+    width: 50%;
+}
+
+.hub ul.settings li{
+    height: 50px;
+    line-height: 50px;
+    margin-bottom: 10px;
+	 padding: 0 10px;
+	/* background: url("images/hub-arrow-right.png") no-repeat 90% top #ed8e01;*/
+}
+
+#content .hub ul.settings li a{
+    color: white;
+    font-family: Arial Black, arial, sans-serif;
+    font-size: large;
+    font-weight: normal;
+}
+
+#content .hub form input.button.submit {
+	 font-family: Arial Black, arial, sans-serif;
+    font-size: small;
+    font-weight: normal;
+	 color: #333;
+	 margin-top: 10px;
+}
+
+.hub .settings .twitter, .hub .settings .facebook, .hub .settings .general {
+   /* border: 1px solid red;*/
 }
