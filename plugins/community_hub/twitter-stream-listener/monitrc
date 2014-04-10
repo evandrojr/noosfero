@@ -1,5 +1,0 @@
-set daemon  5
-
-check process ruby with pidfile /var/run/twitter_stream.pid
-       start = "/home/93274300500/projetos/noosfero/plugins/community_hub/twitter-stream-listener/stream_monitor start"
-       stop = "/home/93274300500/projetos/noosfero/plugins/community_hub/twitter-stream-listener/stream_monitor stop"
