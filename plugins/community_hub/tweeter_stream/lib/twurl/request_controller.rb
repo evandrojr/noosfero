@@ -1,3 +1,5 @@
+require "json"
+
 module Twurl
   class RequestController < AbstractCommandController
     NO_URI_MESSAGE = "No URI specified"
@@ -11,7 +13,9 @@ module Twurl
 
     def perform_request
       client.perform_request_from_options(options) { |response|
-        response.read_body { |chunk| Stream.print chunk }
+          response.read_body { |chunk| parsed = JSON.parse(chunk)
+                              print parsed["text"] + "\n"
+          }
       }
     rescue URI::InvalidURIError
       Stream.puts NO_URI_MESSAGE
