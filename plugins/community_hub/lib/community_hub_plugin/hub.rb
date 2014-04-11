@@ -6,6 +6,9 @@ class CommunityHubPlugin::Hub < Folder
   settings_items :promoted_users, :type => Array, :default => []
   settings_items :pinned_posts, :type => Array, :default => []
 
+  def initialize(my_var)
+    raise "ola".inspect
+  end
   
   def self.icon_name(article = nil)
     'community-hub'
@@ -25,11 +28,6 @@ class CommunityHubPlugin::Hub < Folder
 
   def view_page
     "content_viewer/hub.rhtml"
-  end
-  
-  
-  def start_twitter_service.self
-    #Twurl::Stream.run('popcorntime,time4popcorn,nba', '/root/.twurlrc')
   end
 
 end
