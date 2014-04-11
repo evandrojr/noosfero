@@ -225,6 +225,10 @@
     font-weight: normal;
 }
 
+#content .hub ul.settings li a:hover {
+	 text-decoration: none;
+}
+
 #content .hub form input.button.submit {
 	 font-family: Arial Black, arial, sans-serif;
     font-size: small;
