@@ -15,7 +15,7 @@ module CommunityHubPlugin::HubHelper
   end
 
   def mediator?(hub)
-    true
+    false
   end
 
 end

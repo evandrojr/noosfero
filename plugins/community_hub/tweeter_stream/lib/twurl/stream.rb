@@ -13,8 +13,9 @@ module Twurl
     class << self
       attr_accessor :output
 
-      def run(tags, config_file_path, proxy=nil)
+      def run(page, tags, config_file_path, proxy=nil)
         begin
+            @page = page # maybe should not be a class variable
             @@file_path = config_file_path
             Twurl.options         = Options.new
             Twurl.options.command = 'request' # Not necessary anymore
@@ -29,6 +30,7 @@ module Twurl
             Twurl.options.path="/1.1/statuses/filter.json"
             Twurl.options.host="stream.twitter.com"
             Twurl.options.read_timeout= 0
+            
         rescue NoPathFound => e
           exit
         end
@@ -39,6 +41,10 @@ module Twurl
         @@file_path
       end
 
+      def page 
+        @page
+      end
+      
       def dispatch(options)
         client     = OAuthClient.load_from_options(options)
         controller = RequestController

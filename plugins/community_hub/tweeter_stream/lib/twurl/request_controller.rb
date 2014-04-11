@@ -18,9 +18,17 @@ module Twurl
             #unless chunk.to_i.length = 0 
               begin
                 parsed = JSON.parse(chunk)
-                print "@#{parsed["user"]["name"]} said: #{parsed["text"]}  \n"
+#                print "@#{parsed["user"]["name"]} said: #{parsed["text"]}  \n"
+                comment = Comment.new
+                comment.source_id = Stream.page.id
+                comment.body = parsed["text"]
+                comment.author_id = "54"
+                comment.save!     
               rescue
-              end
+              end  
+                #raise comment.inspect
+#              rescue
+#              end
             #end  
           }
       }

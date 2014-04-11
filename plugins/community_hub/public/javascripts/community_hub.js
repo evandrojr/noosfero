@@ -208,8 +208,8 @@ $(document).ready(function(){
 
   //checkUserLevel();
 
-  //setInterval(checkNewLivePosts, 10000); //10 seconds interval
-  setInterval(checkNewMediationPosts, 10000); //10 seconds interval
+  setInterval(checkNewLivePosts, 10000); //10 seconds interval
+  //setInterval(checkNewMediationPosts, 10000); //10 seconds interval
   //setInterval(checkUserLevel, 10000); //10 seconds interval
 
 });
