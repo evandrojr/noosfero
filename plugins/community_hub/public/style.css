@@ -1,3 +1,8 @@
+#hub-loading {
+  margin-top: 18px;
+  float: right;
+}
+
 .icon-newcommunity-hub,
 .icon-community-hub {
   background-image: url(/plugins/community_hub/icons/community-hub.png)

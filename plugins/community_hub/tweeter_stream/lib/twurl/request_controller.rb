@@ -13,8 +13,15 @@ module Twurl
 
     def perform_request
       client.perform_request_from_options(options) { |response|
-          response.read_body { |chunk| parsed = JSON.parse(chunk)
-                              print parsed["text"] + "\n"
+          response.read_body { |chunk|
+#            print "#{chunk}\n"
+            #unless chunk.to_i.length = 0 
+              begin
+                parsed = JSON.parse(chunk)
+                print "@#{parsed["user"]["name"]} said: #{parsed["text"]}  \n"
+              rescue
+              end
+            #end  
           }
       }
     rescue URI::InvalidURIError

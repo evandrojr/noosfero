@@ -20,9 +20,7 @@ module Twurl
             Twurl.options.command = 'request' # Not necessary anymore
             Twurl.options.data = {"track"=>tags}
 #           Twurl.options.proxy = 'http://161.148.1.167:312' # Use for production mode at SERPRO           
-            if !proxy.nil?
-              Twurl.options.proxy = proxy
-            end  
+            Twurl.options.proxy = proxy unless proxy.nil?
             Twurl.options.trace   = false
             Twurl.options.headers = {}
             Twurl.options.subcommands=[]
