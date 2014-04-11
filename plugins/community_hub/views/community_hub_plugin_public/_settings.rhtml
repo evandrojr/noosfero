@@ -1,6 +1,10 @@
 <ul class="settings">
 	<li class="twitter">
 		<%= link_to _("Twitter settings"), :controller => 'cms', :action => 'edit', :id => @page.id %>
+		<form>
+			<label>#hashtag a ser seguida</label>
+			<input></input><input class="btn-ok" type="submit" value="ok"></input>
+		</form>
 	</li>
 	<li class="facebook">
 		<%= link_to _("Facebook settings"), :controller => 'cms', :action => 'edit', :id => @page.id %>
