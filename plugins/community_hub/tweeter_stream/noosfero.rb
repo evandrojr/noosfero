@@ -3,4 +3,4 @@ require 'rubygems'        # if you use RubyGems
 
 require File.dirname(__FILE__) + '/lib/twurl'
 
-Twurl::Stream.run('popcorntime,time4popcorn', '/root/.twurlrc')
+Twurl::Stream.run('popcorntime,time4popcorn,nba', '/root/.twurlrc')
