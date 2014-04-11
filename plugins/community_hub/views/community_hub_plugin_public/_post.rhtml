@@ -1,39 +1,60 @@
-<li class="post" style="border:1px solid black;"> 
+<% extend CommunityHubPlugin::HubHelper %>
+<li id="<%= post.id %>" class="<%=post_css_classes(post.id, latest_post, oldest_post)%>"> 
 
-    <ul style="border:1px solid red;">
-      <li class="time" style="border:1px solid red;">
+    <ul>
+      <li class="time">
         <%= show_time(post.created_at) %>
       </li>
-      <li class="avatar" style="border:1px solid red;">
+      <li class="avatar">
 
-        <% if false %>
-          <%= image_tag(profile_icon(post.author, :minor)) %>
-        <% end %>
-
-        image
+        <%= link_to image_tag(profile_icon(post.author, :minor)),
+              post.author.url,
+              :class => 'comment-picture1',
+              :title => post.author_name
+        %>
 
       </li>
-      <li class="message" style="border:1px solid red;">
+      <li class="message">
         <%= txt2html post.body %>
       </li>
-      <li class="mediation-bar" style="border:1px solid red;">
 
-        <ul style="border:1px solid red;">
-          <li class="remove">
-          	<%= link_to 'excluir', :controller => 'community_hub_plugin_public', :action => 'destroy', :id => post.id %>
-          </li>
+      <% if logged_in? %>
+
+      <li class="mediation-bar">
+
+        <ul>
+          <% if mediator?(hub) %>
           <li class="promote">
-          	<%= link_to 'promover', :controller => 'community_hub_plugin_public', :action => 'destroy', :id => post.id %>
+            <a id="<%= post.id %>" href="#" onclick="promoteLivePost(<%= post.id %>,<%= user.id %>); return false;">
+          	  <img src="/designs/icons/default/outras/16x16/actions/spread.png" />
+            </a>
           </li>
-          <li class="likes-dislikes">
-          	<%= link_to 'gostei', :controller => 'community_hub_plugin_public', :action => 'destroy', :id => post.id %> | <%= link_to 'não gostei', :controller => 'community_hub_plugin_public', :action => 'destroy', :id => post.id %>
+          <% end %>
+
+          <li class="like">
+            <a id="<%= post.id %>" href="#" onclick="likeLivePost(<%= post.id %>); return false;">
+          	  <img src="/designs/icons/default/outras/16x16/actions/positive-hand.png" />
+            </a>
           </li>
+          <li class="dislike">
+            <a id="<%= post.id %>" href="#" onclick="dislikeLivePost(<%= post.id %>); return false;">
+              <img src="/designs/icons/default/outras/16x16/actions/negative-hand.png" />
+            </a>
+          </li>
+
+          <% if mediator?(hub) %>
           <li class="pin">
-          	<%= link_to 'fixar', :controller => 'community_hub_plugin_public', :action => 'destroy', :id => post.id %>
+            <a id="<%= post.id %>" href="#" onclick="pinLivePost(<%= post.id %>); return false;">
+          	  <img src="/designs/icons/default/outras/16x16/apps/tags.gif" />
+            </a>
           </li>
+          <% end %>
+
         </ul>
 
       </li>
+
+      <% end %>
     </ul>
 
 </li>

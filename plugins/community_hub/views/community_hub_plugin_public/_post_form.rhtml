@@ -1,12 +1,12 @@
     <% if user_role == 'visitor' %>
 
       <% remote_form_for( :comment, 
-                          CommunityHubPlugin::HubStreamPost.new, 
+                          Comment.new, 
                           :url => {
-                            :profile => profile.identifier, 
+                            :profile => hub.profile.identifier, 
                             :controller => 'comment', 
                             :action => 'create', 
-                            :id => @page.id
+                            :id => hub.id
                           }, 
                           :html => { :class => 'comment_form' } ) do |f| %>
 
@@ -26,7 +26,7 @@
 
     <% end %>
 
-    <% if user_role == 'admin' %>
+    <% if user_role == 'mediator' %>
 
       <%= render :file => 'shared/tiny_mce' %>
 
@@ -41,7 +41,7 @@
                             :type => 'TinyMceArticle',
                             :success_back_to => "",
                             :q => "",
-                            :parent_id => @page.id,
+                            :parent_id => hub.id,
                             :back_to => "" 
                           }, 
                           :before => "tinymce.triggerSave(); setMediationTimestamp()",
@@ -58,7 +58,7 @@
       <%= f.hidden_field :allow_members_to_edit, :value => 0 %>
       <%= f.hidden_field :abstract, :value => "" %>
       <%= f.hidden_field :display_hits, :value => 0 %> 
-      <%= f.hidden_field :parent_id, :value => @page.id %>
+      <%= f.hidden_field :parent_id, :value => hub.id %>
       <%= f.hidden_field :name %>
       <%= f.hidden_field :published, :value => true %>
       <%= f.hidden_field :license_id, :value => "" %>
@@ -73,7 +73,7 @@
                         :placeholder => _('Type your message for mediation here')) %>
         </div>
         <div>
-          <%= submit_button('add', _('Post'))%>
+          <%= submit_button('add', _('Post'), :onclick => "send_post_for_mediation(this); return false;")%>
         </div>
       </div>       
 
