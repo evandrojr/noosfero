@@ -2,11 +2,11 @@ require 'rubygems'
 require 'koala'
 require 'json'
 
+#Aviso 12/04/2014
 #token que só deverá expirar em 59 dias
 @graph = Koala::Facebook::API.new('CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH')
 
-#feed = @graph.get_connections("participabr", "posts") 
-
+#feed = @graph.get_connections("participabr", "posts")
 
 comentariosIniciais = []
 comentariosExtraidos = []
@@ -14,13 +14,13 @@ comentariosNovos = []
 
 primeiraVez = true
 
-while true 
+while true
 
-	feed = @graph.get_connections("mundoreagindo", "posts") 
+	feed = @graph.get_connections("mundoreagindo", "posts")
 
 	array = []
 	comentariosExtraidos = []
-	feed.each {|f| 
+	feed.each {|f|
 		if f['comments'] != nil && f['comments']['data'] != nil
 			array.push(f['comments']['data'])
 		end
@@ -35,7 +35,7 @@ while true
 	comentariosExtraidos = comentariosExtraidos.uniq
 
 	if primeiraVez
-		comentariosIniciais=comentariosExtraidos.clone 
+		comentariosIniciais=comentariosExtraidos.clone
 		primeiraVez = false
 	end
 
@@ -45,7 +45,7 @@ while true
 
 	comentariosNovos =  comentariosExtraidos - comentariosIniciais
 	comentariosNovos = comentariosNovos.uniq
-	comentariosIniciais += comentariosNovos 
+	comentariosIniciais += comentariosNovos
 	comentariosIniciais = comentariosIniciais.uniq
 	comentariosNovos.each{|comentario|
 		puts comentario

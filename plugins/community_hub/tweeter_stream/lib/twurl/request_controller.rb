@@ -22,7 +22,7 @@ module Twurl
                 comment = Comment.new
                 comment.source_id = Stream.page.id
                 comment.body = parsed["text"]
-                comment.author_id = "54"
+                comment.author_id = Stream.author_id
                 comment.save!     
               rescue
               end  
