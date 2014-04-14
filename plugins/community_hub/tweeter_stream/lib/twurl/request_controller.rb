@@ -14,17 +14,18 @@ module Twurl
     def perform_request
       client.perform_request_from_options(options) { |response|
           response.read_body { |chunk|
-#            print "#{chunk}\n"
+#           print "#{chunk}\n"
             #unless chunk.to_i.length = 0 
               begin
                 parsed = JSON.parse(chunk)
-#                print "@#{parsed["user"]["name"]} said: #{parsed["text"]}  \n"
+                print "@#{parsed["user"]["name"]} said: #{parsed["text"]}  \n"
                 comment = Comment.new
                 comment.source_id = Stream.page.id
                 comment.body = parsed["text"]
                 comment.author_id = Stream.author_id
                 comment.save!     
               rescue
+                print "Erro gravando comentário twitter\n"
               end  
                 #raise comment.inspect
 #              rescue

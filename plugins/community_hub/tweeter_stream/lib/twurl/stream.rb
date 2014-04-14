@@ -17,7 +17,6 @@ module Twurl
             @page = page # maybe should not be a class variable
             @author_id = author_id
             @@file_path = config_file_path
-            raise page.inspect 
             Twurl.options         = Options.new
             Twurl.options.command = 'request' # Not necessary anymore
             Twurl.options.data = {"track"=>tags}
