@@ -1,5 +1,6 @@
 var latest_post_id = 0;
 var oldest_post_id = 0;
+live_scroll_position = 0;
 
 function toogle_mediation_comments(mediation) {
   jQuery("#mediation-comment-list-" + mediation ).toggle();
@@ -153,7 +154,7 @@ function update_mediations() {
     }
   });
 
-  setTimeout(update_mediations, 10000);  
+  setTimeout(update_mediations, 7000);  
 }
 
 
@@ -176,6 +177,12 @@ function update_live_stream() {
     success: function(data) {
       if (data.trim().length > 0) {
         jQuery("#live-posts").prepend(data);
+        if (jQuery("#auto_scrolling").attr('checked')) {
+          jQuery("#live-posts").scrollTop(0); 
+        }
+        else {
+          jQuery("#live-posts").scrollTop(live_scroll_position);
+        }
       }
     },
     error: function(ajax, stat, errorThrown) {
@@ -188,6 +195,10 @@ function update_live_stream() {
 
 
 jQuery(document).ready(function() {
+  jQuery("#live-posts").scroll(function() {
+    live_scroll_position = jQuery("#live-posts").scrollTop();
+  });
+
   setTimeout(update_live_stream, 5000);
-  setTimeout(update_mediations, 10000);
+  setTimeout(update_mediations, 7000);
 });
