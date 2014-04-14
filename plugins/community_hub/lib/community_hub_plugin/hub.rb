@@ -27,7 +27,7 @@ class CommunityHubPlugin::Hub < Folder
   end
 
   def self.twitter_service(page, action)
-      action=:start
+      author_id = 54
       if action==:start 
         thread = Thread.new {
            Twurl::Stream.run(page, author_id,'torrent', File.dirname(__FILE__) + '/../../tweeter_stream/config/.twurlrc')
@@ -37,7 +37,7 @@ class CommunityHubPlugin::Hub < Folder
   end
   
   def self.facebook_service(page, action)
-      action=:start
+      author_id = 54
       page_id="mundoreagindo"
       if action==:start 
         thread = Thread.new {
