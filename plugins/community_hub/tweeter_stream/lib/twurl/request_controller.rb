@@ -20,7 +20,7 @@ module Twurl
               begin
                 parsed = JSON.parse(chunk)
                 ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')
-                comment_text = ic.iconv("@#{parsed["user"]["name"]} " + _('said:') + " #{parsed["text"]}" + ' ')[0..-2]
+                comment_text = ic.iconv("@#{parsed["user"]["name"]} " + _('said') + ": #{parsed["text"]}" + ' ')[0..-2]
                 print "#{comment_text}\n"
                 comment = Comment.new
                 comment.source_id = Stream.page.id

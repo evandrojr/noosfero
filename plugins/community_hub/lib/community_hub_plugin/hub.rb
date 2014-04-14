@@ -33,24 +33,24 @@ class CommunityHubPlugin::Hub < Folder
     true
   end
 
-  def self.twitter_service(page, action)
-      author_id = 54
-      if action==:start 
-        thread = Thread.new {
-           Twurl::Stream.run(page, author_id,'torrent', File.dirname(__FILE__) + '/../../tweeter_stream/config/twurlrc')
-       } unless@@twitter_thread_started
-       @@twitter_thread_started = true
-      end
+  def self.twitter_service(hub, action)
+#      author_id = 54
+#      if action==:start 
+#        thread = Thread.new {
+#           Twurl::Stream.run(hub, author_id,'torrent', File.dirname(__FILE__) + '/../../tweeter_stream/config/twurlrc')
+#       } unless@@twitter_thread_started
+#       @@twitter_thread_started = true
+#      end
   end
   
-  def self.facebook_service(page, action)
+  def self.facebook_service(hub, action)
       author_id = 54
       page_id="mundoreagindo"
       if action==:start 
-        thread = Thread.new {
-           #facebook_comments(page, author_id, page_id, pooling_time=5, token='CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH')          
-           facebook_comments(page, author_id, page_id)
-        } unless@@facebook_thread_started
+       #facebook_comments(page, author_id, page_id, pooling_time=5, token='CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH')          
+       thread = Thread.new {
+           facebook_comments(hub, author_id, page_id)
+       } unless@@facebook_thread_started
        @@facebook_thread_started = true
       end
   end

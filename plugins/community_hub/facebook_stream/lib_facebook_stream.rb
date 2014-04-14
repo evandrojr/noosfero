@@ -7,11 +7,12 @@ require 'json'
 #'CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH'
 # BACKUP TOKEN 'CAAEhsewl0ZAcBAHhipXszZCURSwWLmgvceDbs9mB5baJdLriFxYMEzywmF2fvZBuThuA2Mm7QF8wPd3E6R5pVqVEnC2VhcBb4VrfAnkZC73ZC5g1NRUnKZCB2e6CaRiUBDatR2nf505PeKp7Aj5XxvTdfSqdZCsXxQFYZApPNSUUgkUWm6HwL4rp21MRJXb612sZD'
 
-def facebook_comments(hub_id, author_id, page_id="participabr", pooling_time=5, token='CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH')
+def facebook_comments(hub, author_id, page_id="participabr", pooling_time=5, token='CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH')
+  
+  #raise hub.id.inspect
   @graph = Koala::Facebook::API.new(token)
   initialComments = []
   extractedComments = []
-  newComments = []
   firstTime = true
   while true
       feed = @graph.get_connections(page_id, "posts")
@@ -24,7 +25,7 @@ def facebook_comments(hub_id, author_id, page_id="participabr", pooling_time=5, 
       }
       array.each{ |comments|
         comments.each{|comment|
-          extractedComments.push("#{comment['from']['name']} " + _("said:")  + " : #{comment['message']}")
+          extractedComments.push("#{comment['from']['name']} " + _("said")  + ": #{comment['message']}")
         }					
       }
       extractedComments = extractedComments.uniq
@@ -34,12 +35,12 @@ def facebook_comments(hub_id, author_id, page_id="participabr", pooling_time=5, 
       end
       newComments =  extractedComments - initialComments
       newComments = newComments.uniq
-      initialCommentsinitialComments += newComments
+      initialComments += newComments
       initialComments = initialComments.uniq
       newComments.each{|comment|
                 puts comment
                 noosferoComment = Comment.new
-                noosferoComment.source_id = hub_id
+                noosferoComment.source_id = hub.id
                 noosferoComment.body = comment
                 noosferoComment.author_id = author_id
                 noosferoComment.save!             
