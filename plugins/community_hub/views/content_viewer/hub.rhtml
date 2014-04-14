@@ -33,78 +33,36 @@
 
   <div class="form">
 
-    <% if !mediator?(@page.id) %>
+    <% if !mediator?(@page) %>
 
-      <form action="/profile/<%=profile.identifier%>/comment/create/<%=@page.id%>" 
-            class="comment_form" 
-            method="post">
+      <% form_for :message, 
+                  :method => 'post',
+                  :url => {
+                    :controller => 'community_hub_plugin_public', 
+                    :action => 'new_message',
+                    :article_id => @page.id
+                  } do |f| %>
+        <span><%= _("Streaming") %></span>
+        <br />
+        <%= f.text_area :body, :style => "width: 99%;", :cols => "38", :rows => "10", :placeholder => _("Type your message here") %>
+        <%= submit_button('add', _('Post'), :onclick => 'new_message(this); return false;') %>
+      <% end %>
 
-        <div>
-          <span>Streaming</span>
-        </div>
-        <div>
-          <textarea cols="38" 
-                    id="comment_body" 
-                    name="comment[body]" 
-                    placeholder="Type your message here" 
-                    rows="10" 
-                    style="width: 99%;"></textarea>
-        </div>
-        <div>
-          <input class="button with-text icon-add submit" 
-                 name="commit" 
-                 onclick="send_message_for_stream(this); return false;" 
-                 type="submit" 
-                 value="Post">
-        </div>
-
-      </form>
-
-    <% end %>
-
-    <% if mediator?(@page.id) %>
+    <% else %>
 
       <%= render :file => 'shared/tiny_mce' %>
 
-      <% category_ids = [] %>
-
-    <form action="/myprofile/<%=profile.identifier%>/cms/new?back_to=&parent_id=<%=@page.id%>&q=&success_back_to=&type=TinyMceArticle" 
-          class="comment_form" 
-          method="post"> 
-
-      <input id="article_moderate_comments" name="article[moderate_comments]" type="hidden" value="0" /> 
-      <input id="article_translation_of_id" name="article[translation_of_id]" type="hidden" value="" />
-      <input id="article_notify_comments" name="article[notify_comments]" type="hidden" value="0" />
-      <input id="article_accept_comments" name="article[accept_comments]" type="hidden" value="1" />
-      <input id="article_tag_list" name="article[tag_list]" type="hidden" value="" />
-      <input id="article_display_versions" name="article[display_versions]" type="hidden" value="0" />
-      <input id="article_allow_members_to_edit" name="article[allow_members_to_edit]" type="hidden" value="0" />
-      <input id="article_abstract" name="article[abstract]" type="hidden" value="" />
-      <input id="article_display_hits" name="article[display_hits]" type="hidden" value="0" /> 
-      <input id="article_parent_id" name="article[parent_id]" type="hidden" value="446" />
-      <input id="article_name" name="article[name]" type="hidden" />
-      <input id="article_published" name="article[published]" type="hidden" value="true" />
-      <input id="article_license_id" name="article[license_id]" type="hidden" value="" />
-      <input id="article_category_ids_" name="article[category_ids][]" type="hidden" value="" /> 
-      <input id="article_language" name="article[language]" type="hidden" value="en" />
-
-      <textarea class="mceEditor" 
-                cols="40" 
-                id="article_body" 
-                name="article[body]" 
-                placeholder="Type your message for mediation here" 
-                rows="20" 
-                style="width: 99%;"
-                aria-hidden="true">
-      </textarea>
-
-      <input class="button with-text icon-add submit" 
-             name="commit" 
-             onclick="send_post_for_mediation(this); return false;" 
-             type="submit" 
-             value="Post" />
-
-    </form>
+      <% form_for :article, 
+                  :method => 'post',
+                  :url => {
+                    :controller => 'community_hub_plugin_public', 
+                    :action => 'new_mediation', 
+                    :profile_id => profile.id 
+                  } do |f| %>
+        <%= f.hidden_field :parent_id, :value => @page.id %>
+        <%= f.text_area :body, :style => "width: 100%;", :class => "mceEditor" %>
+        <%= submit_button('add', _('Post'), :onclick => 'new_mediation(this); return false;') %>
+      <% end %>
 
     <% end %>
 
@@ -112,10 +70,13 @@
 
   <% end %>
 
-  <% if logged_in? %>
-  <div class="settings">
+  <% if mediator?(@page) %>
     <%= render :partial => "community_hub_plugin_public/settings" %>
-  </div>
+  <% else %>
+    <%= render :partial => "community_hub_plugin_public/banner" %>
+    <%= render :partial => "community_hub_plugin_public/embed" %>
   <% end %>
 
 </div>
+
+<%= javascript_include_tag '/plugins/community_hub/javascripts/community_hub.js' %>

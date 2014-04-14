@@ -3,12 +3,19 @@ require File.dirname(__FILE__) + '/../../facebook_stream/lib_facebook_stream'
 
 class CommunityHubPlugin::Hub < Folder
 
+ @@twitter_thread_started = false #change to hash
+ @@facebook_thread_started = false #change to hash
+  
   settings_items :hashtags_twitter, :type => :string, :default => ""
-  settings_items :promoted_users, :type => Array, :default => []
-  settings_items :pinned_posts, :type => Array, :default => []
+  settings_items :twitter_enabled, :type => :boolean, :default => false
+  settings_items :facebook_enabled, :type => :boolean, :default => false
+  settings_items :pinned_messages, :type => Array, :default => []
+  settings_items :pinned_mediations, :type => Array, :default => []
+  settings_items :mediators, :type => Array, :default => []
 
- @@twitter_thread_started = false
- @@facebook_thread_started = false
+  before_create do |hub|
+    hub.mediators = [hub.author.id]
+  end
   
   def self.icon_name(article = nil)
     'community-hub'
@@ -42,17 +49,13 @@ class CommunityHubPlugin::Hub < Folder
       if action==:start 
         thread = Thread.new {
            #facebook_comments(page, author_id, page_id, pooling_time=5, token='CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH')          
-#           raise "entrou".inpect
            facebook_comments(page, author_id, page_id)
         } unless@@facebook_thread_started
        @@facebook_thread_started = true
       end
   end
-
-
   
   def view_page
     "content_viewer/hub.rhtml"
   end
-
 end

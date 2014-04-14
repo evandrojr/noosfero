@@ -1,5 +1,5 @@
 #hub-loading {
-  margin-top: 18px;
+  /*margin-top: 18px;*/
   float: right;
 }
 
@@ -31,7 +31,7 @@
 	font-size: 14px;
 }
 
-.hub .post{
+.hub .post {
 	border-bottom: 1px solid #ddd !important;
 	background: url("images/hub-time-bg.gif") repeat-y	left top #fff;
 }
@@ -59,21 +59,24 @@
     width: 70%;
 }
 
-.hub .mediation-bar{
-    display: inline-block;
-    margin: 10px 0 10px 104px;
-    width: 70%;
+.hub .message .author {
+  font-weight: bold;
+}
 
+.hub .mediation-bar {
+  display: inline-block;
+  margin: 10px 0 10px 104px;
+  width: 70%;
 }
 
 .hub .mediation-bar ul {}
 
 .hub .mediation-bar ul li {
-    display: inline-block;
-    margin-right: 5px;
-    overflow: hidden;
-    text-indent: -1000px;
-    width: 16px;
+  display: inline-block;
+  /*margin-right: 5px;*/
+  overflow: hidden;
+  /*text-indent: -1000px;*/
+  width: 16px;
 }
 
 .hub .mediation-bar ul li.likes-dislikes{
@@ -93,12 +96,22 @@
 	text-indent: -10000px;
 }
 
-.hub .promote{
+.hub .promote {
 	background: url("images/hub-promote-icon.png") no-repeat center center #fff;
 }
 
-.hub .pin{
+.hub .promote .not-promoted {
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
+
+.hub .pin {
 	background: url("images/hub-pin-icon.png") no-repeat center center #fff;
+}
+
+.hub .pin .not-pinned {
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 
 .hub .mediation-bar ul li.pin {
@@ -201,21 +214,56 @@
     float: left;
     width: 49%;
 }
-.hub .settings {
-   /* border: 1px solid red;*/
-}
 
 .hub div.settings {
     float: right;
     width: 50%;
 }
 
-.hub ul.settings li{
+.hub ul.settings li {
     height: 50px;
     line-height: 50px;
     margin-bottom: 10px;
-	 padding: 0 10px;
-	/* background: url("images/hub-arrow-right.png") no-repeat 90% top #ed8e01;*/
+	padding: 0 10px;
+	background: url("images/hub-arrow-right.png") no-repeat 90% top #ed8e01;
+}
+
+.hub ul.settings span.collapse {
+    padding-right: 0.5em;
+    float: right;
+}
+
+.hub div.banner {
+  width: 50%;
+  height: 100px;
+  background-color: #6d6d6d;
+  float: right;
+  text-align: center;
+}
+
+.hub div.banner span {
+  color: white;
+  font-family: Arial Black, arial, sans-serif;
+  font-size: large;
+  font-weight: normal;
+  margin-top: 35px;
+  display: block;
+}
+
+.hub div.embed {
+  margin-top: 10px;
+  padding: 8px;
+  width: 48%;
+  height: 216px;
+  border: 1px solid #c0c0c0;
+  float: right;
+}
+
+.hub div.embed textarea.code {
+  background-color: #f0f0f0;
+  border: 1px solid #f0f0f0;
+  height: 195px;
+  resize: none;
 }
 
 #content .hub ul.settings li a{
