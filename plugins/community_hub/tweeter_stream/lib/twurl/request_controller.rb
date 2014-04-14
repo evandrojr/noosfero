@@ -1,4 +1,5 @@
 require "json"
+require 'iconv'
 
 module Twurl
   class RequestController < AbstractCommandController
@@ -18,10 +19,12 @@ module Twurl
             #unless chunk.to_i.length = 0 
               begin
                 parsed = JSON.parse(chunk)
-                print "@#{parsed["user"]["name"]} said: #{parsed["text"]}  \n"
+                ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')
+                comment_text = ic.iconv("@#{parsed["user"]["name"]} " + _('said:') + " #{parsed["text"]}" + ' ')[0..-2]
+                print "#{comment_text}\n"
                 comment = Comment.new
                 comment.source_id = Stream.page.id
-                comment.body = parsed["text"]
+                comment.body = comment_text
                 comment.author_id = Stream.author_id
                 comment.save!     
               rescue
