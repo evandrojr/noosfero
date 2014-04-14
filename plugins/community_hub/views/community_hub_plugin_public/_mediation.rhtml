@@ -1,0 +1,74 @@
+<% extend CommunityHubPlugin::HubHelper %>
+
+<li id="<%= mediation.id %>" class="<%=post_css_classes(mediation.id, latest_post, oldest_post)%>"> 
+
+  <ul>
+    <li class="time"><%= post_time(mediation.created_at) %></li>
+    <li class="avatar"><%= image_tag(profile_icon(mediation.author, :minor)) %></li>
+    <li class="message"><span class="author"><%= mediation.author_name %>:</span> <%= mediation.body %></li>
+    
+    <% if mediator?(hub) %>
+    <li class="mediation-bar">
+
+      <ul>
+        
+        <li class="promote">
+          <% if !promoted?(hub, mediation.author.id) %>
+          <a id="<%= mediation.id %>" href="#" onclick="promote_user(<%= mediation.author.id %>); return false;">
+            <img class="promoted" src="/designs/icons/default/outras/16x16/actions/spread.png" />
+          </a>
+          <% else %>
+            <img class="not-promoted" src="/designs/icons/default/outras/16x16/actions/spread.png" />
+          <% end %>
+        </li>
+
+        <% if pinned_mediation?(hub, mediation.id) %>
+        <li class="pin">
+          <img class="pinned" src="/designs/icons/default/outras/16x16/apps/tags.gif" />
+        </li>
+        <% end %>
+
+      </ul>
+
+    </li>
+    <% end %>
+
+  </ul>
+
+    <% total_mediation_comments = mediation.comments.count %>
+
+    <span>
+      <%= link_to(_( "#{total_mediation_comments} Comments" ) , '#', 
+            :class => 'display-comment-form', 
+            :id => 'top-post-comment-button', 
+            :onclick => "toogle_mediation_comments(#{mediation.id}); return false;") %>
+    </span>
+
+    <script type="text/javascript">
+      setTimeout(function() { update_mediation_comments('<%= mediation.id %>')}, 5000);
+    </script>
+    
+    <ul id="mediation-comment-list-<%=mediation.id%>" class="mediation-comment-list" style="display:none;">
+    <% if mediation.accept_comments? && mediation.comments.count > 0 %>
+      <%= render :partial => 'community_hub_plugin_public/mediation_comment', :collection => mediation.comments %>
+    <% end %>
+    </ul>
+
+    <% if logged_in? && mediation.accept_comments? %>
+     <div id='mediation-comment-form-<%=mediation.id%>' class='mediation-comment-form' style="display:none;">
+        <%= render :partial => 'community_hub_plugin_public/mediation_comment_form',
+                   :locals => {
+                      :hub => hub,
+                      :mediation => mediation,
+                      :comment => Comment.new, 
+                      :url => {
+                        :controller => :comment, 
+                        :action => :create
+                      }, 
+                      :display_link => true, 
+                      :cancel_triggers_hide => true
+                   } %>
+      </div>
+    <% end %>
+
+</li>

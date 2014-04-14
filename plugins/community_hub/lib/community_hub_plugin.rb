@@ -12,10 +12,6 @@ class CommunityHubPlugin < Noosfero::Plugin
     true
   end
 
-  def js_files
-    'javascripts/community_hub.js'
-  end
-
   def content_types
     if context.respond_to?(:params) && context.params
       types = []

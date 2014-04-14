@@ -12,6 +12,14 @@
     <%= required labelled_form_field(_('Description'), text_area(:article, 'body', :style => 'width: 99%;')) %>
   </div>
 
+  <br />
+
+  <%= check_box(:article, :twitter_enabled) %> <span><%= _("Turn on TWITTER") %></span>
+
   <span><%= labelled_form_field(_('Hashtags (TWITTER)'), text_field(:article, 'hashtags_twitter')) %></span>
+
+  <br />
+
+  <%= check_box(:article, :facebook_enabled) %> <span><%= _("Turn on FACEBOOK") %></span>
 
 </div>

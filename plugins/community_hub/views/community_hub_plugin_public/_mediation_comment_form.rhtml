@@ -1,0 +1,13 @@
+<% form_for :message, 
+            :method => 'post',
+            :url => {
+              :controller => 'community_hub_plugin_public', 
+              :action => 'new_message',
+              :article_id => mediation.id
+            } do |f| %>
+  <%= f.text_area(:body, 
+                  :style => 'width: 97%;',
+                  :rows => 4,
+                  :placeholder => _('Type your comment here')) %>
+  <%= submit_button('add', _('Post'), :onclick => 'new_message(this); return false;') %>
+<% end %>

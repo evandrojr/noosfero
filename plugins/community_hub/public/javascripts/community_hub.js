@@ -1,351 +1,193 @@
-var $ = jQuery;
 var latest_post_id = 0;
 var oldest_post_id = 0;
 
+function toogle_mediation_comments(mediation) {
+  jQuery("#mediation-comment-list-" + mediation ).toggle();
+  jQuery("#mediation-comment-form-" + mediation ).toggle();
+}
 
-function hub_open_loading() {
+
+function hub_open_loading(button) {
   var html = '<div id="hub-loading">' +
                '<img src="/images/loading-small.gif" />' +
              '</div>';
 
-   $('.hub .form .submit').after(html);
-   $('#hub-loading').fadeIn('slow');
+   //$('.hub .form .submit').after(html);
+   jQuery(button).after(html);
+   jQuery('#hub-loading').fadeIn('slow');
 }
 
 
 function hub_close_loading() {
-  $('#hub-loading').fadeOut('slow', function() {
-    $('#hub-loading').remove();
+  jQuery('#hub-loading').fadeOut('slow', function() {
+    jQuery('#hub-loading').remove();
   });
 }
 
 
-function send_message_for_stream(button) {
+function new_message(button) {
+  var form = jQuery(button).parents("form");
 
-  var $button = $(button);
-  var form = $button.parents("form");
-
-  hub_open_loading();
-
-  $.post(form.attr("action"), form.serialize(), function(data) {
-    console.log(data);
-    $("#comment_body").val('');
-    hub_close_loading();
+  //hub_open_loading();
+  jQuery.post(form.attr("action"), form.serialize(), function(data) {
+    if (data.ok) {
+      jQuery("#message_body").val('');
+    }
+    //hub_close_loading();
   }, 'json');
+
 }
 
-function send_post_for_mediation(button) {
-  var $ = jQuery;
-  open_loading(DEFAULT_LOADING_MESSAGE);
-  var $button = $(button);
-  var form = $button.parents("form");
-  $button.addClass('stream-post-button-loading');
-  setMediationTimestamp();
-  $.post(form.attr("action"), form.serialize(), function(data) {
-    tinymce.get('article_body').setContent('');
-    close_loading();
-    $button.removeClass('stream-post-button-loading');
-    $button.enable();
-  });
-}
 
-function clearMediationForm(element) {
-  alert(element);
-}
+function new_mediation(button) {
+  var form = jQuery(button).parents("form");
 
-function setMediationTimestamp() {
-  var now = new Date().getTime();
-  var timestamp = 'hub-mediation-' + now.toString();
-  $("#article_name").val(timestamp);
-  console.log('teste!!!!!!!!!!!');
-}
-
-function loadPosts(section) {
-
-  var url;
-  var container; 
-
-  switch(section) {
-    case 'live':
-      url = '/plugin/community_hub/public/newer_comments';
-      container = $("#live-posts");
-      break;
-    case 'mediation':
-      url = '/plugin/community_hub/public/newer_articles';
-      container = $("#mediation-posts");
-      break;
-  }
-
-  $.ajax({
-    url: url,
-    success: function(data) { 
-      container.append(data);
-    },
-    error: function(ajax, stat, errorThrown) {
-      console.log(stat);
+  //hub_open_loading();
+  tinymce.triggerSave();
+  jQuery.post(form.attr("action"), form.serialize(), function(data) {
+    if (data.ok) {
+      tinymce.get('article_body').setContent('');
     }
-  });
+    //hub_close_loading();
+  }, 'json');
 
 }
 
-function hub() {
-  //checkNewPosts('live');
-  //checkNewPosts('mediation');
-}
-
-function checkNewPosts(postType) {
-
-  var url = '';
-  var container;
-
-  console.log(postType);
-
-  switch (postType) {
-    case 'live':
-      url = '/plugin/community_hub/public/newer_comments';
-      container = $("#live-posts");
-      break;
-    case 'mediation':
-      url = '/plugin/community_hub/public/newer_articles';
-      container = $("#mediation-posts");
-      break;
-  }
-
-  var hub_id = $(".hub").attr('id');
-  var now = new Date();
-
-  $.ajax({
-    url: url,
-    type: 'get',
-    data: { latest_post: latest_post_id, hub: hub_id },
-    success: function(data) {
-
-      if (data.trim().length > 0) {
-        container.prepend(data);
-        latest_post_id = $(".latest").attr("id");
-
-      }
-      else {
-        console.log('No more live posts!');
-      }
-
-    },
-    error: function(ajax, stat, errorThrown) {
-      console.log(stat);
-    }
-  });
-
-}
 
 function toogleAutoScrolling() {
-  alert($("#auto_scrolling").attr('checked'));
-}
-
-function setHubView(role) {
-
-  var hub_id = $(".hub").attr('id');
-
-  $.ajax({
-    url: '/plugin/community_hub/public/set_hub_view',
-    type: 'get',
-    data: { hub: hub_id, role: role },
-    success: function(data) {
-      $(".form").html(data);
-      console.log( data );
-    },
-    error: function(ajax, stat, errorThrown) {
-      console.log( 'ERRO ao processar requisição!');
-    }
-  });
-
+  alert(jQuery("#auto_scrolling").attr('checked'));
 }
 
 
-function checkUserLevel() {
+function promote_user(user_id) {
 
-  var hub_id = $(".hub").attr('id');
+  var hub_id = jQuery(".hub").attr('id');
 
-  $.ajax({
-    url: '/plugin/community_hub/public/check_user_level',
+  jQuery.ajax({
+    url: '/plugin/community_hub/public/promote_user',
     type: 'get',
     dataType: 'json',
-    data: { hub: hub_id },
+    data: { user: user_id, hub: hub_id },
     success: function(data) {
-
-
-      switch (data.level) {
-
-        case -1:
-          console.log( 'usuário não logado...' );
-          setHubView('guest');
-          break;
-        case 0:
-          console.log( 'usuário logado, visitante...');
-          setHubView('visitor');
-          break;
-        case 1:
-          console.log( 'usuário logado, mediador...');
-          setHubView('mediator');
-          break;
-      }
-
-
     },
     error: function(ajax, stat, errorThrown) {
-      console.log( 'ERRO ao processar requisição!');
-    }
-  });
-
-}
-
-$(document).ready(function(){
-
-  $("#auto_scrolling").click(function(){
-    toogleAutoScrolling();
-  });
-
-  hub();
-
-  //checkUserLevel();
-
-  setInterval(checkNewLivePosts, 10000); //10 seconds interval
-  //setInterval(checkNewMediationPosts, 10000); //10 seconds interval
-  //setInterval(checkUserLevel, 10000); //10 seconds interval
-
-});
-
-
-function checkNewLivePosts() {
-  checkNewPosts('live');
-}
-
-
-function checkNewMediationPosts() {
-  checkNewPosts('mediation'); 
-}
-
-
-function removeLivePost(post_id) {
-
-  $.ajax({
-    url: '/plugin/community_hub/public/remove_live_post',
-    type: 'get',
-    dataType: 'json',
-    data: { id: post_id },
-    success: function(data) {
-
-      if (data.ok) {
-        console.log( 'OK - Post removido!');  
-      }
-      else {
-       console.log( 'NOT OK - Post NÃO removido!'); 
-      }
-      
-    },
-    error: function(ajax, stat, errorThrown) {
-      console.log( 'ERRO ao processar requisição!');
+      console.log(stat);
     }
   });
 
 }
 
 
-function promoteLivePost(post_id, user_id) {
+function pin_message(post_id) {
 
-  var hub_id = $(".hub").attr('id');
+  var hub_id = jQuery(".hub").attr('id');
 
-  $.ajax({
-    url: '/plugin/community_hub/public/promote_live_post',
-    type: 'get',
-    dataType: 'json',
-    data: { id: post_id, user: user_id, hub: hub_id },
-    success: function(data) {
-
-      if (data.ok) {
-        console.log( 'OK - Post promovido!');  
-      }
-      else {
-       console.log( 'NOT OK - Post NÃO promovido!'); 
-      }
-      
-    },
-    error: function(ajax, stat, errorThrown) {
-      console.log( 'ERRO ao processar requisição!');
-    }
-  });
-
-}
-
-function pinLivePost(post_id) {
-
-  var hub_id = $(".hub").attr('id');
-
-  $.ajax({
-    url: '/plugin/community_hub/public/pin_live_post',
+  jQuery.ajax({
+    url: '/plugin/community_hub/public/pin_message',
     type: 'get',
     dataType: 'json',
     data: { id: post_id, hub: hub_id },
-    success: function(data) {
-
-      if (data.ok) {
-        console.log( 'OK - Post fixado!');  
-      }
-      else {
-       console.log( 'NOT OK - Post NÃO fixado!'); 
-      }
-      
+    success: function(data) {    
     },
     error: function(ajax, stat, errorThrown) {
-      console.log( 'ERRO ao processar requisição!');
+      console.log(stat);
     }
   });
 
 }
 
-function likeLivePost(post_id) {
 
-  $.ajax({
-    url: '/plugin/community_hub/public/like_live_post',
+function update_mediation_comments(mediation) {
+  var hub_id = jQuery(".hub").attr('id');
+
+  if (jQuery("#mediation-comment-list-" + mediation + " li").first().length == 0) {
+    var latest_post_id = 0;
+  }
+  else {
+    var latest_post_id = jQuery("#mediation-comment-list-" + mediation + " li.mediation-comment").last().attr('id');
+  }
+
+  //console.log(latest_post_id);
+
+  jQuery.ajax({
+    url: '/plugin/community_hub/public/newer_mediation_comment',
     type: 'get',
-    dataType: 'json',
-    data: { id: post_id },
+    data: { latest_post: latest_post_id, mediation: mediation },
     success: function(data) {
-
-      if (data.ok) {
-        console.log( 'OK - Post curtido!');  
+      if (data.trim().length > 0) {
+        jQuery("#mediation-comment-list-" + mediation + "").append(data);
       }
-      else {
-       console.log( 'NOT OK - Post NÃO curtido!'); 
-      }
-      
     },
     error: function(ajax, stat, errorThrown) {
-      console.log( 'ERRO ao processar requisição!');
+      console.log(stat);
     }
   });
 
+  setTimeout(function() { update_mediation_comments(mediation); }, 5000);
 }
 
-function dislikeLivePost(post_id) {
 
-  $.ajax({
-    url: '/plugin/community_hub/public/dislike_live_post',
+function update_mediations() {
+  var hub_id = jQuery(".hub").attr('id');
+
+  if (jQuery("#mediation-posts li").first().length == 0) {
+    var latest_post_id = 0;
+  }
+  else {
+    var latest_post_id = jQuery("#mediation-posts li").first().attr('id');
+  }
+
+  //console.log(latest_post_id);
+
+  jQuery.ajax({
+    url: '/plugin/community_hub/public/newer_articles',
     type: 'get',
-    dataType: 'json',
-    data: { id: post_id },
+    data: { latest_post: latest_post_id, hub: hub_id },
     success: function(data) {
-
-      if (data.ok) {
-        console.log( 'OK - Post descurtido!');  
+      if (data.trim().length > 0) {
+        jQuery("#mediation-posts").prepend(data);
       }
-      else {
-       console.log( 'NOT OK - Post NÃO descurtido!'); 
-      }
-      
     },
     error: function(ajax, stat, errorThrown) {
-      console.log( 'ERRO ao processar requisição!');
+      console.log(stat);
     }
   });
 
+  setTimeout(update_mediations, 10000);  
 }
+
+
+function update_live_stream() {
+  var hub_id = jQuery(".hub").attr('id');
+
+  if (jQuery("#live-posts li").first().length == 0) {
+    var latest_post_id = 0;
+  }
+  else {
+    var latest_post_id = jQuery("#live-posts li").first().attr('id');
+  }
+
+  //console.log(latest_post_id);
+
+  jQuery.ajax({
+    url: '/plugin/community_hub/public/newer_comments',
+    type: 'get',
+    data: { latest_post: latest_post_id, hub: hub_id },
+    success: function(data) {
+      if (data.trim().length > 0) {
+        jQuery("#live-posts").prepend(data);
+      }
+    },
+    error: function(ajax, stat, errorThrown) {
+      console.log(stat);
+    }
+  });
+
+  setTimeout(update_live_stream, 5000);  
+}
+
+
+jQuery(document).ready(function() {
+  setTimeout(update_live_stream, 5000);
+  setTimeout(update_mediations, 10000);
+});

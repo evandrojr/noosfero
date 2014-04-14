@@ -1,60 +1,36 @@
 <% extend CommunityHubPlugin::HubHelper %>
+
 <li id="<%= post.id %>" class="<%=post_css_classes(post.id, latest_post, oldest_post)%>"> 
+  <ul>
+    <li class="time"><%= post_time(post.created_at) %></li>
+    <li class="avatar"><%= image_tag(profile_icon(post.author, :minor)) %></li>
+    <li class="message"><span class="author"><%= post.author_name %>:</span> <%= post.body %></li>
 
-    <ul>
-      <li class="time">
-        <%= show_time(post.created_at) %>
-      </li>
-      <li class="avatar">
+    <% if mediator?(hub) %>
+    <li class="mediation-bar">
 
-        <%= link_to image_tag(profile_icon(post.author, :minor)),
-              post.author.url,
-              :class => 'comment-picture1',
-              :title => post.author_name
-        %>
-
-      </li>
-      <li class="message">
-        <%= txt2html post.body %>
-      </li>
-
-      <% if logged_in? %>
-
-      <li class="mediation-bar">
-
-        <ul>
-          <% if mediator?(hub) %>
-          <li class="promote">
-            <a id="<%= post.id %>" href="#" onclick="promoteLivePost(<%= post.id %>,<%= user.id %>); return false;">
-          	  <img src="/designs/icons/default/outras/16x16/actions/spread.png" />
-            </a>
-          </li>
+      <ul>
+       
+        <li class="promote">
+      	  <img class="<%= !promoted?(hub, post.author.id) ? "promoted" : "not-promoted" %>" src="/designs/icons/default/outras/16x16/actions/spread.png" />
+        </li>
+        <% end %>
+       
+        <% if mediator?(hub) %>
+        <li class="pin">
+          <% if !pinned_message?(hub, post.id)  %>
+          <a id="<%= post.id %>" href="#" onclick="pin_message(<%= post.id %>); return false;">
+        	  <img class="pinned" src="/designs/icons/default/outras/16x16/apps/tags.gif" />
+          </a>
+          <% else %>
+            <img class="not-pinned" src="/designs/icons/default/outras/16x16/apps/tags.gif" />
           <% end %>
+        </li>
 
-          <li class="like">
-            <a id="<%= post.id %>" href="#" onclick="likeLivePost(<%= post.id %>); return false;">
-          	  <img src="/designs/icons/default/outras/16x16/actions/positive-hand.png" />
-            </a>
-          </li>
-          <li class="dislike">
-            <a id="<%= post.id %>" href="#" onclick="dislikeLivePost(<%= post.id %>); return false;">
-              <img src="/designs/icons/default/outras/16x16/actions/negative-hand.png" />
-            </a>
-          </li>
+      </ul>
 
-          <% if mediator?(hub) %>
-          <li class="pin">
-            <a id="<%= post.id %>" href="#" onclick="pinLivePost(<%= post.id %>); return false;">
-          	  <img src="/designs/icons/default/outras/16x16/apps/tags.gif" />
-            </a>
-          </li>
-          <% end %>
+    </li>
+    <% end %>
 
-        </ul>
-
-      </li>
-
-      <% end %>
-    </ul>
-
+  </ul>
 </li>

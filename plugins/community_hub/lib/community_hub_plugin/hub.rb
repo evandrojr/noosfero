@@ -1,14 +1,20 @@
-require File.dirname(__FILE__) + '/../../tweeter_stream/lib/twurl'
-
+#require File.dirname(__FILE__) + '/../../tweeter_stream/lib/twurl'
 
 class CommunityHubPlugin::Hub < Folder
 
   settings_items :hashtags_twitter, :type => :string, :default => ""
-  settings_items :promoted_users, :type => Array, :default => []
-  settings_items :pinned_posts, :type => Array, :default => []
+  settings_items :twitter_enabled, :type => :boolean, :default => false
+  settings_items :facebook_enabled, :type => :boolean, :default => false
+  settings_items :pinned_messages, :type => Array, :default => []
+  settings_items :pinned_mediations, :type => Array, :default => []
+  settings_items :mediators, :type => Array, :default => []
 
-  @@thread_started = false
-  
+  #@@thread_started = false
+
+  before_create do |hub|
+    hub.mediators = [hub.author.id]
+  end
+
   def self.icon_name(article = nil)
     'community-hub'
   end
@@ -25,13 +31,13 @@ class CommunityHubPlugin::Hub < Folder
     true
   end
 
-  def self.start_twitter_service(page)
+#  def self.start_twitter_service(page)
     
-      a = Thread.new { 
-         Twurl::Stream.run(page, 'nba', '/root/.twurlrc')
-      } unless @@thread_started
+#      a = Thread.new { 
+#         Twurl::Stream.run(page, 'nba', '/root/.twurlrc')
+#      } unless @@thread_started
       
-      @@thread_started = true
+#      @@thread_started = true
 
 #     raise page.inspect 
     
@@ -44,7 +50,7 @@ class CommunityHubPlugin::Hub < Folder
       
 #    raise "Pai #{parent.id}".inspect
     
-  end
+#  end
   
   def view_page
     "content_viewer/hub.rhtml"
