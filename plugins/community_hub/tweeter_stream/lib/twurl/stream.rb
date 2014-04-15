@@ -6,16 +6,16 @@ module Twurl
     PATH_PATTERN           = /^\/\w+/
     PROTOCOL_PATTERN       = /^\w+:\/\//
     README                 = File.dirname(__FILE__) + '/../../README'
-    @output              ||= STDOUT
+    @output                ||= STDOUT
     class NoPathFound < Exception
     end
 
     class << self
       attr_accessor :output
-
-      def run(page, tags, config_file_path, proxy=nil)
+      def run(page, author_id, tags, config_file_path, proxy=nil)
         begin
             @page = page # maybe should not be a class variable
+            @author_id = author_id
             @@file_path = config_file_path
             Twurl.options         = Options.new
             Twurl.options.command = 'request' # Not necessary anymore
@@ -30,7 +30,6 @@ module Twurl
             Twurl.options.path="/1.1/statuses/filter.json"
             Twurl.options.host="stream.twitter.com"
             Twurl.options.read_timeout= 0
-            
         rescue NoPathFound => e
           exit
         end
@@ -39,6 +38,10 @@ module Twurl
       
       def file_path
         @@file_path
+      end
+      
+      def author_id
+        @author_id
       end
 
       def page 
