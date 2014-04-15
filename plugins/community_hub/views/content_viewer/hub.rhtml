@@ -1,8 +1,5 @@
 <% extend CommunityHubPlugin::HubHelper %>
 
-<%  CommunityHubPlugin::Hub.twitter_service(@page, :start)  %>
-<%  CommunityHubPlugin::Hub.facebook_service(@page, :start)  %>
-
 <div id="<%=@page.id%>" class="hub">
 
   <div class="title"><%= @page.title %> HUB</div>

@@ -15,8 +15,8 @@ module Twurl
     def perform_request
       client.perform_request_from_options(options) { |response|
           response.read_body { |chunk|
-#           print "#{chunk}\n"
-            #unless chunk.to_i.length = 0 
+            #print "chunk: #{chunk}\n"
+            unless chunk.blank?
               begin
                 parsed = JSON.parse(chunk)
                 ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')
@@ -24,17 +24,16 @@ module Twurl
                 print "#{comment_text}\n"
                 comment = Comment.new
                 comment.title = 'hub-message-twitter'                
-                comment.source_id = Stream.page.id
+                comment.source_id = options.page.id
                 comment.body = comment_text
-                comment.author_id = Stream.author_id
-                comment.save!     
-              rescue
-                print "Erro gravando comentário twitter\n"
-              end  
-                #raise comment.inspect
-#              rescue
-#              end
-            #end  
+                comment.author_id = options.author_id
+                comment.name = parsed["user"]["name"]
+                comment.email = 'admin@localhost.local'
+                comment.save!
+              rescue => e
+                print "Erro gravando comentário twitter #{e}\n"
+              end
+            end
           }
       }
     rescue URI::InvalidURIError
