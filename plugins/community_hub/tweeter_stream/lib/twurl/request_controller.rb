@@ -24,7 +24,7 @@ module Twurl
                 print "#{comment_text}\n"
                 comment = Comment.new
                 comment.title = 'hub-message-twitter'                
-                comment.source_id = options.page.id
+                comment.source = options.page
                 comment.body = comment_text
                 comment.author_id = options.author_id
                 comment.name = parsed["user"]["name"]
