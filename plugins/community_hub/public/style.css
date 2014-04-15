@@ -326,3 +326,13 @@ textarea#message_body {
   width: auto;
   margin-left: 80px;
 }
+
+.comment-count {
+  margin-left: 80px;
+  padding: 5px 10px;
+  background-color: white;
+  display: inline-block;
+  border-radius: 5px;
+  font-weight: bold;
+  margin-bottom: -5px;
+}
