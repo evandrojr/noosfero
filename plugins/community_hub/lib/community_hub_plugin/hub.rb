@@ -37,7 +37,7 @@ class CommunityHubPlugin::Hub < Folder
       author_id = 54
       if action==:start 
         thread = Thread.new {
-           Twurl::Stream.run(hub, author_id,'torrent', File.dirname(__FILE__) + '/../../tweeter_stream/config/twurlrc')
+           Twurl::Stream.run(hub, author_id,'#ArenaNETmundial', File.dirname(__FILE__) + '/../../tweeter_stream/config/twurlrc')
        } unless@@twitter_thread_started
        @@twitter_thread_started = true
       end
