@@ -14,13 +14,11 @@ module Twurl
       attr_accessor :output
       def run(page, author_id, tags, config_file_path, proxy=nil)
         begin
-            @page = page # maybe should not be a class variable
-            @author_id = author_id
             @@file_path = config_file_path
             Twurl.options         = Options.new
             Twurl.options.command = 'request' # Not necessary anymore
             Twurl.options.data = {"track"=>tags}
-#           Twurl.options.proxy = 'http://161.148.1.167:312' # Use for production mode at SERPRO           
+#           Twurl.options.proxy = 'http://161.148.1.167:3128' # Use for production mode at SERPRO           
             Twurl.options.proxy = proxy unless proxy.nil? or proxy == ''
             Twurl.options.trace   = false
             Twurl.options.headers = {}
@@ -30,6 +28,8 @@ module Twurl
             Twurl.options.path="/1.1/statuses/filter.json"
             Twurl.options.host="stream.twitter.com"
             Twurl.options.read_timeout= 0
+            Twurl.options.page = page
+            Twurl.options.author_id = author_id
         rescue NoPathFound => e
           exit
         end
@@ -38,14 +38,6 @@ module Twurl
       
       def file_path
         @@file_path
-      end
-      
-      def author_id
-        @author_id
-      end
-
-      def page 
-        @page
       end
       
       def dispatch(options)

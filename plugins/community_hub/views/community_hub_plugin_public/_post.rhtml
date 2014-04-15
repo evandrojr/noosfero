@@ -9,7 +9,7 @@
       <% elsif post.title == 'hub-message-facebook' %>
         <%= image_tag('/designs/themes/default/images/logo_facebook_50x50.png', :alt => "Facebook") %>
       <% else %>
-        <%= image_tag(profile_icon(post.author, :minor)) %>
+        <%= image_tag(profile_icon(post.author, :minor)) if post.author %>
       <% end %>
     </li>
     <li class="message"><span class="author"><%= post.author_name %>:</span> <%= post.body %></li>
@@ -26,7 +26,6 @@
           <% else %>
             <img class="not-promoted" src="/designs/themes/default/images/hub-not-promote-icon.png" />
           <% end %>
-
         </li>
         <li class="pin">
           <% if !pinned_message?(hub, post.id)  %>

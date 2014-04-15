@@ -3,10 +3,7 @@ require File.dirname(__FILE__) + '/../../facebook_stream/lib_facebook_stream'
 
 class CommunityHubPlugin::Hub < Folder
 
- @@twitter_thread_started = false #change to hash
- @@facebook_thread_started = false #change to hash
-
-  settings_items :proxy_url, :type => :string, :default => 'http://161.148.1.167:312' # Remember to use add the port, if needed!      
+  settings_items :proxy_url, :type => :string, :default => 'http://161.148.1.167:3128' # Remember to use add the port, if needed!      
   settings_items :twitter_enabled, :type => :boolean, :default => false  
   settings_items :hashtags_twitter, :type => :string, :default => "participa.br,participabr,arenanetmundial,netmundial" 
   settings_items :facebook_enabled, :type => :boolean, :default => false
@@ -20,7 +17,7 @@ class CommunityHubPlugin::Hub < Folder
   before_create do |hub|
     hub.mediators = [hub.author.id]
   end
-  
+
   def self.icon_name(article = nil)
     'community-hub'
   end
@@ -37,26 +34,33 @@ class CommunityHubPlugin::Hub < Folder
     true
   end
 
-  def self.twitter_service(hub, action)
-      author_id = 54
-      if action==:start 
-        thread = Thread.new {
-            Twurl::Stream.run(hub, author_id, hub.setting[:hashtags_twitter], File.dirname(__FILE__) + '/../../tweeter_stream/config/twurlrc', hub.setting[:proxy_url])
-        } unless@@twitter_thread_started
-       @@twitter_thread_started = true
-      end
+  def twitter_service
+    Twurl::Stream.run(self, nil, hashtags_twitter, File.dirname(__FILE__) + '/../../tweeter_stream/config/twurlrc', proxy_url)
   end
-  
-  def self.facebook_service(hub, action)
-      author_id = 54
-      if action==:start 
-        thread = Thread.new {
-              facebook_comments(hub, author_id, hub.setting[:facebook_page_id], hub.setting[:facebook_pooling_time], hub.setting[:facebook_access_token], hub.setting[:proxy_url])
-       } unless@@facebook_thread_started
-        @@facebook_thread_started = true
-      end
+
+  def facebook_service
+    facebook_comments(self, nil, facebook_page_id, facebook_pooling_time, facebook_access_token, proxy_url)
   end
-  
+
+  def self.start_listen
+    hubs = {}
+    loop do
+      puts "searching for hubs"
+      CommunityHubPlugin::Hub.all.each do |hub|
+        hub_conf = hubs[hub.id]
+        if hub_conf.nil? || hub_conf[:hub].updated_at < hub.updated_at
+          hub_conf[:threads].each {|t| t.terminate} if hub_conf
+          puts "hub #{hub.id} found!!!!!!"
+          threads = []
+          threads << Thread.new { hub.twitter_service } if hub.twitter_enabled
+          threads << Thread.new { hub.facebook_service } if hub.facebook_enabled
+          hubs[hub.id] = {:threads => threads, :hub => hub}
+        end
+      end
+      sleep(5)
+    end
+  end
+
   def view_page
     "content_viewer/hub.rhtml"
   end
