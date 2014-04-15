@@ -23,6 +23,7 @@ module Twurl
                 comment_text = ic.iconv("@#{parsed["user"]["name"]} " + _('said') + ": #{parsed["text"]}" + ' ')[0..-2]
                 print "#{comment_text}\n"
                 comment = Comment.new
+                comment.title = 'hub-message-twitter'                
                 comment.source_id = Stream.page.id
                 comment.body = comment_text
                 comment.author_id = Stream.author_id

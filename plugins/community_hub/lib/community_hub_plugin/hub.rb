@@ -38,26 +38,22 @@ class CommunityHubPlugin::Hub < Folder
   end
 
   def self.twitter_service(hub, action)
-    #raise hub.inspect
-      #if self.twitter_enabled == false
       author_id = 54
       if action==:start 
         thread = Thread.new {
-           Twurl::Stream.run(hub, author_id, self.hashtags_twitter, File.dirname(__FILE__) + '/../../tweeter_stream/config/twurlrc', self.proxy_url)
-       } unless@@twitter_thread_started
+            Twurl::Stream.run(hub, author_id, hub.setting[:hashtags_twitter], File.dirname(__FILE__) + '/../../tweeter_stream/config/twurlrc', hub.setting[:proxy_url])
+        } unless@@twitter_thread_started
        @@twitter_thread_started = true
       end
   end
   
   def self.facebook_service(hub, action)
       author_id = 54
-      page_id="mundoreagindo"
       if action==:start 
-       #facebook_comments(page, author_id, page_id, pooling_time=5, token='CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH')          
-       thread = Thread.new {
-           facebook_comments(hub, author_id, self.facebook_page_id, self.pooling_time, self.facebook_access_token, self.proxy_url)
+        thread = Thread.new {
+              facebook_comments(hub, author_id, hub.setting[:facebook_page_id], hub.setting[:facebook_pooling_time], hub.setting[:facebook_access_token], hub.setting[:proxy_url])
        } unless@@facebook_thread_started
-       @@facebook_thread_started = true
+        @@facebook_thread_started = true
       end
   end
   

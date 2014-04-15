@@ -8,8 +8,9 @@ require 'json'
 # BACKUP TOKEN 'CAAEhsewl0ZAcBAHhipXszZCURSwWLmgvceDbs9mB5baJdLriFxYMEzywmF2fvZBuThuA2Mm7QF8wPd3E6R5pVqVEnC2VhcBb4VrfAnkZC73ZC5g1NRUnKZCB2e6CaRiUBDatR2nf505PeKp7Aj5XxvTdfSqdZCsXxQFYZApPNSUUgkUWm6HwL4rp21MRJXb612sZD'
 
 def facebook_comments(hub, author_id, page_id, pooling_time, token, proxy_url)
-  
-  #raise hub.id.inspect
+  if pooling_time == nil
+    pooling_time = 5 
+  end  
   @graph = Koala::Facebook::API.new(token)
   initialComments = []
   extractedComments = []
@@ -40,6 +41,7 @@ def facebook_comments(hub, author_id, page_id, pooling_time, token, proxy_url)
       newComments.each{|comment|
                 puts comment
                 noosferoComment = Comment.new
+                noosferoComment.title = 'hub-message-facebook'                                
                 noosferoComment.source_id = hub.id
                 noosferoComment.body = comment
                 noosferoComment.author_id = author_id
