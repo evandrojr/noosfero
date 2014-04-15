@@ -6,7 +6,7 @@ class CommunityHubPlugin::Hub < Folder
  @@twitter_thread_started = false #change to hash
  @@facebook_thread_started = false #change to hash
 
-  settings_items :proxy_url, :type => :string, :default => 'http://161.148.1.167:312' # Remember to use add the port, if needed!      
+  settings_items :proxy_url, :type => :string, :default => 'http://161.148.1.167:3128' # Remember to use add the port, if needed!      
   settings_items :twitter_enabled, :type => :boolean, :default => false  
   settings_items :hashtags_twitter, :type => :string, :default => "participa.br,participabr,arenanetmundial,netmundial" 
   settings_items :facebook_enabled, :type => :boolean, :default => false
@@ -47,6 +47,7 @@ class CommunityHubPlugin::Hub < Folder
       end
   end
   
+  #Faraday.new(:proxy => { :uri => 'http://proxy.example.com', :user => 'foo', :password => 'bar' }) 
   def self.facebook_service(hub, action)
       author_id = 54
       if action==:start 
