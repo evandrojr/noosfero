@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/../../facebook_stream/lib_facebook_stream'
 
 class CommunityHubPlugin::Hub < Folder
 
-  settings_items :proxy_url, :type => :string, :default => 'http://161.148.1.167:3128' # Remember to use add the port, if needed!      
+  settings_items :proxy_url, :type => :string, :default => 'http://161.148.1.167:3128' # Remember to use add the port, in case needed.
   settings_items :twitter_enabled, :type => :boolean, :default => false  
   settings_items :hashtags_twitter, :type => :string, :default => "participa.br,participabr,arenanetmundial,netmundial" 
   settings_items :facebook_enabled, :type => :boolean, :default => false
