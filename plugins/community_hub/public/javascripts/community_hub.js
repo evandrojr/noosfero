@@ -87,7 +87,7 @@ function pin_message(post_id) {
     url: '/plugin/community_hub/public/pin_message',
     type: 'get',
     dataType: 'json',
-    data: { id: post_id, hub: hub_id },
+    data: { message: post_id, hub: hub_id },
     success: function(data) {    
     },
     error: function(ajax, stat, errorThrown) {

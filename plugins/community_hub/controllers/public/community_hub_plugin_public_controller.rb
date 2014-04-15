@@ -165,9 +165,8 @@ class CommunityHubPluginPublicController < PublicController
 	def pin_message
     message = Comment.find(params[:message])
     hub = Article.find(params[:hub])
-    community = Profile.find(params[:community])
 
-    mediation = make_mediation_from_message(community, hub, message)
+    mediation = make_mediation_from_message(hub, message)
     mediation.save
 
     if mediation && mediation.save 
@@ -195,11 +194,11 @@ class CommunityHubPluginPublicController < PublicController
   end
 
 
-  def make_mediation_from_message(community, hub, message)
+  def make_mediation_from_message(hub, message)
     begin
       mediation = Article.new
 
-      mediation.profile = community
+      mediation.profile = hub.profile
       mediation.parent = hub
       mediation.name = mediation_timestamp
       mediation.body = message.body
@@ -217,7 +216,6 @@ class CommunityHubPluginPublicController < PublicController
       mediation.published = true
       mediation.license_id = ""
       mediation.category_ids = []
-      #mediation.save
     rescue
       mediation = nil
     end

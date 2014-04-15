@@ -15,16 +15,16 @@
         <li class="promote">
           <% if !promoted?(hub, mediation.author.id) %>
           <a id="<%= mediation.id %>" href="#" onclick="promote_user(<%= mediation.author.id %>); return false;">
-            <img class="promoted" src="/designs/icons/default/outras/16x16/actions/spread.png" />
+            <img class="promoted" src="/designs/themes/default/images/hub-promote-icon.png" />
           </a>
           <% else %>
-            <img class="not-promoted" src="/designs/icons/default/outras/16x16/actions/spread.png" />
+            <img class="not-promoted" src="/designs/themes/default/images/hub-not-promote-icon.png" />
           <% end %>
         </li>
 
         <% if pinned_mediation?(hub, mediation.id) %>
         <li class="pin">
-          <img class="pinned" src="/designs/icons/default/outras/16x16/apps/tags.gif" />
+          <img class="pinned" src="/designs/themes/default/images/hub-not-pinned-icon.png" />
         </li>
         <% end %>
 
