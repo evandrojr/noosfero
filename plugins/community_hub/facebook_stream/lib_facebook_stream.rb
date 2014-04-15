@@ -9,11 +9,13 @@ require 'json'
 
 def facebook_comments(hub, author_id, page_id, pooling_time, token, proxy_url)
   if pooling_time == nil
-    pooling_time = 5 
-  end  
+    pooling_time = 5
+  end
+  #Koala.http_service.http_options = {
+  #  :proxy => 'http://161.148.1.167:3128'
+  #}
   @graph = Koala::Facebook::API.new(token)
   initialComments = []
-  extractedComments = []
   firstTime = true
   while true
       feed = @graph.get_connections(page_id, "posts")
@@ -24,12 +26,7 @@ def facebook_comments(hub, author_id, page_id, pooling_time, token, proxy_url)
           array.push(f['comments']['data'])
         end
       }
-      array.each{ |comments|
-        comments.each{|comment|
-          extractedComments.push("#{comment['from']['name']} " + _("said")  + ": #{comment['message']}")
-        }					
-      }
-      extractedComments = extractedComments.uniq
+      extractedComments = array.flatten.uniq
       if firstTime
         initialComments=extractedComments.clone
         firstTime = false
@@ -39,13 +36,15 @@ def facebook_comments(hub, author_id, page_id, pooling_time, token, proxy_url)
       initialComments += newComments
       initialComments = initialComments.uniq
       newComments.each{|comment|
-                puts comment
-                noosferoComment = Comment.new
-                noosferoComment.title = 'hub-message-facebook'                                
-                noosferoComment.source_id = hub.id
-                noosferoComment.body = comment
-                noosferoComment.author_id = author_id
-                noosferoComment.save!             
+        puts "#{comment['from']['name']} " + _("said")  + ": #{comment['message']}"
+        noosferoComment = Comment.new
+        noosferoComment.title = 'hub-message-facebook'
+        noosferoComment.source = hub
+        noosferoComment.body = comment['message']
+        noosferoComment.author_id = author_id
+        noosferoComment.name = comment['from']['name']
+        noosferoComment.email = 'admin@localhost.local'
+        noosferoComment.save!
       }
       sleep(pooling_time)
     end
