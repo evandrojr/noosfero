@@ -5,9 +5,9 @@
     <li class="time"><%= post_time(post.created_at) %></li>
     <li class="avatar">
       <% if post.title == 'hub-message-twitter' %>
-        <%= image_tag('/designs/themes/default/images/logo_twitter_bird_white_50x50.png', :alt => "Twitter") %>
+        <%= image_tag('/plugins/community_hub/icons/logo_twitter_bird_white_50x50.png', :alt => "Twitter") %>
       <% elsif post.title == 'hub-message-facebook' %>
-        <%= image_tag('/designs/themes/default/images/logo_facebook_50x50.png', :alt => "Facebook") %>
+        <%= image_tag('/plugins/community_hub/icons/logo_facebook_50x50.png', :alt => "Facebook") %>
       <% else %>
         <%= image_tag(profile_icon(post.author, :minor)) if post.author %>
       <% end %>
@@ -21,19 +21,19 @@
         <li class="promote">
           <% if promoted?(hub, post.author.id) == 'promoted' %>
           <a id="<%= post.id %>" href="#" onclick="pin_message(<%= post.id %>); return false;">
-            <img class="promoted" src="/designs/themes/default/images/hub-promote-icon.png" />
+            <img class="promoted" src="/plugins/community_hub/icons/hub-promote-icon.png" />
           </a>
           <% else %>
-            <img class="not-promoted" src="/designs/themes/default/images/hub-not-promote-icon.png" />
+            <img class="not-promoted" src="/plugins/community_hub/icons/hub-not-promote-icon.png" />
           <% end %>
         </li>
         <li class="pin">
           <% if !pinned_message?(hub, post.id)  %>
           <a id="<%= post.id %>" href="#" onclick="pin_message(<%= post.id %>); return false;">
-        	  <img class="not-pinned" src="/designs/themes/default/images/hub-pinned-icon.png" />
+        	  <img class="not-pinned" src="/plugins/community_hub/icons/hub-pinned-icon.png" />
           </a>
           <% else %>
-            <img class="pinned" src="/designs/themes/default/images/hub-not-pinned-icon.png" />
+            <img class="pinned" src="/plugins/community_hub/icons/hub-not-pinned-icon.png" />
           <% end %>
         </li>
       </ul>
