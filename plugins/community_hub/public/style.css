@@ -62,9 +62,16 @@
     max-width: 43px;
 }
 
-.hub .message{
+/*.hub .message{
     display: inline-block;
     width: 70%;
+}*/
+
+.hub .message {
+display: inline-block;
+width: 69%;
+float: none;
+clear: both;
 }
 
 .hub .message .author {
@@ -331,6 +338,7 @@ textarea#message_body {
   margin-left: 80px;
 }
 
+/*
 .comment-count {
   margin-left: 80px;
   padding: 5px 10px;
@@ -339,5 +347,23 @@ textarea#message_body {
   border-radius: 5px;
   font-weight: bold;
   margin-bottom: -5px;
+}
+*/
+
+.comment-count {
+  margin-left: 80px;
+  padding: 5px 10px;
+  background-color: white;
+  display: inline-block;
+  border-radius: 5px;
+  font-weight: bold;
+  display: block;
+  margin-bottom: -5px;
+  margin-top: 10px;
+  max-width: 100px;
+}
+
+.hub ul.mediation-comment-list {
+  width: 80%;
 }
 
