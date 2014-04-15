@@ -53,10 +53,12 @@ class CommunityHubPluginPublicController < PublicController
   def newer_mediation_comment
     latest_id = params[:latest_post]
     mediation = params[:mediation]
-    comments = Comment.find(:all, :conditions => ["id > :id and source_id = :mediation", {
-                            :id => latest_id, 
-                            :mediation => mediation
-                          }])
+    comments = Comment.find(:all, 
+                            :limit => 100,
+                            :conditions => ["id > :id and source_id = :mediation", {
+                              :id => latest_id, 
+                              :mediation => mediation
+                            }])
 
     render :partial => "mediation_comment", 
            :collection => comments
@@ -67,8 +69,12 @@ class CommunityHubPluginPublicController < PublicController
 		latest_post = params[:latest_post]
     hub = Article.find(params[:hub])
 		posts = Comment.find(:all,
-                         :order => "id desc", 
-                        :conditions => ["id > ?", latest_post])
+                         :order => "id desc",
+                         :limit => 100,
+                         :conditions => ["id > :id and source_id = :hub", {
+                           :id => latest_post,
+                           :hub => hub
+                         }])
 
 		if !posts.empty?
 			oldest_post = posts.last.id
@@ -93,6 +99,7 @@ class CommunityHubPluginPublicController < PublicController
     hub = Article.find(params[:hub])
     posts = Article.find(:all,
                          :order => "id desc", 
+                         :limit => 100,
                          :conditions => ["id > :id and type = :type and parent_id = :hub", {
                             :id => latest_post, 
                             :type => 'TinyMceArticle', 
@@ -115,13 +122,6 @@ class CommunityHubPluginPublicController < PublicController
               :hub => hub
            }
   end
-
-
-	def more_comments
-		@posts = Comment.find(:all)
-		render :partial => "post", :collection => @posts
-	end
-
 
 
   def settings

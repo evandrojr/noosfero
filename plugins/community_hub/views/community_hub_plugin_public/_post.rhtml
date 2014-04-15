@@ -1,22 +1,26 @@
 <% extend CommunityHubPlugin::HubHelper %>
 
-<li id="<%= post.id %>" class="<%=post_css_classes(post.id, latest_post, oldest_post)%>"> 
+<li id="<%= post.id %>" class="post"> 
   <ul>
     <li class="time"><%= post_time(post.created_at) %></li>
-    <li class="avatar"><%= image_tag(profile_icon(post.author, :minor)) %></li>
+    <li class="avatar">
+      <% if post.title == 'hub-message-twitter' %>
+        <%= image_tag('/designs/themes/default/images/logo_twitter_bird_blue_50x50.png', :alt => "Twitter") %>
+      <% elsif post.title == 'hub-message-facebook' %>
+        <%= image_tag('/designs/themes/default/images/logo-facebook-50x50.png', :alt => "Facebook") %>
+      <% else %>
+        <%= image_tag(profile_icon(post.author, :minor)) %>
+      <% end %>
+    </li>
     <li class="message"><span class="author"><%= post.author_name %>:</span> <%= post.body %></li>
 
-    <% if mediator?(hub) %>
+    <% if mediator?(hub) && post.title != 'hub-message-twitter' && post.title != 'hub-message-facebook' %>
     <li class="mediation-bar">
 
       <ul>
-       
         <li class="promote">
       	  <img class="<%= !promoted?(hub, post.author.id) ? "promoted" : "not-promoted" %>" src="/designs/icons/default/outras/16x16/actions/spread.png" />
         </li>
-        <% end %>
-       
-        <% if mediator?(hub) %>
         <li class="pin">
           <% if !pinned_message?(hub, post.id)  %>
           <a id="<%= post.id %>" href="#" onclick="pin_message(<%= post.id %>); return false;">
@@ -26,7 +30,6 @@
             <img class="not-pinned" src="/designs/icons/default/outras/16x16/apps/tags.gif" />
           <% end %>
         </li>
-
       </ul>
 
     </li>

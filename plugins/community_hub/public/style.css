@@ -32,9 +32,11 @@
 }
 
 .hub .post {
-	border-bottom: 1px solid #ddd !important;
-	background: url("images/hub-time-bg.gif") repeat-y	left top #fff;
+	border-bottom: 1px solid #ddd;
+	background: url("images/hub-time-bg.gif") repeat-y left top #fff;
+	padding: 5px 0;
 }
+
 
 .hub .time{
     display: inline-block;
@@ -52,6 +54,12 @@
     margin: 0 10px;
     vertical-align: top;
     width: 43px;
+    text-align: center;
+}
+
+.hub .avatar img{
+    max-height: 43px;
+    max-width: 43px;
 }
 
 .hub .message{
@@ -60,7 +68,11 @@
 }
 
 .hub .message .author {
-  font-weight: bold;
+	font-weight: bold;
+	float: left;
+	display: inline-block;
+	line-height: 20px;
+	margin-right: 5px;
 }
 
 .hub .mediation-bar {
@@ -118,6 +130,18 @@
 	float: right;
 }
 
+.hub ul.mediation-comment-list{
+	margin-left: 80px;
+	display: inline-block;
+	padding: 10px 0;
+	background-color: #fff;
+	margin-bottom: 10px;
+}
+
+.hub ul.mediation-comment-list li{
+	padding-left: 10px;
+}
+
 /**/
 
 .hub .live {
@@ -138,6 +162,15 @@
 	padding-top: 10px;
 }
 
+
+.hub #live-posts .post {
+	background-color:#fff;
+}
+
+.hub ul#mediation-posts .post{
+  background-color:#eee;
+  border-color: #fff;
+}
 
 #content .main-block .hub .live h1{
 	 background-color: #f4f4f4;
@@ -287,4 +320,9 @@
 
 .hub .settings .twitter, .hub .settings .facebook, .hub .settings .general {
    /* border: 1px solid red;*/
+}
+
+textarea#message_body {
+  width: auto;
+  margin-left: 80px;
 }
