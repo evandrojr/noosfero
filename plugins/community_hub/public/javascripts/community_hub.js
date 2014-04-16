@@ -2,39 +2,66 @@ var latest_post_id = 0;
 var oldest_post_id = 0;
 live_scroll_position = 0;
 
+function clearLoadingMediationCommentSignal(mediation) {
+ jQuery(".loading-mediation-comment").filter("#" + mediation).removeClass("loading-signal-error");
+ jQuery(".loading-mediation-comment").filter("#" + mediation).removeClass("loading-signal-done");
+}
+
+function clearLoadingMessageSignal() {
+ jQuery("#loading-message").removeClass("loading-signal-error");
+ jQuery("#loading-message").removeClass("loading-signal-done");
+}
+
+function clearLoadingMediationSignal() {
+ jQuery("#loading-mediation").removeClass("loading-signal-error");
+ jQuery("#loading-mediation").removeClass("loading-signal-done");
+}
+
 function toogle_mediation_comments(mediation) {
   jQuery("#mediation-comment-list-" + mediation ).toggle();
   jQuery("#mediation-comment-form-" + mediation ).toggle();
 }
 
 
-function hub_open_loading(button) {
-  var html = '<div id="hub-loading">' +
-               '<img src="/images/loading-small.gif" />' +
-             '</div>';
+function new_mediation_comment(button, mediation) {
+  var form = jQuery(button).parents("form");
 
-   //$('.hub .form .submit').after(html);
-   jQuery(button).after(html);
-   jQuery('#hub-loading').fadeIn('slow');
-}
+  jQuery(".loading-mediation-comment").filter("#" + mediation).addClass("loading-signal-processing");
 
+  jQuery.post(form.attr("action"), form.serialize(), function(data) {
+    jQuery(".loading-mediation-comment").filter("#" + mediation).removeClass("loading-signal-processing");
+    if (data.ok) {
+      jQuery(".hub .form #message_body").val('');
+      jQuery(".loading-mediation-comment").filter("#" + mediation).addClass("loading-signal-done");
+      setTimeout(function(){
+        clearLoadingMediationCommentSignal(mediation);
+      }, 3000);
+    }
+    else {
+      jQuery(".loading-mediation-comment").filter("#" + mediation).addClass("loading-signal-error");
+      setTimeout(clearLoadingMessageSignal, 3000);
+    }
+  }, 'json');
 
-function hub_close_loading() {
-  jQuery('#hub-loading').fadeOut('slow', function() {
-    jQuery('#hub-loading').remove();
-  });
 }
 
 
 function new_message(button) {
   var form = jQuery(button).parents("form");
 
-  //hub_open_loading();
+  jQuery("#loading-message").addClass("loading-signal-processing");
+
   jQuery.post(form.attr("action"), form.serialize(), function(data) {
+    jQuery("#loading-message").removeClass("loading-signal-processing");
     if (data.ok) {
-      jQuery("#message_body").val('');
+      jQuery(".hub .form #message_body").val('');
+      jQuery("#loading-message").addClass("loading-signal-done");
+      setTimeout(clearLoadingMessageSignal, 3000);
     }
-    //hub_close_loading();
+    else {
+      jQuery("#loading-message").addClass("loading-signal-error");
+      setTimeout(clearLoadingMessageSignal, 3000);
+    }
   }, 'json');
 
 }
@@ -43,20 +70,22 @@ function new_message(button) {
 function new_mediation(button) {
   var form = jQuery(button).parents("form");
 
-  //hub_open_loading();
+  jQuery("#loading-mediation").addClass("loading-signal-processing");
+
   tinymce.triggerSave();
   jQuery.post(form.attr("action"), form.serialize(), function(data) {
+    jQuery("#loading-mediation").removeClass("loading-signal-processing");
     if (data.ok) {
+      jQuery("#loading-mediation").addClass("loading-signal-done");
       tinymce.get('article_body').setContent('');
+      setTimeout(clearLoadingMediationSignal, 3000);
     }
-    //hub_close_loading();
+    else {
+      jQuery("#loading-mediation").addClass("loading-signal-error");
+      setTimeout(clearLoadingMediationSignal, 3000);
+    }
   }, 'json');
 
-}
-
-
-function toogleAutoScrolling() {
-  alert(jQuery("#auto_scrolling").attr('checked'));
 }
 
 
