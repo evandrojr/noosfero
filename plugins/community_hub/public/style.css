@@ -153,6 +153,19 @@ clear: both;
   margin-bottom: 2px;
 }
 
+.hub .mediation-comment-form {
+  margin-left: 70px;
+  margin-top: 10px;
+}
+
+.hub input.button.with-text.icon-add.submit{
+  display: block;
+}
+
+.hub ul#mediation-posts .post {
+  padding-bottom: 10px;
+}
+
 /**/
 
 .hub .live {
@@ -397,3 +410,5 @@ textarea#message_body {
 .loading-signal-processing {
   background-image: url(/plugins/community_hub/icons/hub-samarelo.gif);
 }
+
+

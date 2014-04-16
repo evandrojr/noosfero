@@ -31,7 +31,7 @@ function new_mediation_comment(button, mediation) {
   jQuery.post(form.attr("action"), form.serialize(), function(data) {
     jQuery(".loading-mediation-comment").filter("#" + mediation).removeClass("loading-signal-processing");
     if (data.ok) {
-      jQuery(".hub .form #message_body").val('');
+      jQuery("#mediation-comment-form-" + mediation + " textarea").val('');
       jQuery(".loading-mediation-comment").filter("#" + mediation).addClass("loading-signal-done");
       setTimeout(function(){
         clearLoadingMediationCommentSignal(mediation);
@@ -117,7 +117,7 @@ function pin_message(post_id) {
     type: 'get',
     dataType: 'json',
     data: { message: post_id, hub: hub_id },
-    success: function(data) {    
+    success: function(data) {
     },
     error: function(ajax, stat, errorThrown) {
       console.log(stat);
@@ -137,8 +137,6 @@ function update_mediation_comments(mediation) {
     var latest_post_id = jQuery("#mediation-comment-list-" + mediation + " li.mediation-comment").last().attr('id');
   }
 
-  //console.log(latest_post_id);
-
   jQuery.ajax({
     url: '/plugin/community_hub/public/newer_mediation_comment',
     type: 'get',
@@ -146,6 +144,7 @@ function update_mediation_comments(mediation) {
     success: function(data) {
       if (data.trim().length > 0) {
         jQuery("#mediation-comment-list-" + mediation + "").append(data);
+        jQuery("#mediation-comment-total-" + mediation).html(jQuery("#mediation-comment-list-" + mediation + " li.mediation-comment").size());
       }
     },
     error: function(ajax, stat, errorThrown) {
