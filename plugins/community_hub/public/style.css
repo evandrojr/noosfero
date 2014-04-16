@@ -78,7 +78,7 @@ clear: both;
 	font-weight: bold;
 	float: left;
 	display: inline-block;
-	line-height: 20px;
+	line-height: 16px;
 	margin-right: 5px;
 }
 
@@ -107,6 +107,7 @@ clear: both;
 
 .hub .mediation-bar ul li.pin{
 	height: 25px;
+  margin-right: 10px;
 }
 
 .hub .remove{}
