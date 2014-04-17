@@ -1,13 +1,13 @@
 --- 
 profiles: 
-  evandro: 
+  MariaJoseOPinto: 
     c7dZNecaM2gF5Jx0bRHxocLmv: 
-      token: 8601482-SnlTsySr3ULpnWgjhlCys2s4RzfIu1dgxxiNHKS4Lr
+      token: 2450103578-CXZK39hmoZhLuGecQou9jympNl9uXG0vB9Xmuks
       consumer_key: c7dZNecaM2gF5Jx0bRHxocLmv
-      username: evandro
+      username: MariaJoseOPinto
       consumer_secret: uDIuSmCJaCgDMk1uuumaibzBQk4imlw4g9IdpVtC7Xo3Jj6mog
-      secret: adEJxbubtrGPsrU7VRIO7pv3ebvnYURsAytNMF2BtexVt
+      secret: HE7gKVgEl11PkGlKUtUwWj9XYwOFOf4DprhlZxOZ25GXl
 configuration: 
   default_profile: 
-  - evandro
+  - MariaJoseOPinto
   - c7dZNecaM2gF5Jx0bRHxocLmv
