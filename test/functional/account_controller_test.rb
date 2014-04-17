@@ -8,7 +8,6 @@ class AccountControllerTest < ActionController::TestCase
   # Be sure to include AuthenticatedTestHelper in test/test_helper.rb instead
   # Then, you can remove it from this and the units test.
   include AuthenticatedTestHelper
-
   all_fixtures
 
   def teardown
@@ -17,8 +16,8 @@ class AccountControllerTest < ActionController::TestCase
 
   def setup
     @controller = AccountController.new
-    @request    = ActionController::TestRequest.new
-    @response   = ActionController::TestResponse.new
+    @request = ActionController::TestRequest.new
+    @response = ActionController::TestResponse.new
     disable_signup_bot_check
   end
 
@@ -646,19 +645,26 @@ class AccountControllerTest < ActionController::TestCase
     assert_redirected_to :controller => 'home', :action => 'index'
   end
 
-  should 'check_url is available on environment' do
+  should 'check_valid_name is available on environment' do
     env = fast_create(Environment, :name => 'Environment test')
     @controller.expects(:environment).returns(env).at_least_once
     profile = create_user('mylogin').person
-    get :check_url, :identifier => 'mylogin'
+    get :check_valid_name, :identifier => 'mylogin'
     assert_equal 'validated', assigns(:status_class)
   end
 
   should 'check if url is not available on environment' do
     @controller.expects(:environment).returns(Environment.default).at_least_once
     profile = create_user('mylogin').person
-    get :check_url, :identifier => 'mylogin'
+    get :check_valid_name, :identifier => 'mylogin'
     assert_equal 'invalid', assigns(:status_class)
+  end
+
+  should 'suggest a list with three possible usernames' do
+    profile = create_user('mylogin').person
+    get :check_valid_name, :identifier => 'mylogin'
+
+    assert_equal 3, assigns(:suggested_usernames).uniq.size
   end
 
   should 'check if e-mail is available on environment' do
@@ -926,6 +932,30 @@ class AccountControllerTest < ActionController::TestCase
     assert @response.body.blank?
   end
 
+  should "Search for state" do
+    create_state_and_city
+
+    xhr :get, :search_state, :state_name=>"Rio Grande"
+
+    json_response = ActiveSupport::JSON.decode(@response.body)
+    label = json_response[0]['label']
+
+    assert_equal label, "Rio Grande do Sul"
+  end
+
+  should "Search for city" do
+    create_state_and_city
+
+    xhr :get, :search_cities, :state_name=>"Rio Grande do Sul", :city_name=>"Lavras"
+
+    json_response = ActiveSupport::JSON.decode(@response.body)
+    label = json_response[0]['label']
+    category =  json_response[0]['category']
+
+    assert_equal category, "Rio Grande do Sul"
+    assert_equal label, "Lavras do Sul"
+  end
+
   protected
   def new_user(options = {}, extra_options ={})
     data = {:profile_data => person_data}
@@ -953,5 +983,19 @@ class AccountControllerTest < ActionController::TestCase
   def disable_signup_bot_check(environment = Environment.default)
     environment.min_signup_delay = 0
     environment.save!
+  end
+
+  def create_state_and_city
+    city = 'Lavras do Sul'
+    state = 'Rio Grande do Sul'
+
+    parent_region = fast_create(NationalRegion, :name => state,
+                                :national_region_code => '43',
+                                :national_region_type_id => NationalRegionType::STATE)
+
+    fast_create(NationalRegion, :name =>  city,
+                                :national_region_code => '431150',
+                                :national_region_type_id => NationalRegionType::CITY,
+                                :parent_national_region_code => parent_region.national_region_code)
   end
 end
