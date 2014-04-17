@@ -173,7 +173,7 @@ function update_mediation_comments(mediation) {
 
 function update_mediations() {
 
-  if (jQuery("#mediation-section.show").size() != 0) {
+  if (jQuery("#right-tab.show").size() != 0) {
 
     var hub_id = jQuery(".hub").attr('id');
 
@@ -206,7 +206,7 @@ function update_mediations() {
 
 function update_live_stream() {
 
-  if (jQuery("#live-section.show").size() != 0) {
+  if (jQuery("#left-tab.show").size() != 0) {
 
     var hub_id = jQuery(".hub").attr('id');
 
@@ -243,17 +243,22 @@ function update_live_stream() {
 }
 
 function hub_left_tab_click() {
-  jQuery("#mediation-section").removeClass('show');
-  jQuery("#mediation-section").addClass('hide');
-  jQuery("#live-section").removeClass('hide');
-  jQuery("#live-section").addClass('show');
+  jQuery("#right-tab").removeClass('show');
+  jQuery("#right-tab").addClass('hide');
+  jQuery("#left-tab").removeClass('hide');
+  jQuery("#left-tab").addClass('show');
 }
 
 function hub_right_tab_click() {
-  jQuery("#live-section").removeClass('show');
-  jQuery("#live-section").addClass('hide');
-  jQuery("#mediation-section").removeClass('hide');
-  jQuery("#mediation-section").addClass('show');
+  jQuery("#left-tab").removeClass('show');
+  jQuery("#left-tab").addClass('hide');
+  jQuery("#right-tab").removeClass('hide');
+  jQuery("#right-tab").addClass('show');
+  jQuery(".hub #left-tab.hide").click(hub_left_tab_click);
+}
+
+function marcelo() {
+  console.log('teste!');
 }
 
 jQuery(document).ready(function() {
@@ -261,8 +266,7 @@ jQuery(document).ready(function() {
     live_scroll_position = jQuery("#live-posts").scrollTop();
   });
 
-  jQuery(".hub #left-tab").click(hub_left_tab_click);
-  jQuery(".hub #right-tab").click(hub_right_tab_click);
+  jQuery(".hub #right-tab.hide").click(hub_right_tab_click);
 
   setTimeout(update_live_stream, 5000);
   setTimeout(update_mediations, 7000);
