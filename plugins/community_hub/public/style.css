@@ -334,7 +334,7 @@ div.content-tab.hide {
     background-color: lightGray;
 }
 
-.hub .live.hide ul#live-posts .li{
+.hub .live.hide ul#live-posts li{
     display: none;
 }
 
