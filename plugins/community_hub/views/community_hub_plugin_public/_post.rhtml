@@ -20,10 +20,10 @@
         <li class="pin">
           <% if !pinned_message?(hub, post.id)  %>
           <a id="<%= post.id %>" href="#" onclick="pin_message(<%= post.id %>); return false;">
-        	  <img class="not-pinned" src="/plugins/community_hub/icons/hub-pinned-icon.png" />
+        	  <img class="not-pinned" src="/plugins/community_hub/icons/hub-pinned-icon.png" title="<%= _("Pin message")%>" />
           </a>
           <% else %>
-            <img class="pinned" src="/plugins/community_hub/icons/hub-not-pinned-icon.png" />
+            <img class="pinned" src="/plugins/community_hub/icons/hub-not-pinned-icon.png" title="<%= _("Message pinned")%>" />
           <% end %>
         </li>
       </ul>
