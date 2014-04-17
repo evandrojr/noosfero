@@ -189,9 +189,9 @@ div.content-tab.hide {
 	 vertical-align: top;
 }
 
-.hub .mediation-bar ul li.pin{
+.hub .mediation-bar ul li.pin {
 	height: 25px;
-  /*margin-right: 10px;*/
+  margin-right: 15px;
 }
 
 .hub .remove{}
@@ -520,19 +520,30 @@ background-color: #f9f9f9;
 
 /****fim aba mediation aberta****/
 
-.hub .form {
+.hub .form-mediation {
     /*clear: left;*/
     /*float: left;*/
-    width: 47%;
+    width: 93%;
   display: inline-block;
-  height: 323px;
+  height: 376px;
   padding: 10px;
   border: 1px solid #c0c0c0;
 }
 
+.hub .form-message {
+    /*clear: left;*/
+    /*float: left;*/
+    width: 93%;
+  display: inline-block;
+  height: 148px;
+  padding: 10px;
+  border: 1px solid #c0c0c0;
+}
+
+
 .hub div.settings {
-    float: right;
-    width: 50%;
+  width: 96%;
+  margin-top: 10px;
 }
 
 .hub ul.settings li {
@@ -646,7 +657,7 @@ textarea#message_body {
   display: inline-block;
   float: right;
   margin-top: -24px;
-  margin-right: 260px;
+  margin-right: 585px;
 }
 
 .hub .loading-mediation-comment {
@@ -655,7 +666,7 @@ textarea#message_body {
   display: inline-block;
   float: right;
   margin-top: -25px;
-  margin-right: 555px;
+  margin-right: 440px;
 }
 
 .loading-signal-done {

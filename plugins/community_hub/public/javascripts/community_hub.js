@@ -33,6 +33,7 @@ function new_mediation_comment(button, mediation) {
     if (data.ok) {
       jQuery("#mediation-comment-form-" + mediation + " textarea").val('');
       jQuery(".loading-mediation-comment").filter("#" + mediation).addClass("loading-signal-done");
+      update_mediation_comments(mediation);
       setTimeout(function(){
         clearLoadingMediationCommentSignal(mediation);
       }, 3000);
@@ -79,6 +80,7 @@ function new_mediation(button) {
     if (data.ok) {
       jQuery("#loading-mediation").addClass("loading-signal-done");
       tinymce.get('article_body').setContent('');
+      update_mediations();
       setTimeout(clearLoadingMediationSignal, 3000);
     }
     else {
@@ -140,7 +142,7 @@ function pin_message(post_id) {
 
 function update_mediation_comments(mediation) {
 
-  if (jQuery("#mediation-section.show").size() != 0) {
+  if (jQuery("#right-tab.show").size() != 0) {
 
     var hub_id = jQuery(".hub").attr('id');
 
@@ -201,7 +203,7 @@ function update_mediations() {
 
   }
 
-  setTimeout(update_mediations, 7000);
+  setTimeout(update_mediations, 5000);
 }
 
 
@@ -270,5 +272,5 @@ jQuery(document).ready(function() {
   jQuery(".hub #right-tab.hide").click(hub_right_tab_click);
 
   setTimeout(update_live_stream, 5000);
-  setTimeout(update_mediations, 7000);
+  setTimeout(update_mediations, 5000);
 });

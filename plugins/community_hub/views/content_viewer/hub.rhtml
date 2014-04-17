@@ -8,7 +8,6 @@
 
   <br />
 
-  
 <div id="left-tab" class="live content-tab show">
 	<h1>
 		<span class="title"><%= @page.title %></span><span class="on-air"><%= _("Live") %></span>
@@ -32,7 +31,7 @@
 
     <% if logged_in? %>
 
-    <div class="form">
+    <div class="form-mediation">
 
       <%= render :file => 'shared/tiny_mce' %>
 
@@ -61,7 +60,7 @@
 
     <% if logged_in? %>
 
-      <div class="form">
+      <div class="form-message">
 
         <% form_for :message,
                     :method => 'post',
@@ -72,7 +71,7 @@
                     } do |f| %>
           <span><%= _("Streaming") %></span>
           <br />
-          <%= f.text_area :body, :style => "width: 99%;", :cols => "38", :rows => "10", :placeholder => _("Type your message here") %>
+          <%= f.text_area :body, :style => "width: 99%;", :cols => "38", :rows => "5", :placeholder => _("Type your message here") %>
           <%= submit_button('add', _('Post'), :onclick => 'new_message(this); return false;') %>
           <span id="loading-message"></span>
         <% end %>
@@ -80,11 +79,6 @@
       </div>
 
       <% end %>
-
-      <div id="banner-embed-container">
-        <%= render :partial => "community_hub_plugin_public/banner" %>
-        <%= render :partial => "community_hub_plugin_public/embed" %>
-      </div>
 
     </div>
 

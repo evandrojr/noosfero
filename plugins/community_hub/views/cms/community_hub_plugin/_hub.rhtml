@@ -14,18 +14,12 @@
   </div>
   <br />
   <div>
-    <%= labelled_form_field(_('Proxy URL[:port] leave blank for none (example: http://161.148.1.167:3128)'), text_field(:article, :proxy_url, :size => '64', :maxlength => 150)) %>
-  </div>
-  <br />
-  <div>
     <%= _('Twitter Settings:') %>
   </div>
   <br />
   <%= check_box(:article, :twitter_enabled) %> <span><%= _("Turn on TWITTER") %></span>
   <br /><br />
     <span><%= required labelled_form_field(_('Twitter\'s Hashtags, comma separated words<br>(example: participa.br,participabr,arenanetmundial,netmundial'), text_field(:article, :hashtags_twitter)) %></span>
-  <br />
-    <span><%= required labelled_form_field(_('Twitter\'s token file<br>use "twurlrc_mariajoseopinto" for production and "twurlrc" for development and test'), text_field(:article, :twitter_token_file)) %></span>
   <br />
   <div>
     <%= _('Facebook Settings:') %>
@@ -34,9 +28,5 @@
   <%= check_box(:article, :facebook_enabled) %> <span><%= _("Turn on FACEBOOK") %></span>
   <br /><br />
     <span><%= required labelled_form_field(_('Id of Facebook\'s page which will be listened for comments (example: participabr'), text_field(:article, :facebook_page_id)) %></span>
-  <br />
-    <span><%= required labelled_form_field(_('Facebook\'s access token (don\'t change unless last one has expired)'), text_field(:article, :facebook_access_token)) %></span>
-    <br />
-    <a href='https://smashballoon.com/custom-facebook-feed/access-token/' ><%= _('How to get a new access token?') %><a>
   <br />
 </div>
