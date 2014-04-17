@@ -8,15 +8,22 @@
 
   <br />
 
-  <span id="left-tab"><%= @page.title %><span class="on-air"><%= _("Live") %></span></span>
-  <span id="right-tab"><%= _("Mediation") %><span class="expand">&#9660;</span></span>
-  <div id="live-section" class="content-tab show">
+  
+<div id="left-tab" class="live content-tab show">
+	<h1>
+		<span class="title"><%= @page.title %></span><span class="on-air"><%= _("Live") %></span>
+	</h1>
+
     <ul id="live-posts">
     </ul>
     <span><%= check_box_tag 'auto_scrolling', 'yes', true %><%= _("Auto scrolling") %></span>
   </div>
 
-  <div id="mediation-section" class="content-tab hide">
+  <div id="right-tab" class="mediation content-tab hide">
+	<h1>
+		<span class="title"><%= _("Mediation") %><span class="expand">&#9660;</span></span>
+	</h1>
+
     <ul id="mediation-posts">
     </ul>
   </div>
