@@ -1,3 +1,5 @@
+require 'ftools'
+
 class CommunityHubPlugin::Listener
 
   class << self
