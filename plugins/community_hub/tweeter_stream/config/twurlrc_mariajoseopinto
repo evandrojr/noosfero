@@ -1,0 +1,13 @@
+--- 
+profiles: 
+  evandro: 
+    c7dZNecaM2gF5Jx0bRHxocLmv: 
+      token: 8601482-SnlTsySr3ULpnWgjhlCys2s4RzfIu1dgxxiNHKS4Lr
+      consumer_key: c7dZNecaM2gF5Jx0bRHxocLmv
+      username: evandro
+      consumer_secret: uDIuSmCJaCgDMk1uuumaibzBQk4imlw4g9IdpVtC7Xo3Jj6mog
+      secret: adEJxbubtrGPsrU7VRIO7pv3ebvnYURsAytNMF2BtexVt
+configuration: 
+  default_profile: 
+  - evandro
+  - c7dZNecaM2gF5Jx0bRHxocLmv

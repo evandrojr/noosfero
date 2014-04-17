@@ -16,7 +16,7 @@ module Twurl
     def perform_request
       client.perform_request_from_options(options) { |response|
           chunk_begining = ""
-          puts "Connecting to tweeter stream : " + response.inspect
+          puts "Connecting to tweeter stream: " + response.inspect
           response.read_body {   |chunk|
             chunk = chunk_begining + chunk
             chunk_complete = false
