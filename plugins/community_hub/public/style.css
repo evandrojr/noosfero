@@ -1,10 +1,10 @@
-div.content-tab.show {
+/*div.content-tab.show {
   display: block;
 }
 
 div.content-tab.hide {
   display: none;
-}
+}*/
 
 #banner-embed-container {
   width: 49%;
@@ -17,17 +17,17 @@ div.content-tab.hide {
   height: 350px;
 }
 
-.hub #left-tab {
-  /*border: 0px solid lightGray;*/
+/*.hub #left-tab {
+  comentado-border: 0px solid lightGray;-comentado
   border: 1px solid red;
   display: inline-block;
   float: left;
   width: 49%;
 	margin-bottom: 2em;
   cursor: pointer;
-}
+}*/
 
-.hub #right-tab {
+/*.hub #right-tab {
   border: 1px solid green;
 	display: inline-block;
 	clear: right;
@@ -36,12 +36,12 @@ div.content-tab.hide {
 	width: 50%;
 	margin-bottom: 2em;
   cursor: pointer;
-}
+}*/
 
 .hub #content-tab {
 }
 
-.hub #left-tab .on-air {
+/*.hub #left-tab .on-air {
     background-color: #d40000;
     border-radius: 10px 10px 10px 10px;
     color: white;
@@ -69,7 +69,7 @@ div.content-tab.hide {
     vertical-align: top;
     width: 20%;
 }
-
+*/
 
 #hub-loading {
   /*margin-top: 18px;*/
@@ -141,18 +141,29 @@ div.content-tab.hide {
 }*/
 
 .hub .message {
-display: inline-block;
-width: 69%;
-float: none;
-clear: both;
+	display: inline-block;
+	width: 65%;
+	float: none;
+	clear: both;
 }
 
-.hub .message .author {
+.hub .show .message {
+	width: 80%;
+}
+
+/*.hub .message .author {
 	font-weight: bold;
 	float: left;
 	display: inline-block;
 	line-height: 16px;
 	margin-right: 5px;
+}*/
+
+.hub .message .author {
+	font-weight: bold;
+	display: inline-block;
+	margin-right: 5px;
+	padding-bottom: 0px;
 }
 
 .hub .mediation-bar {
@@ -236,10 +247,6 @@ clear: both;
   display: block;
 }
 
-.hub ul#mediation-posts .post {
-  padding-bottom: 10px;
-}
-
 /**/
 
 .hub .live {
@@ -269,7 +276,9 @@ clear: both;
 .hub ul#mediation-posts .post{
   background-color:#eee;
   border-color: #fff;
+  padding-bottom: 10px;
 }
+
 
 #content .main-block .hub .live h1{
 	 background-color: #f4f4f4;
@@ -312,6 +321,68 @@ clear: both;
     width: 20%;
 }
 
+/****aba live fechada****/
+
+
+.hub .live.hide {
+    width: 10%;
+}
+
+.hub .live.hide ul#live-posts{
+    overflow-x: visible;
+    overflow-y: visible;
+    background-color: lightGray;
+}
+
+.hub .live.hide ul#live-posts .li{
+    display: none;
+}
+
+#content .hub .live.hide h1 {
+    text-align: center;
+}
+
+#content .hub .live.hide h1 .title {
+    /*display: inline-block;*/
+    display: none;
+}
+#content .hub .live.hide .on-air,
+#content .hub .live.hide .off-air {
+    width: auto;	
+}
+
+
+/****fim aba mediation fechada****/
+
+/****aba mediation aberta****/
+
+.hub .live.show {
+    width: 85%;
+}
+
+/*.hub .live.show ul#live-posts{
+    overflow-x: hidden;
+    overflow-y: scroll;
+    background-color: #fff;
+}*/
+
+.hub .live.show ul#live-posts .li{
+
+}
+
+
+/*#content .hub .live.show .on-air,
+#content .hub .live.show .off-air {
+    width: 20%;	
+}*/
+
+
+
+/****fim aba mediation aberta****/
+
+
+/**************************************/
+
 
 .hub .mediation {
 	border: 0px solid lightGray;
@@ -341,6 +412,104 @@ clear: both;
     float: right;
     padding-right: 1em;
 }
+
+/****aba mediation fechada****/
+
+.hub .mediation.hide {
+	border: 0px solid lightGray;
+	display: inline-block;
+	clear: right;
+	float: none;
+	margin-left: 1%;
+	width: 10%;
+	margin-bottom: 0em;
+}
+
+#content .main-block .hub .mediation.hide h1{
+    background-color: #ed8e01;
+    border: 1px solid lightGray
+}
+
+#content .hub .mediation.hide .title {
+    color: white;
+    display: inline-block;
+    font-size: 14px;
+    font-family: Arial Black, arial, sans-serif;
+    padding-right: 0;
+    width: 100%;
+    /*font-variant: normal;*/
+}
+.hub .mediation.hide .expand {
+    display: none;
+}
+
+
+.hub .mediation.hide ul#mediation-posts {
+height: 500px;
+overflow-x: visible;
+overflow-y: visible;
+border-width: 0 1px 1px;
+border-style: solid;
+border-color: lightGray;
+padding-top: 10px;
+background-color: lightgray;
+}
+
+.hub .mediation.hide ul#mediation-posts li{
+display: none;
+}
+
+/****fim aba mediation fechada****/
+
+/****aba mediation aberta****/
+
+.hub .mediation.show {
+	border: 0px solid lightGray;
+	display: inline-block;
+	clear: right;
+	float: none;
+	margin-left: 1%;
+	width: 85%;
+	margin-bottom: 2em;
+}
+
+#content .main-block .hub .mediation.show h1{
+    background-color: #ed8e01;
+	 border: 1px solid lightGray
+}
+
+#content .hub .mediation.show .title {
+    color: white;
+    display: inline-block;
+    font-size: 20px;
+	 font-family: Arial Black, arial, sans-serif;
+    padding-right: 0;
+    width: 100%;
+	/*font-variant: normal;*/
+}
+.hub .mediation.show .expand {
+    float: right;
+    padding-right: 1em;
+    display: block;
+}
+
+
+.hub .mediation.show ul#mediation-posts {
+height: 500px;
+overflow-x: hidden;
+overflow-y: scroll;
+border-width: 0 1px 1px;
+border-style: solid;
+border-color: lightGray;
+padding-top: 10px;
+background-color: #f9f9f9;
+}
+
+.hub .mediation.hide ul#mediation-posts li{
+display: list-item;
+}
+/****fim aba mediation aberta****/
+
 .hub .form {
     /*clear: left;*/
     /*float: left;*/
