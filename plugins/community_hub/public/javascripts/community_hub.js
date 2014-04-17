@@ -89,143 +89,180 @@ function new_mediation(button) {
 }
 
 
-function promote_user(user_id) {
+function promote_user(mediation, user_id) {
 
-  var hub_id = jQuery(".hub").attr('id');
+  if (confirm(DEFAULT_PROMOTE_QUESTION)) {
 
-  jQuery.ajax({
-    url: '/plugin/community_hub/public/promote_user',
-    type: 'get',
-    dataType: 'json',
-    data: { user: user_id, hub: hub_id },
-    success: function(data) {
-    },
-    error: function(ajax, stat, errorThrown) {
-      console.log(stat);
-    }
-  });
+    var hub_id = jQuery(".hub").attr('id');
+
+    jQuery.ajax({
+      url: '/plugin/community_hub/public/promote_user',
+      type: 'get',
+      dataType: 'json',
+      data: { user: user_id, hub: hub_id },
+      success: function(data) {
+        jQuery(".promote a").filter("#" + mediation).replaceWith( '<img class="promoted" src="/plugins/community_hub/icons/hub-not-promote-icon.png" title="User promoted">' );
+      },
+      error: function(ajax, stat, errorThrown) {
+        console.log(stat);
+      }
+    });
+
+  }
 
 }
 
 
 function pin_message(post_id) {
 
-  var hub_id = jQuery(".hub").attr('id');
+  if (confirm(DEFAULT_PIN_QUESTION)) {
 
-  jQuery.ajax({
-    url: '/plugin/community_hub/public/pin_message',
-    type: 'get',
-    dataType: 'json',
-    data: { message: post_id, hub: hub_id },
-    success: function(data) {
-    },
-    error: function(ajax, stat, errorThrown) {
-      console.log(stat);
-    }
-  });
+    var hub_id = jQuery(".hub").attr('id');
+
+    jQuery.ajax({
+      url: '/plugin/community_hub/public/pin_message',
+      type: 'get',
+      dataType: 'json',
+      data: { message: post_id, hub: hub_id },
+      success: function(data) {
+        jQuery(".pin a").filter("#" + post_id).replaceWith( '<img class="pinned" src="/plugins/community_hub/icons/hub-not-pinned-icon.png" title="Message pinned">' );
+      },
+      error: function(ajax, stat, errorThrown) {
+        console.log(stat);
+      }
+    });
+
+  }
 
 }
 
 
 function update_mediation_comments(mediation) {
-  var hub_id = jQuery(".hub").attr('id');
 
-  if (jQuery("#mediation-comment-list-" + mediation + " li").first().length == 0) {
-    var latest_post_id = 0;
-  }
-  else {
-    var latest_post_id = jQuery("#mediation-comment-list-" + mediation + " li.mediation-comment").last().attr('id');
-  }
+  if (jQuery("#mediation-section.show").size() != 0) {
 
-  jQuery.ajax({
-    url: '/plugin/community_hub/public/newer_mediation_comment',
-    type: 'get',
-    data: { latest_post: latest_post_id, mediation: mediation },
-    success: function(data) {
-      if (data.trim().length > 0) {
-        jQuery("#mediation-comment-list-" + mediation + "").append(data);
-        jQuery("#mediation-comment-total-" + mediation).html(jQuery("#mediation-comment-list-" + mediation + " li.mediation-comment").size());
-      }
-    },
-    error: function(ajax, stat, errorThrown) {
-      console.log(stat);
+    var hub_id = jQuery(".hub").attr('id');
+
+    if (jQuery("#mediation-comment-list-" + mediation + " li").first().length == 0) {
+      var latest_post_id = 0;
     }
-  });
+    else {
+      var latest_post_id = jQuery("#mediation-comment-list-" + mediation + " li.mediation-comment").last().attr('id');
+    }
+
+    jQuery.ajax({
+      url: '/plugin/community_hub/public/newer_mediation_comment',
+      type: 'get',
+      data: { latest_post: latest_post_id, mediation: mediation },
+      success: function(data) {
+        if (data.trim().length > 0) {
+          jQuery("#mediation-comment-list-" + mediation + "").append(data);
+          jQuery("#mediation-comment-total-" + mediation).html(jQuery("#mediation-comment-list-" + mediation + " li.mediation-comment").size());
+        }
+      },
+      error: function(ajax, stat, errorThrown) {
+        console.log(stat);
+      }
+    });
+
+  }
 
   setTimeout(function() { update_mediation_comments(mediation); }, 5000);
 }
 
 
 function update_mediations() {
-  var hub_id = jQuery(".hub").attr('id');
 
-  if (jQuery("#mediation-posts li").first().length == 0) {
-    var latest_post_id = 0;
-  }
-  else {
-    var latest_post_id = jQuery("#mediation-posts li").first().attr('id');
-  }
+  if (jQuery("#mediation-section.show").size() != 0) {
 
-  //console.log(latest_post_id);
+    var hub_id = jQuery(".hub").attr('id');
 
-  jQuery.ajax({
-    url: '/plugin/community_hub/public/newer_articles',
-    type: 'get',
-    data: { latest_post: latest_post_id, hub: hub_id },
-    success: function(data) {
-      if (data.trim().length > 0) {
-        jQuery("#mediation-posts").prepend(data);
-      }
-    },
-    error: function(ajax, stat, errorThrown) {
-      console.log(stat);
+    if (jQuery("#mediation-posts li").first().length == 0) {
+      var latest_post_id = 0;
     }
-  });
+    else {
+      var latest_post_id = jQuery("#mediation-posts li").first().attr('id');
+    }
 
-  setTimeout(update_mediations, 7000);  
+    jQuery.ajax({
+      url: '/plugin/community_hub/public/newer_articles',
+      type: 'get',
+      data: { latest_post: latest_post_id, hub: hub_id },
+      success: function(data) {
+        if (data.trim().length > 0) {
+          jQuery("#mediation-posts").prepend(data);
+        }
+      },
+      error: function(ajax, stat, errorThrown) {
+        console.log(stat);
+      }
+    });
+
+  }
+
+  setTimeout(update_mediations, 7000);
 }
 
 
 function update_live_stream() {
-  var hub_id = jQuery(".hub").attr('id');
 
-  if (jQuery("#live-posts li").first().length == 0) {
-    var latest_post_id = 0;
-  }
-  else {
-    var latest_post_id = jQuery("#live-posts li").first().attr('id');
-  }
+  if (jQuery("#live-section.show").size() != 0) {
 
-  //console.log(latest_post_id);
+    var hub_id = jQuery(".hub").attr('id');
 
-  jQuery.ajax({
-    url: '/plugin/community_hub/public/newer_comments',
-    type: 'get',
-    data: { latest_post: latest_post_id, hub: hub_id },
-    success: function(data) {
-      if (data.trim().length > 0) {
-        jQuery("#live-posts").prepend(data);
-        if (jQuery("#auto_scrolling").attr('checked')) {
-          jQuery("#live-posts").scrollTop(0); 
-        }
-        else {
-          jQuery("#live-posts").scrollTop(live_scroll_position);
-        }
-      }
-    },
-    error: function(ajax, stat, errorThrown) {
-      console.log(stat);
+    if (jQuery("#live-posts li").first().length == 0) {
+      var latest_post_id = 0;
     }
-  });
+    else {
+      var latest_post_id = jQuery("#live-posts li").first().attr('id');
+    }
 
-  setTimeout(update_live_stream, 5000);  
+    jQuery.ajax({
+      url: '/plugin/community_hub/public/newer_comments',
+      type: 'get',
+      data: { latest_post: latest_post_id, hub: hub_id },
+      success: function(data) {
+        if (data.trim().length > 0) {
+          jQuery("#live-posts").prepend(data);
+          if (jQuery("#auto_scrolling").attr('checked')) {
+            jQuery("#live-posts").scrollTop(0);
+          }
+          else {
+            jQuery("#live-posts").scrollTop(live_scroll_position);
+          }
+        }
+      },
+      error: function(ajax, stat, errorThrown) {
+        console.log(stat);
+      }
+    });
+
+  }
+
+  //setTimeout(update_live_stream, 5000);
 }
 
+function hub_left_tab_click() {
+  jQuery("#mediation-section").removeClass('show');
+  jQuery("#mediation-section").addClass('hide');
+  jQuery("#live-section").removeClass('hide');
+  jQuery("#live-section").addClass('show');
+}
+
+function hub_right_tab_click() {
+  jQuery("#live-section").removeClass('show');
+  jQuery("#live-section").addClass('hide');
+  jQuery("#mediation-section").removeClass('hide');
+  jQuery("#mediation-section").addClass('show');
+}
 
 jQuery(document).ready(function() {
   jQuery("#live-posts").scroll(function() {
     live_scroll_position = jQuery("#live-posts").scrollTop();
   });
+
+  jQuery(".hub #left-tab").click(hub_left_tab_click);
+  jQuery(".hub #right-tab").click(hub_right_tab_click);
 
   setTimeout(update_live_stream, 5000);
   setTimeout(update_mediations, 7000);

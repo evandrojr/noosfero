@@ -13,12 +13,12 @@
       <ul>
 
         <li class="promote">
-          <% if promoted?(hub, mediation.author.id) %>
-          <a id="<%= mediation.id %>" href="#" onclick="promote_user(<%= mediation.author.id %>); return false;">
-            <img class="promoted" src="/plugins/community_hub/icons/hub-promote-icon.png" title="<%= _("User promoted") %>" />
+          <% if !promoted?(hub, mediation.author.id) %>
+          <a id="<%= mediation.id %>" href="#" onclick="promote_user(<%= mediation.id %>,<%= mediation.author.id %>); return false;">
+            <img class="not-promoted" src="/plugins/community_hub/icons/hub-not-promote-icon.png" title="<%= _("User not promoted") %>" />
           </a>
           <% else %>
-            <img class="not-promoted" src="/plugins/community_hub/icons/hub-not-promote-icon.png" title="<%= _("User not  promoted") %>" />
+            <img class="promoted" src="/plugins/community_hub/icons/hub-not-promote-icon.png" title="<%= _("User promoted") %>" />
           <% end %>
         </li>
 

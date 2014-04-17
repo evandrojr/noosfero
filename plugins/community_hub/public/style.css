@@ -1,3 +1,76 @@
+div.content-tab.show {
+  display: block;
+}
+
+div.content-tab.hide {
+  display: none;
+}
+
+#banner-embed-container {
+  width: 49%;
+  float: right;
+}
+
+#input-panel {
+  height: 350px;
+  padding-top: 10px;
+  height: 350px;
+}
+
+.hub #left-tab {
+  /*border: 0px solid lightGray;*/
+  border: 1px solid red;
+  display: inline-block;
+  float: left;
+  width: 49%;
+	margin-bottom: 2em;
+  cursor: pointer;
+}
+
+.hub #right-tab {
+  border: 1px solid green;
+	display: inline-block;
+	clear: right;
+	float: none;
+	margin-left: 1%;
+	width: 50%;
+	margin-bottom: 2em;
+  cursor: pointer;
+}
+
+.hub #content-tab {
+}
+
+.hub #left-tab .on-air {
+    background-color: #d40000;
+    border-radius: 10px 10px 10px 10px;
+    color: white;
+    display: inline-block;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 0 0.5em;
+    text-align: center;
+    text-transform: uppercase;
+    vertical-align: top;
+    width: 20%;
+
+}
+
+.hub #left-tab .off-air {
+    background-color: gray;
+    border-radius: 10px 10px 10px 10px;
+    color: black;
+    display: inline-block;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 0 0.5em;
+    text-align: center;
+    text-transform: uppercase;
+    vertical-align: top;
+    width: 20%;
+}
+
+
 #hub-loading {
   /*margin-top: 18px;*/
   float: right;
@@ -85,7 +158,7 @@ clear: both;
 .hub .mediation-bar {
   display: inline-block;
   margin: 10px 0 10px 104px;
-  width: 70%;
+  width: 83%;
 }
 
 .hub .mediation-bar ul {}
@@ -107,7 +180,7 @@ clear: both;
 
 .hub .mediation-bar ul li.pin{
 	height: 25px;
-  margin-right: 10px;
+  /*margin-right: 10px;*/
 }
 
 .hub .remove{}
@@ -185,6 +258,7 @@ clear: both;
 	border-style: solid;
 	border-color: lightGray;
 	padding-top: 10px;
+/*border: 1px solid red;*/
 }
 
 
@@ -268,9 +342,13 @@ clear: both;
     padding-right: 1em;
 }
 .hub .form {
-    clear: left;
-    float: left;
-    width: 49%;
+    /*clear: left;*/
+    /*float: left;*/
+    width: 47%;
+  display: inline-block;
+  height: 323px;
+  padding: 10px;
+  border: 1px solid #c0c0c0;
 }
 
 .hub div.settings {
@@ -292,11 +370,12 @@ clear: both;
 }
 
 .hub div.banner {
-  width: 50%;
-  height: 100px;
+  /*width: 50%;*/
+  height: 70px;
   background-color: #6d6d6d;
-  float: right;
+  /*float: right;*/
   text-align: center;
+  padding-top: 30px;
 }
 
 .hub div.banner span {
@@ -304,17 +383,17 @@ clear: both;
   font-family: Arial Black, arial, sans-serif;
   font-size: large;
   font-weight: normal;
-  margin-top: 35px;
+  /*margin-top: 35px;*/
   display: block;
 }
 
 .hub div.embed {
   margin-top: 10px;
   padding: 8px;
-  width: 48%;
-  height: 216px;
+  /*width: 48%;*/
+  /*height: 216px;*/
   border: 1px solid #c0c0c0;
-  float: right;
+  /*float: right;*/
 }
 
 .hub div.embed textarea.code {
@@ -387,8 +466,8 @@ textarea#message_body {
   height: 16px;
   display: inline-block;
   float: right;
-  margin-top: 17px;
-  margin-right: 270px;
+  margin-top: -24px;
+  margin-right: 260px;
 }
 
 .hub .loading-mediation-comment {
@@ -396,8 +475,8 @@ textarea#message_body {
   height: 16px;
   display: inline-block;
   float: right;
-  margin-top: 16px;
-  margin-right: 260px;
+  margin-top: -25px;
+  margin-right: 555px;
 }
 
 .loading-signal-done {
