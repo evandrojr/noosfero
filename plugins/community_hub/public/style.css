@@ -352,9 +352,10 @@ div.content-tab.hide {
 }
 
 
-/****fim aba mediation fechada****/
 
-/****aba mediation aberta****/
+/****fim aba live fechada****/
+
+/****aba live aberta****/
 
 .hub .live.show {
     width: 85%;
@@ -370,6 +371,11 @@ div.content-tab.hide {
 
 }
 
+#content .hub .live.show .on-air,
+#content .hub .live.show .off-air{
+float: right;
+margin-right: 10px;
+}
 
 /*#content .hub .live.show .on-air,
 #content .hub .live.show .off-air {
@@ -378,7 +384,7 @@ div.content-tab.hide {
 
 
 
-/****fim aba mediation aberta****/
+/****fim aba mlive aberta****/
 
 
 /**************************************/
@@ -427,7 +433,9 @@ div.content-tab.hide {
 
 #content .main-block .hub .mediation.hide h1{
     background-color: #ed8e01;
-    border: 1px solid lightGray
+    border: 1px solid lightGray;
+    text-align: center;
+    padding-left: 0;
 }
 
 #content .hub .mediation.hide .title {
@@ -508,6 +516,8 @@ background-color: #f9f9f9;
 .hub .mediation.hide ul#mediation-posts li{
 display: list-item;
 }
+
+
 /****fim aba mediation aberta****/
 
 .hub .form {
