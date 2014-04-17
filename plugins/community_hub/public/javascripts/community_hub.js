@@ -254,6 +254,11 @@ function hub_right_tab_click() {
   jQuery("#left-tab").addClass('hide');
   jQuery("#right-tab").removeClass('hide');
   jQuery("#right-tab").addClass('show');
+  jQuery(".hub #left-tab.hide").click(hub_left_tab_click);
+}
+
+function marcelo() {
+  console.log('teste!');
 }
 
 jQuery(document).ready(function() {
@@ -261,7 +266,6 @@ jQuery(document).ready(function() {
     live_scroll_position = jQuery("#live-posts").scrollTop();
   });
 
-  jQuery(".hub #left-tab.hide").click(hub_left_tab_click);
   jQuery(".hub #right-tab.hide").click(hub_right_tab_click);
 
   setTimeout(update_live_stream, 5000);
