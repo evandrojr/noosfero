@@ -17,6 +17,10 @@ module Twurl
       client.perform_request_from_options(options) { |response|
           chunk_begining = ""
           puts "Connecting to tweeter stream: " + response.inspect
+          if response.inspect.to_s.include?('HTTPClientError 420')
+             puts "<<<<<<Error connecting to tweeter stream, maybe need another token!!!!!>>>>>>"
+             return
+          end
           response.read_body {   |chunk|
             chunk = chunk_begining + chunk
             chunk_complete = false
@@ -39,11 +43,11 @@ module Twurl
                   comment.source = options.page
                   comment.body = comment_text
                   comment.author_id = options.author_id
-                  #Attention please, don't remove + ' ')[0..-2] it is used for UTF8 validation               
+                  #Attention please, don't remove + ' ')[0..-2] it is used for UTF8 validation
                   comment.name = ic.iconv(parsed["user"]["name"] + ' ')[0..-2]
+                  puts "@#{comment.name} " +_('said') + ": #{comment.body}"
                   comment.email = 'admin@localhost.local'
                   comment.save!
-                  puts "@#{comment.name} " +_('said') + ": #{comment_text}"
                 end
               rescue => e
                 puts "Erro gravando comentário twitter #{e.inspect}"
