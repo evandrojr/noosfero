@@ -513,7 +513,7 @@ padding-top: 10px;
 background-color: #f9f9f9;
 }
 
-.hub .mediation.hide ul#mediation-posts li{
+.hub .mediation.show ul#mediation-posts li{
 display: list-item;
 }
 
