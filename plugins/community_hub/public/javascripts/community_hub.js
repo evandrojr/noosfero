@@ -56,6 +56,7 @@ function new_message(button) {
     if (data.ok) {
       jQuery(".hub .form #message_body").val('');
       jQuery("#loading-message").addClass("loading-signal-done");
+      update_live_stream();
       setTimeout(clearLoadingMessageSignal, 3000);
     }
     else {
@@ -239,7 +240,7 @@ function update_live_stream() {
 
   }
 
-  //setTimeout(update_live_stream, 5000);
+  setTimeout(update_live_stream, 5000);
 }
 
 function hub_left_tab_click() {
