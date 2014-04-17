@@ -25,6 +25,8 @@
   <br /><br />
     <span><%= required labelled_form_field(_('Twitter\'s Hashtags, comma separated words<br>(example: participa.br,participabr,arenanetmundial,netmundial'), text_field(:article, :hashtags_twitter)) %></span>
   <br />
+    <span><%= required labelled_form_field(_('Twitter\'s token file<br>use "twurlrc_mariajoseopinto" for production and "twurlrc" for development and test'), text_field(:article, :twitter_token_file)) %></span>
+  <br />
   <div>
     <%= _('Facebook Settings:') %>
   </div>
