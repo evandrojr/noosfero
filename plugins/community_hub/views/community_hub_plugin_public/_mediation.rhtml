@@ -6,25 +6,25 @@
     <li class="time"><%= post_time(mediation.created_at) %></li>
     <li class="avatar"><%= image_tag(profile_icon(mediation.author, :minor)) %></li>
     <li class="message"><span class="author"><%= mediation.author_name %>:</span> <%= mediation.body %></li>
-    
+
     <% if mediator?(hub) %>
     <li class="mediation-bar">
 
       <ul>
-        
+
         <li class="promote">
-          <% if !promoted?(hub, mediation.author.id) %>
+          <% if promoted?(hub, mediation.author.id) %>
           <a id="<%= mediation.id %>" href="#" onclick="promote_user(<%= mediation.author.id %>); return false;">
-            <img class="promoted" src="/plugins/community_hub/icons/hub-promote-icon.png" />
+            <img class="promoted" src="/plugins/community_hub/icons/hub-promote-icon.png" title="<%= _("User promoted") %>" />
           </a>
           <% else %>
-            <img class="not-promoted" src="/plugins/community_hub/icons/hub-not-promote-icon.png" />
+            <img class="not-promoted" src="/plugins/community_hub/icons/hub-not-promote-icon.png" title="<%= _("User not  promoted") %>" />
           <% end %>
         </li>
 
         <% if pinned_mediation?(hub, mediation.id) %>
         <li class="pin">
-          <img class="pinned" src="/plugins/community_hub/icons/hub-not-pinned-icon.png" />
+          <img class="pinned" src="/plugins/community_hub/icons/hub-not-pinned-icon.png" title="<%= _("Message pinned")%>" />
         </li>
         <% end %>
 
@@ -38,16 +38,16 @@
     <% total_mediation_comments = mediation.comments.count %>
 
     <span class="comment-count">
-      <%= link_to(_( "#{total_mediation_comments} Comments" ) , '#', 
-            :class => 'display-comment-form', 
-            :id => 'top-post-comment-button', 
+      <%= link_to(_( "<span id='mediation-comment-total-#{mediation.id}'>#{total_mediation_comments}</span> Comments" ) , '#',
+            :class => 'display-comment-form',
+            :id => 'top-post-comment-button',
             :onclick => "toogle_mediation_comments(#{mediation.id}); return false;") %>
     </span>
 
     <script type="text/javascript">
       setTimeout(function() { update_mediation_comments('<%= mediation.id %>')}, 5000);
     </script>
-    
+
     <ul id="mediation-comment-list-<%=mediation.id%>" class="mediation-comment-list" style="display:none;">
     <% if mediation.accept_comments? && mediation.comments.count > 0 %>
       <%= render :partial => 'community_hub_plugin_public/mediation_comment', :collection => mediation.comments %>
@@ -60,12 +60,12 @@
                    :locals => {
                       :hub => hub,
                       :mediation => mediation,
-                      :comment => Comment.new, 
+                      :comment => Comment.new,
                       :url => {
-                        :controller => :comment, 
+                        :controller => :comment,
                         :action => :create
-                      }, 
-                      :display_link => true, 
+                      },
+                      :display_link => true,
                       :cancel_triggers_hide => true
                    } %>
       </div>

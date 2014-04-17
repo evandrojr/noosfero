@@ -18,6 +18,10 @@ class CommunityHubPlugin::Hub < Folder
     hub.mediators = [hub.author.id]
   end
 
+  def notify_comments
+    false
+  end
+
   def self.icon_name(article = nil)
     'community-hub'
   end

@@ -16,17 +16,7 @@
 
     <% if mediator?(hub) && post.title != 'hub-message-twitter' && post.title != 'hub-message-facebook' %>
     <li class="mediation-bar">
-
       <ul>
-        <li class="promote">
-          <% if promoted?(hub, post.author.id) == 'promoted' %>
-          <a id="<%= post.id %>" href="#" onclick="pin_message(<%= post.id %>); return false;">
-            <img class="promoted" src="/plugins/community_hub/icons/hub-promote-icon.png" />
-          </a>
-          <% else %>
-            <img class="not-promoted" src="/plugins/community_hub/icons/hub-not-promote-icon.png" />
-          <% end %>
-        </li>
         <li class="pin">
           <% if !pinned_message?(hub, post.id)  %>
           <a id="<%= post.id %>" href="#" onclick="pin_message(<%= post.id %>); return false;">
@@ -37,7 +27,6 @@
           <% end %>
         </li>
       </ul>
-
     </li>
     <% end %>
 

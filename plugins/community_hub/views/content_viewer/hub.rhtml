@@ -43,6 +43,7 @@
         <br />
         <%= f.text_area :body, :style => "width: 99%;", :cols => "38", :rows => "10", :placeholder => _("Type your message here") %>
         <%= submit_button('add', _('Post'), :onclick => 'new_message(this); return false;') %>
+        <span id="loading-message"></span>
       <% end %>
 
     <% else %>
@@ -59,6 +60,7 @@
         <%= f.hidden_field :parent_id, :value => @page.id %>
         <%= f.text_area :body, :style => "width: 100%;", :class => "mceEditor" %>
         <%= submit_button('add', _('Post'), :onclick => 'new_mediation(this); return false;') %>
+        <span id="loading-mediation"></span>
       <% end %>
 
     <% end %>

@@ -78,7 +78,7 @@ clear: both;
 	font-weight: bold;
 	float: left;
 	display: inline-block;
-	line-height: 20px;
+	line-height: 16px;
 	margin-right: 5px;
 }
 
@@ -107,6 +107,7 @@ clear: both;
 
 .hub .mediation-bar ul li.pin{
 	height: 25px;
+  margin-right: 10px;
 }
 
 .hub .remove{}
@@ -151,6 +152,19 @@ clear: both;
 
 .hub ul.mediation-comment-list li {
   margin-bottom: 2px;
+}
+
+.hub .mediation-comment-form {
+  margin-left: 70px;
+  margin-top: 10px;
+}
+
+.hub input.button.with-text.icon-add.submit{
+  display: block;
+}
+
+.hub ul#mediation-posts .post {
+  padding-bottom: 10px;
 }
 
 /**/
@@ -366,4 +380,36 @@ textarea#message_body {
 .hub ul.mediation-comment-list {
   width: 80%;
 }
+
+.hub #loading-message,
+.hub #loading-mediation {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  float: right;
+  margin-top: 17px;
+  margin-right: 270px;
+}
+
+.hub .loading-mediation-comment {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  float: right;
+  margin-top: 16px;
+  margin-right: 260px;
+}
+
+.loading-signal-done {
+  background-image: url(/plugins/community_hub/icons/hub-sverde-a.png);
+}
+
+.loading-signal-error {
+  background-image: url(/plugins/community_hub/icons/hub-svermelho-a.png);
+}
+
+.loading-signal-processing {
+  background-image: url(/plugins/community_hub/icons/hub-samarelo.gif);
+}
+
 
