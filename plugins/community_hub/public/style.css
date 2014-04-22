@@ -1,11 +1,3 @@
-/*div.content-tab.show {
-  display: block;
-}
-
-div.content-tab.hide {
-  display: none;
-}*/
-
 #banner-embed-container {
   width: 49%;
   float: right;
@@ -17,72 +9,13 @@ div.content-tab.hide {
   height: 350px;
 }
 
-/*.hub #left-tab {
-  comentado-border: 0px solid lightGray;-comentado
-  border: 1px solid red;
-  display: inline-block;
-  float: left;
-  width: 49%;
-	margin-bottom: 2em;
-  cursor: pointer;
-}*/
-
-/*.hub #right-tab {
-  border: 1px solid green;
-	display: inline-block;
-	clear: right;
-	float: none;
-	margin-left: 1%;
-	width: 50%;
-	margin-bottom: 2em;
-  cursor: pointer;
-}*/
-
-.hub #content-tab {
-}
-
-/*.hub #left-tab .on-air {
-    background-color: #d40000;
-    border-radius: 10px 10px 10px 10px;
-    color: white;
-    display: inline-block;
-    font-size: 16px;
-    font-weight: bold;
-    padding: 0 0.5em;
-    text-align: center;
-    text-transform: uppercase;
-    vertical-align: top;
-    width: 20%;
-
-}
-
-.hub #left-tab .off-air {
-    background-color: gray;
-    border-radius: 10px 10px 10px 10px;
-    color: black;
-    display: inline-block;
-    font-size: 16px;
-    font-weight: bold;
-    padding: 0 0.5em;
-    text-align: center;
-    text-transform: uppercase;
-    vertical-align: top;
-    width: 20%;
-}
-*/
-
 #hub-loading {
-  /*margin-top: 18px;*/
   float: right;
 }
 
 .icon-newcommunity-hub,
 .icon-community-hub {
   background-image: url(/plugins/community_hub/icons/community-hub.png)
-}
-
-.hub {
-    /*border: 1px solid red;*/
 }
 
 .hub ul {padding-left: 0px; margin-top: 0;}
@@ -135,11 +68,6 @@ div.content-tab.hide {
     max-width: 43px;
 }
 
-/*.hub .message{
-    display: inline-block;
-    width: 70%;
-}*/
-
 .hub .message {
 	display: inline-block;
 	width: 65%;
@@ -150,14 +78,6 @@ div.content-tab.hide {
 .hub .show .message {
 	width: 80%;
 }
-
-/*.hub .message .author {
-	font-weight: bold;
-	float: left;
-	display: inline-block;
-	line-height: 16px;
-	margin-right: 5px;
-}*/
 
 .hub .message .author {
 	font-weight: bold;
@@ -176,9 +96,7 @@ div.content-tab.hide {
 
 .hub .mediation-bar ul li {
   display: inline-block;
-  /*margin-right: 5px;*/
   overflow: hidden;
-  /*text-indent: -1000px;*/
   width: 16px;
 }
 
@@ -200,22 +118,10 @@ div.content-tab.hide {
 	text-indent: -10000px;
 }
 
-/*
-.hub .promoted {
-	background: url("images/hub-promote-icon.png") no-repeat center center #fff;
-}*/
-
 .hub .not-promoted {
-  /*background: url("images/hub-not-promote-icon.png") no-repeat center center #fff;*/
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
-
-/*
-.hub .pin {
-	background: url("images/hub-pin-icon.png") no-repeat center center #fff;
-}
-*/
 
 .hub .pin .not-pinned {
   opacity: 0.5;
@@ -247,8 +153,6 @@ div.content-tab.hide {
   display: block;
 }
 
-/**/
-
 .hub .live {
     border: 0px solid lightGray;
     display: inline-block;
@@ -265,7 +169,6 @@ div.content-tab.hide {
 	border-style: solid;
 	border-color: lightGray;
 	padding-top: 10px;
-/*border: 1px solid red;*/
 }
 
 
@@ -343,15 +246,12 @@ div.content-tab.hide {
 }
 
 #content .hub .live.hide h1 .title {
-    /*display: inline-block;*/
     display: none;
 }
 #content .hub .live.hide .on-air,
 #content .hub .live.hide .off-air {
-    width: auto;	
+    width: auto;
 }
-
-
 
 /****fim aba live fechada****/
 
@@ -360,12 +260,6 @@ div.content-tab.hide {
 .hub .live.show {
     width: 85%;
 }
-
-/*.hub .live.show ul#live-posts{
-    overflow-x: hidden;
-    overflow-y: scroll;
-    background-color: #fff;
-}*/
 
 .hub .live.show ul#live-posts .li{
 
@@ -376,13 +270,6 @@ div.content-tab.hide {
 float: right;
 margin-right: 10px;
 }
-
-/*#content .hub .live.show .on-air,
-#content .hub .live.show .off-air {
-    width: 20%;	
-}*/
-
-
 
 /****fim aba mlive aberta****/
 
@@ -412,7 +299,6 @@ margin-right: 10px;
 	 font-family: Arial Black, arial, sans-serif;
     padding-right: 0;
     width: 100%;
-	/*font-variant: normal;*/
 }
 .hub .mediation .expand {
     float: right;
@@ -445,7 +331,6 @@ margin-right: 10px;
     font-family: Arial Black, arial, sans-serif;
     padding-right: 0;
     width: 100%;
-    /*font-variant: normal;*/
 }
 .hub .mediation.hide .expand {
     display: none;
@@ -493,7 +378,6 @@ display: none;
 	 font-family: Arial Black, arial, sans-serif;
     padding-right: 0;
     width: 100%;
-	/*font-variant: normal;*/
 }
 .hub .mediation.show .expand {
     float: right;
@@ -521,8 +405,6 @@ background-color: #f9f9f9;
 /****fim aba mediation aberta****/
 
 .hub .form-mediation {
-    /*clear: left;*/
-    /*float: left;*/
     width: 93%;
   display: inline-block;
   height: 376px;
@@ -531,8 +413,6 @@ background-color: #f9f9f9;
 }
 
 .hub .form-message {
-    /*clear: left;*/
-    /*float: left;*/
     width: 93%;
   display: inline-block;
   height: 148px;
@@ -560,10 +440,8 @@ background-color: #f9f9f9;
 }
 
 .hub div.banner {
-  /*width: 50%;*/
   height: 70px;
   background-color: #6d6d6d;
-  /*float: right;*/
   text-align: center;
   padding-top: 30px;
 }
@@ -573,17 +451,13 @@ background-color: #f9f9f9;
   font-family: Arial Black, arial, sans-serif;
   font-size: large;
   font-weight: normal;
-  /*margin-top: 35px;*/
   display: block;
 }
 
 .hub div.embed {
   margin-top: 10px;
   padding: 8px;
-  /*width: 48%;*/
-  /*height: 216px;*/
   border: 1px solid #c0c0c0;
-  /*float: right;*/
 }
 
 .hub div.embed textarea.code {
@@ -612,26 +486,10 @@ background-color: #f9f9f9;
 	 margin-top: 10px;
 }
 
-.hub .settings .twitter, .hub .settings .facebook, .hub .settings .general {
-   /* border: 1px solid red;*/
-}
-
 textarea#message_body {
   width: auto;
   margin-left: 80px;
 }
-
-/*
-.comment-count {
-  margin-left: 80px;
-  padding: 5px 10px;
-  background-color: white;
-  display: inline-block;
-  border-radius: 5px;
-  font-weight: bold;
-  margin-bottom: -5px;
-}
-*/
 
 .comment-count {
   margin-left: 80px;
@@ -680,5 +538,3 @@ textarea#message_body {
 .loading-signal-processing {
   background-image: url(/plugins/community_hub/icons/hub-samarelo.gif);
 }
-
-

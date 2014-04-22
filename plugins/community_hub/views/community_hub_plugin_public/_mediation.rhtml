@@ -45,7 +45,7 @@
     </span>
 
     <script type="text/javascript">
-      setTimeout(function() { update_mediation_comments('<%= mediation.id %>')}, 5000);
+      mediations.push( [ <%= mediation.id %>, setInterval(function() { update_mediation_comments('<%= mediation.id %>', false)}, 5000) ] );
     </script>
 
     <ul id="mediation-comment-list-<%=mediation.id%>" class="mediation-comment-list" style="display:none;">

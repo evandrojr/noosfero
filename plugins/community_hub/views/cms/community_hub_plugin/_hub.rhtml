@@ -5,7 +5,8 @@
     <%= required labelled_form_field(_('Title'), text_field(:article, 'name', :size => '64', :maxlength => 150)) %>
   </div>
   <div>
-    <%= required labelled_form_field(_('Description'), text_area(:article, 'body', :style => 'width: 99%;')) %>
+    <%= render :file => 'shared/tiny_mce' %>
+    <%= required labelled_form_field(_('Description'), text_area(:article, 'body', :style => 'width: 100%;', :class => 'mceEditor')) %>
   </div>
   <br />
 
