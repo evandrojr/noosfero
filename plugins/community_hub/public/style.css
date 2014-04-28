@@ -243,6 +243,7 @@
 
 #content .hub .live.hide h1 {
     text-align: center;
+  cursor: pointer;
 }
 
 #content .hub .live.hide h1 .title {
@@ -322,6 +323,7 @@ margin-right: 10px;
     border: 1px solid lightGray;
     text-align: center;
     padding-left: 0;
+  cursor: pointer;
 }
 
 #content .hub .mediation.hide .title {
