@@ -38,7 +38,7 @@
     <% total_mediation_comments = mediation.comments.count %>
 
     <span class="comment-count">
-      <%= link_to(_( "<span id='mediation-comment-total-#{mediation.id}'>#{total_mediation_comments}</span> Comments" ) , '#',
+      <%= link_to( "<span id='mediation-comment-total-#{mediation.id}'>#{total_mediation_comments}</span>" + _("Comments") , '#',
             :class => 'display-comment-form',
             :id => 'top-post-comment-button',
             :onclick => "toogle_mediation_comments(#{mediation.id}); return false;") %>
