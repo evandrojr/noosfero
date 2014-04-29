@@ -114,9 +114,9 @@ class ContentViewerController < ApplicationController
 
     if params[:slideshow]
       render :action => 'slideshow', :layout => 'slideshow'
+    else
+      render :file => @page.view_page, :layout => true
     end
-
-    render :file => @page.view_page, :layout => true
   end
 
   def article_versions
