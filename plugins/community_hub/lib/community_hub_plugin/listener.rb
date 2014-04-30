@@ -5,8 +5,7 @@ class CommunityHubPlugin::Listener
   class << self
 
     def twitter_service(hub)
-      hub.twitter_token_file ||= 'twurlrc'
-      Twurl::Stream.run(hub, nil, hub.hashtags_twitter, File.dirname(__FILE__) + '/../../tweeter_stream/config/' + hub.twitter_token_file, hub.proxy_url)
+      listen_twitter_stream(hub, nil)
     end
 
     def facebook_service(hub)
