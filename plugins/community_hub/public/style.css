@@ -242,7 +242,11 @@
 	text-align: center;
     top: 7px;
     line-height: 27px;
-    
+}
+
+#content .main-block .hub div#left-tab.show h1.mediation,
+#content .main-block .hub div#right-tab.show h1.live {
+  cursor: pointer;
 }
 
 #content .main-block .hub .live h1.mediation,
