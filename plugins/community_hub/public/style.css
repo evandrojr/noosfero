@@ -7,6 +7,7 @@
   height: 350px;
   padding-top: 10px;
   height: 350px;
+  display: inline-block; 
 }
 
 #hub-loading {
@@ -24,6 +25,14 @@
 	margin-bottom: 0;
 }
 
+#content .hub .content-tab h1{
+    border-color: #D71410 #CCCCCC -moz-use-text-color;
+    border-left: 1px solid #CCCCCC;
+    border-right: 1px solid #CCCCCC;
+    border-style: solid solid none;
+    border-width: 1px 1px 0;
+    border-top: 1px solid #D71410;
+}
 
 #content .hub .title {
     font-size: 33px;
@@ -38,7 +47,7 @@
 }
 
 .hub .post {
-	border-bottom: 1px solid #ddd;
+	border-top: 1px solid #ddd;
 	background: url("images/hub-time-bg.gif") repeat-y left top #fff;
 	padding: 5px 0;
 }
@@ -165,12 +174,36 @@
     height: 500px;
     overflow-x: hidden;
     overflow-y: scroll;
-	border-width: 0 1px 1px;
+	border-width: 1px 0;
 	border-style: solid;
 	border-color: lightGray;
 	padding-top: 10px;
+    clear: both;
 }
 
+/*modificação da scroll bar*/
+.hub ul#live-posts::-webkit-scrollbar-button {
+	height: 0;
+	width: 0;
+}
+
+.hub ul#live-posts::-webkit-scrollbar-thumb {
+	background-clip: padding-box;
+	background-color: rgba(0,0,0,.3);
+	border: 5px solid transparent;
+	border-radius: 10px;
+	min-height: 20px;
+	min-width: 20px;
+	height: 5px;
+	width: 5px;
+}
+
+.hub ul#live-posts::-webkit-scrollbar {
+	height: 15px;
+	width: 15px;
+}
+
+/*fim de modificação da scroll bar*/
 
 .hub #live-posts .post {
 	background-color:#fff;
@@ -182,22 +215,53 @@
   padding-bottom: 10px;
 }
 
-
-#content .main-block .hub .live h1{
-	 background-color: #f4f4f4;
+/*novos elementos: h1.live - h1.mediation*/
+#content .main-block .hub .live h1.live,
+#content .main-block .hub .mediation h1.mediation {
+	 /*background-color: #f4f4f4;*/
 	 border: 1px solid lightGray
+
+    border-bottom: 1px solid #FFFFFF;
+    float: left;
+    font-weight: normal;
+    margin-bottom: -1px;
+    margin-right: 20px;
+    width: 60%;
+}
+#content .main-block .hub .live h1.mediation,
+#content .main-block .hub .mediation h1.live  {
+
+    display: inline;
+    background-color: #EEEEEE;
+    border-bottom: 1px solid #CCCCCC;
+    border-top-color: #CCCCCC;
+    color: gray;
+    position: relative;
+    top: 1px;
+    width: 20%;
+	text-align: center;
+    top: 7px;
+    line-height: 27px;
+    
 }
 
-#content .hub .live .title {
-    color: #656565;
+#content .main-block .hub .live h1.mediation,
+#content .main-block .hub .mediation h1.live  {
     display: inline-block;
-    font-size: 20px;
+}
+/*fim de novos elementos: h1.live - h1.mediation*/
+
+
+#content .hub .live .title {
+    color: #D71410;
+    display: inline-block;
+    font-size: 14px;
 	 font-family: Arial Black, arial, sans-serif;
     padding-right: 0;
     width: 70%;
 }
 #content .hub .live .on-air {
-    background-color: #d40000;
+    background-color: #96110D;
     border-radius: 10px 10px 10px 10px;
     color: white;
     display: inline-block;
@@ -294,10 +358,10 @@ margin-right: 10px;
 }
 
 #content .hub .mediation .title {
-    color: white;
+    color: gray;
     display: inline-block;
-    font-size: 20px;
-	 font-family: Arial Black, arial, sans-serif;
+    font-size: 14px;
+	 font-family: Arial, sans-serif;
     padding-right: 0;
     width: 100%;
 }
@@ -403,8 +467,19 @@ background-color: #f9f9f9;
 
 }
 
-
 /****fim aba mediation aberta****/
+
+.hub .mediation.hide, 
+.hub .live.hide {
+	display: none;
+	visibility: hidden;
+}
+
+.hub .mediation.show, 
+.hub .live.show {
+	display: inline-block;
+	visibility: visible;
+}
 
 .hub .form-mediation {
     width: 93%;
@@ -416,7 +491,7 @@ background-color: #f9f9f9;
 
 .hub .form-message {
     width: 93%;
-  display: inline-block;
+  /*display: inline-block;*/
   height: 148px;
   padding: 10px;
   border: 1px solid #c0c0c0;
