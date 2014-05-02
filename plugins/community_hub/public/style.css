@@ -174,7 +174,7 @@
     height: 500px;
     overflow-x: hidden;
     overflow-y: scroll;
-	border-width: 1px 0;
+	border-width: 1px;
 	border-style: solid;
 	border-color: lightGray;
 	padding-top: 10px;
@@ -219,8 +219,8 @@
 #content .main-block .hub .live h1.live,
 #content .main-block .hub .mediation h1.mediation {
 	 /*background-color: #f4f4f4;*/
-	 border: 1px solid lightGray
-
+	 border: 1px solid lightGray;
+	 border-top: 1px solid #96110D;
     border-bottom: 1px solid #FFFFFF;
     float: left;
     font-weight: normal;
@@ -240,13 +240,9 @@
     top: 1px;
     width: 20%;
 	text-align: center;
-    top: 7px;
+    top: 9px;
     line-height: 27px;
-}
-
-#content .main-block .hub div#left-tab.show h1.mediation,
-#content .main-block .hub div#right-tab.show h1.live {
-  cursor: pointer;
+    
 }
 
 #content .main-block .hub .live h1.mediation,
@@ -260,7 +256,7 @@
     color: #D71410;
     display: inline-block;
     font-size: 14px;
-	 font-family: Arial Black, arial, sans-serif;
+	 font-family: /*Arial Black, */arial, sans-serif;
     padding-right: 0;
     width: 70%;
 }
@@ -327,7 +323,8 @@
 /****aba live aberta****/
 
 .hub .live.show {
-    width: 85%;
+    /*width: 85%;*/
+    width: 100%;
 }
 
 .hub .live.show ul#live-posts .li{
@@ -357,7 +354,7 @@ margin-right: 10px;
 }
 
 #content .main-block .hub .mediation h1{
-    background-color: #ed8e01;
+ /*   background-color: #ed8e01;*/
 	 border: 1px solid lightGray
 }
 
@@ -387,18 +384,20 @@ margin-right: 10px;
 }
 
 #content .main-block .hub .mediation.hide h1{
+/*
     background-color: #ed8e01;
     border: 1px solid lightGray;
     text-align: center;
     padding-left: 0;
+*/
   cursor: pointer;
 }
 
 #content .hub .mediation.hide .title {
-    color: white;
+/*    color: white;*/
     display: inline-block;
     font-size: 14px;
-    font-family: Arial Black, arial, sans-serif;
+    font-family: /*Arial Black, */arial, sans-serif;
     padding-right: 0;
     width: 100%;
 }
@@ -437,15 +436,15 @@ display: none;
 }
 
 #content .main-block .hub .mediation.show h1{
-    background-color: #ed8e01;
+/*    background-color: #ed8e01;*/
 	 border: 1px solid lightGray
 }
 
 #content .hub .mediation.show .title {
-    color: white;
+    /*color: white;*/
     display: inline-block;
     font-size: 20px;
-	 font-family: Arial Black, arial, sans-serif;
+	 font-family: /*Arial Black, */arial, sans-serif;
     padding-right: 0;
     width: 100%;
 }
@@ -486,11 +485,14 @@ background-color: #f9f9f9;
 }
 
 .hub .form-mediation {
-    width: 93%;
-  display: inline-block;
-  height: 376px;
-  padding: 10px;
-  border: 1px solid #c0c0c0;
+  /*width: 93%;*/
+	/*width: 426px;*/
+	width: 60%;
+	display: inline-block;
+	height: 376px;
+	padding: 10px;
+	border: 1px solid #c0c0c0;
+	overflow-x: hidden;
 }
 
 .hub .form-message {
@@ -503,8 +505,15 @@ background-color: #f9f9f9;
 
 
 .hub div.settings {
-  width: 96%;
-  margin-top: 10px;
+    /*width: 96%;*/
+    /*margin-top: 10px;*/
+    /*margin-left: 10px;*/
+    /*width: 240px;*/
+    display: inline-block;
+    margin-left: 1%;
+    margin-top: 10px;
+    vertical-align: top;
+    width: 35%;
 }
 
 .hub ul.settings li {
