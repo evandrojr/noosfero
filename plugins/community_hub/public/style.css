@@ -245,14 +245,13 @@
 #content .main-block .hub .mediation h1.live  {
     display: inline-block;
     background-color: #EEEEEE;
-    border-bottom: 1px solid #CCCCCC;
+    border-bottom: 0px solid #CCCCCC;
     border-top-color: #CCCCCC;
     color: gray;
     position: relative;
-    top: 1px;
     width: 30%;
 	 text-align: center;
-    top: 9px;
+    margin-top: 9px;
     line-height: 27px;
     
 }
