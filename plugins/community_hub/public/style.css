@@ -225,30 +225,43 @@
     float: left;
     font-weight: normal;
     margin-bottom: -1px;
-    margin-right: 20px;
+
     width: 60%;
 }
+
+#content .main-block .hub .live h1.live{
+    float: left;
+    margin-right: 20px;
+    margin-left: 0px;
+}
+
+#content .main-block .hub .mediation h1.mediation{
+    float: right;
+    margin-right: 0px;
+    margin-left: 20px;
+}
+
 #content .main-block .hub .live h1.mediation,
 #content .main-block .hub .mediation h1.live  {
-
-    display: inline;
+    display: inline-block;
     background-color: #EEEEEE;
     border-bottom: 1px solid #CCCCCC;
     border-top-color: #CCCCCC;
     color: gray;
     position: relative;
     top: 1px;
-    width: 20%;
-	text-align: center;
+    width: 30%;
+	 text-align: center;
     top: 9px;
     line-height: 27px;
     
 }
 
-#content .main-block .hub .live h1.mediation,
-#content .main-block .hub .mediation h1.live  {
-    display: inline-block;
-}
+#content .main-block .hub .live h1.mediation {}
+
+#content .main-block .hub .mediation h1.live {margin-left: 20px;}
+
+
 /*fim de novos elementos: h1.live - h1.mediation*/
 
 
@@ -269,7 +282,7 @@
     font-weight: bold;
     padding: 0 0.5em;
     text-align: center;
-    text-transform: uppercase;
+    /*text-transform: uppercase;*/
     vertical-align: top;
     width: 20%;
 
@@ -364,7 +377,7 @@ margin-right: 10px;
     font-size: 14px;
 	 font-family: Arial, sans-serif;
     padding-right: 0;
-    width: 100%;
+   /* width: 100%;*/
 }
 .hub .mediation .expand {
     float: right;
@@ -426,44 +439,50 @@ display: none;
 /****aba mediation aberta****/
 
 .hub .mediation.show {
-	border: 0px solid lightGray;
+/*	border: 0px solid lightGray;
 	display: inline-block;
 	clear: right;
 	float: none;
 	margin-left: 1%;
-	width: 85%;
 	margin-bottom: 2em;
+*/
+	/*width: 85%;*/
+	width: 100%;
 }
 
 #content .main-block .hub .mediation.show h1{
 /*    background-color: #ed8e01;*/
-	 border: 1px solid lightGray
+/*	 border: 1px solid lightGray*/
 }
 
 #content .hub .mediation.show .title {
     /*color: white;*/
     display: inline-block;
-    font-size: 20px;
+/*    font-size: 20px;*/
 	 font-family: /*Arial Black, */arial, sans-serif;
     padding-right: 0;
-    width: 100%;
+/*    width: 60%;*/
 }
+
+/*
 .hub .mediation.show .expand {
     float: right;
     padding-right: 1em;
     display: block;
-}
+}*/
 
 
 .hub .mediation.show ul#mediation-posts {
-height: 500px;
-overflow-x: hidden;
-overflow-y: scroll;
-border-width: 0 1px 1px;
-border-style: solid;
-border-color: lightGray;
-padding-top: 10px;
-background-color: #f9f9f9;
+/*
+	height: 500px;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	border-width: 0 1px 1px;
+	border-style: solid;
+	border-color: lightGray;
+	padding-top: 10px;
+	background-color: #f9f9f9;
+*/
 }
 
 .hub .mediation.show ul#mediation-posts li{
