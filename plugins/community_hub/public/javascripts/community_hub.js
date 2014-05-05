@@ -3,8 +3,23 @@ var oldest_post_id = 0;
 live_scroll_position = 0;
 var mediations = [];
 
-function load_more_messages() {
+function load_more(tab) {
+  switch (tab) {
+    case 'live':
+      load_more_messages();
+      break;
+    case 'mediation':
+      load_more_mediations();
+      break;
+  }
+}
 
+
+function load_more_mediations() {i
+  // implement!
+}
+
+function load_more_messages() {
   var hub_id = jQuery(".hub").attr('id');
   var oldest_id = jQuery("#live-posts li.post").last().attr("id");
 
@@ -312,11 +327,28 @@ function hub_right_tab_click() {
 
 first_hub_load = true;
 
-jQuery(".hub .live .envelope").scroll(function() {
+jQuery(".hub .envelope").scroll(function() {
   jQuery("#auto_scrolling").attr('checked', false);
-  if (jQuery(".hub .live .envelope").scrollTop() == (jQuery(".hub ul#live-posts").height() - jQuery(".hub .live .envelope").height() + 23)) {
-    load_more_messages();
+
+  // live stream tab...
+  if (jQuery("#left-tab.show").size() != 0) {
+    current_envelope = jQuery(".hub .live .envelope");
+    current_list_posts = jQuery(".hub ul#live-posts");
+    tab = 'live';
   }
+  else {
+    // mediation tab...
+    if (jQuery("#right-tab.show").size() != 0) {
+      current_envelope = jQuery(".hub .mediation .envelope");
+      current_list_posts = jQuery(".hub ul#mediation-posts");
+      tab = 'mediation';
+    }
+  }
+
+  if (current_envelope.scrollTop() == (current_list_posts.height() - current_envelope.height() + 23)) {
+    load_more(tab);
+  }
+
 });
 
 
