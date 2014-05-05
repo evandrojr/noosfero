@@ -1,7 +1,7 @@
-<% form_for :message, 
+<% form_for :message,
             :method => 'post',
             :url => {
-              :controller => 'community_hub_plugin_public', 
+              :controller => 'community_hub_plugin_public',
               :action => 'new_message',
               :article_id => mediation.id
             } do |f| %>
