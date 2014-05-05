@@ -7,7 +7,7 @@
   height: 350px;
   padding-top: 10px;
   height: 350px;
-  display: inline-block; 
+  display: inline-block;
 }
 
 #hub-loading {
@@ -174,11 +174,14 @@
 	margin-bottom: 2em;
 }
 
+.hub .envelope {
+  height: 500px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
 .hub ul#live-posts, .hub ul#mediation-posts{
-    height: 500px;
-    overflow-x: hidden;
-    overflow-y: scroll;
-	border-width: 1px;
+	border-width: 0 1px 1px;
 	border-style: solid;
 	border-color: lightGray;
 	padding-top: 10px;
@@ -257,7 +260,6 @@
 	 text-align: center;
     margin-top: 9px;
     line-height: 27px;
-    
 }
 
 #content .main-block .hub .live h1.mediation {}
