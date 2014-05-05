@@ -312,6 +312,7 @@ function update_live_stream(recursive) {
       update_live_stream(true);
     }, 5000);
   }
+
 }
 
 function hub_left_tab_click() {
@@ -326,17 +327,18 @@ function hub_right_tab_click() {
   jQuery("#left-tab").addClass('hide');
   jQuery("#right-tab").removeClass('hide');
   jQuery("#right-tab").addClass('show');
-  jQuery(".hub #left-tab.hide").click(hub_left_tab_click);
+  jQuery(".hub #right-tab.show h1.live").click(hub_left_tab_click);
 }
 
 first_hub_load = true;
 
 jQuery(document).ready(function() {
+
   jQuery("#live-posts").scroll(function() {
     live_scroll_position = jQuery("#live-posts").scrollTop();
   });
 
-  jQuery(".hub #right-tab.hide").click(hub_right_tab_click);
+  jQuery(".hub #left-tab.show h1.mediation").click(hub_right_tab_click);
 
   jQuery("body").addClass("loading");
 

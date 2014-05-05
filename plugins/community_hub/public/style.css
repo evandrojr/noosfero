@@ -174,7 +174,7 @@
     height: 500px;
     overflow-x: hidden;
     overflow-y: scroll;
-	border-width: 1px 0;
+	border-width: 1px;
 	border-style: solid;
 	border-color: lightGray;
 	padding-top: 10px;
@@ -219,36 +219,48 @@
 #content .main-block .hub .live h1.live,
 #content .main-block .hub .mediation h1.mediation {
 	 /*background-color: #f4f4f4;*/
-	 border: 1px solid lightGray
-
+	 border: 1px solid lightGray;
+	 border-top: 1px solid #96110D;
     border-bottom: 1px solid #FFFFFF;
     float: left;
     font-weight: normal;
     margin-bottom: -1px;
-    margin-right: 20px;
+
     width: 60%;
 }
-#content .main-block .hub .live h1.mediation,
-#content .main-block .hub .mediation h1.live  {
 
-    display: inline;
-    background-color: #EEEEEE;
-    border-bottom: 1px solid #CCCCCC;
-    border-top-color: #CCCCCC;
-    color: gray;
-    position: relative;
-    top: 1px;
-    width: 20%;
-	text-align: center;
-    top: 7px;
-    line-height: 27px;
-    
+#content .main-block .hub .live h1.live{
+    float: left;
+    margin-right: 20px;
+    margin-left: 0px;
+}
+
+#content .main-block .hub .mediation h1.mediation{
+    float: right;
+    margin-right: 0px;
+    margin-left: 20px;
 }
 
 #content .main-block .hub .live h1.mediation,
 #content .main-block .hub .mediation h1.live  {
     display: inline-block;
+    background-color: #EEEEEE;
+    border-bottom: 0px solid #CCCCCC;
+    border-top-color: #CCCCCC;
+    color: gray;
+    position: relative;
+    width: 30%;
+	 text-align: center;
+    margin-top: 9px;
+    line-height: 27px;
+    
 }
+
+#content .main-block .hub .live h1.mediation {}
+
+#content .main-block .hub .mediation h1.live {margin-left: 20px;}
+
+
 /*fim de novos elementos: h1.live - h1.mediation*/
 
 
@@ -256,7 +268,7 @@
     color: #D71410;
     display: inline-block;
     font-size: 14px;
-	 font-family: Arial Black, arial, sans-serif;
+	 font-family: /*Arial Black, */arial, sans-serif;
     padding-right: 0;
     width: 70%;
 }
@@ -269,7 +281,7 @@
     font-weight: bold;
     padding: 0 0.5em;
     text-align: center;
-    text-transform: uppercase;
+    /*text-transform: uppercase;*/
     vertical-align: top;
     width: 20%;
 
@@ -323,7 +335,8 @@
 /****aba live aberta****/
 
 .hub .live.show {
-    width: 85%;
+    /*width: 85%;*/
+    width: 100%;
 }
 
 .hub .live.show ul#live-posts .li{
@@ -353,7 +366,7 @@ margin-right: 10px;
 }
 
 #content .main-block .hub .mediation h1{
-    background-color: #ed8e01;
+ /*   background-color: #ed8e01;*/
 	 border: 1px solid lightGray
 }
 
@@ -363,7 +376,7 @@ margin-right: 10px;
     font-size: 14px;
 	 font-family: Arial, sans-serif;
     padding-right: 0;
-    width: 100%;
+   /* width: 100%;*/
 }
 .hub .mediation .expand {
     float: right;
@@ -383,18 +396,20 @@ margin-right: 10px;
 }
 
 #content .main-block .hub .mediation.hide h1{
+/*
     background-color: #ed8e01;
     border: 1px solid lightGray;
     text-align: center;
     padding-left: 0;
+*/
   cursor: pointer;
 }
 
 #content .hub .mediation.hide .title {
-    color: white;
+/*    color: white;*/
     display: inline-block;
     font-size: 14px;
-    font-family: Arial Black, arial, sans-serif;
+    font-family: /*Arial Black, */arial, sans-serif;
     padding-right: 0;
     width: 100%;
 }
@@ -423,44 +438,50 @@ display: none;
 /****aba mediation aberta****/
 
 .hub .mediation.show {
-	border: 0px solid lightGray;
+/*	border: 0px solid lightGray;
 	display: inline-block;
 	clear: right;
 	float: none;
 	margin-left: 1%;
-	width: 85%;
 	margin-bottom: 2em;
+*/
+	/*width: 85%;*/
+	width: 100%;
 }
 
 #content .main-block .hub .mediation.show h1{
-    background-color: #ed8e01;
-	 border: 1px solid lightGray
+/*    background-color: #ed8e01;*/
+/*	 border: 1px solid lightGray*/
 }
 
 #content .hub .mediation.show .title {
-    color: white;
+    /*color: white;*/
     display: inline-block;
-    font-size: 20px;
-	 font-family: Arial Black, arial, sans-serif;
+/*    font-size: 20px;*/
+	 font-family: /*Arial Black, */arial, sans-serif;
     padding-right: 0;
-    width: 100%;
+/*    width: 60%;*/
 }
+
+/*
 .hub .mediation.show .expand {
     float: right;
     padding-right: 1em;
     display: block;
-}
+}*/
 
 
 .hub .mediation.show ul#mediation-posts {
-height: 500px;
-overflow-x: hidden;
-overflow-y: scroll;
-border-width: 0 1px 1px;
-border-style: solid;
-border-color: lightGray;
-padding-top: 10px;
-background-color: #f9f9f9;
+/*
+	height: 500px;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	border-width: 0 1px 1px;
+	border-style: solid;
+	border-color: lightGray;
+	padding-top: 10px;
+	background-color: #f9f9f9;
+*/
 }
 
 .hub .mediation.show ul#mediation-posts li{
@@ -482,11 +503,14 @@ background-color: #f9f9f9;
 }
 
 .hub .form-mediation {
-    width: 93%;
-  display: inline-block;
-  height: 376px;
-  padding: 10px;
-  border: 1px solid #c0c0c0;
+  /*width: 93%;*/
+	/*width: 426px;*/
+	width: 60%;
+	display: inline-block;
+	height: 376px;
+	padding: 10px;
+	border: 1px solid #c0c0c0;
+	overflow-x: hidden;
 }
 
 .hub .form-message {
@@ -499,8 +523,15 @@ background-color: #f9f9f9;
 
 
 .hub div.settings {
-  width: 96%;
-  margin-top: 10px;
+    /*width: 96%;*/
+    /*margin-top: 10px;*/
+    /*margin-left: 10px;*/
+    /*width: 240px;*/
+    display: inline-block;
+    margin-left: 1%;
+    margin-top: 10px;
+    vertical-align: top;
+    width: 35%;
 }
 
 .hub ul.settings li {
