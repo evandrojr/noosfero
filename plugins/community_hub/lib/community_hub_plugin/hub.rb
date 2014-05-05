@@ -6,10 +6,10 @@ class CommunityHubPlugin::Hub < Folder
   settings_items :proxy_url, :type => :string, :default => 'http://161.148.1.167:3128' # Remember to use add the port, in case needed.
   settings_items :twitter_enabled, :type => :boolean, :default => false
   settings_items :twitter_hashtags, :type => :string, :default => "participa.br,participabr,arenanetmundial,netmundial"
-  settings_items :twitter_consumer_key, :type => :string, :default => ""  
-  settings_items :twitter_consumer_secret, :type => :string, :default => ""  
-  settings_items :twitter_access_token, :type => :string, :default => ""  
-  settings_items :twitter_access_token_secret, :type => :string, :default => ""  
+  settings_items :twitter_consumer_key, :type => :string, :default => "" 
+  settings_items :twitter_consumer_secret, :type => :string, :default => "" 
+  settings_items :twitter_access_token, :type => :string, :default => "" 
+  settings_items :twitter_access_token_secret, :type => :string, :default => "" 
   settings_items :facebook_enabled, :type => :boolean, :default => false
   settings_items :facebook_page_id, :type => :string, :default => "participabr"
   settings_items :facebook_pooling_time, :type => :integer, :default => 5 # Time in seconds
