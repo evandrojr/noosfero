@@ -363,7 +363,7 @@ class ProfileTest < ActiveSupport::TestCase
     t2 = c.tasks.build; t2.save!; t2.finish
     t3 = c.tasks.build; t3.save!; t3.finish
 
-    assert_equal [t2, t3], c.tasks.finished
+    assert_equivalent [t2, t3], c.tasks.finished
   end
 
   should 'responds to categories' do
@@ -1812,6 +1812,7 @@ class ProfileTest < ActiveSupport::TestCase
         Person.members_of(Community.find_by_identifier('community2'))
       end
     end
+    Noosfero::Plugin.stubs(:all).returns(['ProfileTest::Plugin1', 'ProfileTest::Plugin2'])
     Environment.default.enable_plugin(Plugin1)
     Environment.default.enable_plugin(Plugin2)
 
@@ -1969,6 +1970,7 @@ class ProfileTest < ActiveSupport::TestCase
     end
 
     environment = Environment.default
+    Noosfero::Plugin.stubs(:all).returns(['ProfileTest::Plugin1'])
     environment.enable_plugin(Plugin1)
     plugins = Noosfero::Plugin::Manager.new(environment, self)
     p = fast_create(Profile)
