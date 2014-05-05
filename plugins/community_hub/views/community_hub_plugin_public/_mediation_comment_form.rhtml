@@ -9,5 +9,4 @@
                   :rows => 4,
                   :placeholder => _('Type your comment here')) %>
   <%= submit_button('add', _('Post'), :onclick => "new_mediation_comment(this,#{mediation.id}); return false;") %>
-  <span id="<%=mediation.id%>" class="loading-mediation-comment"></span>
 <% end %>

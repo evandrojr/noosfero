@@ -50,15 +50,12 @@ function new_mediation_comment(button, mediation) {
 
   jQuery("#mediation-comment-form-" + mediation + " .submit").attr("disabled", true);
 
-  jQuery("body").addClass("loading");
-  jQuery(".loading-mediation-comment").filter("#" + mediation).addClass("loading-signal-processing");
+  jQuery("body").addClass("hub-loading");
 
   jQuery.post(form.attr("action"), form.serialize(), function(data) {
-    jQuery(".loading-mediation-comment").filter("#" + mediation).removeClass("loading-signal-processing");
+    jQuery("body").removeClass("hub-loading");
     if (data.ok) {
       jQuery("#mediation-comment-form-" + mediation + " textarea").val('');
-      jQuery(".loading-mediation-comment").filter("#" + mediation).addClass("loading-signal-done");
-      jQuery("body").removeClass("loading");
       jQuery("#mediation-comment-form-" + mediation + " .submit").attr("disabled", false);
       update_mediation_comments(mediation, false);
       setTimeout(function(){
@@ -67,8 +64,6 @@ function new_mediation_comment(button, mediation) {
       mediations.push( [ mediation, setInterval(function() { update_mediation_comments(mediation, false)}, 5000) ] );
     }
     else {
-      jQuery(".loading-mediation-comment").filter("#" + mediation).addClass("loading-signal-error");
-      jQuery("body").removeClass("loading");
       jQuery("#mediation-comment-form-" + mediation + " .submit").attr("disabled", false);
       setTimeout(function(){
         clearLoadingMediationCommentSignal(mediation);
@@ -90,23 +85,18 @@ function new_message(button) {
 
   jQuery(".hub .form-message .submit").attr("disabled", true);
 
-  jQuery("body").addClass("loading");
-  jQuery("#loading-message").addClass("loading-signal-processing");
+  jQuery("body").addClass("hub-loading");
 
   jQuery.post(form.attr("action"), form.serialize(), function(data) {
-    jQuery("#loading-message").removeClass("loading-signal-processing");
+    jQuery("body").removeClass("hub-loading");
     if (data.ok) {
       jQuery(".hub .form-message #message_body").val('');
-      jQuery("#loading-message").addClass("loading-signal-done");
-      jQuery("body").removeClass("loading");
       jQuery(".hub .form-message .submit").attr("disabled", false);
       update_live_stream(false);
       setTimeout(clearLoadingMessageSignal, 3000);
 
     }
     else {
-      jQuery("#loading-message").addClass("loading-signal-error");
-      jQuery("body").removeClass("loading");
       jQuery(".hub .form-message .submit").attr("disabled", false);
       setTimeout(clearLoadingMessageSignal, 3000);
     }
@@ -125,23 +115,18 @@ function new_mediation(button) {
 
   jQuery(".hub .form-mediation .submit").attr("disabled", true);
 
-  jQuery("body").addClass("loading");
-  jQuery("#loading-mediation").addClass("loading-signal-processing");
+  jQuery("body").addClass("hub-loading");
 
   tinymce.triggerSave();
   jQuery.post(form.attr("action"), form.serialize(), function(data) {
-    jQuery("#loading-mediation").removeClass("loading-signal-processing");
+    jQuery("body").removeClass("hub-loading");
     if (data.ok) {
-      jQuery("#loading-mediation").addClass("loading-signal-done");
-      jQuery("body").removeClass("loading");
       jQuery(".hub .form-mediation .submit").attr("disabled", false);
       tinymce.get('article_body').setContent('');
       update_mediations();
       setTimeout(clearLoadingMediationSignal, 3000);
     }
     else {
-      jQuery("#loading-mediation").addClass("loading-signal-error");
-      jQuery("body").removeClass("loading");
       jQuery(".hub .form-mediation .submit").attr("disabled", false);
       setTimeout(clearLoadingMediationSignal, 3000);
     }

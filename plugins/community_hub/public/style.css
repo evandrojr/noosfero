@@ -14,6 +14,10 @@
   float: right;
 }
 
+.hub-loading {
+  cursor: wait;
+}
+
 .icon-newcommunity-hub,
 .icon-community-hub {
   background-image: url(/plugins/community_hub/icons/community-hub.png)
@@ -614,35 +618,4 @@ textarea#message_body {
 
 .hub ul.mediation-comment-list {
   width: 80%;
-}
-
-.hub #loading-message,
-.hub #loading-mediation {
-  width: 16px;
-  height: 16px;
-  display: inline-block;
-  float: right;
-  margin-top: -24px;
-  margin-right: 585px;
-}
-
-.hub .loading-mediation-comment {
-  width: 16px;
-  height: 16px;
-  display: inline-block;
-  float: right;
-  margin-top: -25px;
-  margin-right: 440px;
-}
-
-.loading-signal-done {
-  background-image: url(/plugins/community_hub/icons/hub-sverde-a.png);
-}
-
-.loading-signal-error {
-  background-image: url(/plugins/community_hub/icons/hub-svermelho-a.png);
-}
-
-.loading-signal-processing {
-  background-image: url(/plugins/community_hub/icons/hub-samarelo.gif);
 }
