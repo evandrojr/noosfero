@@ -30,6 +30,8 @@ class Comment < ActiveRecord::Base
       rec.errors.add(:name, _('{fn} can only be informed for unauthenticated authors').fix_i18n)
     end
   end
+  
+  acts_as_having_settings :field => :setting
 
   xss_terminate :only => [ :body, :title, :name ], :on => 'validation'
 

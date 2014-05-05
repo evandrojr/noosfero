@@ -3,17 +3,16 @@ require File.dirname(__FILE__) + '/../../facebook_stream/lib_facebook_stream'
 
 class CommunityHubPlugin::Hub < Folder
 
-  settings_items :proxy_url, :type => :string, :default => 'http://161.148.1.167:3128' # Remember to use add the port, in case needed.
   settings_items :twitter_enabled, :type => :boolean, :default => false
-  settings_items :twitter_hashtags, :type => :string, :default => "participa.br,participabr,arenanetmundial,netmundial"
+  settings_items :twitter_hashtags, :type => :string, :default => ""
   settings_items :twitter_consumer_key, :type => :string, :default => "" 
   settings_items :twitter_consumer_secret, :type => :string, :default => "" 
   settings_items :twitter_access_token, :type => :string, :default => "" 
   settings_items :twitter_access_token_secret, :type => :string, :default => "" 
   settings_items :facebook_enabled, :type => :boolean, :default => false
-  settings_items :facebook_page_id, :type => :string, :default => "participabr"
+  settings_items :facebook_page_id, :type => :string, :default => ""
   settings_items :facebook_pooling_time, :type => :integer, :default => 5 # Time in seconds
-  settings_items :facebook_access_token,  :type => :string, :default => 'CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH'
+  settings_items :facebook_access_token,  :type => :string, :default => ''
   settings_items :pinned_messages, :type => Array, :default => []
   settings_items :pinned_mediations, :type => Array, :default => []
   settings_items :mediators, :type => Array, :default => []

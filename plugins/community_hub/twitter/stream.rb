@@ -42,10 +42,12 @@ def listen_twitter_stream(hub, author_id)
           comment = Comment.new
           comment.title = 'hub-message-twitter'
           comment.source = hub
-          comment.body = UTF8Filter(object.text + "<picture>#{object.user.profile_image_url}</picture>")
+          comment.body = UTF8Filter(object.text)
+          comment.profile_picture = UTF8Filter(object.user.profile_image_url)
           comment.author_id = author_id
           comment.name = UTF8Filter(object.user.screen_name)
           comment.email = 'admin@localhost.local'
+
           tries = 0          
           begin
             comment.save!
