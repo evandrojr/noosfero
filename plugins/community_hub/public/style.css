@@ -175,9 +175,13 @@
 }
 
 .hub .envelope {
-  height: 500px;
+/*  height: 500px;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: scroll;*/
+	margin-top: -1px;
+	border-top: 1px solid lightgray;
+	display: inline-block;
+	width: 100%;
 }
 
 .hub ul#live-posts, .hub ul#mediation-posts{
@@ -186,15 +190,20 @@
 	border-color: lightGray;
 	padding-top: 10px;
     clear: both;
+	height: 475px;
+	overflow-y: scroll;
+
 }
 
 /*modificação da scroll bar*/
-.hub ul#live-posts::-webkit-scrollbar-button {
+.hub ul#live-posts::-webkit-scrollbar-button,
+.hub ul#mediation-posts::-webkit-scrollbar-button {
 	height: 0;
 	width: 0;
 }
 
-.hub ul#live-posts::-webkit-scrollbar-thumb {
+.hub ul#live-posts::-webkit-scrollbar-thumb,
+.hub ul#mediation-posts::-webkit-scrollbar-thumb{
 	background-clip: padding-box;
 	background-color: rgba(0,0,0,.3);
 	border: 5px solid transparent;
@@ -205,7 +214,8 @@
 	width: 5px;
 }
 
-.hub ul#live-posts::-webkit-scrollbar {
+.hub ul#live-posts::-webkit-scrollbar,
+.hub ul#mediation-posts::-webkit-scrollbar {
 	height: 15px;
 	width: 15px;
 }
@@ -232,8 +242,10 @@
     float: left;
     font-weight: normal;
     margin-bottom: -1px;
-
+	 position: relative;
     width: 60%;
+background-color: white;
+z-index: 99;
 }
 
 #content .main-block .hub .live h1.live{
@@ -252,19 +264,22 @@
 #content .main-block .hub .mediation h1.live  {
     display: inline-block;
     background-color: #EEEEEE;
-    border-bottom: 0px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
     border-top-color: #CCCCCC;
     color: gray;
     position: relative;
     width: 30%;
 	 text-align: center;
-    margin-top: 9px;
+    margin-top: 8px;
     line-height: 27px;
 }
 
 #content .main-block .hub .live h1.mediation {}
 
-#content .main-block .hub .mediation h1.live {margin-left: 20px;}
+#content .main-block .hub .mediation h1.live {
+	margin-left: 20px;
+	/*border-bottom: 0px;*/
+}
 
 
 /*fim de novos elementos: h1.live - h1.mediation*/
@@ -513,7 +528,7 @@ display: none;
 	/*width: 426px;*/
 	width: 60%;
 	display: inline-block;
-	height: 376px;
+	/*height: 376px;*/
 	padding: 10px;
 	border: 1px solid #c0c0c0;
 	overflow-x: hidden;
