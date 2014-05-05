@@ -5,8 +5,8 @@
 
 #input-panel {
   height: 350px;
+  width: 100%;
   padding-top: 10px;
-  height: 350px;
   display: inline-block;
 }
 
@@ -535,8 +535,6 @@ display: none;
 }
 
 .hub .form-message {
-    width: 93%;
-  /*display: inline-block;*/
   height: 148px;
   padding: 10px;
   border: 1px solid #c0c0c0;
