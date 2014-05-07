@@ -24,6 +24,27 @@
 
     <span><%= check_box_tag 'auto_scrolling', 'yes', true %><%= _("Auto scrolling") %></span>
 
+    <% if logged_in? %>
+    <div id="input-panel">
+      <div class="form-message">
+
+        <% form_for :message,
+                    :method => 'post',
+                    :url => {
+                      :controller => 'community_hub_plugin_public',
+                      :action => 'new_message',
+                      :article_id => @page.id
+                    } do |f| %>
+          <span><%= _("Streaming") %></span>
+          <br />
+          <%= f.text_area :body, :style => "width: 99%;", :cols => "38", :rows => "5", :placeholder => _("Type your message here") %>
+          <%= submit_button('add', _('Post'), :onclick => 'new_message(this); return false;') %>
+        <% end %>
+
+      </div>
+    </div>
+    <% end %>
+
   </div>
 
   <div id="right-tab" class="mediation content-tab hide">
@@ -40,12 +61,7 @@
       <ul id="mediation-posts"></ul>
     </div>
 
-  </div>
-
-  <% if mediator?(@page) %>
-
-    <% if logged_in? %>
-
+    <% if logged_in? && mediator?(@page) %>
     <div class="form-mediation">
 
       <%= render :file => 'shared/tiny_mce' %>
@@ -68,34 +84,7 @@
 
     <%= render :partial => "community_hub_plugin_public/settings" %>
 
-  <% else %>
-
-    <div id="input-panel">
-
-    <% if logged_in? %>
-
-      <div class="form-message">
-
-        <% form_for :message,
-                    :method => 'post',
-                    :url => {
-                      :controller => 'community_hub_plugin_public',
-                      :action => 'new_message',
-                      :article_id => @page.id
-                    } do |f| %>
-          <span><%= _("Streaming") %></span>
-          <br />
-          <%= f.text_area :body, :style => "width: 99%;", :cols => "38", :rows => "5", :placeholder => _("Type your message here") %>
-          <%= submit_button('add', _('Post'), :onclick => 'new_message(this); return false;') %>
-        <% end %>
-
-      </div>
-
-      <% end %>
-
-    </div>
-
-    <% end %>
+  </div>
 
 </div>
 
