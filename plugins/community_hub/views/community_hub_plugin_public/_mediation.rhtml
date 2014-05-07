@@ -4,13 +4,24 @@
 
   <ul>
     <li class="time"><%= post_time(mediation.created_at) %></li>
-    <li class="avatar"><%= image_tag(profile_icon(mediation.author, :minor)) %></li>
-    <li class="message"><span class="author"><%= mediation.author_name %>:</span> <%= mediation.body %></li>
+
+    <li class="avatar">
+      <% if mediation.source == 'twitter' %>
+        <%= image_tag('/plugins/community_hub/icons/logo_twitter_bird_white_50x50.png', :alt => "Twitter") %>
+      <% elsif mediation.source == 'facebook' %>
+        <%= image_tag('/plugins/community_hub/icons/logo_facebook_50x50.png', :alt => "Facebook") %>
+      <% else %>
+        <%= image_tag(profile_icon(mediation.author, :minor)) if mediation.author %>
+      <% end %>
+    </li>
+    <li class="message"><span class="author"><%= mediation.setting[:author_name] %>:</span> <%= mediation.body %></li>
 
     <% if mediator?(hub) %>
     <li class="mediation-bar">
 
       <ul>
+
+        <% if mediation.source != 'twitter' && mediation.source != 'facebook' %>
 
         <li class="promote">
           <% if !promoted?(hub, mediation.author.id) %>
@@ -21,6 +32,8 @@
             <img class="promoted" src="/plugins/community_hub/icons/hub-not-promote-icon.png" title="<%= _("User promoted") %>" />
           <% end %>
         </li>
+
+        <% end %>
 
         <% if pinned_mediation?(hub, mediation.id) %>
         <li class="pin">

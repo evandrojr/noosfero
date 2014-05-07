@@ -169,18 +169,36 @@ class CommunityHubPluginPublicController < PublicController
           rescue
             message = nil
           end
+
           if message
             mediation = TinyMceArticle.new
             mediation.profile = hub.profile
             mediation.parent = hub
-            mediation.last_changed_by = message.author
-            mediation.created_by_id = message.author.id
+
+            author = message.author.blank? ? user : message.author
+
+            mediation.last_changed_by = author
+            mediation.created_by_id = author.id
+
             mediation.name = mediation_timestamp
             mediation.body = message.body
             mediation.notify_comments = false
             mediation.type = 'TinyMceArticle'
             mediation.advertise = false
+            mediation.source = 'local'
+
             if mediation.save
+
+              if ( message.title == 'hub-message-twitter' )
+                mediation.source = 'twitter'
+                mediation.author_name = message.name
+              elsif ( message.title == 'hub-message-facebook' )
+                mediation.source = 'facebook'
+                mediation.author_name = message.name
+              end
+
+              mediation.save
+
               hub.pinned_messages += [message.id] unless hub.pinned_messages.include?(message.id)
               hub.pinned_mediations += [mediation.id] unless hub.pinned_mediations.include?(mediation.id)
               if hub.save
