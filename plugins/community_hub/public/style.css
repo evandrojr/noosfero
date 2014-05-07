@@ -278,6 +278,7 @@ z-index: 99;
 	 text-align: center;
     margin-top: 8px;
     line-height: 27px;
+  cursor: pointer;
 }
 
 #content .main-block .hub .live h1.mediation {}
