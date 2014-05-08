@@ -5,7 +5,7 @@
     <li class="time"><%= post_time(post.created_at) %></li>
     <li class="avatar">
       <% if post.title == 'hub-message-twitter' %>
-        <%= image_tag('/plugins/community_hub/icons/logo_twitter_bird_white_50x50.png', :alt => "Twitter") %>
+        <%= image_tag(post.profile_picture, :alt => "Twitter") %>
       <% elsif post.title == 'hub-message-facebook' %>
         <%= image_tag('/plugins/community_hub/icons/logo_facebook_50x50.png', :alt => "Facebook") %>
       <% else %>

@@ -192,6 +192,7 @@ class CommunityHubPluginPublicController < PublicController
               if ( message.title == 'hub-message-twitter' )
                 mediation.source = 'twitter'
                 mediation.author_name = message.name
+                mediation.external_link = message.profile_picture
               elsif ( message.title == 'hub-message-facebook' )
                 mediation.source = 'facebook'
                 mediation.author_name = message.name
