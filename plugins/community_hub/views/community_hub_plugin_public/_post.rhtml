@@ -14,7 +14,7 @@
     </li>
     <li class="message"><span class="author"><%= post.author_name %>:</span> <%= post.body %></li>
 
-    <% if mediator?(hub) %>
+    <% if mediator?(hub) && post.title != 'hub-message-facebook' %>
     <li class="mediation-bar">
       <ul>
         <li class="pin">

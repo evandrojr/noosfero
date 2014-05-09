@@ -50,14 +50,12 @@ class CommunityHubPluginPublicController < PublicController
         mediation_data = {}
         mediation_data.merge!(params[:article]) if params[:article]
 
-        mediation = TinyMceArticle.new(mediation_data)
+        mediation = CommunityHubPlugin::Mediation.new(mediation_data)
+        mediation.name = CommunityHubPlugin::Mediation.timestamp
         mediation.profile = profile
         mediation.last_changed_by = user
-        mediation.name = mediation_timestamp
-        mediation.notify_comments = false
-        mediation.type = 'TinyMceArticle'
-        mediation.advertise = false
         mediation.created_by_id = user.id
+        mediation.source = 'local'
 
         if mediation && mediation.save
           render :text => {'ok' => true}.to_json, :content_type => 'application/json'
@@ -113,7 +111,7 @@ class CommunityHubPluginPublicController < PublicController
   def newer_articles
     latest_post = params[:latest_post]
     hub = Article.find(params[:hub])
-    posts = Article.find(:all, :order => "id desc", :conditions => ["id > :id and type = :type and parent_id = :hub", { :id => latest_post, :type => 'TinyMceArticle', :hub => hub.id }])
+    posts = CommunityHubPlugin::Mediation.find(:all, :order => "id desc", :conditions => ["id > :id and parent_id = :hub", { :id => latest_post, :hub => hub.id }])
 
     if !posts.empty?
       oldest_post = posts.last.id
@@ -158,11 +156,13 @@ class CommunityHubPluginPublicController < PublicController
 	def pin_message
     if logged_in?
       if (!params[:hub].blank? && !params[:message].blank?)
+
         begin
           hub = Article.find(params[:hub])
         rescue
           hub = nil
         end
+
         if hub && hub.mediator?(user)
           begin
             message = Comment.find(params[:message])
@@ -171,42 +171,37 @@ class CommunityHubPluginPublicController < PublicController
           end
 
           if message
-            mediation = TinyMceArticle.new
-            mediation.profile = hub.profile
-            mediation.parent = hub
-
             author = message.author.blank? ? user : message.author
 
+            mediation = CommunityHubPlugin::Mediation.new
+            mediation.name = CommunityHubPlugin::Mediation.timestamp
+
+            mediation.profile = hub.profile
             mediation.last_changed_by = author
             mediation.created_by_id = author.id
-
-            mediation.name = mediation_timestamp
             mediation.body = message.body
-            mediation.notify_comments = false
-            mediation.type = 'TinyMceArticle'
-            mediation.advertise = false
+            mediation.parent_id = hub.id
             mediation.source = 'local'
 
-            if mediation.save
+            if mediation && mediation.save
 
               if ( message.title == 'hub-message-twitter' )
                 mediation.source = 'twitter'
                 mediation.author_name = message.name
-                mediation.external_link = message.profile_picture
-              elsif ( message.title == 'hub-message-facebook' )
-                mediation.source = 'facebook'
-                mediation.author_name = message.name
+                mediation.profile_picture = message.profile_picture
+                mediation.save
               end
-
-              mediation.save
 
               hub.pinned_messages += [message.id] unless hub.pinned_messages.include?(message.id)
               hub.pinned_mediations += [mediation.id] unless hub.pinned_mediations.include?(mediation.id)
-              if hub.save
+
+              if hub && hub.save
                 render :text => {'ok' => true}.to_json, :content_type => 'application/json'
                 return true
               end
+
             end
+
           end
         end
       end
@@ -216,11 +211,6 @@ class CommunityHubPluginPublicController < PublicController
 
 
 	protected
-
-  def mediation_timestamp
-    "hub-mediation-#{(Time.now.to_f * 1000).to_i}"
-  end
-
 
   def message_timestamp
     "hub-message-#{(Time.now.to_f * 1000).to_i}"

@@ -7,7 +7,7 @@
 
     <li class="avatar">
       <% if mediation.source == 'twitter' %>
-        <%= image_tag(mediation.external_link, :alt => "Twitter") %>
+        <%= image_tag(mediation.profile_picture, :alt => "Twitter") %>
       <% elsif mediation.source == 'facebook' %>
         <%= image_tag('/plugins/community_hub/icons/logo_facebook_50x50.png', :alt => "Facebook") %>
       <% else %>
