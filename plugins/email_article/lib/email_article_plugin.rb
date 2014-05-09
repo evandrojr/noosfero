@@ -12,7 +12,9 @@ class EmailArticlePlugin < Noosfero::Plugin
         lambda { 
           link_to_remote(_("Email article to members"),
                    {:url => { :controller => 'email_article_plugin_myprofile', :action => "send_email", :id => @page},
-                   :method => :get
+                   :method => :get,
+                   :success => "alert('Emails enviados')",
+                   :failure => "alert('Erro ao enviar email')"
 #                   , :loading => "Enviando emails" 
                  })
         }
