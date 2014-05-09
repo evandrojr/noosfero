@@ -178,6 +178,7 @@
   overflow-x: hidden;
   overflow-y: scroll;
 	margin-top: -1px;
+	margin-bottom: 14px;
 	border: 1px solid lightgray;
   /*border-bottom: 1px solid lightgray;
   border-left: 1px solid lightgray;*/
@@ -243,7 +244,8 @@
 	 /*background-color: #f4f4f4;*/
 	 border: 1px solid lightGray;
 	 border-top: 1px solid #96110D;
-    border-bottom: 1px solid #FFFFFF;
+    border-bottom: 0px solid #FFFFFF;
+	 top: 1px;
     float: left;
     font-weight: normal;
     margin-bottom: -1px;
@@ -263,6 +265,8 @@ z-index: 99;
     float: right;
     margin-right: 0px;
     margin-left: 20px;
+	 top: 2px;
+	 left: 2px;
 }
 
 #content .main-block .hub .live h1.mediation,
@@ -278,12 +282,14 @@ z-index: 99;
     margin-top: 8px;
     line-height: 27px;
   cursor: pointer;
+
 }
 
 #content .main-block .hub .live h1.mediation {}
 
 #content .main-block .hub .mediation h1.live {
 	margin-left: 20px;
+	top:1px;
 	/*border-bottom: 0px;*/
 }
 
