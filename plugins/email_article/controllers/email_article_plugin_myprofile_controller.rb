@@ -24,9 +24,9 @@ class EmailArticlePluginMyprofileController < MyProfileController
       members.each{ |m|
         emails.push(m.user.email) 
       }
-      puts "***************************"
-      y emails
-      puts "***************************"    
+#      puts "***************************"
+#      y emails
+#      puts "***************************"    
       content_type 'text/html'
       recipients emails
       from "#{article.author.user.name} <#{article.author.user.email}>"
@@ -41,40 +41,5 @@ class EmailArticlePluginMyprofileController < MyProfileController
       body article.body
     end
   end  
-  
-  
-  
-#  def deliver
-#    #return false unless self.valid?
-#    EmailArticlePluginMyprofileController::Sender.deliver_mail(self)
-#  end
-#
-#  class Sender < ActionMailer::Base
-#    def mail(contact)
-#      content_type 'text/html'
-#      emails = contact.dest.notification_emails
-#      recipients emails
-#      from "#{contact.name} <#{contact.dest.environment.noreply_email}>"
-#      reply_to contact.email
-#      if contact.sender
-#        headers 'X-Noosfero-Sender' => contact.sender.identifier
-#      end
-#      if contact.receive_a_copy
-#        cc "#{contact.name} <#{contact.email}>"
-#      end
-#      subject "[#{contact.dest.short_name(30)}] " + contact.subject
-#      body :name => contact.name,
-#        :email => contact.email,
-#        :city => contact.city,
-#        :state => contact.state,
-#        :message => contact.message,
-#        :environment => contact.dest.environment.name,
-#        :url => url_for(:host => contact.dest.environment.default_hostname, :controller => 'home'),
-#        :target => contact.dest.name
-#    end
-#  end
-  
-  
 end
 
-#append_view_path File.join(File.dirname(__FILE__) + '/../views')
