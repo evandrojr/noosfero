@@ -2,6 +2,7 @@ var latest_post_id = 0;
 var oldest_post_id = 0;
 live_scroll_position = 0;
 var mediations = [];
+var message_interval_id;
 
 function load_more(tab) {
   switch (tab) {
@@ -89,6 +90,8 @@ function new_message(button) {
     return false;
   }
 
+  clearInterval( message_interval_id );
+
   var form = jQuery(button).parents("form");
 
   jQuery(".hub .form-message .submit").attr("disabled", true);
@@ -101,9 +104,11 @@ function new_message(button) {
       jQuery(".hub .form-message #message_body").val('');
       jQuery(".hub .form-message .submit").attr("disabled", false);
       update_live_stream(false);
+      message_interval_id = setInterval(function() { update_live_stream(false)}, 5000);
     }
     else {
       jQuery(".hub .form-message .submit").attr("disabled", false);
+      message_interval_id = setInterval(function() { update_live_stream(false)}, 5000);
     }
   }, 'json');
 
@@ -362,6 +367,6 @@ jQuery(document).ready(function() {
 
   jQuery("body").addClass("hub-loading");
 
-  update_live_stream(true);
+  message_interval_id = setInterval(function() { update_live_stream(false) }, 5000);
 
 });
