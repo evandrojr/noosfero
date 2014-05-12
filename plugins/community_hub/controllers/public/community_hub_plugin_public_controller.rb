@@ -79,7 +79,7 @@ class CommunityHubPluginPublicController < PublicController
 	def newer_comments
 		latest_post = params[:latest_post]
     hub = Article.find(params[:hub])
-		posts = Comment.find(:all, :order => "id desc", :conditions => ["id > :id and source_id = :hub", { :id => latest_post, :hub => hub }], :limit => 20)
+		posts = Comment.find(:all, :order => "id desc", :conditions => ["id > :id and source_id = :hub", { :id => latest_post, :hub => hub }], :limit => 30)
 
 		if !posts.empty?
 			oldest_post = posts.last.id
@@ -97,7 +97,7 @@ class CommunityHubPluginPublicController < PublicController
   def older_comments
     oldest_id = params[:oldest_id]
     hub = Article.find(params[:hub])
-    posts = Comment.find(:all, :order => "id desc", :conditions => ["id < :id and source_id = :hub", { :id => oldest_id, :hub => hub }], :limit => 20)
+    posts = Comment.find(:all, :order => "id desc", :conditions => ["id < :id and source_id = :hub", { :id => oldest_id, :hub => hub }], :limit => 30)
 
     if !posts.empty?
       oldest_id = posts.last.id
