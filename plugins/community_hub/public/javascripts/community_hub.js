@@ -243,6 +243,7 @@ function update_mediations() {
       type: 'get',
       data: { latest_post: latest_post_id, hub: hub_id },
       success: function(data) {
+        jQuery("body").removeClass("hub-loading");
         if (data.trim().length > 0) {
           jQuery("#mediation-posts").prepend(data);
         }
@@ -284,7 +285,7 @@ function update_live_stream(recursive) {
             jQuery("#live-posts").scrollTop(live_scroll_position);
           }
           if (first_hub_load) {
-            jQuery("body").removeClass("loading");
+            jQuery("body").removeClass("hub-loading");
             first_hub_load = false;
           }
         }
@@ -316,10 +317,15 @@ function hub_right_tab_click() {
   jQuery("#right-tab").removeClass('hide');
   jQuery("#right-tab").addClass('show');
   jQuery(".hub #right-tab.show h1.live").click(hub_left_tab_click);
-  update_mediations();
+  if (first_mediations_load) {
+    jQuery("body").addClass("hub-loading");
+    first_mediations_load = false;
+    update_mediations();
+  }
 }
 
 first_hub_load = true;
+first_mediations_load = true;
 
 jQuery(".hub .envelope").scroll(function() {
   jQuery("#auto_scrolling").attr('checked', false);
@@ -354,7 +360,7 @@ jQuery(document).ready(function() {
 
   jQuery(".hub #left-tab.show h1.mediation").click(hub_right_tab_click);
 
-  jQuery("body").addClass("loading");
+  jQuery("body").addClass("hub-loading");
 
   update_live_stream(true);
 
