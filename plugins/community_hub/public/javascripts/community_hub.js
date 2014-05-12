@@ -8,16 +8,9 @@ function load_more(tab) {
     case 'live':
       load_more_messages();
       break;
-    case 'mediation':
-      load_more_mediations();
-      break;
   }
 }
 
-
-function load_more_mediations() {i
-  // implement!
-}
 
 function load_more_messages() {
   var hub_id = jQuery(".hub").attr('id');
@@ -323,6 +316,7 @@ function hub_right_tab_click() {
   jQuery("#right-tab").removeClass('hide');
   jQuery("#right-tab").addClass('show');
   jQuery(".hub #right-tab.show h1.live").click(hub_left_tab_click);
+  update_mediations();
 }
 
 first_hub_load = true;
@@ -363,6 +357,5 @@ jQuery(document).ready(function() {
   jQuery("body").addClass("loading");
 
   update_live_stream(true);
-  update_mediations();
 
 });
