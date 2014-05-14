@@ -37,7 +37,7 @@
       <%= colorbox_button(:new, label_for_new_article(@page), profile.admin_url.merge(:controller => 'cms', :action => 'new', :parent_id => (@page.folder? ? @page : (@page.parent.nil? ? nil : @page.parent)))) unless remove_content_button(:new) %>
     <% end %>
 
-    <% 
+    <%
     @plugins.dispatch(:article_toolbar_extra_buttons).each do |plugin_button| %>
       <%= instance_eval(&plugin_button) %>
     <% end %>

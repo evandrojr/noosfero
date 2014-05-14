@@ -285,7 +285,7 @@ class Noosfero::Plugin
     nil
   end
 
-  
+
   # -> Adds buttons to manage members page
   # returns = { :title => title, :icon => icon, :url => url }
   #   title = name that will be displayed.
@@ -293,9 +293,9 @@ class Noosfero::Plugin
   #   url   = url or route to which the button will redirect.
   def article_toolbar_extra_buttons
     nil
-  end  
-  
-  
+  end
+
+
   # This method will be called just before a comment is saved to the database.
   #
   # It can modify the comment in several ways. In special, a plugin can call
@@ -582,6 +582,6 @@ class Noosfero::Plugin
     #content_expire too.
     %w[edit delete spread locale suggest home new upload]
   end
-  
+
 
 end

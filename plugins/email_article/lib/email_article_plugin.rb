@@ -12,9 +12,9 @@ class EmailArticlePlugin < Noosfero::Plugin
     label = _("Send article to members")
     htmlclass = _("button with-text icon-menu-mail")
     title = _("Email article to all community members")
-      lambda { 
+      lambda {
         link_to_remote(
-            label,  
+            label,
             {
                :url => { :controller => 'email_article_plugin_myprofile', :action => "send_email", :id => @page},
                :method => :get,
@@ -22,12 +22,12 @@ class EmailArticlePlugin < Noosfero::Plugin
                :failure => "alert('Erro ao enviar email')",
                :confirm => _("Are you sure you want to email this article to the all community members?"),
             },
-            :class => htmlclass,  
+            :class => htmlclass,
             :title => title
          )
       }
   end
-  
+
   def stylesheet?
     true
   end
