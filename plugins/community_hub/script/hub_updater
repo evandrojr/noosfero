@@ -7,6 +7,9 @@ NOOSFERO_ROOT = File.expand_path(File.dirname(__FILE__) + '/../../../')
 
 Daemons.run_proc('hub') do
   require NOOSFERO_ROOT + '/config/environment'
-  require 'proxifier/env' unless ENV['PROXY'].blank?
+  unless ENV['PROXY'].blank?
+    ENV['NO_PROXY'] ||= 'localhost'
+    require 'proxifier/env'
+  end
   CommunityHubPlugin::Listener.run
 end
