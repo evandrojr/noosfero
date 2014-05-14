@@ -17,9 +17,5 @@ class EmailArticlePluginTest < ActiveSupport::TestCase
   should 'have description' do
     assert_equal  _("A plugin that lists the most accessed, most commented, most liked and most disliked contents."), EmailArticlePlugin.plugin_description
   end
-
-  should 'have stylesheet' do
-    assert @plugin.stylesheet?
-  end
-
+  
 end
