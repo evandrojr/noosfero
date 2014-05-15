@@ -5,3 +5,10 @@ def create_hub(name, community, user)
   hub.save!
   hub
 end
+
+def create_mediation(hub, community)
+  mediation = CommunityHubPlugin::Mediation.new(:profile => community)
+  mediation.name = CommunityHubPlugin::Mediation.timestamp
+  mediation.save!
+  mediation
+end
