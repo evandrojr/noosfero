@@ -12,7 +12,8 @@ class EmailArticlePlugin < Noosfero::Plugin
     label = _("Send article to members")
     htmlclass = _("button with-text icon-menu-mail")
     title = _("Email article to all community members")
-      lambda {
+    lambda {
+      if user.is_admin?(profile) and @page.kind_of?(TextArticle)      
         link_to_remote(
             label,
             {
@@ -25,11 +26,7 @@ class EmailArticlePlugin < Noosfero::Plugin
             :class => htmlclass,
             :title => title
          )
-      }
+      end   
+    }
   end
-
-  def stylesheet?
-    true
-  end
-
 end
