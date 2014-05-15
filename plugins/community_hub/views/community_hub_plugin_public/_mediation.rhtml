@@ -1,6 +1,6 @@
 <% extend CommunityHubPlugin::HubHelper %>
 
-<li id="<%= mediation.id %>" class="<%=post_css_classes(mediation.id, latest_post, oldest_post)%>">
+<li id="<%= mediation.id %>" class="post">
 
   <ul>
     <li class="time"><%= post_time(mediation.created_at) %></li>

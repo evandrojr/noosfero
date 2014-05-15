@@ -1,19 +1,5 @@
 module CommunityHubPlugin::HubHelper
 
-  def post_css_classes(post_id, latest_post_id, oldest_post_id)
-    classes = "post"
-
-    if post_id == latest_post_id
-      classes += " latest"
-    end
-
-    if post_id == oldest_post_id
-      classes += " oldest"
-    end
-
-    classes
-  end
-
   def mediator?(hub)
     logged_in? && (hub.author.id == user.id || hub.mediators.include?(user.id)) ? true : false
   end
@@ -31,15 +17,7 @@ module CommunityHubPlugin::HubHelper
   end
 
   def post_time(time)
-    if time
-      _('%{hour}:%{minutes}') % { :hour => time.hour, :minutes => time.strftime("%M") }
-    else
-      ''
-    end
-  end
-
-  def embed_code(hub)
-    "<iframe width='425' height='350' frameborder='0' scrolling='no' marginheight='0' marginwidth='0' src='#{url_for(hub.url)}'></iframe>"
+    _('%{hour}:%{minutes}') % { :hour => time.hour, :minutes => time.strftime("%M") } rescue ''
   end
 
 end
