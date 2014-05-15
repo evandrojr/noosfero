@@ -34,12 +34,4 @@
   <br />
     <span><%= required labelled_form_field(_('Twitter\'s access token secret'), text_field(:article, :twitter_access_token_secret)) %></span>
   <br />
-  <div>
-    <%= _('Facebook Settings:') %>
-  </div>
-  <br />
-  <%= check_box(:article, :facebook_enabled) %> <span><%= _("Turn on FACEBOOK") %></span>
-  <br /><br />
-    <span><%= required labelled_form_field(_('Id of Facebook\'s page which will be listened for comments (example: participabr'), text_field(:article, :facebook_page_id)) %></span>
-  <br />
 </div>
