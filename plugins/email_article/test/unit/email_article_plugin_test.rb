@@ -11,11 +11,11 @@ class EmailArticlePluginTest < ActiveSupport::TestCase
   end
 
   should 'have name' do
-    assert_equal 'Relevant Content Plugin', EmailArticlePlugin.plugin_name
+    assert_equal 'Email Article to Community Members Plugin', EmailArticlePlugin.plugin_name
   end
 
   should 'have description' do
-    assert_equal  _("A plugin that lists the most accessed, most commented, most liked and most disliked contents."), EmailArticlePlugin.plugin_description
+    assert_equal  _("A plugin that emails an article to the members of the community"), EmailArticlePlugin.plugin_description
   end
 
 end

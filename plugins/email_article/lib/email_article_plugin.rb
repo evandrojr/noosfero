@@ -5,7 +5,7 @@ class EmailArticlePlugin < Noosfero::Plugin
   end
 
   def self.plugin_description
-    _("A plugin that emails an article to the members of the community.")
+    _("A plugin that emails an article to the members of the community")
   end
 
   def article_toolbar_extra_buttons
