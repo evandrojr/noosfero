@@ -1,10 +1,6 @@
 class EmailArticlePluginMyprofileController < MyProfileController
-  
 
   needs_profile
-#  before_filter :check_access_to_profile, :except => [:join, :join_not_logged, :index, :add]
-#  before_filter :store_location, :only => [:join, :join_not_logged, :report_abuse, :send_mail]
-#  before_filter :login_required, :only => [:add, :join, :join_not_logged, :leave, :unblock, :leave_scrap, :remove_scrap, :remove_activity, :view_more_activities, :view_more_network_activities, :report_abuse, :register_report, :leave_comment_on_activity, :send_mail]
 
   def send_email
     if user.is_admin?(profile)
@@ -15,7 +11,6 @@ class EmailArticlePluginMyprofileController < MyProfileController
   end
 
   class Sender < ActionMailer::Base
-    add_template_helper(PersonNotifierHelper)    
     def mail(article)
       members = article.profile.members
       emails = []
@@ -29,24 +24,20 @@ class EmailArticlePluginMyprofileController < MyProfileController
       subject "[Artigo] " + article.title
       body set_absolute_path(article.body, article.environment)
     end
-    
-  def set_absolute_path(body, environment)
-    parsed = Hpricot(body.to_s)
-    parsed.search('img[@src]').map { |i| change_element_path(i, 'src', environment) }
-    parsed.search('a[@href]').map { |i| change_element_path(i, 'href', environment) }
-    parsed.to_s
-  end
 
-  def change_element_path(el, attribute, environment)
-    fullpath = /^http/.match(el[attribute])
-    if not fullpath
-      relative_path = /\/?(.*)/.match(el[attribute])
-      el[attribute] = "http://#{environment.default_hostname}/#{relative_path[1]}" 
+    def set_absolute_path(body, environment)
+      parsed = Hpricot(body.to_s)
+      parsed.search('img[@src]').map { |i| change_element_path(i, 'src', environment) }
+      parsed.search('a[@href]').map { |i| change_element_path(i, 'href', environment) }
+      parsed.to_s
     end
-  end  
 
-    
+    def change_element_path(el, attribute, environment)
+      fullpath = /^http/.match(el[attribute])
+      if not fullpath
+        relative_path = /\/?(.*)/.match(el[attribute])
+        el[attribute] = "http://#{environment.default_hostname}/#{relative_path[1]}"
+      end
+    end
   end
-  
-  
 end
