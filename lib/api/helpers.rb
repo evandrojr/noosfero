@@ -32,13 +32,8 @@ module API
     end
 
     def period(from_date, until_date)
-      if from_date.nil?
-        begin_period = Time.at(0).to_datetime
-        end_period = until_date.nil? ? DateTime.now : until_date
-      else
-        begin_period = from_date
-        end_period = DateTime.now
-      end
+      begin_period = from_date.nil? ? Time.at(0).to_datetime : from_date
+      end_period = until_date.nil? ? DateTime.now : until_date
 
       begin_period...end_period
     end
@@ -61,6 +56,18 @@ module API
       conditions[:created_at] = period(from_date, until_date)
 
       conditions
+    end
+
+
+    def select_filtered_collection_of(object, method, params)
+      conditions = make_conditions_with_parameter(params)
+               
+      if params[:reference_id]
+        objects = object.send(method).send("#{params.key?(:oldest) ? 'older_than' : 'newer_than'}", params[:reference_id]).find(:all, :conditions => conditions, :limit => limit, :order => "created_at DESC")
+      else
+        objects = object.send(method).find(:all, :conditions => conditions, :limit => limit, :order => "created_at DESC")
+      end
+      objects
     end
 
 #FIXME see if its needed
