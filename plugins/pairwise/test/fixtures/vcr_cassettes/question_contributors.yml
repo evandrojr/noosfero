@@ -1,0 +1,180 @@
+--- 
+http_interactions: 
+- request: 
+    method: get
+    uri: http://abner.oliveira%40serpro.gov.br:serpro@localhost:3030/questions/3.xml
+    body: 
+      string: ""
+    headers: 
+      Accept: 
+      - application/xml
+  response: 
+    status: 
+      code: 200
+      message: "OK "
+    headers: 
+      Cache-Control: 
+      - private, max-age=0, must-revalidate
+      Server: 
+      - WEBrick/1.3.1 (Ruby/1.8.7/2013-06-27)
+      X-Runtime: 
+      - "34"
+      Etag: 
+      - "\"39313ba95b65cb4e2d34f30b0a5bd2f8\""
+      Content-Type: 
+      - application/xml; charset=utf-8
+      Content-Length: 
+      - "955"
+      Set-Cookie: 
+      - _rebirth_session_key=BAh7BzoOcmV0dXJuX3RvIhUvcXVlc3Rpb25zLzMueG1sOg9zZXNzaW9uX2lkIiVjNDJlNjkyMGMxOWVkYWYxNTMzMTI2YTZmNjIyODA1NQ%3D%3D--94c39b83716120a25177673b0a21d788dd4af36c; path=/; HttpOnly
+      Date: 
+      - Wed, 19 Mar 2014 18:46:05 GMT
+      Connection: 
+      - Keep-Alive
+    body: 
+      string: |
+        <?xml version="1.0" encoding="UTF-8"?>
+        <question>
+          <active type="boolean">true</active>
+          <choices-count type="integer">9</choices-count>
+          <created-at type="datetime">2014-03-18T13:53:23Z</created-at>
+          <creator-id type="integer">4</creator-id>
+          <id type="integer">3</id>
+          <inactive-choices-count type="integer">0</inactive-choices-count>
+          <information nil="true"></information>
+          <it-should-autoactivate-ideas type="boolean">true</it-should-autoactivate-ideas>
+          <local-identifier>1</local-identifier>
+          <name>Q1</name>
+          <prompts-count type="integer">2</prompts-count>
+          <show-results type="boolean">true</show-results>
+          <site-id type="integer">1</site-id>
+          <tracking nil="true"></tracking>
+          <updated-at type="datetime">2014-03-18T13:53:30Z</updated-at>
+          <uses-catchup type="boolean">true</uses-catchup>
+          <version type="integer">6</version>
+          <votes-count type="integer">1</votes-count>
+          <item-count type="integer">9</item-count>
+        </question>
+
+    http_version: 
+  recorded_at: Wed, 19 Mar 2014 18:46:05 GMT
+- request: 
+    method: post
+    uri: http://abner.oliveira%40serpro.gov.br:serpro@localhost:3030/questions/3/choices.xml
+    body: 
+      string: |
+        <?xml version="1.0" encoding="UTF-8"?>
+        <choice>
+          <local-identifier>1</local-identifier>
+          <data>New Choice</data>
+          <visitor-identifier>John Travolta</visitor-identifier>
+        </choice>
+
+    headers: 
+      Content-Type: 
+      - application/xml
+      Accept: 
+      - "*/*"
+  response: 
+    status: 
+      code: 201
+      message: "Created "
+    headers: 
+      Cache-Control: 
+      - no-cache
+      Server: 
+      - WEBrick/1.3.1 (Ruby/1.8.7/2013-06-27)
+      X-Runtime: 
+      - "157"
+      Content-Type: 
+      - application/xml; charset=utf-8
+      Content-Length: 
+      - "1039"
+      Set-Cookie: 
+      - _rebirth_session_key=BAh7BjoPc2Vzc2lvbl9pZCIlM2FhODAxMDFkZmUwZDJmMTgyYjNkNGZjMzEzOTQ0ZTM%3D--0cde22913ec32bc420cafc0e60a84bfd45878c00; path=/; HttpOnly
+      Date: 
+      - Wed, 19 Mar 2014 18:46:05 GMT
+      Location: 
+      - http://localhost:3030/questions/3/choices/40
+      Connection: 
+      - Keep-Alive
+    body: 
+      string: |
+        <?xml version="1.0" encoding="UTF-8"?>
+        <choice>
+          <active type="boolean">true</active>
+          <created-at type="datetime">2014-03-19T18:46:05Z</created-at>
+          <creator-id type="integer">5</creator-id>
+          <data>New Choice</data>
+          <id type="integer">40</id>
+          <item-id type="integer" nil="true"></item-id>
+          <local-identifier>1</local-identifier>
+          <losses type="integer">0</losses>
+          <position type="integer" nil="true"></position>
+          <prompt-id type="integer" nil="true"></prompt-id>
+          <prompts-count type="integer">0</prompts-count>
+          <prompts-on-the-left-count type="integer">0</prompts-on-the-left-count>
+          <prompts-on-the-right-count type="integer">0</prompts-on-the-right-count>
+          <question-id type="integer">3</question-id>
+          <ratings type="integer" nil="true"></ratings>
+          <request-id type="integer" nil="true"></request-id>
+          <score type="float">50.0</score>
+          <tracking nil="true"></tracking>
+          <updated-at type="datetime">2014-03-19T18:46:05Z</updated-at>
+          <version type="integer">1</version>
+          <wins type="integer">0</wins>
+        </choice>
+
+    http_version: 
+  recorded_at: Wed, 19 Mar 2014 18:46:05 GMT
+- request: 
+    method: get
+    uri: http://abner.oliveira%40serpro.gov.br:serpro@localhost:3030/visitors.xml?ideas_count=1&page=1&question_id=3
+    body: 
+      string: ""
+    headers: 
+      Accept: 
+      - application/xml
+  response: 
+    status: 
+      code: 200
+      message: "OK "
+    headers: 
+      Cache-Control: 
+      - private, max-age=0, must-revalidate
+      Server: 
+      - WEBrick/1.3.1 (Ruby/1.8.7/2013-06-27)
+      X-Runtime: 
+      - "107"
+      Etag: 
+      - "\"5252e9c48a1957fab7084271c0aed768\""
+      Content-Type: 
+      - application/xml; charset=utf-8
+      Content-Length: 
+      - "527"
+      Set-Cookie: 
+      - _rebirth_session_key=BAh7BzoOcmV0dXJuX3RvIjUvdmlzaXRvcnMueG1sP2lkZWFzX2NvdW50PTEmcGFnZT0xJnF1ZXN0aW9uX2lkPTM6D3Nlc3Npb25faWQiJTNhMzQyOTUyMzY0ZWE4MjA0MzlhNmZjOTY4M2Y5MGRk--215ec52c7edd5d155e2c6cb59c37aadea69c0d65; path=/; HttpOnly
+      Date: 
+      - Wed, 19 Mar 2014 18:46:06 GMT
+      Connection: 
+      - Keep-Alive
+    body: 
+      string: |
+        <?xml version="1.0" encoding="UTF-8"?>
+        <visitors type="array">
+          <visitor>
+            <activated type="boolean" nil="true"></activated>
+            <created-at type="datetime">2014-03-18T13:48:45Z</created-at>
+            <id type="integer">5</id>
+            <ideas-count type="">7</ideas-count>
+            <identifier>John Travolta</identifier>
+            <site-id type="integer">1</site-id>
+            <tracking nil="true"></tracking>
+            <updated-at type="datetime">2014-03-18T13:48:45Z</updated-at>
+            <user-id type="integer" nil="true"></user-id>
+          </visitor>
+        </visitors>
+
+    http_version: 
+  recorded_at: Wed, 19 Mar 2014 18:46:06 GMT
+recorded_with: VCR 2.8.0

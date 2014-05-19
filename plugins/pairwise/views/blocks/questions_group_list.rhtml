@@ -1,0 +1,46 @@
+<% extend PairwisePlugin::Helpers::ViewerHelper %>
+
+<%= block_title(block.title) %>
+
+<div id='pairwise_group_list_block_<%= block.id %>' class='pairwise_group_list_container' data-open-prompt="0">
+  <div class="description">
+    <%= block.group_description %>
+  </div>
+	<div class="question container">
+	<% if block.questions.nil?  || block.questions.empty? %>
+		<span><%= _("Empty") %></span>
+	<% else 
+	  block.questions_for_view.each_with_index do |pairwise_content, index| 
+	 %>
+		<div class='<%= pairwise_group_row_classes(index) %>'>
+          <div class="number"><p><%= index + 1 %></p></div>
+          <div class="title"><p><%= pairwise_content.title %></p></div>
+			<div class="arrow" ><%= pairwise_span_arrow(index) %></div>
+		</div>
+		<%= pairwise_group_content_body(index, pairwise_content) %>
+		<% end %>
+	<% end %>
+	</div>
+</div>
+
+<script type="text/javascript">
+jQuery(document).ready(function($){
+	var block_id = '#pairwise_group_list_block_<%= block.id %>';
+	var block_element = $(block_id);
+	var questions_arrows = $(block_id + ' .arrow');
+	var questions_rows = $(block_id + ' .row');
+	var questions_bodies = $(block_id + ' .pairwise_inner_body');
+	questions_rows.click(function(){
+		var current_open =  parseInt(block_element.attr('data-open-prompt'));
+		var index_clicked = questions_rows.index(this);
+		if(index_clicked != current_open){
+			block_element.attr('data-open-prompt', index_clicked);
+			$(questions_bodies[current_open]).slideToggle();
+			$(questions_rows[current_open]).toggleClass("secondary");
+
+			$(questions_bodies[index_clicked]).slideToggle();
+			$(questions_rows[index_clicked]).toggleClass("secondary");
+		}
+	});
+});
+</script>

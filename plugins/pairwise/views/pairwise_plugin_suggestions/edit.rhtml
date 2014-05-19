@@ -1,0 +1,16 @@
+<h1><%= _("Edit Pairwise Question Choice") %> </h1>
+
+<h4><%= @pairwise_content.name %></h4>
+
+<% form_for 'choice', 
+		:url => { 
+			:controller => 'pairwise_plugin_suggestions',
+			:action => 'update', 
+			:id => @pairwise_content.id
+		} do |f| %>
+	<%= f.hidden_field 'id' %>
+	<%= f.text_area 'data', :rows => 4, :style => "width:100%" %>
+	<%= f.check_box 'active' %> <%= f.label _('Active') %>
+	<br class="clear">
+	<%= submit_button('save', _('Update'), :id => 'update_choice_button') %>
+<% end %>

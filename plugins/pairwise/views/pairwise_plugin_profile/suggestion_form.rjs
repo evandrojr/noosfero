@@ -1,0 +1,5 @@
+extend PairwisePlugin::Helpers::ViewerHelper
+
+page.replace_html "pairwise_suggestion_form_#{@pairwise_content.id}", :partial => "suggestion_form",
+   :locals=> {:pairwise_content => @pairwise_content, :page => @pairwise_content, :embeded => @embeded, :source => @source }
+#page.visual_effect :slide_down, "suggestions_box"

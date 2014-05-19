@@ -1,0 +1,34 @@
+<div class="article-block-edition">
+<% if @block.owner.kind_of?(Environment) and @block.owner.portal_community.nil? %>
+  <p id="no_portal_community">
+  <%= _("You don't have an community defined as the portal community. Define it before use this block properly.") %>
+  </p>
+<% else %>
+  <%
+    questions = @block.available_questions
+  %>
+  <div class="group_description">
+    <h3> <%= _('Description:') %> </h3>
+    <%= text_area(:block, :group_description, :rows => 6, :cols => 50) %>
+  </div>
+  <div id="questions_content" %>
+    <h3> <%= _('Choose which attributes should be displayed and drag to reorder them:') %> </h3>
+    <ul id="pairwise_questions_list">
+      <% questions.each do |question| %>
+        <li>
+          <%=  
+            check_box_tag( "block[questions_ids][]", question.id, @block.settings[:questions_ids] && @block.settings[:questions_ids].include?(question.id.to_s), :id => "pairwise_question_#{question.id}" ) +
+            content_tag( 'label', question.name, :for => "pairwise_question_#{question.id}" )
+          %>
+        </li>
+      <% end %>
+    </ul>
+   <div class="random_sort">
+      <%= labelled_form_field check_box(:block, :random_sort) + _('Show items in a random order'), '' %>
+  </div>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  jQuery( "#pairwise_questions_list" ).sortable();
+</script>

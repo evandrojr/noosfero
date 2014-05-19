@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<%= html_language %>" lang="<%= html_language %>">
+  <head>
+    <title>Pairwise embed</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <%= noosfero_stylesheets %>
+    <%= noosfero_javascript %>
+
+    <script type='text/javascript'>
+      DEFAULT_LOADING_MESSAGE = <%="'#{ _('loading...') }'" %>;
+    </script>
+
+    <style>
+      #pairwise_embed {
+        padding: 20px;
+        margin: 20x;
+      }
+    </style>
+
+  </head>
+  <body class="<%= h body_classes %>">
+    <%=
+      @plugins.dispatch(:body_beginning).collect do |content|
+        content.respond_to?(:call) ? content.call : content
+      end.join("\n")
+    %>
+    <div id="pairwise_embed">
+      
+                    <%= yield %>
+      
+    </div>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+--- 
+recorded_with: VCR 2.8.0
+http_interactions: 
+- request: 
+    method: get
+    uri: http://abner.oliveira%40serpro.gov.br:serpro@localhost:3030/questions/3/choices.xml
+    body: 
+      string: ""
+    headers: 
+      Accept: 
+      - application/xml
+  response: 
+    status: 
+      code: 200
+      message: "OK "
+    headers: 
+      Server: 
+      - WEBrick/1.3.1 (Ruby/1.8.7/2013-06-27)
+      Content-Length: 
+      - "773"
+      Set-Cookie: 
+      - _rebirth_session_key=BAh7BzoOcmV0dXJuX3RvIh0vcXVlc3Rpb25zLzMvY2hvaWNlcy54bWw6D3Nlc3Npb25faWQiJTcwNTViODljNzY0YWYyNTdiOTlmMDJmMTVkMzU3ZDQy--e1ef0b40ed34d06aab2f0770d9f7b2103758934f; path=/; HttpOnly
+      Content-Type: 
+      - application/xml; charset=utf-8
+      Cache-Control: 
+      - private, max-age=0, must-revalidate
+      Connection: 
+      - Keep-Alive
+      X-Runtime: 
+      - "34"
+      Etag: 
+      - "\"0813255a93cff945e3f3ce1f6f128460\""
+      Date: 
+      - Tue, 18 Mar 2014 13:53:23 GMT
+    body: 
+      string: |
+        <?xml version="1.0" encoding="UTF-8"?>
+        <choices type="array">
+          <choice>
+            <active type="boolean">true</active>
+            <created-at type="datetime">2014-03-18T13:53:23Z</created-at>
+            <data>Choice 1</data>
+            <id type="integer">11</id>
+            <losses type="integer">0</losses>
+            <score type="float">50.0</score>
+            <wins type="integer">0</wins>
+            <user-created type="boolean">false</user-created>
+          </choice>
+          <choice>
+            <active type="boolean">true</active>
+            <created-at type="datetime">2014-03-18T13:53:23Z</created-at>
+            <data>Choice 2</data>
+            <id type="integer">12</id>
+            <losses type="integer">0</losses>
+            <score type="float">50.0</score>
+            <wins type="integer">0</wins>
+            <user-created type="boolean">false</user-created>
+          </choice>
+        </choices>
+
+    http_version: 
+  recorded_at: Tue, 18 Mar 2014 13:53:23 GMT

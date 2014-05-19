@@ -1,0 +1,344 @@
+div#pairwise_form_fields textarea {
+	width: 100%;
+	margin-top: 5px;
+	height:30px;
+
+}
+
+#pairwise_main {
+    width: 100%;
+    padding: 10px;
+}
+
+.vote_question {
+
+}
+
+#pairwise_main div.footer {
+    text-align:right;
+    padding: 20px;
+}
+
+#pairwise_main  div.prompt {
+	width: 45%;
+	float:none;
+	color:white;
+	min-height: 30px;
+	height:auto;
+	word-wrap: break-word;
+	font-size: 12pt;
+	text-align: center;
+	display: inline-block;
+	vertical-align: top;
+
+}
+
+#pairwise_main  div.prompt  a {
+	width:100%;
+	color:white;
+	display: block;
+	text-decoration: none;
+}
+
+
+#pairwise_main div#suggestions_box {
+	/*border: 1px solid;
+	border-radius: 7px;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    border-color: #ccc;
+	border-width: 1px;
+	border-style: solid;*/
+	padding: 10px;
+	margin-top: 15px;
+}
+
+#pairwise_main div#suggestion_box_loading {
+	color: black;
+	border: 1px solid;
+	border-radius: 7px;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    border-color: #ccc;
+	border-width: 1px;
+	border-style: solid;
+	padding: 10px;
+	margin-top: 15px;
+	text-align: center;
+}
+
+
+#pairwise_main div#suggestions_box  textarea{
+	width: 100%;
+	border: 1px solid #99999;
+	border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+
+#pairwise_main div#suggestions_box  #new_idea_button{
+	background-color: #01bb00;
+	padding: 5px 10px 5px 10px;
+	cursor: pointer;
+	border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+
+#pairwise_main div#suggestions_box  div.suggestion_header {
+	text-align: right;
+	color: blue;
+}
+
+#pairwise_main div#suggestions_box  #new_idea_button:hover{
+	boder-color: gray;
+}
+
+#pairwise_main #suggestions_box span.close_button {
+	cursor: pointer;
+}
+
+#pairwise_main #suggestions_box span.close_button:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+
+#pairwise_main  div.show_new_idea_box {
+	width: 150px;
+	float:none;
+	color:white;
+	min-height: 18px;
+	height:auto;
+	padding: 0.5em;
+	word-wrap: break-word;
+	font-size: 12pt;
+	background-color: #01bb00;
+	text-align: center;
+    border-radius: 7px;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+	border-color:#CCCCCC;
+	border-width: 1px;
+	border-style: solid;
+	vertical-align: top;
+	margin-top: 12px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	clear: both;
+}
+
+#pairwise_main  div.show_new_idea_box a{
+	color: white;
+	text-decoration: none;
+}
+
+#pairwise_main  div.show_new_idea_box a:hover{
+	text-decoration: underline;
+}
+
+#pairwise_main  div.skip_vote {
+	width: 150px;
+	float:none;
+	color:white;
+	min-height: 18px;
+	height:auto;
+	padding: 0.5em;
+	word-wrap: break-word;
+	font-size: 12pt;
+	text-align: center;
+	vertical-align: top;
+	margin-top: 12px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+
+#pairwise_main div.skip_vote_reasons.show {
+	display:block;
+}
+
+#pairwise_main div.skip_vote_reasons {
+	display:none;
+	padding:20px;
+	margin-bottom: 10px;
+}
+
+#pairwise_main div.skip_vote_item {
+	width:100%;
+	margin-bottom: 15px;
+	padding-left: 5px;
+	padding-right: 5px;
+	/*float:left;*/
+	float:left;
+	background-color:#ccc;
+	height: 3em;
+	text-align: center;
+	vertical-align: center;
+	min-height: 2em;
+	padding-top: 10px;
+	border-width: 1px;
+	border-style: solid;
+	 border-radius: 7px;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+	border-color:#CCCCCC;
+}
+
+#pairwise_main div.skip_vote_reasons div:nth-child(even) {
+	/*margin-left: 10px;*/
+}
+
+#pairwise_main  div.skip_vote a{
+	color: white;
+	text-decoration: none;
+	width: 100%;
+}
+
+#pairwise_main  div.skip_vote a:hover{
+	text-decoration: underline;
+	width: 100%;
+}
+
+.result_label {
+	padding: 15px 0px;
+}
+
+div.choices_filter {
+	width: 100%;
+	text-align: right;
+}
+
+table.pairwise_choices_table {
+	border: 1px #fcfcfc solid;
+	 border-radius: 7px;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+}
+
+table.pairwise_choices_table th{
+	font-weight: bolder;
+	text-align: left;
+}
+
+
+
+div.pairwise_group_list_container {
+	font-family: 'Open Sans';
+}
+
+div.pairwise_group_list_container .row {
+    font-size: 14px;
+    height: 40px;
+	width:100%;
+	background-color: #F8C300;
+  vertical-align: middle;
+  margin-top:10px;
+  margin-bottom:auto;
+  padding:0px;
+  cursor: auto;
+}
+
+div.pairwise_group_list_container .row p {
+	line-height: 30px;
+    margin: auto;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+
+div.pairwise_group_list_container .title{
+	display: inline-block;
+	color: #2F5707;
+    Height: 40px;
+   padding-left: 20px;
+}
+
+div.pairwise_group_list_container .number{
+	display: inline-block;
+	left: 0px;
+    background-color: #2F5707;
+    width: 40px;
+    text-align: center;
+	color: #F8C300;
+  }
+
+div.pairwise_group_list_container .row.secondary {
+  cursor: pointer;
+  background-color: #497B16;
+}
+
+div.pairwise_group_list_container .row.secondary .title {
+  color: white;
+}
+
+
+div.pairwise_group_list_container .row.secondary .number {
+  color: white;
+}
+
+div.pairwise_group_list_container .arrow{
+	display: inline-block;
+    position: absolute;
+	right: 20px;
+	margin-top: 10px;
+}
+/*
+div.pairwise_group_list_container .arrow{
+	display: inline-block;
+    position: absolute;
+	right: 20px;
+	margin-top: 10px;
+	height: 22px;
+	width:23px;
+	color: #2F5707;
+	background: url('/designs/themes/participa-theme/images/arrow_right.jpg') no-repeat center;
+}
+
+div.pairwise_group_list_container .arrow.active{
+	height: 18px;
+    margin-top: 10px;
+    right: 20px;
+    width: 22px;
+	background: url('/designs/themes/participa-theme/images/arrow_down.jpg') no-repeat center;
+}*/
+
+div.pairwise_group_list_container .row.secondary .arrow span {
+	background: url('/designs/themes/participa-theme/images/arrow_right.jpg') no-repeat center;
+	border: 0px;
+	width: 25px;
+	height: 25px;
+	display: inline-block;
+	cursor: pointer;
+}
+
+div.pairwise_group_list_container .row .arrow span {
+	cursor: auto;
+	border: 0px;
+	width: 25px;
+	height: 25px;
+	display: inline-block;
+	background: url('/designs/themes/participa-theme/images/arrow_down.jpg') no-repeat center;
+
+}
+
+div.pairwise_main .spinner {
+	position: absolute;
+	text-align: center;
+	width: 95%;
+	height: 190px;
+	display: none;
+	z-index: 999;
+	background-color: #ECF2E7;
+}
+
+div.pairwise_main .spinner h5{
+	padding-top: 30px;
+}
+
+#pairwise_main .pairwise_content .total_votes {
+  float: right;
+  color: #999;
+}

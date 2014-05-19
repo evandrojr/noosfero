@@ -1,0 +1,17 @@
+<div id="pairwise_prompts_<%= pairwise_content.id %>">
+  <%= pairwise_spinner(pairwise_content) %>
+  <% unless question %>
+    <div style="height: 190px"></div>
+    <script>
+     <%= pairwise_spinner_show_function_call(pairwise_content) %>
+     jQuery.ajax({
+       url: "<%= url_for :controller=>'pairwise_plugin_profile', :action=>'load_prompt', :profile => pairwise_content.profile.identifier, :id => pairwise_content.id %>",
+       dataType: 'script'
+     });
+    </script>
+  <% else %>
+      <div class="prompt left"><%= choose_left_link(pairwise_content, question, question.prompt, embeded, source, question.appearance_id) %></div>
+      <div class="separator"></div>
+     <div class="prompt right"><%= choose_right_link(pairwise_content, question, question.prompt, embeded, source, question.appearance_id  ) %></div>
+  <% end %>
+</div>

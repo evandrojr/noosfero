@@ -1,0 +1,17 @@
+<h1><%= _('Pairwise settings')%></h1>
+
+<% form_for(:settings) do |f| %>
+
+  <div id="pairwise-config-fields">
+    <%= labelled_form_field _('Pairwise api host'), f.text_field(:api_host) %>
+    <%= labelled_form_field _('Pairwise username'), f.text_field(:username) %>
+    <%= labelled_form_field _('Pairwise password'), f.text_field(:password) %>
+
+
+
+    <% button_bar do %>
+      <%= submit_button(:save, _('Save'), :cancel => {:controller => 'plugins', :action => 'index'}) %>
+    <% end %>
+  </div>
+<% end %>
+

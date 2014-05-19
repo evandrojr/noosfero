@@ -1,0 +1,25 @@
+extend PairwisePlugin::Helpers::ViewerHelper
+
+question = @pairwise_content.prepare_prompt(pairwise_user_identifier(user), nil)
+
+spinner = "pairwise_spinner#{@pairwise_content.id}"
+
+div_id = "pairwise_prompts_#{@pairwise_content.id}"
+
+skip_div_id = "skip_vote_reasons_#{@pairwise_content.id}"
+
+page.replace div_id, :partial => 'content_viewer/pairwise_prompts', :locals => {
+                    :embeded => params[:embeded], 
+                    :source => params[:source], 
+                    :pairwise_content => @pairwise_content,
+                    :question => question
+                  }
+
+page.replace_html skip_div_id, :partial => 'content_viewer/pairwise_skips', :locals  => {
+                    :embeded => params[:embeded], 
+                    :source => params[:source], 
+                    :pairwise_content => @pairwise_content,
+                    :question => question
+                  }                  
+
+page.call pairwise_spinner_hide_function_name(@pairwise_content)

@@ -1,0 +1,5 @@
+<ul>
+	<% pairwise_content.ask_skip_reasons(question.prompt).each do |reason| %>
+	  <%= skip_vote_link(pairwise_content, question, question.prompt, embeded, source, question.appearance_id, reason ) %>
+	<% end %>
+</ul>

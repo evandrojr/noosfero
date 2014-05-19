@@ -1,0 +1,19 @@
+<style type="text/css">
+	div#pairwise_form_fields textarea {
+		width: 100% !important;
+		margin-top: 5px;
+		height:30px;
+
+	}
+</style>
+<h1> <%= _(PairwisePlugin::PairwiseContent.short_description) %> </h1>
+
+<%
+  @question = @article.title.nil? ? nil : @article.question
+%>
+
+<%= error_messages_for 'question_content' %>
+
+<%= hidden_field_tag 'question_content[profile_id]', profile.id %>
+<%= hidden_field_tag 'pairwise_question_id', @article.pairwise_question_id %>
+<%= render :partial => "cms/pairwise_plugin/pairwise_content_form", :locals => {:f => f} %>

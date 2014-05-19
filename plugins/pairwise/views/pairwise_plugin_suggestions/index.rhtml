@@ -1,0 +1,154 @@
+<% extend PairwisePlugin::Helpers::ViewerHelper %>
+<% extend PairwisePlugin::Helpers::SuggestionsHelper %>
+
+<%= pairwise_plugin_stylesheet  %>
+
+<h1><%= _("Pairwise Question") %></h1>
+<h4><%= _("Question text" ) %>: </h4><span><%= @pairwise_content.name %></span>
+<div class="result_label">
+	<%= pairwise_result_link _("Results"), @pairwise_content %>
+</div>
+<% if flash[:error] %>
+	<div class="error">
+	   <%= flash[:error] %>
+	</div>
+<% end %>
+<% if  flash[:notice] %>
+	<div class="notice">
+	   <%= flash[:notice] %>
+	</div>
+<% end %>
+
+<br />
+
+<style type="text/css" media="all">
+
+	#tab_ideas_suggestions td.selected_tab {
+		background-color: #f0f0f0;
+	}
+
+	#tab_ideas_suggestions td.not_selected_tab {
+		background-color: white;
+	}
+
+	#tab_ideas_suggestions td.not_used_tab {
+		background-color: white;
+		border-bottom: 0px;
+	}
+
+	#tab_ideas_suggestions {
+		background-color: #f0f0f0;
+	}
+
+	#tab_ideas_suggestions tr {
+		border-bottom: 1px solid #c0c0c0;
+	}
+
+	#pairwise_search tr {
+		background-color: white;
+	}
+
+	.pairwise_search_field {
+		border: 1px solid #c0c0c0;
+		background-color:white;
+		width: 100%;
+		height: 25px;
+	}
+
+	.selected_column {
+		background-color: #f0f0f0;
+	}
+
+	.not_selected_column {
+		background-color: #ffffff;
+	}
+
+	.soAscending {
+	    background:url(/designs/icons/default/outras/16x16/actions/go-up.gif) no-repeat 99% 60% #f0f0f0;
+	}
+	.soDescending {
+	    background:url(/designs/icons/default/outras/16x16/actions/go-down.gif) no-repeat 99% 60% #f0f0f0;
+	}
+
+</style>
+
+<table border="0" id="tab_ideas_suggestions">
+	<tr>
+		<td align="center" width="50%" class="<%= ! has_param_pending_choices? ? "selected_tab" : "not_selected_tab" %>">
+  		<h5><%= link_to_if  has_param_pending_choices?, _('Ideas'), :pending => '' %></h5>
+  	</td>
+		<td align="center" width="50%" colspan="2" class="<%= has_param_pending_choices? ? "selected_tab" : "not_selected_tab" %>">
+  		<h5><%= link_to_if ! has_param_pending_choices?, _('Suggestions'), :pending => '1', :reproved => '' %></h5>
+  	</td>
+  </tr>
+  <% if params[:pending] == '1' %>
+	<tr>
+		<td align="center" class="not_used_tab">&nbsp;</td>
+		<td align="center" width="25%" class="<%= ! has_param_reproved_choices? ? "selected_tab" : "not_selected_tab" %>">
+			<%= link_to_if has_param_reproved_choices?, _('Pending'), :pending => '1', :reproved => '' %>
+		</td>
+		<td align="center" width="25%" class="<%= has_param_reproved_choices? ? "selected_tab" : "not_selected_tab" %>">
+			<%= link_to_if ! has_param_reproved_choices?, _('Reproved'), :pending => '1', :reproved => '1' %>
+		</td>
+  </tr>
+  <% end %>
+</table>
+
+<br />
+
+<% form_for(
+		:filter, {
+			:action => :index,
+			:controller => 'pairwise_plugin_suggestions',
+			:profile => profile.identifier
+		}) do %>
+<table border="0" id="pairwise_search">
+	<tr>
+		<td>
+			<%= hidden_field_tag 'pending', params[:pending] %>
+			<%= hidden_field_tag 'reproved', params[:reproved] %>
+	    <%= text_field_tag(
+	    			'filter[data]',
+	    			params[:filter] ? params[:filter][:data]:'',
+	    			:placeholder => _('Type words about ideas/suggestions you\'re looking for'),
+	    			:class => "pairwise_search_field"
+	    		) %>
+		</td>
+		<td width="40px"><%= submit_button :search, _('Search') %></td>
+	</tr>
+</table>
+<% end %>
+
+<br />
+
+<table class="pairwise_choices_table">
+	<tr>
+		<th class="<%= class_to_order_column("data", params[:order]) %>">
+			<%= link_to_sort_choices(@pairwise_content, _("Text"), "data") %>
+		</th>
+		<th class="<%= class_to_order_column("created_date", params[:order]) %>">
+			<%= link_to_sort_choices(@pairwise_content, _("Date"), "created_date") %>
+		</th>
+    <th class="<%= class_to_order_column("visitor_identifier", params[:order]) %>">
+    	<%= link_to_sort_choices(@pairwise_content, _("Author"), "visitor_identifier") %>
+    </th>
+    <th></th>
+	</tr>
+
+	<% @choices.each do |choice| %>
+		<tr>
+      <td width="270px"><%= choice.data %></td>
+      <td><%= show_date choice.created_at %></td>
+      <td width="105px" ><%= choice.user_created ? choice.creator_identifier : profile.identifier %></td>
+			<td width="50px">
+				<%= link_to_edit_choice(@pairwise_content, choice) unless choice.reproved %>
+				<% unless choice.active || choice.reproved %>
+					|
+					<%= link_to_approve_choice(@pairwise_content, choice, params)%>
+					| <%= link_to_reprove_idea @pairwise_content, choice, 'reprove', params %>
+				<% end %>
+			</td>
+		</tr>
+	<% end %>
+</table>
+<%= pagination_for_choices(@choices) %>

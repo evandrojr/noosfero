@@ -1,0 +1,10 @@
+extend PairwisePlugin::Helpers::ViewerHelper
+
+div_id = "pairwise_#{@pairwise_content.id}"
+
+page.replace div_id, :partial => 'content_viewer/result', :locals => {
+                    :embeded => params[:embeded],
+                    :pairwise_content => @pairwise_content,
+                  }
+
+page.call pairwise_spinner_hide_function_name(@pairwise_content)

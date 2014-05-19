@@ -1,0 +1,37 @@
+<div id="pairwise_<%= pairwise_content.id %>">
+<div id="pairwise_main" class="pairwise_main">
+  <%= render :partial => 'content_viewer/menu', :locals => {:embeded => embeded, :pairwise_content => pairwise_content, :active_tab => :prompt} %>
+  <div class="pairwise_content">
+      <div class="pairwise_body"><%= pairwise_content.title %></div>
+      <div class="pairwise_call_for_action"><%= pairwise_content.body %></div>
+      <%= render :partial => 'content_viewer/pairwise_prompts', :locals => {:embeded => embeded, :pairwise_content => pairwise_content, :question => question, :source => (defined?(source) ? source : '') } %>
+      <% if embeded %>
+       	<div class="footer"><%= _('Powered by') + ' ' + pairwise_content.environment.name%></div>
+      <% end %>
+  </div>
+	<div class="skip_vote">
+			<%= skip_vote_open_function(pairwise_content) %>
+	</div>
+  <div id="skip_vote_reasons_<%= pairwise_content.id %>" class="skip_vote_reasons">
+  <% if question %>
+    <%= render :partial => 'content_viewer/pairwise_skips', :locals => {:embeded => embeded, :pairwise_content => pairwise_content, :question => question, :source => (defined?(source) ? source : '') } %>
+  <% end %>
+  </div>
+
+	<% if pairwise_content.allow_new_ideas? %>
+    <% if user %>
+      <div id="suggestions_box">
+        <span>Gostaria de sugerir uma ideia?</span>
+        <div class="suggestion_form">
+        <%= render :partial => "pairwise_plugin_profile/suggestion_form",
+            :locals => {:pairwise_content => pairwise_content, :embeded => embeded, :source => source} %>
+        </div>
+      </div>
+    <% else %>
+      <div id="suggestions_box_not_logged">
+        <%= link_to(_("Add new idea"), '#', :id => 'new_idea_button_not_logged', :class => 'require-login-popup') %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+</div>

@@ -1,0 +1,14 @@
+extend PairwisePlugin::Helpers::ViewerHelper
+
+div_id = "pairwise_#{@pairwise_content.id}"
+
+question = @pairwise_content.prepare_prompt(pairwise_user_identifier(user), nil)
+
+page.replace div_id, :partial => 'content_viewer/prompt_body', :locals => {
+                    :embeded => params[:embeded],
+                    :source => params[:source],
+                    :pairwise_content => @pairwise_content,
+                    :question => question
+                  }
+
+page.call pairwise_spinner_hide_function_name(@pairwise_content)

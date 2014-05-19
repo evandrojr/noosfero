@@ -1,0 +1,47 @@
+<div id="pairwise_form_fields">
+
+	<%= hidden_field_tag 'id', @article.id %>
+	<%= required_fields_message %>
+	<%= required f.text_field(:name) %><br/>
+
+	<%= render :file => 'shared/tiny_mce' %>
+
+	<%= f.text_area(:body, :style => 'width: 98%; height: 400px;', :class => 'mceEditor') %>
+
+	<%#= labelled_form_field(_('Text'), text_area(@article, :body, :style => 'width: 98%; height: 400px;', :class => 'mceEditor')) %>
+
+	<%= required f.check_box :allow_new_ideas %><br/>
+
+	<div id="choices">
+		<span class="required-field">
+			<label class="formlabel" for="choices"><%= _('Choices') %></label>
+		</span>
+		<%#new articles starts with two choices fields %>
+		<div id="pairwise_choices_list">
+			<% if @article.new_record? %>
+					<%= required text_area_tag 'article[choices][]', '', :id => 'choice1' %>
+					<%= required text_area_tag 'article[choices][]', '', :id => 'choice2' %>
+				
+			<% else #already saved pairwise content show one input for each choice%>
+				<% @article.choices.each do |choice_hash| %>
+					<% choice_hash.each do |id, data| %>
+						<%= required text_area_tag "article[choices_saved[#{id}]", 
+						data, :id => "choice_#{id}", :disabled => false  %>
+					<% end %>
+				<% end %>
+			<% end %>
+		</div>
+	</div>
+	<div class="button-bar">
+		<input class="button with-text icon-add" type="button" id="add_new_choice" value="<%= _("New choice") %>">
+		<br style="clear: left;">
+	</div>
+	<script type="text/javascript">
+	jQuery('#add_new_choice').click(function(){
+		var qty = jQuery("#pairwise_choices_list textarea").size();
+		var choice_id = 'choice' + qty;
+		jQuery("#pairwise_choices_list").append("<span class='required-field'><textarea id='choices_' name='article[choices][]'></textarea></span>");
+		return false;
+	})
+	</script>
+</div>

@@ -1,0 +1,12 @@
+<% extend PairwisePlugin::Helpers::ViewerHelper %>
+
+<ul class="pairwise_menu">
+   <li>
+    <%=  pairwise_tab_remote_link _('Pairwise Vote'), pairwise_content.prompt_url, pairwise_content, embeded, :class => active_tab == :prompt ? 'active' : ''  %>
+   </li>
+   <li><%=  pairwise_tab_remote_link _('Results'), pairwise_content.result_url, pairwise_content, embeded, :class => active_tab == :results ? 'active' : ''  %></li>
+    <% if !embeded && pairwise_content.allow_edit?(user) %>
+      <li><%= pairwise_edit_link _('Edit'), pairwise_content %></li>
+      <li><%= ideas_management_link _('Manage Ideas'), pairwise_content, user %></li>
+    <% end %>
+</ul>
