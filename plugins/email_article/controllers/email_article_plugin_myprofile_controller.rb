@@ -6,7 +6,9 @@ class EmailArticlePluginMyprofileController < MyProfileController
     if user.is_admin?(profile)
       article = Article.find(params[:id])
       EmailArticlePluginMyprofileController::Sender.deliver_mail(article)
-      render :text=>'ok'
+      render :action => 'success'
+    else
+      render :action => 'fail'
     end
   end
 
