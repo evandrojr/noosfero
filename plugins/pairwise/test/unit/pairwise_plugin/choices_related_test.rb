@@ -1,5 +1,5 @@
 require "test_helper"
-require "#{RAILS_ROOT}/plugins/pairwise/test/fixtures/pairwise_content_fixtures"
+require "#{Rails.root}/plugins/pairwise/test/fixtures/pairwise_content_fixtures"
 
 class PairwisePlugin::ChoicesRelatedTest < ActiveSupport::TestCase
 
@@ -10,31 +10,31 @@ class PairwisePlugin::ChoicesRelatedTest < ActiveSupport::TestCase
   should 'have choice id' do
     choices_related = PairwisePlugin::ChoicesRelated.new
     choices_related.valid?
-    assert choices_related.errors.invalid?(:choice_id)
+    assert choices_related.errors.include?(:choice_id)
 
     choices_related.choice_id = 1
     choices_related.valid?
-    assert !choices_related.errors.invalid?(:choice_id)
+    assert !choices_related.errors.include?(:choice_id)
   end
 
   should 'have parent choice id' do
     choices_related = PairwisePlugin::ChoicesRelated.new
     choices_related.valid?
-    assert choices_related.errors.invalid?(:parent_choice_id)
+    assert choices_related.errors.include?(:parent_choice_id)
 
     choices_related.parent_choice_id = 1
     choices_related.valid?
-    assert !choices_related.errors.invalid?(:parent_choice_id)
+    assert !choices_related.errors.include?(:parent_choice_id)
   end
 
   should 'belongs to a question' do
     choices_related = PairwisePlugin::ChoicesRelated.new
     choices_related.valid?
-    assert choices_related.errors.invalid?(:question)
+    assert choices_related.errors.include?(:question)
 
     choices_related.question = @pairwise_content
     choices_related.valid?
-    assert !choices_related.errors.invalid?(:question)
+    assert !choices_related.errors.include?(:question)
   end
 
   should 'optionally have an user' do

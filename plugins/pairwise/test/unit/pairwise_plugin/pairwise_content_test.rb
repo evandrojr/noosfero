@@ -1,11 +1,11 @@
 require "test_helper"
-require "#{RAILS_ROOT}/plugins/pairwise/test/fixtures/pairwise_content_fixtures"
-require "#{RAILS_ROOT}/plugins/pairwise/test/fixtures/http_stub_fixtures"
+require "#{Rails.root}/plugins/pairwise/test/fixtures/pairwise_content_fixtures"
+require "#{Rails.root}/plugins/pairwise/test/fixtures/http_stub_fixtures"
 
 # require 'vcr'
 
 # VCR.configure do |c|
-#   c.cassette_library_dir = "#{RAILS_ROOT}/plugins/pairwise/test/fixtures/vcr_cassettes"
+#   c.cassette_library_dir = "#{Rails.root}/plugins/pairwise/test/fixtures/vcr_cassettes"
 #   c.hook_into :webmock
 #   c.before_playback do |i|
 #     puts "I in PLAYBACK: #{i.inspect}"
@@ -70,7 +70,7 @@ class PairwisePlugin::PairwiseContentTest < ActiveSupport::TestCase
 
   should 'prepare prompt' do
     @question = Pairwise::Question.new(:id => @pairwise_content.pairwise_question_id, :name => 'Question 1')
-    @pairwise_content.expects(:pairwise_client).returns(@pairwise_client)
+    @pairwise_content.expects(:pairwise_client).returns(@pairwise_client).at_least_once
     @pairwise_client.expects(:question_with_prompt).with(@question.id,'any_user', nil).returns(@question)
     prompt = @pairwise_content.prepare_prompt('any_user')
     assert_not_nil prompt
@@ -84,11 +84,12 @@ class PairwisePlugin::PairwiseContentTest < ActiveSupport::TestCase
     @pairwise_client.expects(:find_question_by_id).with(@pairwise_content.pairwise_question_id).raises(ActiveResource::ResourceNotFound.new(@response))
 
     @pairwise_content.expects(:pairwise_client).returns(@pairwise_client)
-    assert_nil @pairwise_content.errors[:base]
+    assert @pairwise_content.errors[:base].blank?
     @pairwise_content.question
 
-    assert_not_nil @pairwise_content.errors[:base]
-    assert_equal 'Failed with 422 Any error', @pairwise_content.errors[:base]
+    assert !@pairwise_content.errors[:base].blank?
+    assert_match /Any error/, @pairwise_content.errors[:base].first
+    assert_match /422/, @pairwise_content.errors[:base].first
   end
 
   should 'send question to pairwise service' do
@@ -146,7 +147,7 @@ class PairwisePlugin::PairwiseContentTest < ActiveSupport::TestCase
     assert_equal true, @pairwise_content.allow_new_ideas?
     @question = Pairwise::Question.new(:id => @pairwise_content.pairwise_question_id, :name => 'Question 1', :active => false)
     @pairwise_content.expects(:pairwise_client).returns(@pairwise_client).at_least_once
-    @pairwise_client.expects(:add_new_idea).with(@question.id, "New idea").returns(true)
+    @pairwise_client.expects(:add_new_idea).with(@question.id, "New idea", nil).returns(true)
     assert_equal true, @pairwise_content.add_new_idea("New idea")
   end
 

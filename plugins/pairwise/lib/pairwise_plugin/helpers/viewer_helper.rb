@@ -17,7 +17,7 @@ module PairwisePlugin::Helpers::ViewerHelper
   end
 
   def skip_vote_open_function(pairwise_content)
-    link_to_function _('Skip vote'), "jQuery(\"#skip_vote_reasons_#{pairwise_content.id}\").slideToggle()"
+    link_to_function _('Skip vote'), "jQuery('#skip_vote_reasons_#{pairwise_content.id}').slideToggle()"
   end
 
   def skip_vote_link(pairwise_content, question, prompt, embeded = false, source = nil, appearance_id = nil, reason = nil)

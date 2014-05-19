@@ -8,9 +8,9 @@ class PairwisePluginProfileController < ProfileController
     source = params[:source]
     locals = {:source => source, :pairwise_content => @pairwise_content, :embeded => embeded, :source => source, :prompt_id => prompt_id }
     if embeded
-      render 'content_viewer/prompt.rhtml', :layout => "embeded", :locals => locals
+      render 'content_viewer/prompt', :layout => "embeded", :locals => locals
     else
-      render 'content_viewer/prompt.rhtml', :locals => locals
+      render 'content_viewer/prompt', :locals => locals
     end
   end
 
@@ -18,7 +18,7 @@ class PairwisePluginProfileController < ProfileController
   def load_prompt
     @pairwise_content = find_content(params)
     if request.xhr?
-      render 'content_viewer/prompt.rjs'
+      render 'content_viewer/load_prompt.rjs'
     else
       redirect_to after_action_url
     end
@@ -28,7 +28,7 @@ class PairwisePluginProfileController < ProfileController
     @pairwise_content = find_content(params)
     vote = @pairwise_content.vote_to(params[:prompt_id], params[:direction], user_identifier, params[:appearance_id])
     if request.xhr? 
-      render 'content_viewer/prompt.rjs'
+      render 'content_viewer/load_prompt.rjs'
     else
       redirect_to after_action_url 
     end
@@ -41,7 +41,7 @@ class PairwisePluginProfileController < ProfileController
     reason = params[:reason]
     skip = @pairwise_content.skip_prompt(params[:prompt_id], user_identifier, params[:appearance_id], reason)
     if request.xhr? 
-      render 'content_viewer/prompt.rjs'
+      render 'content_viewer/load_prompt.rjs'
     else
       redirect_to after_action_url  
     end
@@ -53,7 +53,7 @@ class PairwisePluginProfileController < ProfileController
     @page = @pairwise_content = find_content(params)
 
     if request.xhr?
-      render 'content_viewer/result'
+      render 'content_viewer/load_result.rjs'
     else
       render 'pairwise_plugin_profile/result'
     end

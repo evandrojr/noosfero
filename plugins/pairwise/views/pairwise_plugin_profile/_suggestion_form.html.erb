@@ -1,4 +1,4 @@
-	<% remote_form_for('idea', :url => pairwise_suggestion_url(pairwise_content, embeded, source),
+	<%= remote_form_for('idea', :url => pairwise_suggestion_url(pairwise_content, embeded, source),
 	    :html => {:id => "pairwise_suggestion_form_#{pairwise_content.id}"}, :loading => "jQuery('#pairwise_suggestion_form_#{pairwise_content.id} .suggestion_box_fields').hide();jQuery('#pairwise_suggestion_form_#{pairwise_content.id} .suggestion_box_loading').show();", :loaded => "jQuery('#pairwise_suggestion_form_#{pairwise_content.id} .suggestion_box_fields').show();jQuery('#pairwise_suggestion_form_#{pairwise_content.id} .suggestion_box_loading').hide();") do  |f| %>
 	  <div class="suggestion_box_fields">
 		<div class="error">
@@ -9,7 +9,7 @@
 	    </div>
 	    <div class="div_text_input_container"> 
 			<div id="text_idea_content_<%= pairwise_content.id %>" class="div_text_input">
-			    <%= f.text_area 'text', :maxlenght => 160, :rows => 4, :placeholder => _('Type your idea here') %>
+			    <%= text_area :idea, :text, :maxlenght => 160, :rows => 4, :placeholder => _('Type your idea here') %>
 	    	</div> 
 	    	<div class="suggest_idea_btn">
 			    <%= submit_button('', '', :id => 'new_idea_button', :class => user ? '':'require-login-popup') %>

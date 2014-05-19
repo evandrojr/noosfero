@@ -2,6 +2,7 @@ class Pairwise::Question < ActiveResource::Base
   extend Pairwise::Resource
 
   self.element_name = "question"
+  self.format = :xml
 
   def get_choices(filter=nil, order=nil)
     Pairwise::Choice.find(

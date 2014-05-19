@@ -1,5 +1,5 @@
 require 'test_helper'
-require "#{RAILS_ROOT}/plugins/pairwise/test/fixtures/pairwise_content_fixtures"
+require "#{Rails.root}/plugins/pairwise/test/fixtures/pairwise_content_fixtures"
 
 class PairwisePlugin::QuestionsGroupBlockTest < ActiveSupport::TestCase
 
@@ -25,7 +25,7 @@ class PairwisePlugin::QuestionsGroupBlockTest < ActiveSupport::TestCase
   end
 
   should 'have available question' do
-    assert_equal [@question1, @question2], @block.available_questions
+    assert_equivalent [@question1, @question2], @block.available_questions
   end
 
   should 'add multiple questions to block' do

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-require "#{RAILS_ROOT}/plugins/pairwise/test/fixtures/pairwise_content_fixtures"
+require "#{Rails.root}/plugins/pairwise/test/fixtures/pairwise_content_fixtures"
 
 class PairwisePluginProfileControllerTest < ActionController::TestCase
 
@@ -35,10 +35,10 @@ class PairwisePluginProfileControllerTest < ActionController::TestCase
     login_as(@user.user.login)
     PairwisePluginProfileController.any_instance.expects(:find_content).returns(@content)
     @content.expects(:question_with_prompt_for_visitor).with(@user.identifier, nil).returns(@question)
-    get :prompt, 
-                  :profile => @profile.identifier, 
+    get :prompt,
+                  :profile => @profile.identifier,
                   :id => @content.id,
-                  :question_id => @question.id         
+                  :question_id => @question.id
     assert_not_nil  assigns(:pairwise_content)
     assert_match /#{@question.name}/, @response.body
     assert_match /#{@question.prompt.left_choice_text}/, @response.body
@@ -49,14 +49,14 @@ class PairwisePluginProfileControllerTest < ActionController::TestCase
     login_as(@user.user.login)
     PairwisePluginProfileController.any_instance.expects(:find_content).returns(@content)
     @content.expects(:question_with_prompt_for_visitor).with(@user.identifier, @question.prompt.id.to_s).returns(@question)
-    get :prompt, 
-                  :profile => @profile.identifier, 
+    get :prompt,
+                  :profile => @profile.identifier,
                   :id => @content.id,
                   :question_id => @question.id,
-                  :prompt_id => @question.prompt.id         
-    
+                  :prompt_id => @question.prompt.id
+
     assert_not_nil  assigns(:pairwise_content)
-    
+
     assert_match /#{@question.name}/, @response.body
     assert_match /#{@question.prompt.left_choice_text}/, @response.body
     assert_match /#{@question.prompt.right_choice_text}/, @response.body

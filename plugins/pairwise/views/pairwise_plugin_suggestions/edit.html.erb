@@ -2,7 +2,7 @@
 
 <h4><%= @pairwise_content.name %></h4>
 
-<% form_for 'choice', 
+<%= form_for 'choice', 
 		:url => { 
 			:controller => 'pairwise_plugin_suggestions',
 			:action => 'update', 

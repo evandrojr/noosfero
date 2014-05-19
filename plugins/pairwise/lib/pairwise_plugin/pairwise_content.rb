@@ -5,7 +5,9 @@ class PairwisePlugin::PairwiseContent < Article
 
   before_save :send_question_to_service
 
-  validate_on_create :validate_choices
+  validate :validate_choices, :on => :create
+
+  attr_accessible :pairwise_question_id, :allow_new_ideas, :choices, :choices_saved
 
   REASONS_ARRAY = [
      {:text => _("I like both ideas"), :compare => false},
@@ -59,7 +61,7 @@ class PairwisePlugin::PairwiseContent < Article
     pairwise_content = self
     lambda do
       locals = {:pairwise_content =>  pairwise_content, :source => source, :embeded => embeded, :prompt_id => prompt_id }
-      render :file => 'content_viewer/prompt.rhtml', :locals => locals
+      render :file => 'content_viewer/prompt', :locals => locals
     end
   end
 
@@ -83,7 +85,7 @@ class PairwisePlugin::PairwiseContent < Article
     begin
       @question ||= pairwise_client.find_question_by_id(pairwise_question_id)
     rescue Exception => error
-      errors.add_to_base(error.message)
+      errors.add(:base, error.message)
     end
     @question
   end
@@ -135,7 +137,7 @@ class PairwisePlugin::PairwiseContent < Article
       @choices = []
     else
       begin
-        @choices ||= question.get_choices.map {|q| { q.id.to_s, q.data } }
+        @choices ||= question.get_choices.map {|q| { q.id.to_s => q.data } }
       rescue
        @choices = []
       end
@@ -182,12 +184,12 @@ class PairwisePlugin::PairwiseContent < Article
   end
 
    def validate_choices
-    errors.add_to_base(_("Choices empty")) if choices.nil?
-    errors.add_to_base(_("Choices invalid format")) unless choices.is_a?(Array)
-    errors.add_to_base(_("Choices invalid")) if choices.size == 0
+    errors.add(:base, _("Choices empty")) if choices.nil?
+    errors.add(:base, _("Choices invalid format")) unless choices.is_a?(Array)
+    errors.add(:base, _("Choices invalid")) if choices.size == 0
     choices.each do | choice |
       if choice.empty?
-        errors.add_to_base(_("Choice empty"))
+        errors.add(:base, _("Choice empty"))
         break
       end
     end
@@ -197,7 +199,7 @@ class PairwisePlugin::PairwiseContent < Article
     begin
       return pairwise_client.update_choice(question, choice_id, choice_text, active)
     rescue Exception => e
-      errors.add_to_base(N_("Choices:") + " " + N_(e.message))
+      errors.add(:base, N_("Choices:") + " " + N_(e.message))
       return false
     end
   end
@@ -206,7 +208,7 @@ class PairwisePlugin::PairwiseContent < Article
     begin
       return pairwise_client.approve_choice(question, choice_id)
     rescue Exception => e
-      errors.add_to_base(N_("Choices:") + " " + N_(e.message))
+      errors.add(:base, N_("Choices:") + " " + N_(e.message))
       return false
     end
   end
@@ -239,7 +241,7 @@ class PairwisePlugin::PairwiseContent < Article
               pairwise_client.approve_choice(question, choice.id)
             end
           rescue Exception => e
-            errors.add_to_base(N_("Choices: Error adding new choice to question") + N_(e.message))
+            errors.add(:base, N_("Choices: Error adding new choice to question") + N_(e.message))
             return false
           end
         end
@@ -250,7 +252,7 @@ class PairwisePlugin::PairwiseContent < Article
           begin
             pairwise_client.update_choice(question, id, data, true)
           rescue Exception => e
-            errors.add_to_base(N_("Choices:") + " " + N_(e.message))
+            errors.add(:base, (N_("Choices:") + " " + N_(e.message)))
             return false
           end
         end
@@ -258,7 +260,7 @@ class PairwisePlugin::PairwiseContent < Article
       begin
         pairwise_client.update_question(pairwise_question_id, name)
       rescue Exception => e
-        errors.add_to_base(N_("Question not saved:  ") + N_(e.message))
+        errors.add(:base, (N_("Question not saved:  ") + N_(e.message)))
         return false
       end
     end
@@ -304,7 +306,7 @@ class PairwisePlugin::PairwiseContent < Article
     obj.pairwise_question_id = self.pairwise_question_id
     obj.allow_new_ideas = self.allow_new_ideas
     id = obj.send(:create_without_callbacks)
-    raise "Objeto não gravado" unless id
+    raise "object not saved" unless id
   end
 
   def copy!(options = {})
@@ -315,7 +317,7 @@ class PairwisePlugin::PairwiseContent < Article
     obj.pairwise_question_id = self.pairwise_question_id
     obj.allow_new_ideas = self.allow_new_ideas
     id = obj.send(:create_without_callbacks)
-    raise "Objeto não gravado" unless id
+    raise "object not saved" unless id
   end
 
   def page_size

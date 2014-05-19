@@ -7,7 +7,7 @@
 
 <% extend PairwisePlugin::Helpers::ViewerHelper %>
 
-<% unless @page.errors[:base].nil? %>
+<% unless @page.errors[:base].blank? %>
     <h3><%= _('Pairwise Integration Error') %></h3>
     <p> <%= _('Please contact the administrator') %></p>
     <pre>
