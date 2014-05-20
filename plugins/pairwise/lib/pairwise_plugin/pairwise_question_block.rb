@@ -14,7 +14,7 @@ class PairwisePlugin::PairwiseQuestionBlock < Block
 
   def content(args={})
     block = self
-    lambda do
+    proc do
       pairwise_client = new PairwiseClient(owner.id)
       question = pairwise_client.get_question(pairwise_question_id)
       if !question.blank?

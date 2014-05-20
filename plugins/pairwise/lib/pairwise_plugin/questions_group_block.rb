@@ -12,7 +12,7 @@ class PairwisePlugin::QuestionsGroupBlock < Block
   def content(args={})
     block = self
     question = pick_question
-    lambda do
+    proc do
       content = block_title(block.title)
       content += ( question ? article_to_html(question,:gallery_view => false, :format => 'full').html_safe : _('No Question selected yet.') )
     end

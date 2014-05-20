@@ -13,13 +13,13 @@ class PairwisePlugin::QuestionsGroupListBlock < Block
   def content(args={})
     block = self
     questions = questions.shuffle if(questions)
-    #lambda do
+    #proc do
     #  content = block_title(block.title)
     #  content += ( question ? article_to_html(question,:gallery_view => false, :format => 'full').html_safe : _('No Question selected yet.') )
     #end
-     lambda do
-       render :file => 'blocks/questions_group_list', :locals => {:block => block}
-     end
+    proc do
+      render :file => 'blocks/questions_group_list', :locals => {:block => block}
+    end
   end
 
   def random_sort= value
