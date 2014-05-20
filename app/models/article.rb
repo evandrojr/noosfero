@@ -745,6 +745,10 @@ class Article < ActiveRecord::Base
     true
   end
 
+  def view_page
+    "content_viewer/view_page.rhtml"
+  end
+
   private
 
   def sanitize_tag_list
