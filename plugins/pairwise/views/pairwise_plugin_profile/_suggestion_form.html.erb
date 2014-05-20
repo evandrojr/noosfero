@@ -12,7 +12,7 @@
 			    <%= text_area :idea, :text, :maxlenght => 160, :rows => 4, :placeholder => _('Type your idea here') %>
 	    	</div> 
 	    	<div class="suggest_idea_btn">
-			    <%= submit_button('', '', :id => 'new_idea_button', :class => user ? '':'require-login-popup') %>
+			    <%= submit_button('', _("Send"), :id => 'new_idea_button', :class => user ? '':'require-login-popup') %>
 			</div>
 		</div>
 	  </div>

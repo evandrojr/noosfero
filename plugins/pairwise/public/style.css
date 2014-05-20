@@ -1,3 +1,198 @@
+.action-home-index div.pairwise_main .spinner {
+  width: 94%;
+}
+
+.pairwise-plugin_pairwise-content #article-header .title {
+  display: none;
+}
+
+#pairwise_main {
+	text-align: center;
+	width: auto;
+}
+
+#pairwise_main ul.pairwise_menu {
+	background-color: white;
+	color: #ECF2E7;
+	text-align: right;
+}
+
+#pairwise_main ul.pairwise_menu li {
+	display: inline;
+}
+
+#pairwise_main ul.pairwise_menu li a {
+    color: #b3c4a6;
+    font-size: 14px;
+    padding: 1em;
+    text-decoration: none;
+}
+
+#pairwise_main ul.pairwise_menu li a:hover{
+	color: #497B16;
+	background-color: #ECF2E7;
+	border-radius: 10px 10px 0 0;
+	border: 1px solid #b3c4a6;
+	border-bottom: 0px;
+	margin: -1px;
+}
+
+#pairwise_main ul.pairwise_menu li a.active{
+    color: #497B16;
+    background-color: #ECF2E7;
+    border-radius: 10px 10px 0 0;
+    border: 1px solid #b3c4a6;
+    border-bottom: 0px;
+}
+
+#pairwise_main .pairwise_content {
+    background-color: #ECF2E7;
+    padding: 1em;
+    overflow: hidden;
+}
+
+#pairwise_main .pairwise_body {
+    background-color: white;
+    border-radius: 7px 7px 7px 7px;
+    display: block;
+    font-size: 22px;
+    margin: 0 0 0.5em;
+    padding: 1em;
+}
+
+#pairwise_main .pairwise_call_for_action {
+    color: #4B7421;
+    font-size: 14px;
+	 line-height: 1.5em;
+}
+
+#pairwise_main .prompt {
+	background: url("images/prompt_bg_normal.png") no-repeat center top #cfe1bf;
+	border-width: 0px;
+  max-width: 369px;
+  height: 170px !important;
+  padding: 10px 0;
+	border-width: 0 !important;
+	border-radius: 10px;
+}
+
+#pairwise_main .prompt:hover {
+	background: url("images/prompt_bg_hover.png") no-repeat 50% top #548A1C;
+}
+
+#pairwise_main .prompt.left{
+	background-position: 51% top;
+	float: left;
+}
+
+#pairwise_main .prompt.right{
+	background-position: 50% top;
+	float: right;
+}
+
+#pairwise_main .prompt a{
+	color: #2a2d28 !important;
+	font-size: 12px;
+	display: block;
+	max-width: 349px;
+	padding: 10px;
+  height: 100%;
+}
+
+#pairwise_main .separator {
+    background-color: #CCCCCC;
+    display: inline-block;
+    float: none;
+    height: 170px;
+    margin-top: 8px;
+    width: 1px;
+}
+
+
+#pairwise_main .skip_vote {
+	width: 200px !important;
+	text-align: center;
+	padding: 0;
+	border-width: 0px;
+	background-color: transparent !important;
+}
+
+#pairwise_main .skip_vote a {
+	 display: inline-block;
+   height: 1px;
+   line-height: 0;
+   padding: 1em 0;
+   text-decoration: none;
+   width: 200px;
+}
+
+#pairwise_main .skip_vote_reasons {background-color: #7D8874;padding-top: 0 !important;}
+
+#pairwise_main .skip_vote_reasons ul {margin: 0; padding: 1em;}
+
+#pairwise_main .skip_vote_reasons ul li {color: white; padding: 0.5em 0.5em 0.5em 2em; text-align: left;}
+
+#pairwise_main .skip_vote_reasons ul li:hover{background-color:#666;}
+
+#pairwise_main .skip_vote_reasons ul li a {color: white;text-decoration: none;font-size: 14px;}
+
+#pairwise_main #suggestions_box {
+	display: block !important;
+   margin-top: 15px;
+   padding: 10px;
+	text-align: left;
+}
+
+#pairwise_main #suggestions_box span {
+    color: #4B7421;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+#pairwise_main .suggestion_form {}
+
+#pairwise_main #suggestion_box_fields {}
+
+#pairwise_main .div_text_input_container {width: 100%;}
+
+#pairwise_main .div_text_input_container .div_text_input {
+    display: inline-block;
+    width: 80%;
+}
+
+#pairwise_main .div_text_input_container .div_text_input textarea {
+	 border: 1px solid #CCCCCC;
+    border-radius: 0 0 0 0 !important;
+}
+
+#pairwise_main .div_text_input_container .div_text_input .jqEasyCounterMsg {color: #7D8874 !important;font-size: 13px;}
+
+#pairwise_main .div_text_input_container .suggest_idea_btn {
+    display: inline-block;
+    margin-left: 5%;
+    vertical-align: top;
+    width: 14%;
+}
+
+#pairwise_main .div_text_input_container .suggest_idea_btn input#new_idea_button{
+    background: url("images/botao-enviar-pairwise.png") no-repeat top center transparent;
+    border-radius: 0px;
+    cursor: pointer;
+    display: block;
+    min-height: 71px;
+    padding: 5px 10px;
+    width: 93px;
+    border-width: 0;
+}
+
+div.pairwise_group_list_container .arrow span.active {
+	background-position: center top;
+}
+/* */
+
+
 div#pairwise_form_fields textarea {
 	width: 100%;
 	margin-top: 5px;
@@ -42,13 +237,6 @@ div#pairwise_form_fields textarea {
 
 
 #pairwise_main div#suggestions_box {
-	/*border: 1px solid;
-	border-radius: 7px;
-    -webkit-border-radius: 7px;
-    -moz-border-radius: 7px;
-    border-color: #ccc;
-	border-width: 1px;
-	border-style: solid;*/
 	padding: 10px;
 	margin-top: 15px;
 }
@@ -77,12 +265,14 @@ div#pairwise_form_fields textarea {
 }
 
 #pairwise_main div#suggestions_box  #new_idea_button{
-	background-color: #01bb00;
+	background-color: #DDD;
 	padding: 5px 10px 5px 10px;
 	cursor: pointer;
 	border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  font-size: 16pt;
+  color: rgb(133, 133, 151);
 }
 
 #pairwise_main div#suggestions_box  div.suggestion_header {
@@ -141,7 +331,6 @@ div#pairwise_form_fields textarea {
 #pairwise_main  div.skip_vote {
 	width: 150px;
 	float:none;
-	color:white;
 	min-height: 18px;
 	height:auto;
 	padding: 0.5em;
@@ -171,7 +360,6 @@ div#pairwise_form_fields textarea {
 	margin-bottom: 15px;
 	padding-left: 5px;
 	padding-right: 5px;
-	/*float:left;*/
 	float:left;
 	background-color:#ccc;
 	height: 3em;
@@ -187,12 +375,8 @@ div#pairwise_form_fields textarea {
 	border-color:#CCCCCC;
 }
 
-#pairwise_main div.skip_vote_reasons div:nth-child(even) {
-	/*margin-left: 10px;*/
-}
-
 #pairwise_main  div.skip_vote a{
-	color: white;
+	color: rgb(219, 162, 42);
 	text-decoration: none;
 	width: 100%;
 }
@@ -285,25 +469,6 @@ div.pairwise_group_list_container .arrow{
 	right: 20px;
 	margin-top: 10px;
 }
-/*
-div.pairwise_group_list_container .arrow{
-	display: inline-block;
-    position: absolute;
-	right: 20px;
-	margin-top: 10px;
-	height: 22px;
-	width:23px;
-	color: #2F5707;
-	background: url('/designs/themes/participa-theme/images/arrow_right.jpg') no-repeat center;
-}
-
-div.pairwise_group_list_container .arrow.active{
-	height: 18px;
-    margin-top: 10px;
-    right: 20px;
-    width: 22px;
-	background: url('/designs/themes/participa-theme/images/arrow_down.jpg') no-repeat center;
-}*/
 
 div.pairwise_group_list_container .row.secondary .arrow span {
 	background: url('/designs/themes/participa-theme/images/arrow_right.jpg') no-repeat center;

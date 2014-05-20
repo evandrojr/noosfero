@@ -21,7 +21,7 @@
 	<% if pairwise_content.allow_new_ideas? %>
     <% if user %>
       <div id="suggestions_box">
-        <span>Gostaria de sugerir uma ideia?</span>
+        <span><%= _('Would you like to suggest an idea?') %> </span>
         <div class="suggestion_form">
         <%= render :partial => "pairwise_plugin_profile/suggestion_form",
             :locals => {:pairwise_content => pairwise_content, :embeded => embeded, :source => source} %>
