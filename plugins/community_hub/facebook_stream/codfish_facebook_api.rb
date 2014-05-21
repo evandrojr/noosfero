@@ -41,7 +41,7 @@ while true
           message += i['message']
         end
         if not_blank(message)
-          if mostRecent == "" or mostRecent > i["updated_time"]
+          if mostRecent == "" or mostRecent < i["updated_time"]
             mostRecent = i["updated_time"]
           end
           
