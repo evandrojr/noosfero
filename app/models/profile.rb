@@ -89,6 +89,16 @@ class Profile < ActiveRecord::Base
   scope :templates, {:conditions => {:is_template => true}}
   scope :no_templates, {:conditions => {:is_template => false}}
 
+  #FIXME make this test
+  scope :newer_than, lambda { |reference_id|
+    {:conditions => ["profiles.id > #{reference_id}"]}
+  }
+
+  #FIXME make this test
+  scope :older_than, lambda { |reference_id|
+    {:conditions => ["profiles.id < #{reference_id}"]}
+  }
+
   def members
     scopes = plugins.dispatch_scopes(:organization_members, self)
     scopes << Person.members_of(self)
@@ -875,6 +885,13 @@ private :generate_url, :url_options
 
   def profile_custom_icon(gravatar_default=nil)
     image.public_filename(:icon) if image.present?
+  end
+
+  #FIXME make this test
+  def profile_custom_image(size = :icon)
+    image_path = profile_custom_icon if size == :icon
+    image_path ||= image.public_filename(size) if image.present?
+    image_path
   end
 
   def jid(options = {})
