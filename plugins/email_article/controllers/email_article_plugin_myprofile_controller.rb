@@ -6,9 +6,9 @@ class EmailArticlePluginMyprofileController < MyProfileController
     if user.is_admin?(profile)
       article = Article.find(params[:id])
       EmailArticlePluginMyprofileController::Sender.deliver_mail(article)
-      render :action => 'success'
+      render :text => "Email sent to queue"
     else
-      render :action => 'fail'
+      render :status => :forbidden, :text => "Forbidden user"
     end
   end
 
