@@ -27,6 +27,7 @@ end
 extractedComments = []
 initialComments = []
 firstTime = true
+read = 1
 
 while true
   file = open("https://graph.facebook.com/v1.0/search?q=%23#{hashtag}&type=post&access_token=#{token}")
@@ -41,8 +42,8 @@ while true
           message += i['message']
         end
         if not_blank(message)
-          if mostRecent == "" or mostRecent < i["updated_time"]
-            mostRecent = i["updated_time"]
+          if mostRecent == "" or mostRecent < i["created_time"]
+            mostRecent = i["created_time"]
           end
           
           extractedComments.push("#{from} said: #{message}")
@@ -61,6 +62,11 @@ while true
 #			 puts comment
 #		}					
 
+#	 extractedComments.each{|comment|
+#		puts comment
+#	}
+
+  
 	newComments =  extractedComments - initialComments
 	newComments = newComments.uniq
 	initialComments += newComments
@@ -68,7 +74,11 @@ while true
 	newComments.each{|comment|
 		puts comment
 	}
+  puts "****************************************************************************************************************"    
   puts "most recent post at #{mostRecent}"
+  puts "Read: #{read} newComments: #{newComments.length} initialComments: #{initialComments.length} extractedComments: #{extractedComments.length}  *******"
+
+  read+=1
   sleep(pooling_time)
 end
 
