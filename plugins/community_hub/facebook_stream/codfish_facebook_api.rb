@@ -4,7 +4,7 @@ require 'json'
 
 token = 'CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH'
 hashtag = "#nba"
-pooling_time = 5
+pooling_time = 10
 
 
 #Aviso 12/04/2014
@@ -24,13 +24,13 @@ if hashtag[0]='#'
   hashtag = hashtag[1,hashtag.length-1]
 end
 
-file = open("https://graph.facebook.com/v1.0/search?q=%23#{hashtag}&type=post&access_token=#{token}")
-itens = JSON.parse(file.read)['data']
-
 extractedComments = []
 initialComments = []
 firstTime = true
+
 while true
+  file = open("https://graph.facebook.com/v1.0/search?q=%23#{hashtag}&type=post&access_token=#{token}")
+  itens = JSON.parse(file.read)['data']
   mostRecent = ""
   itens.each{|i|
       from = ""
