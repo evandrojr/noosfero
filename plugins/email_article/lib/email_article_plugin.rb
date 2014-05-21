@@ -20,8 +20,8 @@ class EmailArticlePlugin < Noosfero::Plugin
             {
                :url => { :controller => 'email_article_plugin_myprofile', :action => "send_email", :id => @page},
                :method => :get,
-               :success => "alert('" + _("Messages sent to outbox, soon will be delivered") + "')",
-               :failure => "alert('" + _("Error sending emails") + "')",
+               :success => "display_notice('" + _("Messages are being sent") + "')",
+               :failure => "display_notice('" + _("Error sending emails") + "')",
                :confirm => _("Are you sure you want to email this article to all community members?"),
             },
             :class => htmlclass,
