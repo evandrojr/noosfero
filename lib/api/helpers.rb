@@ -32,12 +32,10 @@ module API
     end
 
     def period(from_date, until_date)
-      return nil if from_date.nil? && until_date.nil?
-
       begin_period = from_date.nil? ? Time.at(0).to_datetime : from_date
       end_period = until_date.nil? ? DateTime.now : until_date
 
-      begin_period..end_period
+      begin_period...end_period
     end
 
     def parse_content_type(content_type)
@@ -57,6 +55,18 @@ module API
       conditions[:created_at] = period(from_date, until_date) if from_date || until_date
 
       conditions
+    end
+
+
+    def select_filtered_collection_of(object, method, params)
+      conditions = make_conditions_with_parameter(params)
+               
+      if params[:reference_id]
+        objects = object.send(method).send("#{params.key?(:oldest) ? 'older_than' : 'newer_than'}", params[:reference_id]).find(:all, :conditions => conditions, :limit => limit, :order => "created_at DESC")
+      else
+        objects = object.send(method).find(:all, :conditions => conditions, :limit => limit, :order => "created_at DESC")
+      end
+      objects
     end
 
 #FIXME see if its needed
@@ -151,6 +161,9 @@ module API
       error!({'message' => message, :code => status}, status)
     end
 
+    def render_api_errors!(messages)
+      render_api_error!(messages.join(','), 400)
+    end
     protected
 
     def detect_stuff_by_domain
