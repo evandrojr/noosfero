@@ -3,16 +3,17 @@ require 'open-uri'
 require 'json'
 
 
-  def not_blank(v)
-    if v == nil || v == ""
-      false
-    else
-      true
-    end
+def not_blank(v)
+  if v == nil || v == ""
+    false
+  else
+    true
   end
+end
 
 
-def facebook_comments(hub, author_id, hashtag, pooling_time, token, proxy_url)
+def facebook_comments(hub, author_id, hashtag, pooling_time, token)
+  
   
   puts "entrou"
   
@@ -82,8 +83,7 @@ def facebook_comments(hub, author_id, hashtag, pooling_time, token, proxy_url)
       puts "#{comment['from']['name']} " + _("said")  + ": #{comment['message']}"
       noosferoComment = Comment.new
       noosferoComment.title = 'hub-message-facebook'
-      noosferoComment.source = Article.last
-      #noosferoComment.source = hub
+      noosferoComment.source = hub
       noosferoComment.body = comment['message']
       noosferoComment.author_id = author_id
       noosferoComment.name = comment['from']['name']
@@ -96,10 +96,3 @@ def facebook_comments(hub, author_id, hashtag, pooling_time, token, proxy_url)
     sleep(pooling_time)
   end
 end
-
-
-
-facebook_comments(nil, 54, "nba", 5, nil, nil)
-
-
-puts "ola"
