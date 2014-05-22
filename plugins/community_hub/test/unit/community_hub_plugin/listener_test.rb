@@ -10,7 +10,7 @@ class ListenerTest < ActiveSupport::TestCase
   end
 
   should 'log message' do
-    logdir = File.join(RAILS_ROOT, 'log', CommunityHubPlugin::Listener.name.underscore)
+    logdir = File.join(Rails.root, 'log', CommunityHubPlugin::Listener.name.underscore)
 
     if File.exists?(logdir)
       Dir.foreach(logdir) { |f|

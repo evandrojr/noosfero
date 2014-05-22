@@ -30,15 +30,13 @@ def listen_twitter_stream(hub, author_id)
       sleep (10 + 2 ** tries)
     end
   end
-  
+
   tries = 0
   while true
     begin
       tries += 1
       client.filter(:track => hub.twitter_hashtags) do |object|
         if object.is_a?(Twitter::Tweet)
-#          puts '@' + object.user.screen_name	+ ' said: ' + object.text
-#          puts object.user.profile_image_url 	
           comment = Comment.new
           comment.title = 'hub-message-twitter'
           comment.source = hub
@@ -48,16 +46,16 @@ def listen_twitter_stream(hub, author_id)
           comment.name = UTF8Filter(object.user.screen_name)
           comment.email = 'admin@localhost.local'
 
-          tries = 0          
+          tries = 0
           begin
             comment.save!
           rescue => e
-            puts "Erro gravando comentário twitter #{e.inspect}"
+            puts "Error writing twitter comment #{e.inspect}"
           end
         end
       end
     rescue => e
-      puts "Erro lendo stream #{e.inspect}"
+      puts "Error reading twitter stream #{e.inspect}"
       sleep (10 + 2 ** tries)
       break
     end

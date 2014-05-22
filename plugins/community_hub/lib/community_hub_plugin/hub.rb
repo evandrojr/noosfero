@@ -3,6 +3,8 @@ require File.dirname(__FILE__) + '/../../facebook_stream/lib_facebook_stream'
 
 class CommunityHubPlugin::Hub < Folder
 
+  attr_accessible :last_changed_by_id, :integer
+
   settings_items :twitter_enabled, :type => :boolean, :default => false
   settings_items :twitter_hashtags, :type => :string, :default => ""
   settings_items :twitter_consumer_key, :type => :string, :default => "" 

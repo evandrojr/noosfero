@@ -32,8 +32,8 @@ class CommunityHubPlugin::Listener
     end
 
     def initialize_logger
-      logdir = File.join(RAILS_ROOT, 'log', CommunityHubPlugin::Listener.name.underscore)
-      File.makedirs(logdir) if !File.exist?(logdir)
+      logdir = File.join(Rails.root, 'log', CommunityHubPlugin::Listener.name.underscore)
+      FileUtils.makedirs(logdir) if !File.exist?(logdir)
       logpath = File.join(logdir, "#{ENV['RAILS_ENV']}_#{Time.now.strftime('%F')}.log")
       @logger = Logger.new(logpath)
     end
