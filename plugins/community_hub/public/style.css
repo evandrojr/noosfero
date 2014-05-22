@@ -245,7 +245,7 @@
 	 border: 1px solid lightGray;
 	 border-top: 1px solid #96110D;
     border-bottom: 0px solid #FFFFFF;
-	 top: 1px;
+	 top: 3px;
     float: left;
     font-weight: normal;
     margin-bottom: -1px;
@@ -259,14 +259,16 @@ z-index: 99;
     float: left;
     margin-right: 20px;
     margin-left: 0px;
+  text-align: center;
 }
 
 #content .main-block .hub .mediation h1.mediation{
     float: right;
     margin-right: 0px;
     margin-left: 20px;
-	 top: 2px;
+	 top: 0px;
 	 left: 2px;
+  text-align: center;
 }
 
 #content .main-block .hub .live h1.mediation,
@@ -378,7 +380,6 @@ z-index: 99;
 
 #content .hub .live.show .on-air,
 #content .hub .live.show .off-air{
-float: right;
 margin-right: 10px;
 }
 
