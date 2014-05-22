@@ -9,7 +9,7 @@ class CommunityHubPlugin::Listener
     end
 
     def facebook_service(hub)
-      facebook_comments(hub, nil, hub.facebook_page_id, hub.facebook_pooling_time, hub.facebook_access_token, hub.proxy_url)
+      facebook_comments(hub, nil, hub.facebook_hashtag, hub.facebook_pooling_time, hub.facebook_access_token, hub.proxy_url)
     end
 
     def run
@@ -39,6 +39,7 @@ class CommunityHubPlugin::Listener
     end
 
     def log(message)
+      #puts message
       initialize_logger unless @initiated
       @initiated ||= true
       @logger << "[#{Time.now.strftime('%F %T %z')}] #{message}\n"

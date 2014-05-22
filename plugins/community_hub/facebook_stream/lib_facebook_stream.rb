@@ -1,48 +1,105 @@
 require 'rubygems'
-require 'koala'
+require 'open-uri'
 require 'json'
 
-#Warning!!!  Warning!!!  Warning!!!  Warning!!!  Warning!!!  Warning!!!  Warning!!!  Warning!!!
-#token will expire at 12/04/2014 (Brazilian date format) + 59 days
-#'CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH'
-# BACKUP TOKEN 'CAAEhsewl0ZAcBAHhipXszZCURSwWLmgvceDbs9mB5baJdLriFxYMEzywmF2fvZBuThuA2Mm7QF8wPd3E6R5pVqVEnC2VhcBb4VrfAnkZC73ZC5g1NRUnKZCB2e6CaRiUBDatR2nf505PeKp7Aj5XxvTdfSqdZCsXxQFYZApPNSUUgkUWm6HwL4rp21MRJXb612sZD'
 
-def facebook_comments(hub, author_id, page_id, pooling_time, token, proxy_url)
-  pooling_time ||= 5
-  Koala.http_service.http_options = { :proxy => proxy_url } unless proxy_url.blank?
+  def not_blank(v)
+    if v == nil || v == ""
+      false
+    else
+      true
+    end
+  end
 
-  @graph = Koala::Facebook::API.new(token)
+
+def facebook_comments(hub, author_id, hashtag, pooling_time, token, proxy_url)
+  
+  puts "entrou"
+  
+  pooling_time ||= 10
+  token ||= 'CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH'
+  hashtag ||= "#nba"
+  
+
+  #Aviso 12/04/2014
+  #token que só deverá expirar em 59 dias
+  #@graph = Koala::Facebook::API.new('CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH')
+  # https://graph.facebook.com/v1.0/search?q=%23nba&type=post&access_token=CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH
+
+  #removes extra #
+  if hashtag[0]='#'
+    hashtag = hashtag[1,hashtag.length-1]
+  end
+
+  extractedComments = []
   initialComments = []
   firstTime = true
+  read = 1
+
   while true
-    feed = @graph.get_connections(page_id, "posts")
-    array = []
-    extractedComments = []
-    feed.each {|f|
-      if f['comments'] != nil && f['comments']['data'] != nil
-        array.push(f['comments']['data'])
-      end
+    file = open("https://graph.facebook.com/v1.0/search?q=%23#{hashtag}&type=post&access_token=#{token}")
+    itens = JSON.parse(file.read)['data']
+    mostRecent = ""
+    itens.each{|i|
+        from = ""
+        message = ""
+        if  not_blank(i['from']['name'])
+          from = i['from']['name']
+          if not_blank(i['message'])
+            message += i['message']
+          end
+          if not_blank(message)
+            if mostRecent == "" or mostRecent < i["created_time"]
+              mostRecent = i["created_time"]
+            end
+
+            extractedComments.push("#{from} said: #{message}")
+           # puts "#{from} said: #{message}"
+          end
+        end
     }
-    extractedComments = array.flatten.uniq
+
+    extractedComments = extractedComments.uniq
     if firstTime
       initialComments = extractedComments.clone
       firstTime = false
     end
+
+  #		extractedComments.each{|comment|
+  #			 puts comment
+  #		}					
+
+  #	 extractedComments.each{|comment|
+  #		puts comment
+  #	}
+
     newComments =  extractedComments - initialComments
     newComments = newComments.uniq
     initialComments += newComments
     initialComments = initialComments.uniq
     newComments.each{|comment|
+      puts comment
       puts "#{comment['from']['name']} " + _("said")  + ": #{comment['message']}"
       noosferoComment = Comment.new
       noosferoComment.title = 'hub-message-facebook'
-      noosferoComment.source = hub
+      noosferoComment.source = Article.last
+      #noosferoComment.source = hub
       noosferoComment.body = comment['message']
       noosferoComment.author_id = author_id
       noosferoComment.name = comment['from']['name']
       noosferoComment.email = 'admin@localhost.local'
       noosferoComment.save!
     }
+    puts "****************************************************************************************************************"    
+    puts "Read: #{read} last post #{mostRecent} newComments: #{newComments.length} initialComments: #{initialComments.length} extractedComments: #{extractedComments.length}"
+    read+=1
     sleep(pooling_time)
   end
 end
+
+
+
+facebook_comments(nil, 54, "nba", 5, nil, nil)
+
+
+puts "ola"

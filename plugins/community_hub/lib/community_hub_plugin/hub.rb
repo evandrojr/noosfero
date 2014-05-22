@@ -10,7 +10,7 @@ class CommunityHubPlugin::Hub < Folder
   settings_items :twitter_access_token, :type => :string, :default => "" 
   settings_items :twitter_access_token_secret, :type => :string, :default => "" 
   settings_items :facebook_enabled, :type => :boolean, :default => false
-  settings_items :facebook_page_id, :type => :string, :default => ""
+  settings_items :facebook_hashtag, :type => :string, :default => ""
   settings_items :facebook_pooling_time, :type => :integer, :default => 5 # Time in seconds
   settings_items :facebook_access_token,  :type => :string, :default => ''
   settings_items :pinned_messages, :type => Array, :default => []
