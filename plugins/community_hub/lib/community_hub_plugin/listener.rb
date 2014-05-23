@@ -39,7 +39,7 @@ class CommunityHubPlugin::Listener
     end
 
     def log(message)
-      puts message
+      #puts message
       initialize_logger unless @initiated
       @initiated ||= true
       @logger << "[#{Time.now.strftime('%F %T %z')}] #{message}\n"
