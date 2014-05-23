@@ -103,12 +103,12 @@ function new_message(button) {
     if (data.ok) {
       jQuery(".hub .form-message #message_body").val('');
       jQuery(".hub .form-message .submit").attr("disabled", false);
-      update_live_stream(false);
-      message_interval_id = setInterval(function() { update_live_stream(false)}, 5000);
+      update_live_stream();
+      message_interval_id = setInterval(function() { update_live_stream()}, 5000);
     }
     else {
       jQuery(".hub .form-message .submit").attr("disabled", false);
-      message_interval_id = setInterval(function() { update_live_stream(false)}, 5000);
+      message_interval_id = setInterval(function() { update_live_stream()}, 5000);
     }
   }, 'json');
 
@@ -263,8 +263,7 @@ function update_mediations() {
 }
 
 
-function update_live_stream(recursive) {
-
+function update_live_stream() {
   if (jQuery("#left-tab.show").size() != 0) {
 
     var hub_id = jQuery(".hub").attr('id');
@@ -281,32 +280,26 @@ function update_live_stream(recursive) {
       type: 'get',
       data: { latest_post: latest_post_id, hub: hub_id },
       success: function(data) {
+
         if (data.trim().length > 0) {
           jQuery("#live-posts").prepend(data);
-          if (jQuery("#auto_scrolling").attr('checked')) {
+          if (jQuery("#auto_scrolling").prop('checked', true)) {
             jQuery("#live-posts").scrollTop(0);
           }
           else {
             jQuery("#live-posts").scrollTop(live_scroll_position);
           }
-          if (first_hub_load) {
-            jQuery("body").removeClass("hub-loading");
-            first_hub_load = false;
-          }
         }
-      },
-      error: function(ajax, stat, errorThrown) {
+
+        if (first_hub_load) {
+          jQuery("body").removeClass("hub-loading");
+          first_hub_load = false;
+        }
+
       }
     });
 
   }
-
-  if (recursive) {
-    setTimeout(function() {
-      update_live_stream(true);
-    }, 5000);
-  }
-
 }
 
 function hub_left_tab_click() {
@@ -333,7 +326,8 @@ first_hub_load = true;
 first_mediations_load = true;
 
 jQuery(".hub .envelope").scroll(function() {
-  jQuery("#auto_scrolling").attr('checked', false);
+  jQuery("#auto_scrolling").prop('checked', false);
+
 
   // live stream tab...
   if (jQuery("#left-tab.show").size() != 0) {
@@ -367,6 +361,6 @@ jQuery(document).ready(function() {
 
   jQuery("body").addClass("hub-loading");
 
-  message_interval_id = setInterval(function() { update_live_stream(false) }, 5000);
+  message_interval_id = setInterval(function() { update_live_stream() }, 5000);
 
 });

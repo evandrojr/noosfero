@@ -5,12 +5,19 @@ class CommunityHubPlugin::Hub < Folder
 
   attr_accessible :last_changed_by_id, :integer
 
+  attr_accessible :twitter_enabled, :type => :booelan, :default => false
+  attr_accessible :twitter_hashtags, :type => :string, :default => ""
+  attr_accessible :twitter_consumer_key, :type => :string, :default => ""
+  attr_accessible :twitter_consumer_secret, :type => :string, :default => ""
+  attr_accessible :twitter_access_token, :type => :string, :default => ""
+  attr_accessible :twitter_access_token_secret, :type => :string, :default => ""
+
   settings_items :twitter_enabled, :type => :boolean, :default => false
   settings_items :twitter_hashtags, :type => :string, :default => ""
-  settings_items :twitter_consumer_key, :type => :string, :default => "" 
-  settings_items :twitter_consumer_secret, :type => :string, :default => "" 
-  settings_items :twitter_access_token, :type => :string, :default => "" 
-  settings_items :twitter_access_token_secret, :type => :string, :default => "" 
+  settings_items :twitter_consumer_key, :type => :string, :default => ""
+  settings_items :twitter_consumer_secret, :type => :string, :default => ""
+  settings_items :twitter_access_token, :type => :string, :default => ""
+  settings_items :twitter_access_token_secret, :type => :string, :default => ""
   settings_items :facebook_enabled, :type => :boolean, :default => false
   settings_items :facebook_page_id, :type => :string, :default => ""
   settings_items :facebook_pooling_time, :type => :integer, :default => 5 # Time in seconds
