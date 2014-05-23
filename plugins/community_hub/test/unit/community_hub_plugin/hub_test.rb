@@ -65,14 +65,6 @@ class HubTest < ActiveSupport::TestCase
     assert_equal @hub.facebook_enabled, false
   end
 
-  should 'has setting facebook_page_id' do
-    assert_respond_to @hub, :facebook_page_id
-  end
-
-  should 'default value of setting facebook_page_id' do
-    assert_equal @hub.facebook_page_id, ""
-  end
-
   should 'has setting facebook_pooling_time' do
     assert_respond_to @hub, :facebook_pooling_time
   end
