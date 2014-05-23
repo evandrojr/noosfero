@@ -11,6 +11,9 @@ class CommunityHubPlugin::Hub < Folder
   attr_accessible :twitter_consumer_secret, :type => :string, :default => ""
   attr_accessible :twitter_access_token, :type => :string, :default => ""
   attr_accessible :twitter_access_token_secret, :type => :string, :default => ""
+  attr_accessible :facebook_enabled, :type => :string, :default => ""
+  attr_accessible :facebook_hashtag, :type => :string, :default => ""
+  attr_accessible :facebook_access_token, :type => :string, :default => ""
 
   settings_items :twitter_enabled, :type => :boolean, :default => false
   settings_items :twitter_hashtags, :type => :string, :default => ""
