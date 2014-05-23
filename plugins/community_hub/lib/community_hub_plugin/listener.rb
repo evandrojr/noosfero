@@ -9,7 +9,7 @@ class CommunityHubPlugin::Listener
     end
 
     def facebook_service(hub)
-      facebook_comments(hub, nil, hub.facebook_hashtag, hub.facebook_pooling_time, hub.facebook_access_token, hub.proxy_url)
+      facebook_comments(hub, nil, hub.facebook_hashtag, hub.facebook_pooling_time, hub.facebook_access_token)
     end
 
     def run

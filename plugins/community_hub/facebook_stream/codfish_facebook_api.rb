@@ -3,7 +3,7 @@ require 'open-uri'
 require 'json'
 
 token = 'CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH'
-hashtag = "#nba"
+hashtag = "love"
 pooling_time = 10
 
 
@@ -20,9 +20,9 @@ def not_blank(v)
   end
 end
 
-if hashtag[0]='#'
-  hashtag = hashtag[1,hashtag.length-1]
-end
+#if hashtag[0]='#'
+#  hashtag = hashtag[1,hashtag.length-1]
+#end
 
 extractedComments = []
 initialComments = []
