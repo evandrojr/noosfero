@@ -1,5 +1,5 @@
 <div class='hub'>
-	<h1><%= _("HUB Settings:") %></h1>
+  <h1><%= _("HUB Settings:") %></h1>
 	<%= required_fields_message %>
   <div>
     <%= required labelled_form_field(_('Title'), text_field(:article, 'name', :size => '64', :maxlength => 150)) %>
@@ -8,28 +8,38 @@
     <%= required labelled_form_field(_('Description'), text_area(:article, 'body', :style => 'width: 99%;')) %>
   </div>
   <br />
-
   <div>
-    <%= _('General Streaming Settings:') %>
-  </div>
-  <br />
-  <div>
-    <%= _('Twitter Settings:') %>
+    <h2><%= _('Twitter Settings:') %></h2>
   </div>
   <br />
   <%= check_box(:article, :twitter_enabled) %> <span><%= _("Turn on TWITTER") %></span>
-  <br /><br />
-    <span><%= required labelled_form_field(_('Twitter\'s Hashtags, comma separated words<br>(example: participa.br,participabr,arenanetmundial,netmundial'), text_field(:article, :twitter_hashtags)) %></span>
   <br />
+    <span><%= labelled_form_field(_('Twitter\'s Hashtags, comma separated words<br>(example: participa.br,participabr,arenanetmundial,netmundial'), text_field(:article, :twitter_hashtags)) %></span>
   <div>
-    <%= _('Facebook Settings:') %>
+    <%=  labelled_form_field(_('Twitter\'s consumer key'), text_field(:article, :twitter_consumer_key)) %>
+  </div>  
+
+  <div>
+    <%=  labelled_form_field(_('Twitter\'s consumer secret'), text_field(:article, :twitter_consumer_secret)) %>
+  </div>  
+
+  <div>
+    <%=  labelled_form_field(_('Twitter\'s access token'), text_field(:article, :twitter_access_token)) %>
+  </div>  
+
+  <div>
+    <%=  labelled_form_field(_('Twitter\'s access token secret'), text_field(:article, :twitter_access_token_secret)) %>
+  </div>  
+  <br />  
+  <div>
+    <h2><%= _('Facebook Settings:') %></h2>
   </div>
   <br />
   <%= check_box(:article, :facebook_enabled) %> <span><%= _("Turn on FACEBOOK") %></span>
   <br /><br />
-    <span><%= required labelled_form_field(_('Facebook\'s hashtag (example: #participabr)'), text_field(:article, :facebook_hashtag)) %></span>
+    <span><%= labelled_form_field(_('Facebook\'s hashtag (example: #participabr)'), text_field(:article, :facebook_hashtag)) %></span>
   <br />
-    <span><%= required labelled_form_field(_('Facebook\'s access token'), text_field(:article, :facebook_access_token)) %></span>
+    <span><%= labelled_form_field(_('Facebook\'s access token'), text_field(:article, :facebook_access_token)) %></span>
     <br />
     <a href='https://smashballoon.com/custom-facebook-feed/access-token/' ><%= _('How to get a new access token?') %><a>
   <br />
