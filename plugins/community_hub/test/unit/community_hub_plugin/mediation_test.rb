@@ -7,7 +7,7 @@ class MediationTest < ActiveSupport::TestCase
     @user = create_user('testuser', :environment => @env).person
     @comm = fast_create(Community, :environment_id => @env.id)
     @hub = create_hub('hub', @comm, @user)
-    @mediation = create_mediation(@hub, @comm)
+    @mediation = create_mediation(@hub, @user, @comm)
   end
 
   should 'has setting profile_picture' do
