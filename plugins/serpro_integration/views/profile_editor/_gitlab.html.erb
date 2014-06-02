@@ -1,0 +1,22 @@
+<div class='option'>  
+  <%= labelled_check_box(_('Uses Gitlab integration'), 'profile_data[allow_gitlab_integration]', true, profile.allow_gitlab_integration) %>
+</div>
+
+<ul>
+  <h2>
+    <%= _('Gitlab Integration') %>
+    <%= link_to_remote _('Force'), :url => {:controller => 'serpro_integration_plugin_myprofile', :action => 'create_gitlab'} %>
+
+  </h2>
+  <li>
+    <%= labelled_text_field(_('Server Host'), 'profile_data[gitlab][host]', profile.gitlab[:host]) %>
+  </li>
+  <li>
+    <%= labelled_text_field(_('User private token: '), 'profile_data[gitlab][private_token]', profile.gitlab[:private_token]) %>
+  </li>
+  <li>
+    <%= _('Erros: %s') % (profile.gitlab[:errors] || _('None')) %>
+  </li>
+
+</ul>
+

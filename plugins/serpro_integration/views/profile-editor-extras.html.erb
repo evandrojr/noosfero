@@ -1,0 +1,49 @@
+ 
+<div id='serpro-integration'>
+  <div id='gitlab' class='gitlab'>
+    <%= render :partial => 'gitlab' %>
+  </div>
+
+  <div>
+    <%= labelled_check_box(_('Uses sonar integration'), 'profile_data[allow_sonar_integration]', true, profile.allow_sonar_integration) %>
+  </div>
+  
+  <ul class='sonar'>
+    <h2><%= _('Sonar Integration') %></h2>
+    <li>
+      <%= labelled_text_field(_('Server Host'), 'profile_data[sonar]host]', profile.sonar[:host]) %>
+    </li>
+    <li>
+      <%= labelled_text_field(_('Project: '), 'profile_data[sonar][project]', profile.sonar[:project]) %>
+    </li>
+  </ul>
+  
+  
+  <div>
+  <%= labelled_check_box(_('Uses Jenkins integration'), 'profile_data[allow_jenkins_integration]', true, profile.allow_jenkins_integration) %>
+  </div>
+  
+  <ul class='jenkins'>
+    <h2><%= _('Jenkins Integration') %></h2>
+    <li>
+      <%= labelled_text_field(_('Server Host'), 'profile_data[jenkins][host]', profile.jenkins[:host]) %>
+    </li>
+    <li>
+      <%= labelled_text_field(_('Server Port'), 'profile_data[jenkins][port]', profile.jenkins[:port]) %>
+    </li>
+    <li>
+      <%= labelled_text_field(_('Server Context Name'), 'profile_data[jenkins][context_name]', profile.jenkins[:context_name]) %>
+    </li>
+    <li>
+      <%= labelled_text_field(_('Server User'), 'profile_data[jenkins][user]', profile.jenkins[:user]) %>
+    </li>
+    <li>
+      <%= labelled_text_field(_('Server Private Token'), 'profile_data[jenkins][private_token]', profile.jenkins[:private_token]) %>
+    </li>
+    <li>
+      <%= labelled_text_field(_('Server Url'), 'profile_data[jenkins][url]', profile.jenkins[:url], {:disabled => true}) %>
+    </li>
+  
+  </ul>
+  
+</div>
