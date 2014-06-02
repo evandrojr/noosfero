@@ -211,14 +211,14 @@ class ProfileEditorControllerTest < ActionController::TestCase
 
   should 'back when update community info fail' do
     org = fast_create(Community)
-    Community.any_instance.stubs(:update_attributes!).returns(false)
+    Community.any_instance.stubs(:update_attributes).returns(false)
     post :edit, :profile => org.identifier
     assert_template 'edit'
   end
 
   should 'back when update enterprise info fail' do
     org = fast_create(Enterprise)
-    Enterprise.any_instance.stubs(:update_attributes!).returns(false)
+    Enterprise.any_instance.stubs(:update_attributes).returns(false)
     post :edit, :profile => org.identifier
     assert_template 'edit'
   end
@@ -744,7 +744,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
   should 'not crash if identifier is left blank' do
     c = fast_create(Community)
     assert_nothing_raised do
-      post :edit, :profile => c.identifier, :profile_data => c.attributes.merge('identifier' => '')
+      post :edit, :profile => c.identifier, :profile_data => {:identifier => ''}
     end
   end
 
@@ -883,6 +883,23 @@ class ProfileEditorControllerTest < ActionController::TestCase
     class TestProfileEditPlugin < Noosfero::Plugin
       def profile_editor_extras
         "<input id='field_added_by_plugin' value='value_of_field_added_by_plugin'/>"
+      end
+    end
+    Noosfero::Plugin.stubs(:all).returns([TestProfileEditPlugin.to_s])
+
+    Noosfero::Plugin::Manager.any_instance.stubs(:enabled_plugins).returns([TestProfileEditPlugin.new])
+
+    get :edit, :profile => profile.identifier
+
+    assert_tag :tag => 'input', :attributes => {:id => 'field_added_by_plugin', :value => 'value_of_field_added_by_plugin'}
+  end
+
+  should 'add extra content with block provided by plugins on edit' do
+    class TestProfileEditPlugin < Noosfero::Plugin
+      def profile_editor_extras
+        lambda do
+          render :text => "<input id='field_added_by_plugin' value='value_of_field_added_by_plugin'/>"
+        end
       end
     end
     Noosfero::Plugin.stubs(:all).returns([TestProfileEditPlugin.to_s])
