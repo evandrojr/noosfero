@@ -17,7 +17,6 @@ Build-Depends:
  ruby-cucumber-rails,
  ruby-capybara,
  ruby-database-cleaner,
- ruby-selenium-webdriver,
  ruby-tidy,
  ruby-mocha,
  imagemagick,
