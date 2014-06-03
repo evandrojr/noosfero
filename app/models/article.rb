@@ -746,7 +746,7 @@ class Article < ActiveRecord::Base
   end
 
   def view_page
-    "content_viewer/view_page.rhtml"
+    "content_viewer/view_page"
   end
 
   private
