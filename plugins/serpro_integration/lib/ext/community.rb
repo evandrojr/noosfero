@@ -1,5 +1,5 @@
 require_dependency 'community'
-#require 'gitlab'
+require 'gitlab'
 #require 'jenkins_api_client'
 
 class Community
@@ -9,53 +9,54 @@ class Community
   settings_items :allow_jenkins_integration, :type => :boolean, :default => true
 
   #FIXME make test for default option
-  settings_items :serpro_integration_plugin, :type => Hash
+  settings_items :serpro_integration_plugin, :type => Hash, :default => {}
+
+  attr_accessible :allow_unauthenticated_comments, :allow_gitlab_integration, :gitlab, :allow_sonar_integration, :sonar, :allow_jenkins_integration, :jenkins
 
   ##########################################
   #             Gitlab stuff               #
   ##########################################
 
-  after_create :create_gitlab_project
+  #after_create :create_gitlab_project
 
   def gitlab= params
     self.serpro_integration_plugin[:gitlab] = params
   end
 
   def gitlab
-    self.serpro_integration_plugin ||= {}
     self.serpro_integration_plugin[:gitlab] ||= {}
-    self.serpro_integration_plugin[:gitlab]
+  end
+
+  def serpro_integration_plugin_settings
+    @settings ||= Noosfero::Plugin::Settings.new(environment, SerproIntegrationPlugin)
   end
 
   def create_gitlab_project
-    Gitlab.endpoint =  self.gitlab_host
-    Gitlab.private_token = self.gitlab_private_token
-
-    user = nil
+    Gitlab.endpoint = gitlab_host
+    Gitlab.private_token = serpro_integration_plugin_settings.gitlab[:private_token]
 
     #Find user by email
     begin
-      user = Gitlab.users(:search => email)        
+      gitlab_user = Gitlab.users(:search => gitlab[:email])
     rescue Gitlab::Error::NotFound, Gitlab::Error::Parsing
-      user = nil
+      gitlab_user = nil
     end
 
     #User not found, create user
-    if user == nil || user.count == 0        
-      user = self.admins.first
+    if gitlab_user == nil || gitlab_user.count == 0
       gitlab_user = Gitlab.create_user(user.email, '123456', {:username => user.identifier, :name => user.name, :provider => 'ldap'})
     end
 
     if gitlab_user.nil?
       self.gitlab[:errors] = _('Gitlab user could not be created')
       return nil
-    end    
-    
+    end
+
     #Create project for user
     begin
       #FIXME Why this?
       if gitlab_user.is_a?(Array)
-        gitlab_user = user[0]
+        gitlab_user = gitlab_user[0]
       end
 
       project_options = {}
@@ -64,7 +65,7 @@ class Community
       project_options[:wall_enabled] = true
       project_options[:wiki_enabled] = true
       project_options[:public] = true
-      project = Gitlab.create_project(self.identifier, project_options)
+      project = Gitlab.create_project(gitlab_project_name, project_options)
 
       #Create Web Hook for Jenkins' integration
 #      Gitlab.add_project_hook(project.id, "#{self.jenkins[:url]}/gitlab/build_now")
@@ -77,14 +78,18 @@ class Community
     self.gitlab[:errors] = nil
   end
 
+  def gitlab_project_name
+    gitlab[:project_name] || self.identifier
+  end
+
   # set an API endpoint
   def gitlab_host
-    self.serpro_integration_plugin[:gitlab_host]
+    serpro_integration_plugin_settings.gitlab[:host]
   end
 
   # set a user private token
   def gitlab_private_token
-    self.serpro_integration_plugin[:gitlab_private_token]
+    serpro_integration_plugin_settings.gitlab[:private_token]
   end
 
   ##########################################

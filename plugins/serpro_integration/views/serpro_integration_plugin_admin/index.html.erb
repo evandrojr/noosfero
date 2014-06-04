@@ -1,0 +1,18 @@
+<h1><%= _('Serpro Integration Settings')%></h1>
+
+<%= form_for(:settings) do |f| %>
+
+  <div class="gitlab_settings">
+    <h2><%= _('Gitlab Settings')%></h2>
+    <%= f.fields_for :gitlab, OpenStruct.new(@settings.gitlab) do |g| %>
+      <%= labelled_form_field _('Server Host'), g.text_field("host") %>
+      <%= labelled_form_field _('Private Token'), g.text_field(:private_token) %>
+    <% end %>
+  </div>
+
+  <% button_bar do %>
+    <%= submit_button(:save, _('Save'), :cancel => {:controller => 'plugins', :action => 'index'}) %>
+  <% end %>
+
+<% end %>
+

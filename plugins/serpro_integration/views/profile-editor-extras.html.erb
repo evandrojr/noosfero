@@ -1,16 +1,32 @@
- 
+<script>
+jQuery( document ).ready(function( $ ) {
+  function toggle_checkbox_selectors(el) {
+    if( el.is(':checked')) {
+      $(el.data('selector')).show('fast');
+    } else {
+      $(el.data('selector')).hide('fast');
+    }
+  }
+  $(".toggle_checkbox").click(function() {
+    toggle_checkbox_selectors($(this));
+  });
+  $(".toggle_checkbox").each(function() {
+    toggle_checkbox_selectors($(this));
+  });
+});
+</script>
+
 <div id='serpro-integration'>
-  <div id='gitlab' class='gitlab'>
-    <%= render :partial => 'gitlab' %>
-  </div>
+  <h2><%= _('Serpro Integration') %></h2>
 
+  <%= render :partial => 'gitlab' %>
 
-  <div>
-    <%= labelled_check_box(_('Uses sonar integration'), 'profile_data[allow_sonar_integration]', true, profile.allow_sonar_integration) %>
-  </div>
-  
+  <div id="sonar">
+  <h3>
+    <%= labelled_check_box('', 'profile_data[allow_sonar_integration]', true, profile.allow_sonar_integration, {:class => "toggle_checkbox", 'data-selector' => 'ul.sonar'}) %>
+    <%= _('Sonar Integration') %>
+  </h3>
   <ul class='sonar'>
-    <h2><%= _('Sonar Integration') %></h2>
     <li>
       <%= labelled_text_field(_('Server Host'), 'profile_data[sonar]host]', profile.sonar[:host]) %>
     </li>
@@ -18,14 +34,14 @@
       <%= labelled_text_field(_('Project: '), 'profile_data[sonar][project]', profile.sonar[:project]) %>
     </li>
   </ul>
-  
-  
-  <div>
-  <%= labelled_check_box(_('Uses Jenkins integration'), 'profile_data[allow_jenkins_integration]', true, profile.allow_jenkins_integration) %>
   </div>
-  
+
+  <div id="jenkins">
+  <h3>
+    <%= labelled_check_box('', 'profile_data[allow_jenkins_integration]', true, profile.allow_jenkins_integration, {:class => "toggle_checkbox", 'data-selector' => 'ul.jenkins'}) %>
+    <%= _('Jenkins Integration') %>
+  </h3>
   <ul class='jenkins'>
-    <h2><%= _('Jenkins Integration') %></h2>
     <li>
       <%= labelled_text_field(_('Server Host'), 'profile_data[jenkins][host]', profile.jenkins[:host]) %>
     </li>
@@ -44,7 +60,6 @@
     <li>
       <%= labelled_text_field(_('Server Url'), 'profile_data[jenkins][url]', profile.jenkins[:url], {:disabled => true}) %>
     </li>
-  
   </ul>
-  
+  </div>
 </div>
