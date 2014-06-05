@@ -1,1 +1,2 @@
 gem 'gitlab', '~> 3.1.0'
+gem 'jenkins_api_client', '~> 0.14.1'

@@ -10,6 +10,15 @@
     <% end %>
   </div>
 
+  <div class="jenkins_settings">
+    <h2><%= _('Jenkins Settings')%></h2>
+    <%= f.fields_for :jenkins, OpenStruct.new(@settings.jenkins) do |g| %>
+      <%= labelled_form_field _('Server Host'), g.text_field("host") %>
+      <%= labelled_form_field _('Server User'), g.text_field(:user) %>
+      <%= labelled_form_field _('Private Token'), g.text_field(:private_token) %>
+    <% end %>
+  </div>
+
   <% button_bar do %>
     <%= submit_button(:save, _('Save'), :cancel => {:controller => 'plugins', :action => 'index'}) %>
   <% end %>

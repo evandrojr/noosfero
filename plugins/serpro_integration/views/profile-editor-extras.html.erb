@@ -20,6 +20,7 @@ jQuery( document ).ready(function( $ ) {
   <h2><%= _('Serpro Integration') %></h2>
 
   <%= render :partial => 'gitlab' %>
+  <%= render :partial => 'jenkins' %>
 
   <div id="sonar">
   <h3>
@@ -36,30 +37,4 @@ jQuery( document ).ready(function( $ ) {
   </ul>
   </div>
 
-  <div id="jenkins">
-  <h3>
-    <%= labelled_check_box('', 'profile_data[allow_jenkins_integration]', true, profile.allow_jenkins_integration, {:class => "toggle_checkbox", 'data-selector' => 'ul.jenkins'}) %>
-    <%= _('Jenkins Integration') %>
-  </h3>
-  <ul class='jenkins'>
-    <li>
-      <%= labelled_text_field(_('Server Host'), 'profile_data[jenkins][host]', profile.jenkins[:host]) %>
-    </li>
-    <li>
-      <%= labelled_text_field(_('Server Port'), 'profile_data[jenkins][port]', profile.jenkins[:port]) %>
-    </li>
-    <li>
-      <%= labelled_text_field(_('Server Context Name'), 'profile_data[jenkins][context_name]', profile.jenkins[:context_name]) %>
-    </li>
-    <li>
-      <%= labelled_text_field(_('Server User'), 'profile_data[jenkins][user]', profile.jenkins[:user]) %>
-    </li>
-    <li>
-      <%= labelled_text_field(_('Server Private Token'), 'profile_data[jenkins][private_token]', profile.jenkins[:private_token]) %>
-    </li>
-    <li>
-      <%= labelled_text_field(_('Server Url'), 'profile_data[jenkins][url]', profile.jenkins[:url], {:disabled => true}) %>
-    </li>
-  </ul>
-  </div>
 </div>
