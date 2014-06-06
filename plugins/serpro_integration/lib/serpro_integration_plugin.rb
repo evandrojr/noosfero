@@ -19,7 +19,7 @@ class SerproIntegrationPlugin < Noosfero::Plugin
   #FIXME make this test
   def profile_editor_extras
    lambda do
-      render :file => 'profile-editor-extras'
+      render :file => 'profile-editor-extras' if profile.kind_of?(Community)
    end
   end
 

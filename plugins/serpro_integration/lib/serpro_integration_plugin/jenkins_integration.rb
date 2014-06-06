@@ -2,27 +2,25 @@
 require 'jenkins_api_client'
 
 class SerproIntegrationPlugin::JenkinsIntegration
+
+  def initialize(host, private_token, user)
+    @client = JenkinsApi::Client.new(:server_url => host, :password => private_token, :username => user)
+  end
+
   #FIXME make jenkins integration works
-  def self.create_jenkis_project(profile, projectName, repositoryPath, webUrl, gitUrl)
-
-    @client = JenkinsApi::Client.new(:server_url => profile.serpro_integration_plugin_settings.jenkins[:host],
-                                     :password => profile.serpro_integration_plugin_settings.jenkins[:private_token],
-                                     :username => profile.serpro_integration_plugin_settings.jenkins[:user])
-
+  def create_jenkis_project(profile, repository_path, web_url, git_url)
     #begin
-        @client.job.create(projectName, xml_jenkins(repositoryPath, webUrl, gitUrl))
+      @client.job.create(profile.jenkins_project_name, xml_jenkins(repository_path, web_url, git_url))
     #rescue JenkinsApi::Exceptions::ApiException
-
     #end
-
   end
 
   #FIXME
-  def self.xml_jenkins(repositoryPath, webUrl, gitUrl)
+  def xml_jenkins(repository_path, web_url, git_url)
     "
         <maven2-moduleset plugin='maven-plugin@1.509'>
             <actions/>
-            <description>Projeto criado para o repositório #{repositoryPath} do Gitlab - #{webUrl}</description>
+            <description>Projeto criado para o repositório #{repository_path} do Gitlab - #{web_url}</description>
             <logRotator class='hudson.tasks.LogRotator'>
                 <daysToKeep>-1</daysToKeep>
                 <numToKeep>2</numToKeep>
@@ -35,7 +33,7 @@ class SerproIntegrationPlugin::JenkinsIntegration
                 <configVersion>2</configVersion>
                 <userRemoteConfigs>
                     <hudson.plugins.git.UserRemoteConfig>
-                        <url>#{gitUrl}</url>
+                        <url>#{git_url}</url>
                     </hudson.plugins.git.UserRemoteConfig>
                 </userRemoteConfigs>
                 <branches>

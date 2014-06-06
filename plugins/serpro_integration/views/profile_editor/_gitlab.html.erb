@@ -11,14 +11,10 @@
   <%= link_to _('Force'), {:controller => 'serpro_integration_plugin_myprofile', :action => 'create_gitlab'}, {:remote => true} %>
   </li>
   <li>
-    <%= labelled_text_field(_('Project Name:'), 'profile_data[gitlab][project_name]', profile.gitlab_project_name ) %>
+    <%= labelled_text_field(_('Group Name:'), 'profile_data[serpro_integration_plugin_gitlab][group]', profile.gitlab_group) %>
   </li>
   <li>
-    <%= labelled_text_field(_('Owner Email:'), 'profile_data[gitlab][email]', profile.gitlab[:email] || current_user.person.email ) %>
+    <%= labelled_text_field(_('Project Name:'), 'profile_data[serpro_integration_plugin_gitlab][project_name]', profile.gitlab_project_name ) %>
   </li>
-  <li>
-    <%= _('Erros: %s') % (profile.gitlab[:errors] || _('None')) %>
-  </li>
-
 </ul>
 </div>
