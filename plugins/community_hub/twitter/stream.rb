@@ -66,7 +66,6 @@ def listen_twitter_stream(hub, author_id)
     rescue => e
       puts "Erro lendo stream #{e.inspect}"
       sleep (10 + 2 ** tries)
-      break
     end
   end
 end
