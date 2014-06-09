@@ -1,8 +1,37 @@
 class FeaturesController < AdminController
+
   protect 'edit_environment_features', :environment
-  
+
   def index
     @features = Environment.available_features.sort_by{|k,v|v}
+  end
+
+  def manage_blocks
+    @blocks = [ ArticleBlock,
+                TagsBlock,
+                RecentDocumentsBlock,
+                ProfileInfoBlock,
+                LinkListBlock,
+                MyNetworkBlock,
+                FeedReaderBlock,
+                ProfileImageBlock,
+                LocationBlock,
+                SlideshowBlock,
+                ProfileSearchBlock,
+                HighlightsBlock,
+                FriendsBlock,
+                FavoriteEnterprisesBlock,
+                CommunitiesBlock,
+                EnterprisesBlock,
+                MembersBlock,
+                DisabledEnterpriseMessageBlock,
+                ProductCategoriesBlock,
+                FeaturedProductsBlock,
+                FansBlock,
+                ProductsBlock ]
+
+    @blocks += plugins.dispatch(:extra_blocks)
+    @blocks.sort_by! { |block| block.name }
   end
 
   post_only :update
@@ -12,6 +41,16 @@ class FeaturesController < AdminController
       redirect_to :action => 'index'
     else
       render :action => 'index'
+    end
+  end
+
+  post_only :update_blocks
+  def update_blocks
+    if @environment.update_attributes(params[:environment])
+      session[:notice] = _('Blocks updated successfully.')
+      redirect_to :action => 'manage_blocks'
+    else
+      render :action => 'manage_blocks'
     end
   end
 
