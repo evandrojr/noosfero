@@ -1,7 +1,7 @@
 require 'open-uri'
 require 'json'
 
-class SonarPlugin::SmileBlock < Block
+class SerproIntegrationPlugin::SmileBlock < Block
 
 
   METRIC_SUCCESS_DENSITY = 'test_success_density'

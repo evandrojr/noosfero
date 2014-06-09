@@ -11,8 +11,8 @@ class SerproIntegrationPlugin < Noosfero::Plugin
   #FIXME make this test
   # User could not have this block
   def self.extra_blocks
-    { SonarPlugin::SonarWidgetBlock => {:type => [Community] },
-      SonarPlugin::SmileBlock => {:type => [Community] } 
+    { SerproIntegrationPlugin::SonarWidgetBlock => {:type => [Community] },
+      SerproIntegrationPlugin::SmileBlock => {:type => [Community] },
     }
   end
 

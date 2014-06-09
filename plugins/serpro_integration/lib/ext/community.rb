@@ -12,7 +12,7 @@ class Community
 
   attr_accessible :allow_unauthenticated_comments, :allow_gitlab_integration, :allow_sonar_integration, :allow_jenkins_integration, :serpro_integration_plugin_gitlab, :serpro_integration_plugin_jenkins, :serpro_integration_plugin_sonar
 
-  after_update :create_integration_projects
+  before_update :create_integration_projects
 
   def create_integration_projects
     return unless setting_changed?(:serpro_integration_plugin_gitlab)
@@ -20,6 +20,7 @@ class Community
     if allow_gitlab_integration
       gitlab_integration = SerproIntegrationPlugin::GitlabIntegration.new(gitlab_host, gitlab_private_token)
       gitlab_project = gitlab_integration.create_gitlab_project(self)
+      serpro_integration_plugin_gitlab[:project_id] = gitlab_project.id
 
       if allow_jenkins_integration
         jenkins_integration = SerproIntegrationPlugin::JenkinsIntegration.new(jenkins_host, jenkins_private_token, jenkins_user)

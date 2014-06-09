@@ -1,4 +1,4 @@
-class SerproIntegrationrPlugin::SonarWidgetBlock < Block
+class SerproIntegrationPlugin::SonarWidgetBlock < Block
 
   #FIXME make this test
   AVAILABLE_WIDGETS = {

@@ -15,7 +15,7 @@ class SerproIntegrationPlugin::GitlabIntegration
   def create_project(project_name, group)
     path_with_namespace = "#{group.name}/#{project_name}"
     #FIXME find project by namespace
-    project = @client.projects(:scope => :all).select do |project|
+    project = @client.get("/projects/search/#{project_name}").select do |project|
       project.path_with_namespace == path_with_namespace
     end.first
 
