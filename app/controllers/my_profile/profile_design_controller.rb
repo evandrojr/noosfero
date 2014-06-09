@@ -3,7 +3,13 @@ class ProfileDesignController < BoxOrganizerController
   needs_profile
 
   protect 'edit_profile_design', :profile
-  
+
+  def filtered_available_blocks(blocks=nil)
+    filtered_available_blocks = []
+    blocks.each { |block| filtered_available_blocks << block if @environment.enabled_blocks.include?(block.name) }
+    filtered_available_blocks
+  end
+
   def available_blocks
     blocks = [ ArticleBlock, TagsBlock, RecentDocumentsBlock, ProfileInfoBlock, LinkListBlock, MyNetworkBlock, FeedReaderBlock, ProfileImageBlock, LocationBlock, SlideshowBlock, ProfileSearchBlock, HighlightsBlock ]
 

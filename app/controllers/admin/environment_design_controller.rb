@@ -1,6 +1,12 @@
 class EnvironmentDesignController < BoxOrganizerController
-  
+
   protect 'edit_environment_design', :environment
+
+  def filtered_available_blocks(blocks=nil)
+    filtered_available_blocks = []
+    blocks.each { |block| filtered_available_blocks << block if @environment.enabled_blocks.include?(block.name) }
+    filtered_available_blocks
+  end
 
   def available_blocks
     # TODO EnvironmentStatisticsBlock is DEPRECATED and will be removed from
