@@ -10,7 +10,10 @@ class SerproIntegrationPlugin::JenkinsIntegration
   #FIXME make jenkins integration works
   def create_jenkis_project(profile, repository_path, web_url, git_url)
     #begin
+    project_name = repository_path.split('/').last
+    if @client.job.list(project_name).blank?
       @client.job.create(profile.jenkins_project_name, xml_jenkins(repository_path, web_url, git_url))
+    end
     #rescue JenkinsApi::Exceptions::ApiException
     #end
   end
