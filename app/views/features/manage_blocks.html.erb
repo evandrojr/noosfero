@@ -24,7 +24,10 @@
       <%= _(block.description) %>
     </td>
     <td align="center">
-      <%= check_box_tag "environment[enabled_blocks][]", block, @environment.block_enabled?(block) %>
+      <%= check_box_tag "environment[available_blocks][]", block, !@environment.block_disabled?(block), :id => "environment_available_blocks_#{block.name}", :onclick => "toogle_hidden_field(this, '#{block.name}');" %>
+      <% if @environment.block_disabled?(block) %>
+        <%= hidden_field_tag "environment[disabled_blocks][]", block.name %>
+      <% end %>
     </td>
   </tr>
   <% end %>
@@ -40,6 +43,22 @@
     }
   }
   // -->
+</script>
+
+<script type="text/javascript">
+  function toogle_hidden_field(element, block_name) {
+
+    var chbx = jQuery(element);
+
+    if (element.checked) {
+      var hidden = chbx.next().remove();
+    }
+    else {
+      var el = jQuery( "<input>", { id: "environment_disabled_blocks_", name: "environment[disabled_blocks][]", type: "hidden", value: block_name } )
+      chbx.after( el );
+    }
+
+  }
 </script>
 
 <div>

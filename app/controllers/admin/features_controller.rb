@@ -46,6 +46,7 @@ class FeaturesController < AdminController
 
   post_only :update_blocks
   def update_blocks
+    params[:environment].delete(:available_blocks)
     if @environment.update_attributes(params[:environment])
       session[:notice] = _('Blocks updated successfully.')
       redirect_to :action => 'manage_blocks'
