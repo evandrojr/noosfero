@@ -3,7 +3,7 @@
 # domains.
 class Environment < ActiveRecord::Base
 
-  attr_accessible :name, :is_default, :signup_welcome_text_subject, :signup_welcome_text_body, :terms_of_use, :message_for_disabled_enterprise, :news_amount_by_folder, :default_language, :languages, :description, :organization_approval_method, :enabled_plugins, :enabled_features, :enabled_blocks, :redirection_after_login, :redirection_after_signup, :contact_email, :theme, :reports_lower_bound, :noreply_email, :signup_welcome_screen_body
+  attr_accessible :name, :is_default, :signup_welcome_text_subject, :signup_welcome_text_body, :terms_of_use, :message_for_disabled_enterprise, :news_amount_by_folder, :default_language, :languages, :description, :organization_approval_method, :enabled_plugins, :enabled_features, :disabled_blocks, :redirection_after_login, :redirection_after_signup, :contact_email, :theme, :reports_lower_bound, :noreply_email, :signup_welcome_screen_body
 
   has_many :users
 
@@ -289,7 +289,7 @@ class Environment < ActiveRecord::Base
 
   settings_items :enabled_plugins, :type => Array, :default => []
 
-  settings_items :enabled_blocks, :type => Array, :default => []
+  settings_items :disabled_blocks, :type => Array, :default => []
 
   settings_items :search_hints, :type => Hash, :default => {}
 
@@ -345,8 +345,8 @@ class Environment < ActiveRecord::Base
     enabled_plugins.include?(plugin.to_s)
   end
 
-  def block_enabled?(block)
-    enabled_blocks.include?(block.to_s)
+  def block_disabled?(block)
+    disabled_blocks.include?(block.to_s)
   end
 
   # enables the features identified by <tt>features</tt>, which is expected to

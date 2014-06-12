@@ -4,7 +4,7 @@ class EnvironmentDesignController < BoxOrganizerController
 
   def filtered_available_blocks(blocks=nil)
     filtered_available_blocks = []
-    blocks.each { |block| filtered_available_blocks << block if @environment.enabled_blocks.include?(block.name) }
+    blocks.each { |block| filtered_available_blocks << block unless @environment.disabled_blocks.include?(block.name) }
     filtered_available_blocks
   end
 
