@@ -10,6 +10,8 @@ class PairwisePlugin::QuestionsGroupListBlock < Block
 
   settings_items :group_description, :type => String
 
+  attr_accessible :group_description, :questions_ids, :random_sort
+
   def content(args={})
     block = self
     questions = questions.shuffle if(questions)
