@@ -27,6 +27,7 @@ end
 group :test do
   gem 'rspec'
   gem 'rspec-rails'
+  gem 'mocha', :require => false
 end
 
 group :cucumber do

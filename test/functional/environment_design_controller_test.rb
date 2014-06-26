@@ -17,14 +17,6 @@ class EnvironmentDesignControllerTest < ActionController::TestCase
     Noosfero::Plugin::Manager.any_instance.stubs(:enabled_plugins).returns([])
   end
 
-  def test_local_files_reference
-    assert_local_files_reference
-  end
-
-  def test_valid_xhtml
-    assert_valid_xhtml
-  end
-
   should 'indicate only actual blocks as such' do
     assert(@controller.available_blocks.all? {|item| item.new.is_a? Block})
   end

@@ -14,14 +14,6 @@ class AdminPanelControllerTest < ActionController::TestCase
     login_as(create_admin_user(Environment.default))
   end
 
-  def test_local_files_reference
-    assert_local_files_reference
-  end
-  
-  def test_valid_xhtml
-    assert_valid_xhtml
-  end
-
   should 'manage the correct environment' do
     current = fast_create(Environment, :name => 'test environment', :is_default => false)
     current.domains.create!(:name => 'example.com')
