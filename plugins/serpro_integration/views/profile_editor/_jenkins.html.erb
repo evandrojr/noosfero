@@ -1,0 +1,11 @@
+<div id="jenkins">
+<h3>
+  <%= labelled_check_box('', 'profile_data[allow_jenkins_integration]', true, profile.allow_jenkins_integration, {:class => "toggle_checkbox", 'data-selector' => 'ul.jenkins'}) %>
+  <%= _('Jenkins Integration') %>
+</h3>
+<ul class='jenkins'>
+  <li>
+    <%= labelled_text_field(_('Project Name:'), 'profile_data[serpro_integration_plugin_jenkins][project_name]', profile.jenkins_project_name ) %>
+  </li>
+</ul>
+</div>

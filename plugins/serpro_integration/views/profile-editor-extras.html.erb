@@ -1,0 +1,40 @@
+<script>
+jQuery( document ).ready(function( $ ) {
+  function toggle_checkbox_selectors(el) {
+    if( el.is(':checked')) {
+      $(el.data('selector')).show('fast');
+    } else {
+      $(el.data('selector')).hide('fast');
+    }
+  }
+  $(".toggle_checkbox").click(function() {
+    toggle_checkbox_selectors($(this));
+  });
+  $(".toggle_checkbox").each(function() {
+    toggle_checkbox_selectors($(this));
+  });
+});
+</script>
+
+<div id='serpro-integration'>
+  <h2><%= _('Serpro Integration') %></h2>
+
+  <%= render :partial => 'gitlab' %>
+  <%= render :partial => 'jenkins' %>
+
+  <div id="sonar">
+  <h3>
+    <%= labelled_check_box('', 'profile_data[allow_sonar_integration]', true, profile.allow_sonar_integration, {:class => "toggle_checkbox", 'data-selector' => 'ul.sonar'}) %>
+    <%= _('Sonar Integration') %>
+  </h3>
+  <ul class='sonar'>
+    <li>
+      <%= labelled_text_field(_('Server Host'), 'profile_data[serpro_integration_plugin_sonar][host]', profile.serpro_integration_plugin_sonar[:host]) %>
+    </li>
+    <li>
+      <%= labelled_text_field(_('Project: '), 'profile_data[serpro_integration_plugin_sonar][project]', profile.serpro_integration_plugin_sonar[:project]) %>
+    </li>
+  </ul>
+  </div>
+
+</div>

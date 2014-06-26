@@ -44,7 +44,11 @@ module ActsAsHavingSettings
         class_eval <<-CODE
           def #{setting}
             val = send(self.class.settings_field)[:#{setting}]
-            val.nil? ? (#{default}.is_a?(String) ? gettext(#{default}) : #{default}) : val
+            if val.nil?
+              val = #{default}.is_a?(String) ? gettext(#{default}) : #{default}
+              send(self.class.settings_field)[:#{setting}] = val
+            end
+            val
           end
           def #{setting}=(value)
             h = send(self.class.settings_field).clone
