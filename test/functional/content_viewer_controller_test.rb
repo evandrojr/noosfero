@@ -18,16 +18,6 @@ class ContentViewerControllerTest < ActionController::TestCase
   end
   attr_reader :profile, :environment
 
-  def test_local_files_reference
-    page = profile.articles.build(:name => 'test')
-    page.save!
-    assert_local_files_reference :get, :view_page, :profile => profile.identifier, :page => [ 'test' ]
-  end
-
-  def test_valid_xhtml
-    assert_valid_xhtml
-  end
-
   def test_should_display_page
     page = profile.articles.build(:name => 'test')
     page.save!
@@ -743,7 +733,7 @@ class ContentViewerControllerTest < ActionController::TestCase
     c = Community.create!(:name => 'test_com')
     u = create_user_with_permission('test_user', 'publish_content', c)
     login_as u.identifier
-    a = create(Article, :profile => c, :name => 'test-article', :last_changed_by => u, :published => false)
+    a = create(Article, :profile => c, :name => 'test-article', :created_by => u, :published => false)
 
     get :view_page, :profile => c.identifier, :page => a.path
 
