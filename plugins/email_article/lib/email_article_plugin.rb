@@ -13,7 +13,7 @@ class EmailArticlePlugin < Noosfero::Plugin
     htmlclass = _("button with-text icon-menu-mail")
     title = _("Email article to all community members")
 
-    lambda {
+    proc {
       if  !profile.blank? and !user.blank? and user.is_admin?(profile) and @page.kind_of?(TextArticle)
         link_to_remote(
             label,

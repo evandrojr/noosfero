@@ -5,7 +5,7 @@ class EmailArticlePluginMyprofileController < MyProfileController
   def send_email
     if user.is_admin?(profile)
       article = Article.find(params[:id])
-      EmailArticlePluginMyprofileController::Sender.deliver_mail(article)
+      EmailArticlePluginMyprofileController::Sender.content(article).deliver
       render :text => "Email sent to queue"
     else
       render :status => :forbidden, :text => "Forbidden user"
@@ -13,18 +13,20 @@ class EmailArticlePluginMyprofileController < MyProfileController
   end
 
   class Sender < ActionMailer::Base
-    def mail(article)
+    def content(article)
       members = article.profile.members
       emails = []
       members.each{ |m|
         emails.push(m.user.email)
       }
-      content_type 'text/html'
-      recipients emails
-      from "#{article.author.user.name} <#{article.author.user.email}>"
-      reply_to article.author.user.email
-      subject "[Artigo] " + article.title
-      body set_absolute_path(article.body, article.environment)
+      mail(
+        content_type: 'text/html',
+        to: emails,
+        from: "#{article.author.user.name} <#{article.author.user.email}>",
+        reply_to: article.author.user.email,
+        subject: "[Artigo] " + article.title,
+        body: set_absolute_path(article.body, article.environment)
+      )
     end
 
     def set_absolute_path(body, environment)
