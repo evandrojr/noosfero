@@ -10,7 +10,7 @@
 
     <% if @page != profile.home_page && !@page.has_posts?  && @page.allow_delete?(user) && !remove_content_button(:delete)%>
       <% content = content_tag( 'span', _('Delete') ) %>
-      <% url = profile.admin_url.merge({ :controller => 'cms', :action => 'destroy', :id => @page.id}) %>
+      <% url = profile.admin_url.merge({ :controller => 'cms', :action => 'destroy', :id => @page}) %>
       <% options = {:method => :post, :confirm => delete_article_message(@page)} %>
       <%= expirable_button @page, :delete, content, url, options %>
     <% end %>
@@ -19,9 +19,9 @@
       <% content = content_tag( 'span', _('Spread this') ) %>
       <% url = nil %>
       <% if profile.kind_of?(Person) %>
-        <% url = profile.admin_url.merge({ :controller => 'cms', :action => 'publish', :id => @page.id }) %>
+        <% url = profile.admin_url.merge({ :controller => 'cms', :action => 'publish', :id => @page }) %>
       <% elsif profile.kind_of?(Community) && environment.portal_community %>
-        <% url = profile.admin_url.merge({ :controller => 'cms', :action => 'publish_on_portal_community', :id => @page.id }) %>
+        <% url = profile.admin_url.merge({ :controller => 'cms', :action => 'publish_on_portal_community', :id => @page }) %>
       <% end %>
       <%= expirable_button @page, :spread, content, url if url %>
     <% end %>
@@ -37,7 +37,8 @@
       <%= colorbox_button(:new, label_for_new_article(@page), profile.admin_url.merge(:controller => 'cms', :action => 'new', :parent_id => (@page.folder? ? @page : (@page.parent.nil? ? nil : @page.parent)))) unless remove_content_button(:new) %>
     <% end %>
 
-    <% @plugins.dispatch(:article_toolbar_extra_buttons).each do |plugin_button| %>
+    <%
+    @plugins.dispatch(:article_toolbar_extra_buttons).each do |plugin_button| %>
       <%= instance_eval(&plugin_button) %>
     <% end %>
 
@@ -64,7 +65,7 @@
       <div class="blog-cover"><%= image_tag(@page.image.public_filename())%></div>
     <% end %>
     <%= link_to(image_tag('icons-mime/rss-feed.png'), @page.feed.url, :class => 'blog-feed-link') if @page.has_posts? && @page.feed %>
-    <%= @plugins.dispatch(:article_header_extra_contents, @page).collect { |content| instance_exec(&content) }.join("") %>
+    <%= @plugins.dispatch(:article_header_extra_contents, @page).collect { |content| instance_eval(&content) }.join("") %>
     <%= article_title(@page, :no_link => true) %>
     <%= article_translations(@page) %>
   </div>
