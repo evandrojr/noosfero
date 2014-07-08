@@ -1131,7 +1131,7 @@ module ApplicationHelper
     pending_tasks_count = ''
     count = user ? Task.to(user).pending.count : -1
     if count > 0
-      pending_tasks_count = link_to(count.to_s, user.tasks_url, :id => 'pending-tasks-count', :title => _("Manage your pending tasks"))
+      pending_tasks_count = link_to("<i class=\"icon-menu-tasks\"></i><span class=\"task-count\">#{count}</span>", user.tasks_url, :id => 'pending-tasks-count', :title => _("Manage your pending tasks"))
     end
 
     (_("<span class='welcome'>Welcome,</span> %s") % link_to("<i style='background-image:url(#{user.profile_custom_icon(gravatar_default)})'></i><strong>#{user.identifier}</strong>", user.public_profile_url, :id => "homepage-link", :title => _('Go to your homepage'))) +
