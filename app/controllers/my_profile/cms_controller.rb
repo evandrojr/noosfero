@@ -383,7 +383,8 @@ class CmsController < MyProfileController
   end
 
   def refuse_blocks
-    if ['TinyMceArticle', 'TextileArticle', 'Event', 'EnterpriseHomepage'].include?(@type)
+    article_types = ['TinyMceArticle', 'TextileArticle', 'Event', 'EnterpriseHomepage'] + @plugins.dispatch(:content_types).map {|type| type.name}
+    if article_types.include?(@type)
       @no_design_blocks = true
     end
   end

@@ -57,7 +57,9 @@
 <% end %>
 </div>
 
-<% if environment.enabled?('media_panel') && [TinyMceArticle, TextileArticle, Event, EnterpriseHomepage].any?{|klass| @article.kind_of?(klass)} %>
+<%
+article_types = [TinyMceArticle, TextileArticle, Event, EnterpriseHomepage] + @plugins.dispatch(:content_types)
+if environment.enabled?('media_panel') && article_types.any?{|klass| @article.kind_of?(klass)} %>
   <%= render :partial => 'text_editor_sidebar' %>
 <% end %>
 
