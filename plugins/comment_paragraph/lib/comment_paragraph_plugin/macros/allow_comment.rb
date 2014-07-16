@@ -7,7 +7,7 @@ class CommentParagraphPlugin::AllowComment < Noosfero::Plugin::Macro
       :skip_dialog => true,
       :generator => 'makeCommentable();',
       :js_files => 'comment_paragraph.js',
-      :icon_path => '/designs/icons/tango/Tango/16x16/emblems/emblem-system.png',
+      :icon_path => '/plugins/comment_paragraph/images/comments.gif',
       :css_files => 'comment_paragraph.css' }
   end
 
