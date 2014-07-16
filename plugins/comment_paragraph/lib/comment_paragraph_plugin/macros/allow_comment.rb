@@ -7,7 +7,7 @@ class CommentParagraphPlugin::AllowComment < Noosfero::Plugin::Macro
       :skip_dialog => true,
       :generator => 'makeCommentable();',
       :js_files => 'comment_paragraph.js',
-      :icon_path => '/plugins/comment_paragraph/images/comments.gif',
+      :icon_path => '/plugins/comment_paragraph/images/balloons-comment.png',
       :css_files => 'comment_paragraph.css' }
   end
 
