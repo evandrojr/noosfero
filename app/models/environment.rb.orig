@@ -3,7 +3,7 @@
 # domains.
 class Environment < ActiveRecord::Base
 
-  attr_accessible :name, :is_default, :signup_welcome_text_subject, :signup_welcome_text_body, :terms_of_use, :message_for_disabled_enterprise, :news_amount_by_folder, :default_language, :languages, :description, :organization_approval_method, :enabled_plugins, :enabled_features, :redirection_after_login, :redirection_after_signup, :contact_email, :theme, :reports_lower_bound, :noreply_email, :signup_welcome_screen_body, :members_whitelist_enabled, :members_whitelist
+  attr_accessible :name, :is_default, :signup_welcome_text_subject, :signup_welcome_text_body, :terms_of_use, :message_for_disabled_enterprise, :news_amount_by_folder, :default_language, :languages, :description, :organization_approval_method, :enabled_plugins, :enabled_features, :redirection_after_login, :redirection_after_signup, :contact_email, :theme, :reports_lower_bound, :noreply_email, :signup_welcome_screen_body
 
   has_many :users
 
@@ -298,12 +298,7 @@ class Environment < ActiveRecord::Base
   settings_items :access_control_allow_origin, :type => Array, :default => []
   settings_items :access_control_allow_methods, :type => String
 
-  settings_items :signup_welcome_screen_body, :type => String
-
-  def has_custom_welcome_screen?
-    settings[:signup_welcome_screen_body].present?
-  end
-
+<<<<<<< HEAD
   settings_items :members_whitelist_enabled, :type => :boolean, :default => false
   settings_items :members_whitelist, :type => Array, :default => []
 
@@ -313,6 +308,12 @@ class Environment < ActiveRecord::Base
 
   def members_whitelist=(members)
     settings[:members_whitelist] = members.split(',').map(&:to_i)
+=======
+  settings_items :signup_welcome_screen_body, :type => String
+
+  def has_custom_welcome_screen?
+    settings[:signup_welcome_screen_body].present?
+>>>>>>> rails3
   end
 
   def news_amount_by_folder=(amount)
