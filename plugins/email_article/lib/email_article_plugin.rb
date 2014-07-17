@@ -18,7 +18,7 @@ class EmailArticlePlugin < Noosfero::Plugin
         link_to_remote(
             label,
             {
-               :url => { :controller => 'email_article_plugin_myprofile', :action => "send_email", :id => @page},
+               :url => { :controller => 'email_article_plugin_myprofile', :action => "send_email", :id => @page, :profile => @page.profile},
                :method => :get,
                :success => "display_notice('" + _("Messages are being sent") + "')",
                :failure => "display_notice('" + _("Error sending emails") + "')",
