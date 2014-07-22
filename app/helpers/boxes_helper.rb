@@ -171,7 +171,8 @@ module BoxesHelper
         "before-block-#{block.id}"
       end
 
-    content_tag('div', '&nbsp;', :id => id, :class => 'block-target' ) + drop_receiving_element(id, :url => { :action => 'move_block', :target => id }, :accept => box.acceptable_blocks, :hoverclass => 'block-target-hover')
+    content_tag('div', '&nbsp;', :id => id, :class => 'block-target', :style => "border: 1px solid red;" ) +
+    drop_receiving_element(id, :url => { :action => 'add_or_move_block', :target => id }, :accept => box.acceptable_blocks, :hoverclass => 'block-target-hover')
   end
 
   # makes the given block draggable so it can be moved away.

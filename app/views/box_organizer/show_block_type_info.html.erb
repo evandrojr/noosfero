@@ -1,0 +1,30 @@
+<div id="bs-block-container">
+
+  <div id="bs-block-header">
+    <%= image_tag(@block.icon, height: '48', width: '48', id: 'bs-block-icon', alt: '' ) %>
+    <h1><%= @block.name %></h1>
+    <p><%= @block.short_description %></p>
+  </div>
+
+  <div id="bs-block-images">
+    <div style="white-space: nowrap;">
+      <% if @block.previews.empty? %>
+        <% for i in 0..2 %>
+          <%= image_tag(@block.default_preview, height: '240', width: '384', alt: '') %>
+        <% end %>
+      <% else %>
+        <% @block.previews.each do |preview| %>
+          <%= image_tag(preview, height: '240', width: '384', alt: '') %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div id="bs-block-info">
+    <h2><%= _('Description') %></h2>
+    <p><%= @block.description %></p>
+    <h2><%= _('What\'s New') %></h2>
+    <p><%= @block.release_notes %></p>
+  </div>
+
+</div>

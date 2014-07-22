@@ -5,10 +5,7 @@ class BoxOrganizerController < ApplicationController
   def index
   end
 
-  def move_block
-    @block = boxes_holder.blocks.find(params[:id].gsub(/^block-/, ''))
-
-    @source_box = @block.box
+  def add_or_move_block
 
     target_position = nil
 
@@ -23,17 +20,26 @@ class BoxOrganizerController < ApplicationController
       @target_box = boxes_holder.boxes.find($1)
     end
 
-    if (@source_box != @target_box)
-      @block.remove_from_list
+    type = params[:id].gsub(/^block-/,'')
+
+    if available_blocks.map(&:name).include?(type)
+      @block = type.constantize.new
       @block.box = @target_box
+      @block.position = target_position
+    else
+      @block = boxes_holder.blocks.find(params[:id].gsub(/^block-/, ''))
+      @source_box = @block.box
+
+      if (@source_box != @target_box)
+        @block.remove_from_list
+        @block.box = @target_box
+      end
     end
 
     if target_position.nil?
-      # insert in the end of the box
       @block.insert_at(@target_box.blocks.size + 1)
       @block.move_to_bottom
     else
-      # insert the block in the given position
       @block.insert_at(@block.position && @block.position < target_position ? target_position - 1 : target_position)
     end
 
@@ -41,9 +47,12 @@ class BoxOrganizerController < ApplicationController
 
     @target_box.reload
 
-    unless request.xhr?
-      redirect_to :action => 'index'
+    if available_blocks.map(&:name).include?(type)
+      render :action => 'add_block'
+    else
+      render :action => 'move_block'
     end
+
   end
 
   def move_block_down
@@ -58,20 +67,17 @@ class BoxOrganizerController < ApplicationController
     redirect_to :action => 'index'
   end
 
-  def add_block
+  def show_block_type_info
     type = params[:type]
     if ! type.blank?
       if available_blocks.map(&:name).include?(type)
-        boxes_holder.boxes.find(params[:box_id]).blocks << type.constantize.new
-        redirect_to :action => 'index'
+        @block = type.constantize
       else
-        raise ArgumentError.new("Type %s is not allowed. Go away." % type)
+       raise ArgumentError.new("Type %s is not allowed. Go away." % type)
       end
+      render :action => 'show_block_type_info', :layout => false
     else
-      @center_block_types = (Box.acceptable_center_blocks & available_blocks) + plugins.dispatch(:extra_blocks, :type => boxes_holder.class, :position => 1)
-      @side_block_types = (Box.acceptable_side_blocks & available_blocks) + plugins.dispatch(:extra_blocks, :type => boxes_holder.class, :position => [2,3])
-      @boxes = boxes_holder.boxes.with_position
-      render :action => 'add_block', :layout => false
+      redirect_to :action => 'index'
     end
   end
 

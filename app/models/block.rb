@@ -110,9 +110,33 @@ class Block < ActiveRecord::Base
   # blocks to choose one to include in the design.
   #
   # Must be redefined in subclasses to match the description of each block
-  # type. 
+  # type.
   def self.description
     '(dummy)'
+  end
+
+  def self.short_description
+    '(dummy)'
+  end
+
+  def self.release_notes
+    '(dummy)'
+  end
+
+  def self.default_preview
+    "/images/block_preview.png"
+  end
+
+  def self.previews
+    []
+  end
+
+  def self.icon
+    "/images/icon_block.png"
+  end
+
+  def self.position
+    [1,2,3]
   end
 
   # Returns the content to be used for this block.
