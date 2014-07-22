@@ -1,19 +1,32 @@
 <div class="comments">
-  <div class="comment_paragraph_<%= paragraph_id %>" style="float: left">
-    <div style="float: left">
+  <textarea id="comment_area_<%= paragraph_id %>" readonly="true" cols="60"  style="border: none;text-align: justify" class='autoexpand-text-area'>
+    <%= inner_html %>
+  </textarea>
+  <script>
+    jQuery("#comment_area_<%= paragraph_id %>").mouseup(function() {
+      var selected_area=getSelectionBounderies("comment_area_<%= paragraph_id %>")
+      form = jQuery('.comment_paragraph_<%= paragraph_id %>').parent().find('form');
+      if (form.find('input.selected_area').length === 0){
+        jQuery('<input>').attr({
+          class: 'selected_area',
+          name: 'comment[comment_paragraph_selected_area]',
+          value: selected_area
+        }).appendTo(form)
+      }else{
+        form.find('input.selected_area').val(selected_area)
+      }
+    });
+  </script>  
+  <div class="comment_paragraph_<%= paragraph_id %>" align="center">
     <%= link_to_remote(image_tag("/plugins/comment_paragraph/images/comments.gif"),
         :url => { :profile => profile_identifier, :controller => 'comment_paragraph_plugin_profile', :action => 'view_comments', :paragraph_id => paragraph_id, :article_id => article_id},
         :method => :post,
         :condition => "!toggleParagraph(#{paragraph_id})",
         :complete => "loadCompleted(#{paragraph_id})")%>
-    </div>
+
     <!-- FIXME: css file -->
-    <div id="comments_paragraph_count_<%= paragraph_id %>" style="float: right; vertical-align: middle; padding-left: 3px; padding-right: 5px; color: #5AC1FC"><span id="comment-count-<%= paragraph_id %>" class='comment-count'><%= count %></span></div>
-
-  </div>
-
-  <div>
-    <%= inner_html %>
+    <div align="center" id="comments_paragraph_count_<%= paragraph_id %>" style="vertical-align: middle; padding-left: 3px; padding-right: 5px; color: #5AC1FC"><span id="comment-count-<%= paragraph_id %>" class='comment-count'><%= count %></span></div>
+    <br><br>
   </div>
 
   <div class="comment-paragraph-loading-<%= paragraph_id %>"/>
