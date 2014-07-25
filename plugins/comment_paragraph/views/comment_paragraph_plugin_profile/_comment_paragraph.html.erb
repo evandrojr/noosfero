@@ -1,23 +1,9 @@
 <div class="comments">
-  <textarea id="comment_area_<%= paragraph_id %>" readonly="true" cols="60"  style="border: none;text-align: justify" class='autoexpand-text-area'>
+  <div class="comment_paragraph" id="comment_paragraph_<%= paragraph_id %>" >
     <%= inner_html %>
-  </textarea>
-  <script>
-    jQuery("#comment_area_<%= paragraph_id %>").mouseup(function() {
-      var selected_area=getSelectionBounderies("comment_area_<%= paragraph_id %>")
-      form = jQuery('.comment_paragraph_<%= paragraph_id %>').parent().find('form');
-      if (form.find('input.selected_area').length === 0){
-        jQuery('<input>').attr({
-          class: 'selected_area',
-          name: 'comment[comment_paragraph_selected_area]',
-          value: selected_area
-        }).appendTo(form)
-      }else{
-        form.find('input.selected_area').val(selected_area)
-      }
-    });
-  </script>  
-  <div class="comment_paragraph_<%= paragraph_id %>" align="center">
+  </div>
+  <BR><BR><BR>
+  <div align="center">
     <%= link_to_remote(image_tag("/plugins/comment_paragraph/images/comments.gif"),
         :url => { :profile => profile_identifier, :controller => 'comment_paragraph_plugin_profile', :action => 'view_comments', :paragraph_id => paragraph_id, :article_id => article_id},
         :method => :post,

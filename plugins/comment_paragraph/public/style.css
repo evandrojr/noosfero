@@ -5,3 +5,21 @@ div.article-comments-list-more{
   font-size: 20px;
   margin-bottom: 5px;
 }
+
+.popBox_comment_paragraph {
+  position: absolute;
+  z-index: 2;
+  background: #cccccc;
+  width: 60px;
+  padding: 0.3em;
+  position: absolute;border: 1px solid gray;
+}
+
+.span_comment_paragraph {
+  color: red;
+  font-weight: bold;
+}
+
+.commented-area {
+  background-color: yellow;
+}
