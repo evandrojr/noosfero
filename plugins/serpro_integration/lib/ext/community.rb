@@ -2,9 +2,9 @@ require_dependency 'community'
 
 class Community
 
-  settings_items :allow_sonar_integration, :type => :boolean, :default => true
-  settings_items :allow_gitlab_integration, :type => :boolean, :default => true
-  settings_items :allow_jenkins_integration, :type => :boolean, :default => true
+  settings_items :allow_sonar_integration, :type => :boolean, :default => false
+  settings_items :allow_gitlab_integration, :type => :boolean, :default => false
+  settings_items :allow_jenkins_integration, :type => :boolean, :default => false
 
   settings_items :serpro_integration_plugin_gitlab, :type => Hash, :default => {}
   settings_items :serpro_integration_plugin_jenkins, :type => Hash, :default => {}
