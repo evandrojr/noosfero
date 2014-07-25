@@ -4,12 +4,15 @@ class SerproIntegrationPlugin::GitlabIntegration
 
   def initialize(host, private_token)
     @client = Gitlab.client(:endpoint => host, :private_token => private_token)
+    @group = nil
+    @project = nil
   end
 
   def create_group(group_name)
     #FIXME find group by name
     group = @client.groups.select {|group| group.name == group_name}.first
     group ||= @client.create_group(group_name, group_name)
+    @group = group
   end
 
   def create_project(project_name, group)
@@ -31,7 +34,7 @@ class SerproIntegrationPlugin::GitlabIntegration
       #Create Web Hook for Jenkins' integration
       #Gitlab.add_project_hook(project.id, "#{self.jenkins[:url]}/gitlab/build_now")
     end
-    project
+    @project = project
   end
 
   def create_user(email, group)
@@ -57,6 +60,11 @@ class SerproIntegrationPlugin::GitlabIntegration
     end
 
     project = create_project(profile.gitlab_project_name, group)
+  end
+
+
+  def create_jenkins_hook(jenkins_project_url)
+    @client.add_project_hook(@project.id, "#{jenkins_project_url}/gitlab/build_now")
   end
 
 end

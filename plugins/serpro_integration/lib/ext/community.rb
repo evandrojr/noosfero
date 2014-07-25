@@ -25,7 +25,9 @@ class Community
       if allow_jenkins_integration
         jenkins_integration = SerproIntegrationPlugin::JenkinsIntegration.new(jenkins_host, jenkins_private_token, jenkins_user)
         jenkins_integration.create_jenkis_project(self, gitlab_project.path_with_namespace, gitlab_project.web_url, gitlab_project.http_url_to_repo)
+        gitlab_integration.create_jenkins_hook(jenkins_integration.project_url)
       end
+      
     end
   end
 
