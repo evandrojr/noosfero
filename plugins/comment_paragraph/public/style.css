@@ -21,5 +21,12 @@ div.article-comments-list-more{
 }
 
 .commented-area {
-  background-color: yellow;
+  background-color: #a8d1ff;
+}
+
+::selection {
+  background: #a8d1ff; /* WebKit/Blink Browsers */
+}
+::-moz-selection {
+  background: #a8d1ff; /* Gecko Browsers */
 }

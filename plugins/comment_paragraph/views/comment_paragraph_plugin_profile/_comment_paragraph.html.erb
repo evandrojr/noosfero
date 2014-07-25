@@ -24,7 +24,17 @@
     </div>
     <div id="page-comment-form-<%= paragraph_id %>" class='post_comment_box closed'>
       <%= render :partial => 'comment/comment_form', :locals => {:comment => Comment.new, :display_link => true, :cancel_triggers_hide => true, :paragraph_id => paragraph_id}%>
+      <BR><BR><BR>
     </div>
 
   </div>
 </div>
+  
+<script>
+  jQuery(document).ready(function($) {
+    //if($(".article-comment").find("comment-<%#= id %>").length > 0){
+     // alert("achou comentario");
+    //}
+  });
+</script>
+    

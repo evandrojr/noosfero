@@ -11,6 +11,6 @@ class Comment
     }
   }
 
-  attr_accessible :paragraph_id, :comment_paragraph_selected_area
+  attr_accessible :paragraph_id, :comment_paragraph_selected_area, :id
 
 end
