@@ -1,4 +1,7 @@
 var comment_paragraph_anchor;
+
+var ParagraphSelectionCache = {};
+
 jQuery(document).ready(function($) {
   rangy.init();
   cssApplier = rangy.createCssClassApplier("commented-area", {normalize: false});
@@ -7,15 +10,28 @@ jQuery(document).ready(function($) {
     $(this).find('.commented-area').replaceWith(function() {
       return $(this).html();
     });
+      var rootElement = $(this).get(0);
+      if(ParagraphSelectionCache.last_paragraph){
+        rootElement.innerHTML = ParagraphSelectionCache.last_paragraph;
+      }
   }); 
   
    //highlight area from the paragraph
   $('.comment_paragraph').mouseup(function(){
-    rootElement = $(this).get(0);
-    console.log(rootElement)
-    cssApplier.toggleSelection();
+    var rootElement = $(this).get(0);
+    
+    ParagraphSelectionCache.last_paragraph = rootElement.innerHTML;
+    
+    console.log(rootElement)   ;
+   
     var selObj = rangy.getSelection();
     var selected_area = rangy.serializeSelection(selObj, true,rootElement);  
+    
+    cssApplier.toggleSelection();
+    
+    ParagraphSelectionCache.last_selected_area = selected_area;    
+    //cssApplier.toggleSelection();
+    
     form = jQuery(this).parent().find('form');
     if (form.find('input.selected_area').length === 0){
       jQuery('<input>').attr({
@@ -32,14 +48,14 @@ jQuery(document).ready(function($) {
 
 
 // em <li id="comment-31" class="article-comment"> colocar um data-paragraph e data-selected-area
- //highlight area from the paragraph
-  $('.article-comment').mouseover(function(){
-    rootElement = $('#comment_paragraph_' + this).get(0);
-    var selObj = rangy.getSelection();
-    var se = $('#result').val();
-    rangy.deserializeSelection(se, rootElement);
-    cssApplier.toggleSelection();
-  });
+// //highlight area from the paragraph
+//  $('.article-comment').mouseover(function(){
+//    rootElement = $('#comment_paragraph_' + this).get(0);
+//    var selObj = rangy.getSelection();
+//    var se = $('#result').val();
+//    rangy.deserializeSelection(se, rootElement);
+//    cssApplier.toggleSelection();
+//  });
 
   function processSomething(){
     var anchor = window.location.hash;
@@ -63,6 +79,57 @@ jQuery(document).ready(function($) {
   }
   
   processSomething();
+  
+  $(document).on('mouseover', 'li.article-comment', function(){
+    var selected_area = $(this).find('input.paragraph_comment_area').val();
+    var paragraph_id =  $(this).find('input.paragraph_id').val();
+    var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
+    
+    if(ParagraphSelectionCache.last_paragraph == null || ParagraphSelectionCache.last_paragraph == 'undefined'){
+      console.log(rootElement.innerHTML);
+      ParagraphSelectionCache.last_paragraph = rootElement.innerHTML;
+    }
+    else {
+      rootElement.innerHTML = ParagraphSelectionCache.last_paragraph ;
+    }
+    
+    //console.log(rootElement.innerHTML);
+    console.log(selected_area);
+    rangy.deserializeSelection(selected_area, rootElement);
+    cssApplier.toggleSelection();
+  });
+  
+  $(document).on('mouseout', 'li.article-comment', function(){
+    var paragraph_id =  $(this).find('input.paragraph_id').val();
+    var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
+    console.log(ParagraphSelectionCache.last_paragraph);
+    
+//    cssApplier.undoToSelection();
+//
+//    cssApplier.toggleSelection();
+    
+    
+    if(ParagraphSelectionCache.last_selected_area != null && ParagraphSelectionCache.last_selected_area != 'undefined' ){
+      rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
+      rootElement.innerHTML = ParagraphSelectionCache.last_paragraph ;
+      rangy.deserializeSelection(ParagraphSelectionCache.last_selected_area, rootElement);
+      cssApplier.toggleSelection();
+    } else {
+      cssApplier.toggleSelection();
+      var sel = rangy.getSelection();
+      sel.removeAllRanges();
+    }
+    
+//var selected_area = $(this).find('input.paragraph_comment_area').val();
+    //var paragraph_id =  $(this).find('input.paragraph_id').val();
+    //var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
+    //console.log(rootElement.innerHTML);
+    //console.log(selected_area);
+    //rangy.deserializeSelection(selected_area, rootElement);
+    //cssApplier.toggleSelection();
+    //window.last_paragraph
+    //if(last_selected_area)
+  });
   
 });
 

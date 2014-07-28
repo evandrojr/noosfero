@@ -23,6 +23,13 @@ class CommentParagraphPlugin < Noosfero::Plugin
       arr
     }
   end
+  
+  def comment_extra_contents(args)
+    comment = args[:comment]
+    proc {
+      render :file => 'comment/comment_extra', :locals => {:comment => comment}
+    }
+  end
 
   def js_files
     ['comment_paragraph_macro', 'rangy-core', 'rangy-cssclassapplier', 'rangy-serializer']

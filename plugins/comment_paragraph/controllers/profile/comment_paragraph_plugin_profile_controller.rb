@@ -11,7 +11,6 @@ class CommentParagraphPluginProfileController < ProfileController
     @comments = article.comments.without_spam.in_paragraph(@paragraph_id)
     @comments_count = @comments.count
     @comments = @comments.without_reply.paginate(:per_page => per_page, :page => @paragraph_comment_page )
-
     @no_more_pages = @comments_count <= @paragraph_comment_page * per_page
   end
 
