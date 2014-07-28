@@ -5,10 +5,17 @@ class SerproIntegrationPlugin::JenkinsIntegration
 
   def initialize(host, private_token, user)
     @client = JenkinsApi::Client.new(:server_url => host, :password => private_token, :username => user)
+    @profile = nil
+
+  end
+
+  def project_url
+    "#{jenkins_host}/#{jenkins_project_name}"
   end
 
   #FIXME make jenkins integration works
   def create_jenkis_project(profile, repository_path, web_url, git_url)
+    @profile = profile
     #begin
     project_name = repository_path.split('/').last
     if @client.job.list(project_name).blank?
