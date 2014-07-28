@@ -3,9 +3,8 @@ function makeCommentable() {
 
   foundCommentableParagraph = false;
   jQuery('#article_body_ifr').contents().find('body').children('div.article_comments').each(function( index ) {
-        paragraphsTxt+="<p>" + jQuery(this).html() + "</p>";
-      console.log(jQuery(this).html())
-      foundCommentableParagraph = true;
+    paragraphsTxt+="<p>" + jQuery(this).html() + "</p>";
+    foundCommentableParagraph = true;
   });
 
   if(foundCommentableParagraph === true){
