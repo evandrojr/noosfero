@@ -1,35 +1,62 @@
 var comment_paragraph_anchor;
 
+function _a(x,y,val){
+    // return depending on parameters
+    switch(arguments.length){
+        case 0: return _a.a;
+        case 1: return _a.a[x];
+        case 2: return _a.a[x][y];
+    }
+
+    // declare array if wasn't declared yet
+    if(typeof _a.a[x] == 'undefined')
+        _a.a[x] = [];
+
+    _a.a[x][y] = val;
+}
+// declare static empty variable
+_a.a = [];
+
 var ParagraphSelectionCache = {};
+var lastParagraph = [];
+var lastSelectedArea = [];
+
+
+function getIdCommentParagraph(paragraphId){
+  var idx = paragraphId.lastIndexOf('_');
+  return paragraphId.substring(idx+1, paragraphId.length)
+}
 
 jQuery(document).ready(function($) {
   rangy.init();
   cssApplier = rangy.createCssClassApplier("commented-area", {normalize: false});
   //Undo previous highlight from the paragraph
   $('.comment_paragraph').mousedown(function(){
+    var paragraphId = getIdCommentParagraph($(this)[0].id);
     $(this).find('.commented-area').replaceWith(function() {
       return $(this).html();
     });
-      var rootElement = $(this).get(0);
-      if(ParagraphSelectionCache.last_paragraph){
-        rootElement.innerHTML = ParagraphSelectionCache.last_paragraph;
-      }
+    var rootElement = $(this).get(0);
+    if(lastParagraph[paragraphId]){
+      rootElement.innerHTML = lastParagraph[paragraphId];
+    }
   }); 
   
    //highlight area from the paragraph
   $('.comment_paragraph').mouseup(function(){
+    var paragraphId = getIdCommentParagraph($(this)[0].id);
     var rootElement = $(this).get(0);
     
-    ParagraphSelectionCache.last_paragraph = rootElement.innerHTML;
+    lastParagraph[paragraphId] = rootElement.innerHTML;
     
-    console.log(rootElement)   ;
+    console.log(rootElement);
    
     var selObj = rangy.getSelection();
     var selected_area = rangy.serializeSelection(selObj, true,rootElement);  
     
     cssApplier.toggleSelection();
     
-    ParagraphSelectionCache.last_selected_area = selected_area;    
+    lastSelectedArea[paragraphId] = selected_area;    
     //cssApplier.toggleSelection();
     
     form = jQuery(this).parent().find('form');
@@ -85,12 +112,12 @@ jQuery(document).ready(function($) {
     var paragraph_id =  $(this).find('input.paragraph_id').val();
     var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
     
-    if(ParagraphSelectionCache.last_paragraph == null || ParagraphSelectionCache.last_paragraph == 'undefined'){
+    if(lastParagraph[paragraph_id] == null || lastParagraph[paragraph_id] == 'undefined'){
       console.log(rootElement.innerHTML);
-      ParagraphSelectionCache.last_paragraph = rootElement.innerHTML;
+      lastParagraph[paragraph_id] = rootElement.innerHTML;
     }
     else {
-      rootElement.innerHTML = ParagraphSelectionCache.last_paragraph ;
+      rootElement.innerHTML = lastParagraph[paragraph_id] ;
     }
     
     //console.log(rootElement.innerHTML);
@@ -102,17 +129,17 @@ jQuery(document).ready(function($) {
   $(document).on('mouseout', 'li.article-comment', function(){
     var paragraph_id =  $(this).find('input.paragraph_id').val();
     var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
-    console.log(ParagraphSelectionCache.last_paragraph);
+    console.log(lastParagraph[paragraph_id]);
     
 //    cssApplier.undoToSelection();
 //
 //    cssApplier.toggleSelection();
     
     
-    if(ParagraphSelectionCache.last_selected_area != null && ParagraphSelectionCache.last_selected_area != 'undefined' ){
+    if(lastSelectedArea[paragraph_id] != null && lastSelectedArea[paragraph_id] != 'undefined' ){
       rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
-      rootElement.innerHTML = ParagraphSelectionCache.last_paragraph ;
-      rangy.deserializeSelection(ParagraphSelectionCache.last_selected_area, rootElement);
+      rootElement.innerHTML = lastParagraph[paragraph_id];
+      rangy.deserializeSelection(lastSelectedArea[paragraph_id], rootElement);
       cssApplier.toggleSelection();
     } else {
       cssApplier.toggleSelection();
