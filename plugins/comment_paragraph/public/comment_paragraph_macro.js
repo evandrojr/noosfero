@@ -1,26 +1,6 @@
 var comment_paragraph_anchor;
-
-function _a(x,y,val){
-    // return depending on parameters
-    switch(arguments.length){
-        case 0: return _a.a;
-        case 1: return _a.a[x];
-        case 2: return _a.a[x][y];
-    }
-
-    // declare array if wasn't declared yet
-    if(typeof _a.a[x] == 'undefined')
-        _a.a[x] = [];
-
-    _a.a[x][y] = val;
-}
-// declare static empty variable
-_a.a = [];
-
-var ParagraphSelectionCache = {};
 var lastParagraph = [];
 var lastSelectedArea = [];
-
 
 function getIdCommentParagraph(paragraphId){
   var idx = paragraphId.lastIndexOf('_');
@@ -121,13 +101,16 @@ jQuery(document).ready(function($) {
     }
     
     //console.log(rootElement.innerHTML);
-    console.log(selected_area);
-    rangy.deserializeSelection(selected_area, rootElement);
-    cssApplier.toggleSelection();
+    console.log("selected_area = '" + selected_area + "'");
+    if(selected_area != ""){
+      rangy.deserializeSelection(selected_area, rootElement);
+      cssApplier.toggleSelection();
+    }
   });
   
   $(document).on('mouseout', 'li.article-comment', function(){
     var paragraph_id =  $(this).find('input.paragraph_id').val();
+    console.log("mouseout paragraph_id = " + paragraph_id);
     var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
     console.log(lastParagraph[paragraph_id]);
     

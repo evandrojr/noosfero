@@ -4,15 +4,14 @@ class Article
 
   has_many :paragraph_comments, :class_name => 'Comment', :foreign_key => 'source_id', :dependent => :destroy, :order => 'created_at asc', :conditions => [ 'paragraph_id IS NOT NULL']
 
-  validate :not_empty_paragraph_comments_removed
+  validate :body_change_with_comments
 
-  def not_empty_paragraph_comments_removed
-    if body && body_changed?
-      paragraphs_with_comments = Comment.find(:all, :select => 'distinct paragraph_id', :conditions => {:source_id => self.id}).map(&:paragraph_id).compact
-      paragraphs = Hpricot(body.to_s).search('.macro').collect{|element| element['data-macro-paragraph_id'].to_i}
-      errors[:base] << (N_('Not empty paragraph comment cannot be removed')) unless (paragraphs_with_comments-paragraphs).empty?
+  def body_change_with_comments
+    if body && body_changed? && !self.comments.empty?
+      paragraphs_with_comments = self.comments.where("'article_id' IS NOT NULL")
+      errors[:base] << (N_('You are unable to change the body of the article when paragraphs are commented')) unless (paragraphs_with_comments).empty?
     end
   end
-
+  
 end
 
