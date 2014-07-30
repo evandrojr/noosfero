@@ -6,23 +6,53 @@
   <%= button(:back, _('Back to control panel'), :controller => (profile.nil? ? 'admin_panel': 'profile_editor')) %>
 <% end %>
 
-<div id="block-types">
-  <% @blocks.each do |block| %>
+<% cont = 0 %>
+<% i = 0 %>
 
-    <div id="block-<%=block.name%>" class="block-type <%= block.name.to_css_class %>">
-      <div class="button-bar">
-        <%= link_to content_tag('span', _('Help on this block')),
-                    {:controller => 'environment_design', :action => 'show_block_type_info', :type => block.name},
-                    :class => "button icon-button icon-help colorbox",
-                    :title => _('Help on this block') %>
-        <br style="clear: left">
+<div id="block-types-container">
+  <div id="block-types">
+
+    <% @blocks.each do |block| %>
+
+    <% if cont == 0 && i < @blocks.length %>
+    <div class="block-types-group">
+    <% end %>
+
+    <% cont += 1 %>
+
+      <div id="block-<%=block.name%>" class="block-type <%= block.name.to_css_class %> drag">
+        <div class="button-bar">
+          <%= link_to content_tag('span', _('Help on this block')),
+                      {:controller => 'environment_design', :action => 'show_block_type_info', :type => block.name},
+                      :class => "button icon-button icon-help colorbox",
+                      :title => _('Help on this block') %>
+          <br style="clear: left">
+        </div>
+        <div>
+          <%= image_tag(block.icon, height: '48', width: '48', class: 'block-type-icon', alt: '' ) %>
+        </div>
+        <span><%= _(block.description) %></span>
       </div>
-      <div>
-        <%= image_tag(block.icon, height: '48', width: '48', class: 'block-type-icon', alt: '' ) %>
-      </div>
-      <span><%= _(block.description) %></span>
+
+      <%= draggable_element("block-#{block.name}", :revert => true) %>
+
+    <% if cont == 5 || i == @blocks.length %>
+      <% cont = 0 %>
     </div>
+    <% end %>
 
-    <%= draggable_element("block-#{block.name}", :revert => true) %>
-  <% end %>
+    <% i += 1 %>
+
+    <% end %>
+
+  </div>
 </div>
+
+<div id="block-types-navigation">
+  <a href="javascript:void(0)" id="previous">Previous block types</a>
+  <a href="javascript:void(0)" id="next">Next block types</a>
+</div>
+
+<div style="clear:both;"></div>
+
+<%= javascript_include_tag('block_store') %>

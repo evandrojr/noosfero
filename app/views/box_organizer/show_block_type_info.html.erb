@@ -1,12 +1,12 @@
-<div id="bs-block-container">
+<div id="block-info-container">
 
   <div id="bs-block-header">
-    <%= image_tag(@block.icon, height: '48', width: '48', id: 'bs-block-icon', alt: '' ) %>
+    <%= image_tag(@block.icon, height: '48', width: '48', id: 'block-info-icon', alt: '' ) %>
     <h1><%= @block.name %></h1>
     <p><%= @block.short_description %></p>
   </div>
 
-  <div id="bs-block-images">
+  <div id="block-info-images">
     <div style="white-space: nowrap;">
       <% if @block.previews.empty? %>
         <% for i in 0..2 %>
@@ -20,7 +20,7 @@
     </div>
   </div>
 
-  <div id="bs-block-info">
+  <div id="block-info-description">
     <h2><%= _('Description') %></h2>
     <p><%= @block.description %></p>
     <h2><%= _('What\'s New') %></h2>
