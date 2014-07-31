@@ -11,7 +11,7 @@ class ContentViewerControllerTest < ActionController::TestCase
 
   def setup
     @profile = fast_create(Community)
-    @page = fast_create(Article, :profile_id => @profile.id, :body => "<div class=\"macro\" data-macro-paragraph_id=\"1\" data-macro='comment_paragraph_plugin/allow_comment' ></div>")
+    @page = fast_create(Article, :profile_id => @profile.id, :body => "<div class=\"macro\" data-macro-paragraph_id=\"0\" data-macro='comment_paragraph_plugin/allow_comment' ></div>")
     @environment = Environment.default
     @environment.enable_plugin(CommentParagraphPlugin)
   end
@@ -19,10 +19,9 @@ class ContentViewerControllerTest < ActionController::TestCase
   attr_reader :page
 
   should 'parse article body and render comment paragraph view' do
-    comment1 = fast_create(Comment, :paragraph_id => 1, :source_id => page.id)
+    comment1 = fast_create(Comment, :paragraph_id => 0, :source_id => page.id)
     get :view_page, @page.url
-    assert_tag 'div', :attributes => {:class => 'comment_paragraph_1'}
-    assert_tag 'div', :attributes => {:id => 'comments_paragraph_count_1'}
+    assert_tag 'div', :attributes => {:class => 'comment_paragraph'}
   end
 
 end

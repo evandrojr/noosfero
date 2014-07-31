@@ -16,41 +16,11 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal [comment1], article.paragraph_comments
   end
 
-  should 'do not allow a exclusion of a paragraph comment macro if this paragraph has comments' do
-    article.body = "<div class=\"macro\" data-macro-paragraph_id=2></div>"
-    comment1 = fast_create(Comment, :paragraph_id => 1, :source_id => article.id)
-    assert !article.save
-    assert_equal ['Not empty paragraph comment cannot be removed'], article.errors[:base]
-  end
-
   should 'allow save if comment paragraph macro is not removed for paragraph with comments' do
-    article.body = "<div class=\"macro\" data-macro-paragraph_id=1></div>"
-    comment1 = fast_create(Comment, :paragraph_id => 1, :source_id => article.id)
+    article.body = "<div class=\"macro\" data-macro-paragraph_id=0></div>"
+    comment1 = fast_create(Comment, :paragraph_id => 0, :source_id => article.id)
     assert article.save
   end
 
-  should 'do not validate empty paragraph if article body is not changed' do
-    article.body = "<div class=\"macro\" data-macro-paragraph_id=2></div>"
-    assert article.save
-    comment1 = fast_create(Comment, :paragraph_id => 1, :source_id => article.id)
-    article.name = article.name + 'changed'
-    assert article.save
-  end
-
-  should 'improve performance checking changes in body' do
-    i = 1
-    time0 = (Benchmark.measure { 50.times {
-      i = i + 1
-      article.body = "i = #{i}"
-      assert article.save
-    }})
-    i = 1
-    time1 = (Benchmark.measure { 50.times {
-      i = i + 1
-      article.body = "i = 1"
-      assert article.save
-    }})
-    assert time0.total > time1.total
-  end
 
 end
