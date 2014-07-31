@@ -12,6 +12,6 @@ class Article
       errors[:base] << (N_('You are unable to change the body of the article when paragraphs are commented')) unless (paragraphs_with_comments).empty?
     end
   end
-  
+ 
 end
 

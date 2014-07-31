@@ -20,25 +20,17 @@ jQuery(document).ready(function($) {
     if(lastParagraph[paragraphId]){
       rootElement.innerHTML = lastParagraph[paragraphId];
     }
-  }); 
-  
+  });
+ 
    //highlight area from the paragraph
   $('.comment_paragraph').mouseup(function(){
     var paragraphId = getIdCommentParagraph($(this)[0].id);
     var rootElement = $(this).get(0);
-    
     lastParagraph[paragraphId] = rootElement.innerHTML;
-    
-    console.log(rootElement);
-   
     var selObj = rangy.getSelection();
-    var selected_area = rangy.serializeSelection(selObj, true,rootElement);  
-    
+    var selected_area = rangy.serializeSelection(selObj, true,rootElement); 
     cssApplier.toggleSelection();
-    
-    lastSelectedArea[paragraphId] = selected_area;    
-    //cssApplier.toggleSelection();
-    
+    lastSelectedArea[paragraphId] = selected_area;   
     form = jQuery(this).parent().find('form');
     if (form.find('input.selected_area').length === 0){
       jQuery('<input>').attr({
@@ -49,20 +41,9 @@ jQuery(document).ready(function($) {
       }).appendTo(form)
     }else{
       form.find('input.selected_area').val(selected_area)
-    }    
+    }   
     rootElement.focus();
-  }); 
-
-
-// em <li id="comment-31" class="article-comment"> colocar um data-paragraph e data-selected-area
-// //highlight area from the paragraph
-//  $('.article-comment').mouseover(function(){
-//    rootElement = $('#comment_paragraph_' + this).get(0);
-//    var selObj = rangy.getSelection();
-//    var se = $('#result').val();
-//    rangy.deserializeSelection(se, rootElement);
-//    cssApplier.toggleSelection();
-//  });
+  });
 
   function processAnchor(){
     var anchor = window.location.hash;
@@ -84,41 +65,30 @@ jQuery(document).ready(function($) {
       }
     });
   }
-  
+ 
   processAnchor();
-  
+ 
   $(document).on('mouseover', 'li.article-comment', function(){
     var selected_area = $(this).find('input.paragraph_comment_area').val();
     var paragraph_id =  $(this).find('input.paragraph_id').val();
     var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
-    
+   
     if(lastParagraph[paragraph_id] == null || lastParagraph[paragraph_id] == 'undefined'){
-      console.log(rootElement.innerHTML);
       lastParagraph[paragraph_id] = rootElement.innerHTML;
     }
     else {
       rootElement.innerHTML = lastParagraph[paragraph_id] ;
     }
-    
-    //console.log(rootElement.innerHTML);
-    console.log("selected_area = '" + selected_area + "'");
     if(selected_area != ""){
       rangy.deserializeSelection(selected_area, rootElement);
       cssApplier.toggleSelection();
     }
   });
-  
+ 
   $(document).on('mouseout', 'li.article-comment', function(){
     var paragraph_id =  $(this).find('input.paragraph_id').val();
-    console.log("mouseout paragraph_id = " + paragraph_id);
     var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
-    console.log(lastParagraph[paragraph_id]);
-    
-//    cssApplier.undoToSelection();
-//
-//    cssApplier.toggleSelection();
-    
-    
+  
     if(lastSelectedArea[paragraph_id] != null && lastSelectedArea[paragraph_id] != 'undefined' ){
       rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
       rootElement.innerHTML = lastParagraph[paragraph_id];
@@ -129,29 +99,8 @@ jQuery(document).ready(function($) {
       var sel = rangy.getSelection();
       sel.removeAllRanges();
     }
-    
-//var selected_area = $(this).find('input.paragraph_comment_area').val();
-    //var paragraph_id =  $(this).find('input.paragraph_id').val();
-    //var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
-    //console.log(rootElement.innerHTML);
-    //console.log(selected_area);
-    //rangy.deserializeSelection(selected_area, rootElement);
-    //cssApplier.toggleSelection();
-    //window.last_paragraph
-    //if(last_selected_area)
   });
-  
 });
-
-function selectAreaForComment(paragraph){
-//    console.log(this)
-//    alert("Paragrafo " + paragraph)
-//    cssApplier.toggleSelection();
-//    saveSelection();
-//    var selObj = rangy.getSelection();
-//    var se = rangy.serializeSelection(selObj, true,rootElement);  
-}
-
 
 function toggleParagraph(paragraph) {
   var div = jQuery('div.comments_list_toggle_paragraph_'+paragraph);
@@ -169,21 +118,4 @@ function loadCompleted(paragraph) {
     jQuery.scrollTo(jQuery(comment_paragraph_anchor));
     comment_paragraph_anchor = null;
   }
-}
-
-
-
-//Return a string with the beggining and the end of the selection of a text area separated by colon
-function getSelectionBounderies(textareaId){
-    
-//    var textarea = document.getElementById(textareaId);
-//    if ('selectionStart' in textarea) {
-//            // check whether some text is selected in the textarea
-//        if (textarea.selectionStart != textarea.selectionEnd) {
-//            alert(textarea.selectionStart + ":" + textarea.selectionEnd)
-//            return textarea.selectionStart + ":" + textarea.selectionEnd;
-//        }
-//    }
-    
-    return false
 }

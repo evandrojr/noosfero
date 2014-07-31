@@ -16,14 +16,14 @@ class CommentParagraphPlugin < Noosfero::Plugin
     comment = args[:comment]
     paragraph_id = comment.paragraph_id || args[:paragraph_id]
     proc {
-      arr = []     
+      arr = []    
       arr << hidden_field_tag('comment[id]', comment.id)
       arr << hidden_field_tag('comment[paragraph_id]', paragraph_id) if paragraph_id
-      arr << hidden_field_tag('comment[comment_paragraph_selected_area]', comment.comment_paragraph_selected_area) if comment.comment_paragraph_selected_area           
+      arr << hidden_field_tag('comment[comment_paragraph_selected_area]', comment.comment_paragraph_selected_area) if comment.comment_paragraph_selected_area          
       arr
     }
   end
-  
+ 
   def comment_extra_contents(args)
     comment = args[:comment]
     proc {

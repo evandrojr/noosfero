@@ -4,7 +4,7 @@ class CommentParagraphPluginProfileController < ProfileController
   def view_comments
     @article_id = params[:article_id]
     @paragraph_id = params[:paragraph_id]
-    
+  
     article = profile.articles.find(@article_id)
     @paragraph_comment_page = (params[:paragraph_comment_page] || 1).to_i
 
