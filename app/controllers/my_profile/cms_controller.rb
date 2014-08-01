@@ -232,7 +232,7 @@ class CmsController < MyProfileController
       @current_category = Category.find(params[:category_id])
       @categories = @current_category.children
     end
-    render :template => 'shared/update_categories', :locals => { :category => @current_category }
+    render :template => 'shared/update_categories', :locals => { :category => @current_category, :object_name => 'article' }
   end
 
   def publish
@@ -248,12 +248,15 @@ class CmsController < MyProfileController
     end.compact unless params[:marked_groups].nil?
     if request.post?
       @failed = {}
+      if @marked_groups.empty?
+        return session[:notice] = _("Select some group to publish your article")
+      end
       @marked_groups.each do |item|
         task = ApproveArticle.create!(:article => @article, :name => item[:name], :target => item[:group], :requestor => profile)
         begin
           task.finish unless item[:group].moderated_articles?
         rescue Exception => ex
-           @failed[ex.message] ? @failed[ex.message] << item[:group].name : @failed[ex.message] = [item[:group].name]
+          @failed[ex.message] ? @failed[ex.message] << item[:group].name : @failed[ex.message] = [item[:group].name]
         end
       end
       if @failed.blank?
