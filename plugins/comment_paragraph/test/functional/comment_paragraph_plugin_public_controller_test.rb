@@ -1,6 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 require File.dirname(__FILE__) + '/../../controllers/public/comment_paragraph_plugin_public_controller'
 
+
 # Re-raise errors caught by the controller.
 class CommentParagraphPluginPublicController; def rescue_action(e) raise e end; end
 
@@ -18,10 +19,11 @@ class CommentParagraphPluginPublicControllerTest < ActionController::TestCase
   attr_reader :article
   attr_reader :profile
 
-=begin fix me on monday
+
   should 'be able to return paragraph_id for a comment' do
     comment = fast_create(Comment, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'lalala', :paragraph_id => 0)
-    xhr :get, :comment_paragraph, :id => comment.id
+    cid = comment.id
+    xhr :get, :comment_paragraph, :id => cid
     assert_match /\{\"paragraph_id\":0\}/, @response.body
   end
 
@@ -30,6 +32,6 @@ class CommentParagraphPluginPublicControllerTest < ActionController::TestCase
     xhr :get, :comment_paragraph, :id => comment.id
     assert_match /\{\"paragraph_id\":null\}/, @response.body
   end
-=end
+
 
 end
