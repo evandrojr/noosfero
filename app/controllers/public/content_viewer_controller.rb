@@ -221,7 +221,7 @@ class ContentViewerController < ApplicationController
       #      relation.
       posts = posts.native_translations if blog_with_translation?(@page)
 
-      @posts = posts.paginate({ :page => params[:npage], :per_page => @page.posts_per_page }.merge(Article.display_filter(user, profile))).to_a
+      @posts = posts.paginate({ :page => params[:npage], :per_page => @page.posts_per_page }.merge(Article.display_filter(user, profile))).includes(:author).to_a
 
       if blog_with_translation?(@page)
         @posts.replace @posts.map{ |p| p.get_translation_to(FastGettext.locale) }.compact
@@ -260,7 +260,7 @@ class ContentViewerController < ApplicationController
   end
 
   def process_comments(params)
-    @comments = @page.comments.without_spam
+    @comments = @page.comments.without_spam.includes(:source)
     @comments = @plugins.filter(:unavailable_comments, @comments)
     @comments_count = @comments.count
     @comments = @comments.without_reply.paginate(:per_page => per_page, :page => params[:comment_page] )
