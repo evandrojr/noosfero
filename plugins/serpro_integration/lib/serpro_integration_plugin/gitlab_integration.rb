@@ -63,8 +63,8 @@ class SerproIntegrationPlugin::GitlabIntegration
   end
 
 
-  def create_jenkins_hook(jenkins_project_url)
-    @client.add_project_hook(@project.id, "#{jenkins_project_url}/gitlab/build_now")
+  def create_jenkins_hook(jenkins_host)
+    @client.add_project_hook(@project.id, "#{jenkins_host}/gitlab/build_now")
   end
 
 end
