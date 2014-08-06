@@ -35,4 +35,10 @@ Noosfero::Application.configure do
   config.assets.debug = true
 
   config.consider_all_requests_local = true
+
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.console = true
+  end
+
 end
