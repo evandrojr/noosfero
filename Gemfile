@@ -23,6 +23,10 @@ gem 'locale',                   '~> 2.0.5'
 # FIXME list here all actual dependencies (i.e. the ones in debian/control),
 # with their GEM names (not the Debian package names)
 
+group :development do
+  gem 'bullet'
+end
+
 group :production do
   gem 'dalli', '~> 2.7.0'
 end
