@@ -52,6 +52,7 @@ Depends:
  ruby-rails-autolink,
  memcached,
  ruby-memcache-client,
+ ruby-rest-client,
  debconf,
  dbconfig-common,
  adduser,

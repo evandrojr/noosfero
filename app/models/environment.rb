@@ -287,7 +287,7 @@ class Environment < ActiveRecord::Base
     www.youtube.com
   ] + ('a' .. 'z').map{|i| "#{i}.yimg.com"}
 
-  settings_items :enabled_plugins, :type => Array, :default => []
+  settings_items :enabled_plugins, :type => Array, :default => Noosfero::Plugin.available_plugin_names
 
   settings_items :disabled_blocks, :type => Array, :default => []
 
