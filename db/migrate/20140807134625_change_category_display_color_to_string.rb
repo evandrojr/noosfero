@@ -1,27 +1,33 @@
 class ChangeCategoryDisplayColorToString < ActiveRecord::Migration
 
+  COLORS = ['ffa500', '00FF00', 'a020f0', 'ff0000', '006400', '191970', '0000ff', 'a52a2a', '32cd32', 'add8e6', '483d8b', 'b8e9ee', 'f5f5dc', 'ffff00', 'f4a460']
+
   def self.up
     change_table :categories do |t|
       t.string :display_color_tmp, :limit => 6
     end
-    Category.update_all({:display_color_tmp => "ffa500"}, {:display_color => 1})
-    Category.update_all({:display_color_tmp => "00FF00"}, {:display_color => 2})
-    Category.update_all({:display_color_tmp => "a020f0"}, {:display_color => 3})
-    Category.update_all({:display_color_tmp => "ff0000"}, {:display_color => 4})
-    Category.update_all({:display_color_tmp => "006400"}, {:display_color => 5})
-    Category.update_all({:display_color_tmp => "191970"}, {:display_color => 6})
-    Category.update_all({:display_color_tmp => "0000ff"}, {:display_color => 7})
-    Category.update_all({:display_color_tmp => "a52a2a"}, {:display_color => 8})
-    Category.update_all({:display_color_tmp => "32cd32"}, {:display_color => 9})
-    Category.update_all({:display_color_tmp => "add8e6"}, {:display_color => 10})
-    Category.update_all({:display_color_tmp => "483d8b"}, {:display_color => 11})
-    Category.update_all({:display_color_tmp => "b8e9ee"}, {:display_color => 12})
-    Category.update_all({:display_color_tmp => "f5f5dc"}, {:display_color => 13})
-    Category.update_all({:display_color_tmp => "ffff00"}, {:display_color => 14})
-    Category.update_all({:display_color_tmp => "f4a460"}, {:display_color => 15})
+
+    COLORS.each_with_index do |color, i|
+      Category.update_all({:display_color_tmp => color}, {:display_color => i+1})
+    end
+
+    change_table :categories do |t|
+      t.remove :display_color
+      t.rename :display_color_tmp, :display_color
+    end
   end
 
   def self.down
+    puts "WARNING: only old defined colors will be reverted"
+
+    change_table :categories do |t|
+      t.integer :display_color_tmp
+    end
+
+    COLORS.each_with_index do |color, i|
+      Category.update_all({:display_color_tmp => i+1}, {:display_color => color})
+    end
+
     change_table :categories do |t|
       t.remove :display_color
       t.rename :display_color_tmp, :display_color
