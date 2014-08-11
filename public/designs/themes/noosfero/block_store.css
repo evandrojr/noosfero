@@ -43,10 +43,16 @@ r,
   vertical-align: top;
 }
 
+#block-types .block-type:hover {
+  box-shadow: 0px 0px 0px 2px #FFF,
+              0px 0px 0px 2px #FFF,
+              0px 0px 10px rgba(0,0,0,0.6);
+  outline: none;
+}
 
 #block-types .button-bar {
   margin: 0;
-	display: inline;
+	display: none;
 	position: absolute;
 	right: 5%;
 	border: 0px solid #AAA;
@@ -54,6 +60,9 @@ r,
 	padding: 0px;
 }
 
+#block-types .block-type:hover .button-bar {
+  display: inline;
+}
 
 #block-info-container {
   width: 770px;
