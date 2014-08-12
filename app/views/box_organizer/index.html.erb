@@ -1,4 +1,5 @@
 <%= stylesheet_link_tag '/designs/themes/default/block_store.css' %>
+<%= stylesheet_link_tag '/designs/themes/default/circlepop.css' %>
 
 <h1><%= _('Editing sideboxes')%></h1>
 
@@ -36,7 +37,7 @@
 
       <%= draggable_element("block-#{block.name}", :revert => true) %>
 
-    <% if cont == 7 || i == @blocks.length %>
+    <% if cont == 7 || i == (@blocks.length - 1) %>
       <% cont = 0 %>
     </div>
     <% end %>
@@ -48,10 +49,16 @@
   </div>
 </div>
 
-<div id="block-types-navigation">
-  <a href="javascript:void(0)" id="previous">Previous block types</a>
-  <a href="javascript:void(0)" id="next">Next block types</a>
-</div>
+<section id="block-types-navigation">
+  <nav class="nav-circlepop">
+    <a class="previous" href="javascript:void(0);">
+      <span class="icon-wrap"></span>
+    </a>
+    <a class="next" href="javascript:void(0);">
+      <span class="icon-wrap"></span>
+    </a>
+  </nav>
+</section>
 
 <div style="clear:both;"></div>
 

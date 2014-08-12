@@ -1,8 +1,8 @@
 jQuery(document).ready(function () {
 
   // navigation - click action
-  jQuery('#block-types-navigation a#previous').click(PreviousSlide);
-  jQuery('#block-types-navigation a#next').click(NextSlide);
+  jQuery('#block-types-navigation a.previous').click(PreviousSlide);
+  jQuery('#block-types-navigation a.next').click(NextSlide);
 
   // set first block types group active
   jQuery('.block-types-group').first().addClass('active');
@@ -10,7 +10,7 @@ jQuery(document).ready(function () {
 
   firstBlockTypesGroup = jQuery(".block-types-group").first();
   lastBlockTypesGroup = jQuery(".block-types-group").last();
-  jQuery("#block-types-navigation a#previous").hide();
+  jQuery("#block-types-navigation a.previous").hide();
 });
 
 function NextSlide() {
@@ -32,10 +32,10 @@ function NextSlide() {
 
     activeBlockTypesGroup = jQuery(".block-types-group.active");
 
-    jQuery("#block-types-navigation a#previous").show();
+    jQuery("#block-types-navigation a.previous").show();
 
     if ( activeBlockTypesGroup.is( lastBlockTypesGroup ) ) {
-      jQuery("#block-types-navigation a#next").hide();
+      jQuery("#block-types-navigation a.next").hide();
     }
 }
 
@@ -56,10 +56,10 @@ function PreviousSlide() {
 
     activeBlockTypesGroup = jQuery(".block-types-group.active");
 
-    jQuery("#block-types-navigation a#next").show();
+    jQuery("#block-types-navigation a.next").show();
 
     if ( activeBlockTypesGroup.is( firstBlockTypesGroup ) ) {
-      jQuery("#block-types-navigation a#previous").hide();
+      jQuery("#block-types-navigation a.previous").hide();
     }
 }
 

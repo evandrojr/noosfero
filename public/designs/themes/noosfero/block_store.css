@@ -1,3 +1,7 @@
+#block-types-container {
+  margin: 0 60px;
+}
+
 .block-types-group {
   display: none;
 }
@@ -54,7 +58,7 @@ r,
   margin: 0;
 	display: none;
 	position: absolute;
-	right: 5%;
+	right: 0%;
 	border: 0px solid #AAA;
 	margin: 0px;
 	padding: 0px;
