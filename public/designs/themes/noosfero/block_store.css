@@ -1,13 +1,15 @@
+#block-types {
+  height: 100px;
+}
+
 #block-types-container {
   margin: 0 60px;
 }
 
 .block-types-group {
   display: none;
-}
-
-.block-types-group.active {
-  display: block;
+  position: absolute;
+  min-width: 800px;
 }
 
 #block-types-navigation a#next {
