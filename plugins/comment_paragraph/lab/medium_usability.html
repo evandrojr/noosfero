@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Comentário em parágrafo</title>
+  <style>
+      
+ .triangle-right {
+    position:relative;
+    padding:15px;
+    margin:1em 0 3em;
+    color:#fff;
+    background:#075698; /* default background for browsers without gradient support */
+    /* css3 */
+    background:-webkit-gradient(linear, 0 0, 0 100%, from(#2e88c4), to(#075698));
+    background:-moz-linear-gradient(#2e88c4, #075698);
+    background:-o-linear-gradient(#2e88c4, #075698);
+    background:linear-gradient(#2e88c4, #075698);
+    -webkit-border-radius:10px;
+    -moz-border-radius:10px;
+    border-radius:10px;
+   }
+
+  .triangle-right:after {
+        content: "";
+        position: absolute;
+        bottom: -20px;
+        left: 50px;
+        border-width: 20px 0 0 20px;
+        border-style: solid;
+        border-color: #075698 transparent;
+        display: block;
+        width: 0;
+    }
+
+  </style>
+  <script src="http://code.jquery.com/jquery-1.11.1.min.js" type="text/javascript"></script>
+  <script>
+        jQuery(function($) {
+            $("#comment-bubble").hide();
+            var currentMousePos = { x: -1, y: -1 };
+            $(document).mousemove(function(event) {
+                currentMousePos.x = event.pageX;
+                currentMousePos.y = event.pageY;
+                $("#comment-bubble").css({top: event.pageY-110, left: event.pageX-70, position:'absolute'});;
+                $("#comment-bubble").show();
+            });
+
+            
+
+        });      
+  </script>
+  
+  
+</head>
+
+<body>
+    
+<!--    <div class="content" >-->
+        <div id="comment-bubble" align="center" style="width:120px" class="triangle-right" >Comentar<br>+</div>
+<!--    </div>    -->
+
+
+<div class="single-text" itemprop="text">
+        <table class="middle"><thead><tr><th scope="col"><p class="bodytext">agicC_Rua-Almirante-Mourao-de-Sa_Evandro-Veiga_01.jpg.jpg" height="387" width="620" alt=""></p></th></tr></thead><tbody><tr><td><p class="bodytext">Rua Almirante Mourão de Sá, entre Paripe e Fazenda Coutos, é um dos pontos de tensão do Subúrbio por conta da guerra do tráfico. Bairros já registraram 34 homicídios em 2014 (Foto: Evandro Veiga)</p></td></tr></tbody></table><p class="bodytext">Já passavam das 23h quando a aposentada Olindina Serra acordou assustada com o barulho de tiros disparados próximo à sua residência, na Rua 05, em Fazenda Coutos. Mesmo com o número de estampidos – seis, até onde contou –, Olindina virou para o outro lado e voltou a dormir. “Quem mora aqui já se acostumou. A gente se assusta no primeiro tiro e depois só espera terminar. É a Faixa de Gaza do Subúrbio, né? Quem não tem como mudar, tenta se acostumar”, afirma a aposentada.
+</p>
+<p class="bodytext"><br>Apesar de não haver nenhum logradouro chamado Faixa de Gaza em Salvador, o apelido é comumente utilizado por moradores para designar vias que separam áreas dominadas por grupos criminosos em conflito constante. Na lei silenciosa das Gazas espalhadas pela capital, quem mora em um lado não cruza para o outro, norma que deve ser obedecida sob pena de retaliação. 
+</p>
+<p class="bodytext">&nbsp;</p><table class="left"><thead><tr><th scope="col"><p class="bodytext"><img style=" " src="uploads/RTEmagicC_tiros_suburbio.jpg.jpg" height="249" width="221" alt=""></p></th></tr></thead><tbody><tr><td><p class="bodytext">Parede com buracos de bala é sinal da<br>violência que assola o Subúrbio<br>(Foto: Evandro Veiga)</p></td></tr></tbody></table><p class="bodytext">A Gaza suburbana citada pela aposentada é a Rua Almirante Mourão de Sá, uma via com cerca de 1,5 km que separa os bairros de Paripe e Fazenda Coutos. No trecho intermediário da via, na altura da “afamada” Rua da Paz do Bate Coração, algumas casas são marcadas por pichações de facções criminosas e buracos de bala, resultado das constantes disputas entre bandidos dos dois bairros.
+</p>
+<p class="bodytext"><br>“Infelizmente, a gente tem que viver com essa situação. Basta aparecer algum desconhecido na área que os bandidos aparecem para saber quem é. Eles ficam revidando: um grupo do Bate Coração vem e assalta alguém aqui na Fazenda Coutos. Depois, um grupo daqui vai lá e atira em alguém”, conta uma moradora, sob anonimato. “Só que a população, que não tem nada a ver, fica no meio”, complementa.
+</p>
+<p class="bodytext"><br>No fim de semana, apareceu mais uma candidata a figurar como Gaza do Subúrbio: na rua Guiné, em Periperi, seis pessoas foram assassinadas. Com a chacina na Guiné, Periperi registrou 31 homicídios em 2014, passando a liderar a estatística por bairros em Salvador, à frente dos vizinhos Paripe e Lobato, ambos com 27 homicídios registrados, e empatando com São Cristóvão, onde também foram registrados 31 crimes de morte.
+</p>
+<p class="bodytext"><br><span style="font-weight: bold; ">Autoestima</span><br>A tenente Jéssica Souza, comandante da Base Comunitária de Fazenda Coutos, não gosta do apelido dado à Mourão de Sá, especialmente após o trabalho que sua equipe vem desenvolvendo na área. “Nós lutamos contra essa situação aqui, mas não gosto do termo Faixa de Gaza. 
+</p>
+<p class="bodytext">Acredito que esse tipo de apelido só contribui para rebaixar a autoestima dos moradores”, diz. <br>Segundo a tenente, “quantitativamente, é visível a redução da criminalidade”, desde que a base foi instalada. “Estamos desenvolvendo a cultura de paz, projetos e ações, como a patrulha comunitária, e isso tem repercutido até mesmo do lado de lá (Paripe)”, afirma. 
+</p>
+<p class="bodytext"><br>Porém, na contramão da tal “cultura de paz”, a cultura do medo tem prevalecido na vizinhança. Situação que se agravou ainda mais com o sequestro de jovens na região, ocorrido nas últimas semanas. Isso afetou, principalmente, a rotina de crianças e adolescentes. “Minha mãe me disse para não ir à escola. A gente vê o que acontece aqui, todo dia. Agora, com essa onda de sequestros, o medo aumentou ainda mais. Tem colega levando até arma para a escola”, afirma um estudante de 13 anos, que não foi à aula semana passada.
+</p>
+<p class="bodytext"><br><span style="font-weight: bold; ">Bonocô</span><br>Há quem diga que o “sistema” no Subúrbio Ferroviário é diferente, mas, ao contrário do que se pensa, as Faixas de Gaza não são exclusividade da periferia de Salvador. Na área central da cidade, a Avenida Bonocô representa a linha que separa dois dos maiores polos do tráfico de narcóticos, os bairros de Cosme de Farias e Campinas de Brotas.<br><br>A guerra entre os bairros ligados por uma passarela ganhou notoriedade após a operação que resultou na morte do traficante Tiago Guimarães Pinto, o Titanic, em fevereiro. Contudo, seis meses após a morte do chefe do tráfico de Cosme de Farias, moradores e funcionários de empresas no entorno ainda temem a travessia quando a noite se aproxima. E a maior parte das pessoas ainda vive sob a lei do silêncio. “Todo mundo aqui sabe o que acontece, mas a gente não pode ficar comentando”, explica um trabalhador.<br><br><span style="font-weight: bold; ">Guerra fria</span><br>Para o capitão Edno Amaral, da 58ª CIPM (Cosme de Farias), a intensificação do policiamento na área reduziu bastante o número de ocorrências, contudo, o medo disseminado na população nos últimos anos contribuiu para uma espécie de trauma que faz com que não se sintam à vontade para falar abertamente sobre o assunto. <br><br>“Tivemos problemas com aquele trecho, no passado, mas o que há ali hoje em dia é uma ‘guerra fria’. Os líderes do tráfico que dominavam aquela região amedrontavam os moradores. A maioria silencia para assegurar uma estada sem sustos, pois essa mesma maioria não tem condições de se mudar”, avalia o capitão.<br><br>Contudo, quem hoje percebe uma certa calmaria na Faixa de Gaza da Bonocô lembra como era o clima nos períodos de conflito aberto. “Morei em Campinas (de Brotas) por mais de 30 anos e hoje venho, de vez em quando, visitar meus filhos”, afirma o taxista Emerson Rodrigues. Segundo ele, houve um tempo em que tinha olheiros dos dois lados. “Bastava cruzar a passarela, que era voz de assalto, tiroteio. Foi por causa de situações assim que decidi me mudar”, explica. <br><br>Apesar da mudança, o taxista não conseguiu se livrar do clima de insegurança. “Saí daqui para o Imbuí e, lá perto, na Boca do Rio, tem uma Faixa de Gaza também”, aponta.<br><br><span style="font-weight: bold; ">Cessar-fogo</span><br>O trecho ao qual Emerson se refere é a altura da Avenida Jorge Amado que separa as invasões do Golfo Pérsico e Irmã Dulce. “Há algum tempo era difícil viver por aqui, não dava para pisar do lado de lá sem ser assaltado. Todo dia a gente ouvia falar de alguma morte. Graças a Deus, acalmou”, relata uma vendedora, que mora na localidade do Golfo Pérsico.<br><br>A rivalidade, mais uma vez, envolve o domínio de pontos de venda de drogas. Assim como no Subúrbio, as ações criminosas se baseavam no sistema de revide. “Estava insuportável. Aconteceram chacinas aqui, nas ruas. Durante o aniversário de uma vizinha, um grupo veio do outro lado e incendiou a moto de um dos convidados. A gente sentia um clima de guerra na pele. Faz algum tempo que a situação melhorou, mas a fama continua”, conta uma moradora.<br><br>O major Gabriel da Silva Neto, comandante da 39ª CIPM (Boca do Rio), garante que o cessar-fogo é resultado das ações afirmativas que a Polícia Militar tem feito na região. “Temos tomado medidas preventivas e intensificamos o policiamento. As estatísticas mostram uma melhora grande. Isso também faz parte de um diálogo com a comunidade, que acaba ajudando nesse trabalho”, relata Silva Neto.
+</p>
+<p class="bodytext">&nbsp;</p><table class="contenttable"><thead><tr><th scope="col"><p class="bodytext"><img src="http://w3.c24hsttc.net/uploads/RTEmagicC_crimesnosuburbio.jpg.jpg" height="965" width="620" alt=""></p></th></tr></thead><tbody></tbody></table><p class="bodytext"><span style="font-weight: bold; ">Palestina soteropolitana também pede uma trégua</span><br>Segunda-feira da semana passada, quando o povo palestino teve uma trégua com o anúncio de cessar-fogo feito por Israel, após um mês de ataques, em uma Palestina muito distante do Oriente Médio – aqui mesmo, em Salvador – civis lamentavam mais uma baixa gerada pela guerra diária do tráfico. “A gente também precisa de trégua aqui. O clima está insustentável. Já era o tempo em que podíamos andar pelas ruas sem medo”, afirma um taxista local. <br><br>Presidente da associação comunitária Zumbi dos Palmares e morador da Palestina soteropolitana há 40 anos, José Antônio Souza afirma que o antigo conjunto de fazendas ganhou esse nome em referência às semelhanças entre a história de luta dos posseiros que formaram o bairro e o perfil aguerrido do povo palestino. “Foi por causa da luta do povo da Palestina pela sua independência e reconhecimento”, conta.<br><br> Apesar do clima interiorano e da receptividade, especialmente dos mais antigos, os relatos de medo e tensão diante dos constantes conflitos entre facções que atuam na área compõem o retrato da guerra. “O medo começa na hora de botar o pé fora de casa. Volta e meia tem um tiroteio nas baixadas. Essa semana mesmo mataram um rapaz. Um antigo vizinho teve que fugir para o interior jurado de morte pelos traficantes”, lista um morador.<br><br> Para José Antônio de Souza, da Zumbi dos Palmares, a onda de violência que tem tomado conta da Palestina nos últimos anos é um reflexo da falta de oportunidades e atrativos para os moradores, principalmente os mais jovens. “Aqui, nós não temos áreas de lazer e entretenimento. Não temos uma escola técnica que possa dar cursos e abrir as portas dos jovens. Como é que a gente quer que as coisas mudem se o poder público esquece a nossa existência?”, questiona o líder comunitário.</p>
+    </div>
+</body>
+</html>
+
