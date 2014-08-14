@@ -68,36 +68,23 @@ jQuery(document).ready(function($) {
       }   
       rootElement.focus();
   });
-  
-  
-  
+ 
   $('#comment-bubble').click(function(){
     this.hide();
     $("#comment-bubble").css({top: 0, left: 0, position:'absolute'});
     var url = $("#comment-bubble").data('url');
     var paragraphId = $("#comment-bubble").data("paragraphId");
     console.log(url);
-    $('.comments_list_toggle_paragraph_0').show();
+    $('.comments_list_toggle_paragraph_' + paragraphId).show();
     $.ajax({
       dataType: "script",
       url: url
     }).done(function() {
-        var button = jQuery('#page-comment-form-' + paragraphId +  'a');
-        console.log(button);
+        var button = jQuery('#page-comment-form-' + paragraphId +  ' a')[0];
+        //console.log(button);
         button.click();
-        $.scrollTo(button);
-    });;
-    
-//    $.getJSON(url, function(data) {
-//        $('.comments_list_toggle_paragraph_0').show();
-//        //var button = $('div.comment_paragraph_'+ data.paragraph_id + ' a');
-//        var button = jQuery('#page-comment-form-' + paragraphId +  'a');
-//        console.log(button);
-//        button.click();
-//        $.scrollTo(button);
-//
-//    });    
-    
+        //$('body').scrollTo('#page-comment-form-' + paragraphId +  ' a');
+    });
   });
 
   function processAnchor(){
