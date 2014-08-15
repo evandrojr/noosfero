@@ -71,7 +71,7 @@ jQuery(function($) {
      },
      insert_or_update_group: function (jid, presence) {
         var jid_id = Jabber.jid_to_id(jid);
-        var list = $('#buddy-list .room-list');
+        var list = $('#buddy-list #rooms .room-list');
         var item = $('#' + jid_id);
         presence = presence || ($(item).length > 0 ? $(item).parent('li').attr('class') : 'offline');
         log('adding or updating contact ' + jid + ' as ' + presence);
@@ -82,7 +82,7 @@ jQuery(function($) {
      },
      insert_or_update_contact: function (jid, name, presence) {
         var jid_id = Jabber.jid_to_id(jid);
-        var list = $('#buddy-list .buddy-list');
+        var list = $('#buddy-list #friends .buddy-list');
         var item = $('#' + jid_id);
         presence = presence || ($(item).length > 0 ? $(item).parent('li').attr('class') : 'offline');
         log('adding or updating contact ' + jid + ' as ' + presence);
