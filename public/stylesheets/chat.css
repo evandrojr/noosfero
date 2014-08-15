@@ -217,6 +217,9 @@
   display: inline-block;
   max-width: 70%;
 }
+.conversation .header .other-name {
+ color: rgb(238, 238, 238);
+}
 .conversation .header .back {
   float: right;
   margin: 6px;
@@ -231,6 +234,7 @@
   color: #257CAD;
   height: 23px;
   overflow: hidden;
+  vertical-align: top;
 }
 #chat #chat-window .history h5 {
   text-align: center;
