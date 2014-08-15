@@ -6,7 +6,7 @@ require 'securerandom'
 # Rails generator.
 class User < ActiveRecord::Base
 
-  attr_accessible :login, :email, :password, :password_confirmation
+  attr_accessible :login, :email, :password, :password_confirmation, :activated_at
 
   N_('Password')
   N_('Password confirmation')
