@@ -809,6 +809,12 @@ module ApplicationHelper
     form_for(name, { :builder => NoosferoFormBuilder }.merge(options), &proc)
   end
 
+  def optional_custom_field(profile)
+    result = ""
+
+    result
+  end
+
   def optional_field(profile, name, field_html = nil, only_required = false, &block)
     result = ""
 

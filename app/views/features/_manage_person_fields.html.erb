@@ -1,46 +1,79 @@
 <%= labelled_form_for(:environment, :url => {:action => 'manage_person_fields'}) do |f| %>
 
-<table id='person_fields_conf'>
+<table id='person_fields_conf' border="0">
   <tr>
     <th><%= _('Field') %></th>
     <th><%= _('Active') %></th>
     <th><%= _('Required') %></th>
     <th><%= _('Display on signup?') %></th>
+    <th>&nbsp;</th>
   </tr>
 
   <tr class='manage-fields-batch-actions'>
     <td>
       <%= _("Check/Uncheck All")%>
     </td>
-    <td>
+    <td align="center">
       <input type="checkbox" id="person_active" />
     </td>
-    <td>
+    <td align="center">
       <input type="checkbox" id="person_required" />
     </td>
-    <td>
+    <td align="center">
       <input type="checkbox" id="person_signup" />
     </td>
+    <td>&nbsp;</td>
   </tr>
 
   <% @person_fields.each do |field| %>
   <tr>
     <td><label for="person_fields[<%= field %>][active]"><%= _(field.humanize) %></label></td>
-    <td>
+    <td align="center">
       <%= hidden_field_tag  "person_fields[#{field}][active]", false %>
       <%= check_box_tag "person_fields[#{field}][active]", true, environment.custom_person_field(field, 'active'), :onclick => "active_action(this, 'person_fields[#{field}][required]', 'person_fields[#{field}][signup]')" %>
     </td>
-    <td>
+    <td align="center">
       <%= hidden_field_tag  "person_fields[#{field}][required]", false %>
       <%= check_box_tag "person_fields[#{field}][required]", true, environment.custom_person_field(field, 'required'), :onclick => "required_action('person_fields[#{field}][active]','person_fields[#{field}][required]', 'person_fields[#{field}][signup]')" %>
     </td>
-    <td>
+    <td align="center">
       <%= hidden_field_tag  "person_fields[#{field}][signup]", false %>
       <%= check_box_tag "person_fields[#{field}][signup]", true, environment.custom_person_field(field, 'signup'), :onclick => "signup_action('person_fields[#{field}][active]','person_fields[#{field}][required]', 'person_fields[#{field}][signup]')" %>
     </td>
+    <td>&nbsp;</td>
   </tr>
   <% end %>
+
+  <% @custom_person_fields.each do |field| %>
+  <tr>
+    <td>
+      <%= text_field_tag "person_fields[#{field}][name]", environment.custom_person_field_name(field) %>
+    </td>
+    <td align="center">
+      <%= hidden_field_tag  "person_fields[#{field}][active]", false %>
+      <%= check_box_tag "person_fields[#{field}][active]", true, environment.custom_person_field(field, 'active'), :onclick => "active_action(this, 'person_fields[#{field}][required]', 'person_fields[#{field}][signup]')" %>
+    </td>
+    <td align="center">
+      <%= hidden_field_tag  "person_fields[#{field}][required]", false %>
+      <%= check_box_tag "person_fields[#{field}][required]", true, environment.custom_person_field(field, 'required'), :onclick => "required_action('person_fields[#{field}][active]','person_fields[#{field}][required]', 'person_fields[#{field}][signup]')" %>
+    </td>
+    <td align="center">
+      <%= hidden_field_tag  "person_fields[#{field}][signup]", false %>
+      <%= check_box_tag "person_fields[#{field}][signup]", true, environment.custom_person_field(field, 'signup'), :onclick => "required_action('person_fields[#{field}][active]','person_fields[#{field}][required]', 'person_fields[#{field}][signup]')" %>
+    </td>
+    <td>
+      <a href="#" class="button icon-delete delete-link-list-row" title="Delete" onclick="return remove_custom_field(this);"><span>Delete</span></a>
+    </td>
+  </tr>
+  <% end %>
+
 </table>
+
+<br />
+
+<%= link_to_function(_('Add field'), 'add_new_field();', :class => 'button icon-add with-text') %>
+
+<%= javascript_include_tag 'edit-profile-fields.js' %>
 
 <script type='text/javascript'>// <!--
   var trs = jQuery('#person_fields_conf tr');

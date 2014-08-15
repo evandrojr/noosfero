@@ -17,17 +17,23 @@ class FeaturesController < AdminController
 
   def manage_fields
     @person_fields = Person.fields
+    @custom_person_fields = []
+    @environment.settings[:custom_person_fields].each{|k,v| @custom_person_fields << k if k =~ /^custom_field/ && ! @custom_person_fields.include?(k) }
     @enterprise_fields = Enterprise.fields
     @community_fields = Community.fields
   end
 
   def manage_person_fields
     environment.custom_person_fields = params[:person_fields]
+
+    #raise params[:person_fields].inspect
+
     if environment.save!
       session[:notice] = _('Person fields updated successfully.')
     else
       flash[:error] = _('Person fields not updated successfully.')
     end
+
     redirect_to :action => 'manage_fields'
   end
 

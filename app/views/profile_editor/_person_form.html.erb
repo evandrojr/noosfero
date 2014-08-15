@@ -64,3 +64,14 @@
 <%= optional_field(@person, 'professional_activity', f.text_field(:professional_activity, :rel => _('Professional activity'))) %>
 <%= optional_field(@person, 'organization', f.text_field(:organization, :rel => _('Organization'))) %>
 <%= optional_field(@person, 'organization_website', f.text_field(:organization_website, :rel => _('Organization website'))) %>
+
+<hr />
+
+<% @environment.custom_person_fields_customs.each { |k| %>
+  <br />
+  <%= label_tag environment.custom_person_field_name(k) %>
+  <%= optional_field(@person, k, text_field_tag("profile_data[#{k}]")) %>
+  <br />
+<% } %>
+
+<hr />
