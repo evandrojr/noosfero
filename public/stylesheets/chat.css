@@ -41,7 +41,7 @@
 #buddy-list .buddy-list li a img, .occupant-list li a img, #chat .avatar {
   height: 32px;
   max-width: 32px;
-  border-radius: 15%;
+  border-radius: 5px;
 }
 #buddy-list .buddy-list li.offline, .occupant-list li.offline {
   display: none;
@@ -136,7 +136,7 @@
   background-color: #257CAD;
   color: rgb(223, 223, 223);
   padding: 5px;
-  border-radius: 5%;
+  border-radius: 5px;
   display: inline-block;
   width: 74%;
 }
@@ -218,7 +218,7 @@
   margin: 6px;
   padding: 7px;
   background-color: rgb(98, 98, 98);
-  border-radius: 12%;
+  border-radius: 6px;
   text-decoration: none;
   font-weight: bold;
   color: white;
@@ -271,4 +271,9 @@
 }
 .conversation .self .author {
   float: right;
+}
+#openchat .unread-messages {
+  color: red;
+  font-weight: bold;
+  font-size: 14px;
 }
