@@ -68,6 +68,7 @@ class Community
   end
 
   def allow_serpro_integration?
+    return false if serpro_integration_plugin_settings.communities.blank? || serpro_integration_plugin_settings.communities[:templates].blank?
     allow = serpro_integration_plugin_settings.communities[:templates].include?(self.id.to_s)
     allow || serpro_integration_plugin_settings.communities[:templates].include?(self.template_id.to_s)
   end
