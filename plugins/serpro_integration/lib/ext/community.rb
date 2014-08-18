@@ -3,8 +3,8 @@ require_dependency 'community'
 class Community
 
   settings_items :allow_sonar_integration, :type => :boolean, :default => false
-  settings_items :allow_gitlab_integration, :type => :boolean, :default => false
-  settings_items :allow_jenkins_integration, :type => :boolean, :default => false
+  settings_items :allow_gitlab_integration, :type => :boolean, :default => true
+  settings_items :allow_jenkins_integration, :type => :boolean, :default => true
 
   settings_items :serpro_integration_plugin_gitlab, :type => Hash, :default => {}
   settings_items :serpro_integration_plugin_jenkins, :type => Hash, :default => {}
@@ -12,10 +12,9 @@ class Community
 
   attr_accessible :allow_unauthenticated_comments, :allow_gitlab_integration, :allow_sonar_integration, :allow_jenkins_integration, :serpro_integration_plugin_gitlab, :serpro_integration_plugin_jenkins, :serpro_integration_plugin_sonar
 
-  before_update :create_integration_projects
+  after_create :create_integration_projects, :if => lambda { |c| c.allow_serpro_integration?}
 
   def create_integration_projects
-    return unless setting_changed?(:serpro_integration_plugin_gitlab)
 
     if allow_gitlab_integration
       gitlab_integration = SerproIntegrationPlugin::GitlabIntegration.new(gitlab_host, gitlab_private_token)
@@ -66,6 +65,11 @@ class Community
 
   def jenkins_project_name
     serpro_integration_plugin_jenkins[:project_name] || self.identifier
+  end
+
+  def allow_serpro_integration?
+    allow = serpro_integration_plugin_settings.communities[:templates].include?(self.id.to_s)
+    allow || serpro_integration_plugin_settings.communities[:templates].include?(self.template_id.to_s)
   end
 
 end
