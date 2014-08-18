@@ -2,6 +2,13 @@
 
 <%= form_for(:settings) do |f| %>
 
+  <div class="community_settings">
+    <h2><%= _('Community Templates')%></h2>
+    <%= f.fields_for :communities, OpenStruct.new(@settings.communities) do |g| %>
+      <%= labelled_form_field _('Communities where integrations will be applied'), g.select("templates", @environment.communities.templates.map{|t| [t.name, t.id]},{}, :multiple => true) %>
+    <% end %>
+  </div>
+
   <div class="gitlab_settings">
     <h2><%= _('Gitlab Settings')%></h2>
     <%= f.fields_for :gitlab, OpenStruct.new(@settings.gitlab) do |g| %>
