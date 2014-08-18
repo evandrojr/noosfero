@@ -35,6 +35,11 @@ class SerproIntegrationPlugin::SmileBlock < Block
     collect_sonar_information
     factor = (self.sonar_info[METRIC_COVERAGE] * self.sonar_info[METRIC_SUCCESS_DENSITY]).to_f/1000
     factor
+     collect_sonar_information
+    factor = 0
+    if self.sonar_info[METRIC_COVERAGE] && self.sonar_info[METRIC_SUCCESS_DENSITY]
+      factor = (self.sonar_info[METRIC_COVERAGE] * self.sonar_info[METRIC_SUCCESS_DENSITY]).to_f/1000
+    end
   end
 
   #FIXME make this test
