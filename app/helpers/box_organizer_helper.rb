@@ -1,5 +1,9 @@
 module BoxOrganizerHelper
 
+  def max_number_of_blocks_per_line
+    7
+  end
+
   def icon_selector(icon = 'no-ico')
     render :partial => 'icon_selector', :locals => { :icon => icon }
   end

@@ -352,4 +352,21 @@ class EnvironmentDesignControllerTest < ActionController::TestCase
     assert_equal json_response, []
   end
 
+  should 'display all available blocks in groups' do
+    login_as(create_admin_user(Environment.default))
+    get :index
+    assert_select 'div.block-types-group', 3
+
+    assert_select 'div.block-types-group' do |elements|
+     assert_select 'div.block-type', 15
+   end
+  end
+
+  should 'paginate the block store with 7 elements per line' do
+    assert_equal 15, @controller.available_blocks.length
+    login_as(create_admin_user(Environment.default))
+    get :index
+    assert_select 'div.block-types-group', 3, "something wrong happens with the pagination of the block store"
+  end
+
 end

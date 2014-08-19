@@ -139,10 +139,6 @@ class Block < ActiveRecord::Base
     "/images/icon_block.png"
   end
 
-  def self.position
-    [1,2,3]
-  end
-
   # Returns the content to be used for this block.
   #
   # This method can return several types of objects:

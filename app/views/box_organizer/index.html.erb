@@ -7,24 +7,24 @@
   <%= button(:back, _('Back to control panel'), :controller => (profile.nil? ? 'admin_panel': 'profile_editor')) %>
 <% end %>
 
-<% cont = 0 %>
-<% i = 0 %>
+<% n_blocks_in_line = 0 %>
+<% last_block = @blocks.last %>
 
 <div id="block-types-container">
   <div id="block-types">
 
     <% @blocks.each do |block| %>
 
-    <% if cont == 0 && i < @blocks.length %>
+    <% if n_blocks_in_line == 0 %>
     <div class="block-types-group">
     <% end %>
 
-    <% cont += 1 %>
+    <% n_blocks_in_line += 1 %>
 
       <div id="block-<%=block.name%>" class="block-type <%= block.name.to_css_class %> drag">
         <div class="button-bar">
           <%= link_to content_tag('span', _('Help on this block')),
-                      {:controller => 'environment_design', :action => 'show_block_type_info', :type => block.name},
+                      {:action => 'show_block_type_info', :type => block.name},
                       :class => "button icon-button icon-help colorbox",
                       :title => _('Help on this block') %>
           <br style="clear: left">
@@ -37,12 +37,10 @@
 
       <%= draggable_element("block-#{block.name}", :revert => true) %>
 
-    <% if cont == 7 || i == (@blocks.length - 1) %>
-      <% cont = 0 %>
+    <% if n_blocks_in_line == max_number_of_blocks_per_line || last_block == block %>
+      <% n_blocks_in_line = 0 %>
     </div>
     <% end %>
-
-    <% i += 1 %>
 
     <% end %>
 
