@@ -119,12 +119,13 @@ class Block < ActiveRecord::Base
     '(dummy)'
   end
 
+  # returns a short description of the block, used when the user sees a list of
+  # blocks to choose one to include in the design.
+  #
+  # Must be redefined in subclasses to match the short description of each block
+  # type.
   def self.short_description
-    '(dummy)'
-  end
-
-  def self.release_notes
-    '(dummy)'
+    _('(dummy)')
   end
 
   def self.default_preview
