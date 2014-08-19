@@ -1,0 +1,20 @@
+<h1><%= _('Notification settings')%></h1>
+
+<% form_for(:settings) do |f| %>
+
+  <div id="notification-config-fields">
+  </div>
+    <%= labelled_form_field _('Noitification Categories'), f.text_field(:categories) %>
+    <%= button_to_remote_without_text(:add, _('Add New Category'), 
+                :update => 'notification-config-fields',
+                :loading => '$("notification-config-fields").addClassName("loading")',
+                :complete => '$("notification-config-fields").removeClassName("loading")',
+                :url => { :action => 'create'}) 
+    %>
+
+
+    <% button_bar do %>
+      <%= submit_button(:save, _('Save'), :cancel => {:action => 'create'}) %>
+    <% end %>
+<% end %>
+

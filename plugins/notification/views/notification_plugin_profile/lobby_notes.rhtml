@@ -1,0 +1,54 @@
+<% extend NotificationPlugin::Helpers::ViewerHelper %>
+
+<%= lobby_notes_plugin_stylesheet  %>
+
+<script type="text/javascript">
+
+function update_stream(recursive) {
+    jQuery.ajax({
+      url: '/profile/<%= params[:profile] %>/plugin/notification/lobby_notes',
+      type: 'get',
+      start : jQuery('#lobby-notes').addClass("loading"),
+      success: function(data) {
+        jQuery("#lobby-note-elements").html(data);
+        jQuery("#lobby-notes").removeClass("loading");
+      },
+      error: function(ajax, stat, errorThrown) {
+      }
+    });
+
+  if (recursive) {
+    setTimeout(function() {
+      update_stream(true);
+    }, 10000);
+  }
+}
+
+jQuery(document).ready(function() {
+  jQuery('#lobby-notes').addClass("loading");
+
+  update_stream(true);
+});
+
+</script>
+
+<div id='lobby-notes' class='lobby-notes'>
+
+  <div class='lobby-header'>
+    <%= image_tag profile.profile_custom_image(:thumb) %>
+    <h1>
+      <%= @profile.name %>
+    </h1>
+    <h2><%= _("You have %s notifications (%s)") % [ @events.count, show_date(@date)] %></h2>
+    <div class='before'>
+      <%= 
+#link_to _('Before'), {:action => 'lobby_notes'} 
+%>
+    </div>
+  </div>
+
+  <ul id='lobby-note-elements'>
+    <%= render :partial => 'event', :collection => @events %>
+  </ul>
+
+</div>
