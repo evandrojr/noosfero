@@ -1,0 +1,20 @@
+<div class="proposal">
+  <div class="topic-color" style="background-color: <%= proposal_card.topic.color %>;"></div>
+  <div class="content">
+    <div class="title">
+      <%= link_to proposal_card.name, proposal_card.view_url %>
+    </div>
+    <div class="social">
+      <%= render :partial => 'content_viewer/social', :locals => {:proposal => proposal_card} %>
+    </div>
+    <div class="abstract">
+      <%= link_to strip_tags(proposal_card.abstract), proposal_card.view_url %>
+    </div>
+  </div>
+  <div class="score">
+    <%= proposal_card.comments_count %>
+  </div>
+  <div class="topic">
+    <%= link_to proposal_card.topic.title, proposal_card.topic.view_url %>
+  </div>
+</div>
