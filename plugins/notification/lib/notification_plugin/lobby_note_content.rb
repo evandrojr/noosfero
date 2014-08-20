@@ -1,5 +1,7 @@
 class NotificationPlugin::LobbyNoteContent < Event
 
+  before_validation :set_title
+
   def self.short_description
     'Lobby note for gatekeepers'
   end
@@ -7,6 +9,11 @@ class NotificationPlugin::LobbyNoteContent < Event
   def self.description
     'Notify gatekeeper'
   end
+
+  def set_title
+    self.name = _('Notification %s') % self.profile.lobby_notes.count unless self.profile.nil?
+  end
+
 
 #FIXME make the html output specific
 #  def to_html(options = {})
