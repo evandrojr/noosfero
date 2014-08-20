@@ -12,8 +12,9 @@ class NotificationPluginProfileController < ProfileController
 
     if request.xhr?
       render :partial => 'event', :collection => @events
+    else
+      render :file => 'notification_plugin_profile/lobby_notes', :layout => 'embed'
     end
-    render :file => 'notification_plugin_profile/lobby_notes', :layout => 'embed'
   end
 
   def index
