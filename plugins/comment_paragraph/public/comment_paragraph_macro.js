@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
   
   //Add marked text bubble
   $("body").append('\
-      <a href="#" id="comment-bubble" style="width:120px;height:105px;">\
+      <a href="#" id="comment-bubble" style="width:120px;height:105px;text-decoration: none">\
           <div  align="center"  class="triangle-right" >Comentar<br>+</div>\
       </a>');
   $("#comment-bubble").hide();
@@ -32,7 +32,6 @@ jQuery(document).ready(function($) {
   $('#comment-bubble').mouseleave(function(){
       this.hide();
       $("#comment-bubble").css({top: 0, left: 0, position:'absolute'});
-//      $("#comment-bubble").css({top: 0, left: 0, position:'absolute', 'background-color': 'yellow'});
   });
  
    //highlight area from the paragraph
@@ -45,10 +44,7 @@ jQuery(document).ready(function($) {
       $("#comment-bubble").data("paragraphId", paragraphId)
       var url = $('#link_to_ajax_comments_' + paragraphId).data('url');      
       $("#comment-bubble").data("url", url)
-//      $("#comment-bubble").css({top: event.pageY-100, left: event.pageX-70, position:'absolute', 'background-color': 'yellow'});
       $("#comment-bubble").show();
-     // var onclickContent = $('#link_to_ajax_comments_' + paragraphId).attr('onclick');
-     // $("#comment-bubble").attr('onclick', onclickContent);
       var rootElement = $(this).get(0);
       lastParagraph[paragraphId] = rootElement.innerHTML;
       var selObj = rangy.getSelection();
@@ -81,11 +77,11 @@ jQuery(document).ready(function($) {
       url: url
     }).done(function() {
         var button = jQuery('#page-comment-form-' + paragraphId +  ' a')[0];
-        //console.log(button);
         button.click();
-        //$('body').scrollTo('#page-comment-form-' + paragraphId +  ' a');
+        window.location="#page-comment-form-" + paragraphId;
     });
   });
+  
 
   function processAnchor(){
     var anchor = window.location.hash;
@@ -149,7 +145,6 @@ function toggleParagraph(paragraph) {
   var visible = div.is(':visible');
   if(!visible)
     jQuery('div.comment-paragraph-loading-'+paragraph).addClass('comment-button-loading');
-
   div.toggle('fast');
   return visible;
 }
