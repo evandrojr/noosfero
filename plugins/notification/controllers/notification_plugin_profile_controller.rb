@@ -18,7 +18,7 @@ class NotificationPluginProfileController < ProfileController
   end
 
   def index
-    @events = current_person.lobby_notes
+    @events = current_person.lobby_notes.find(:all, :conditions => {:profile => profile } )
     @event = NotificationPlugin::LobbyNoteContent.new
   end
 
