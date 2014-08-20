@@ -33,5 +33,21 @@ class NotificationPluginProfileController < ProfileController
     render :partial => 'event', :collection => @events
   end
 
+  def notifications
+    @date = params[:date].nil? ? Date.today : Date.parse(params[:date])
+
+    if request.xhr?
+      @event = NotificationPlugin::NotificationContent.new(params[:event])
+      @event.profile = profile
+      @event.created_by = current_person
+      @event.save!
+      
+      @events = profile.notifications.paginate(:per_page => per_page, :page => params[:page])
+      render :partial => 'event', :collection => @events
+    else
+      @events = profile.notifications.paginate(:per_page => per_page, :page => params[:page])
+      render :file => 'notification_plugin_profile/notifications'
+    end
+  end
 end
 
