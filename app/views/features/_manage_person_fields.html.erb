@@ -71,19 +71,18 @@
 
 <br />
 
-<%= link_to_function(_('Add field'), 'add_new_field();', :class => 'button icon-add with-text') %>
+<%= link_to_function(_('Add field'), "add_new_field('person');", :class => 'button icon-add with-text') %>
 
-<%= javascript_include_tag 'edit-profile-fields.js' %>
+<script type='text/javascript'>
+  // <!--
+  //var trs = jQuery('#person_fields_conf tr');
 
-<script type='text/javascript'>// <!--
-  var trs = jQuery('#person_fields_conf tr');
-
-  var tr, td2;
-  for ( var i=2; tr=trs[i]; i++ ) {
-    if ( td2 = tr.getElementsByTagName('td')[1] ) {
-      td2.getElementsByTagName('input')[1].onclick();
-    }
-  }
+  //var tr, td2;
+  //for ( var i=2; tr=trs[i]; i++ ) {
+  //  if ( td2 = tr.getElementsByTagName('td')[1] ) {
+  //    td2.getElementsByTagName('input')[1].onclick();
+  //  }
+  //}
   // -->
 </script>
 

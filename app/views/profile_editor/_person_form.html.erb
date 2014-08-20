@@ -7,6 +7,17 @@
   </div>
 <% end %>
 
+<% @environment.custom_person_fields_customs.each { |k| %>
+  <% optional_field(@person, k) do %>
+    <div class="formfieldline">
+      <%= label_tag environment.custom_person_field_name(k), nil, class: 'formlabel' %>
+      <div class="formfield type-select">
+        <%= text_field_tag("profile_data[custom_fields][#{k}]", @person.custom_field_value(k)) %>
+      </div>
+    </div>
+  <% end %>
+<% } %>
+
 <%= optional_field(@person, 'description', f.text_area(:description, :rows => 5, :rel => _('Description'))) %>
 <%= optional_field(@person, 'preferred_domain', select_preferred_domain(:profile_data)) %>
 <%= optional_field(@person, 'contact_information', f.text_field(:contact_information, :rel => _('Contact information'))) %>
@@ -65,13 +76,3 @@
 <%= optional_field(@person, 'organization', f.text_field(:organization, :rel => _('Organization'))) %>
 <%= optional_field(@person, 'organization_website', f.text_field(:organization_website, :rel => _('Organization website'))) %>
 
-<hr />
-
-<% @environment.custom_person_fields_customs.each { |k| %>
-  <br />
-  <%= label_tag environment.custom_person_field_name(k) %>
-  <%= optional_field(@person, k, text_field_tag("profile_data[#{k}]")) %>
-  <br />
-<% } %>
-
-<hr />

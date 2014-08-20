@@ -497,7 +497,7 @@ class Environment < ActiveRecord::Base
   end
 
   def custom_enterprise_fields=(values)
-    self.settings[:custom_enterprise_fields] = values.delete_if { |key, value| ! Enterprise.fields.include?(key)}
+    self.settings[:custom_enterprise_fields] = values.delete_if { |key, value| ! ( Enterprise.fields.include?(key) || key =~ /^custom_field/ ) }
     self.settings[:custom_enterprise_fields].each_pair do |key, value|
       if value['required'] == 'true'
         self.settings[:custom_enterprise_fields][key]['active'] = 'true'
@@ -507,6 +507,16 @@ class Environment < ActiveRecord::Base
         self.settings[:custom_enterprise_fields][key]['active'] = 'true'
       end
     end
+  end
+
+  def custom_enterprise_fields_customs()
+    custom_fields = []
+    self.settings[:custom_enterprise_fields].each{ |k,v| custom_fields << k if k =~ /^custom_field/ }
+    custom_fields
+  end
+
+  def custom_enterprise_field_name(field)
+    self.settings[:custom_enterprise_fields][field]['name']
   end
 
   def custom_enterprise_field(field, status)
@@ -539,8 +549,13 @@ class Environment < ActiveRecord::Base
   def custom_community_fields
     self.settings[:custom_community_fields].nil? ? {} : self.settings[:custom_community_fields]
   end
+
   def custom_community_fields=(values)
-    self.settings[:custom_community_fields] = values.delete_if { |key, value| ! Community.fields.include?(key) }
+    self.settings[:custom_community_fields] = values.delete_if { |key, value|
+      ! ( Community.fields.include?(key) || key =~ /^custom_field/ )
+    }
+
+
     self.settings[:custom_community_fields].each_pair do |key, value|
       if value['required'] == 'true'
         self.settings[:custom_community_fields][key]['active'] = 'true'
@@ -550,6 +565,16 @@ class Environment < ActiveRecord::Base
         self.settings[:custom_community_fields][key]['active'] = 'true'
       end
     end
+  end
+
+  def custom_community_fields_customs()
+    custom_fields = []
+    self.settings[:custom_community_fields].each{ |k,v| custom_fields << k if k =~ /^custom_field/ }
+    custom_fields
+  end
+
+  def custom_community_field_name(field)
+    self.settings[:custom_community_fields][field]['name']
   end
 
   def custom_community_field(field, status)
