@@ -1,8 +1,8 @@
 class NotificationPluginProfileController < ProfileController
-  append_view_path File.join(File.dirname(__FILE__) + '/../../views')
+#  append_view_path File.join(File.dirname(__FILE__) + '/../../views')
 
   #FIXME make this test
-  needs_profile
+#  needs_profile
 
   protect 'see_loby_notes', :profile
 
