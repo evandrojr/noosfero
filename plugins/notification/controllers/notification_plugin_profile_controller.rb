@@ -6,8 +6,6 @@ class NotificationPluginProfileController < ProfileController
 
   protect 'see_loby_notes', :profile
 
-  layout 'embed'
-
   def lobby_notes
     @date = params[:date].nil? ? Date.today : Date.parse(params[:date])
     @events = profile.lobby_notes.by_day(@date).paginate(:per_page => per_page, :page => params[:page])
@@ -15,6 +13,23 @@ class NotificationPluginProfileController < ProfileController
     if request.xhr?
       render :partial => 'event', :collection => @events
     end
+    render :file => 'notification_plugin_profile/lobby_notes', :layout => 'embed'
+  end
+
+  def index
+    @events = current_person.lobby_notes
+    @event = NotificationPlugin::LobbyNoteContent.new
+  end
+
+  def create
+    @event = NotificationPlugin::LobbyNoteContent.new(params[:event])
+    @event.profile = profile
+    @event.created_by = current_person
+    @events = current_person.lobby_notes
+    unless @event.save
+      flash[:error] = _('Note not saved')
+    end
+    render :partial => 'event', :collection => @events
   end
 
 end
