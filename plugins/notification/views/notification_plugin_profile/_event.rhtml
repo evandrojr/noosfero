@@ -1,9 +1,0 @@
-<li>  
-  <div class='title'><%= event.title %></div>
-  <span class='created_by'>
-   <%= _("%{author} on %{date}") % {:author => event.author_name, :date => show_time(event.created_at) } %>
-  </span>
-  <div class='body'>
-    <%= event.body %>
-  </div>
-</li>
