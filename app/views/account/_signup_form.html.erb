@@ -29,6 +29,14 @@
 
 <div id='signup-form-header'>
 
+  <script>
+    function show_fields_for_template(element) {
+      // code here
+    }
+  </script>
+
+  <%= template_options(:people, 'profile_data') %>
+
   <div id='signup-formfield-group'>
     <%= label(:user, :login, _('Username'), {:class => 'formlabel'}) %>
     <span id="signup-domain"><%= environment.default_hostname %>/</span>
@@ -108,8 +116,6 @@
   <% end %>
 
   <%= @plugins.dispatch(:signup_extra_contents).collect { |content| instance_eval(&content) }.join("") %>
-
-  <%= template_options(:people, 'profile_data') %>
 
   <% unless @terms_of_use.blank? %>
     <div id='terms-of-use-box' class='formfieldline'>
