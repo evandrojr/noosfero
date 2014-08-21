@@ -24,7 +24,6 @@ jQuery(function($) {
      muc_domain: $muc_domain,
      muc_supported: false,
      presence_status: '',
-     update_presence_status_every: $update_presence_status_every, // time in seconds of how often update presence status to Noosfero DB
      conversation_prefix: 'conversation-',
      jids: {},
      rooms: {},
@@ -62,11 +61,9 @@ jQuery(function($) {
            .replace(/%{presence_status}/g, presence)
            .replace('%{avatar}', getAvatar(identifier))
            .replace('%{name}', name);
-        if ($(item).length > 0) {
-           $(item).parent('li').replaceWith(html);
-        } else {
-           $(list).append(html);
-        }
+
+        $(item).parent().remove();
+        $(list).append(html);
         Jabber.jids[jid_id] = {jid: jid, name: name, type: type, presence: presence};
      },
      insert_or_update_group: function (jid, presence) {
@@ -82,9 +79,10 @@ jQuery(function($) {
      },
      insert_or_update_contact: function (jid, name, presence) {
         var jid_id = Jabber.jid_to_id(jid);
-        var list = $('#buddy-list #friends .buddy-list');
         var item = $('#' + jid_id);
         presence = presence || ($(item).length > 0 ? $(item).parent('li').attr('class') : 'offline');
+        var list = $('#buddy-list #friends .buddy-list' + (presence=='offline' ? '.offline' : '.online'));
+
         log('adding or updating contact ' + jid + ' as ' + presence);
         Jabber.insert_or_update_user(list, item, jid, name, presence, $('#chat #chat-templates .buddy-item').clone().html(), 'chat');
         $("#chat-window .tab a[href='#"+ Jabber.conversation_prefix + jid_id +"']")
@@ -120,7 +118,7 @@ jQuery(function($) {
         return body;
      },
 
-     show_message: function (jid, name, body, who, identifier) {
+     show_message: function (jid, name, body, who, identifier, time) {
          if (body) {
             body = Jabber.render_body_message(body);
             var jid_id = Jabber.jid_to_id(jid);
@@ -129,8 +127,9 @@ jQuery(function($) {
                $(tab_id).find('.history').find('.message:last .content').append('<p>' + body + '</p>');
             }
             else {
-               var time = new Date();
-               time = time.getHours() + ':' + checkTime(time.getMinutes());
+               if (time==undefined) {
+                  time = new Date().toISOString();
+               }
                var message_html = $('#chat #chat-templates .message').clone().html()
                  .replace('%{message}', body)
                  .replace(/%{who}/g, who)
@@ -138,6 +137,7 @@ jQuery(function($) {
                  .replace('%{name}', name)
                  .replace('%{avatar}', getAvatar(identifier));
                $('#' + Jabber.conversation_prefix + jid_id).find('.history').append(message_html);
+               $(".message span.time").timeago();
             }
             $(tab_id).find('.history').scrollTo({top:'100%', left:'0%'});
             if (who != "self") {
@@ -180,7 +180,7 @@ jQuery(function($) {
      },
 
      update_chat_title: function () {
-        var friends_online = $('#buddy-list .buddy-list li:not(.offline)').length;
+        var friends_online = $('#buddy-list .buddy-list.online li').length;
         $('#friends-online').text(friends_online);
      },
 
@@ -198,7 +198,6 @@ jQuery(function($) {
               break;
            case Strophe.Status.DISCONNECTED:
               log('disconnected');
-              //Jabber.show_status('');
               $('#buddy-list ul.buddy-list, .occupant-list ul.occupant-list').html('');
               Jabber.update_chat_title();
               $('#buddy-list .toolbar').removeClass('small-loading-dark');
@@ -400,13 +399,6 @@ jQuery(function($) {
            Jabber.on_muc_support
         );
 
-        // Timed handle to save presence status to Noosfero DB every (N) seconds
-        Jabber.connection.addTimedHandler(Jabber.update_presence_status_every * 1000, function() {
-           log('saving presence status to Noosfero DB');
-           $.get('/chat/update_presence_status', { status: {chat_status: Jabber.presence_status} });
-           return true;
-        });
-
         // uncomment for extra debugging
         //Strophe.log = function (lvl, msg) { log(msg); };
      },
@@ -465,11 +457,6 @@ jQuery(function($) {
       disconnect();
    });
 
-   // save presence_status as offline in Noosfero database when close or reload chat window
-   $(window).unload(function() {
-      disconnect();
-   });
-
    $('#chat-busy').click(function() {
       Jabber.presence_status = 'dnd';
       Jabber.connect();
@@ -494,6 +481,7 @@ jQuery(function($) {
                Jabber.enter_room(jid);
                var conversation = create_conversation_tab(name, jid_id);
                conversation.find('.conversation').show();
+               recent_messages(jid);
             }
          }
          else {
@@ -508,11 +496,19 @@ jQuery(function($) {
         var jid = $(this).attr('data-to');
         var body = $(this).val();
         body = body.stripScripts();
+        save_message(jid, body);
         Jabber.deliver_message(jid, body);
         $(this).val('');
         return false;
      }
    });
+
+   function save_message(jid, body) {
+      $.post('/chat/save_message', {
+        to: getIdentifier(jid),
+        body: body
+      });
+   }
 
    // open new conversation or change to already opened tab
    $('#buddy-list .buddy-list li a').live('click', function() {
@@ -522,6 +518,7 @@ jQuery(function($) {
 
       conversation.find('.conversation').show();
       count_unread_messages(jid_id, true);
+      recent_messages(Jabber.jid_of(jid_id));
       conversation.find('.conversation .input-div textarea.input').focus();
    });
 
@@ -534,12 +531,16 @@ jQuery(function($) {
       $('.conversation textarea:visible').val(val + name + ', ').focus();
    });
 
-   $('.conversation .history').live('click', function() {
+   $('#chat .conversation .history').live('click', function() {
       $('.conversation textarea:visible').focus();
    });
 
-   $('.conversation .back').live('click', function() {
+   $('#chat .conversation .back').live('click', function() {
       $('#chat #chat-window .conversation').hide();
+   });
+
+   $('#chat .toolbar .back').live('click', function() {
+      $('#chat').hide('fast');
    });
 
    function create_conversation_tab(title, jid_id) {
@@ -567,7 +568,30 @@ jQuery(function($) {
           panel.find('.history').addClass('room');
       }
       textarea.attr('data-to', jid);
+
       return panel;
+   }
+
+   function recent_messages(jid) {
+      $.getJSON('/chat/recent_messages', {
+        identifier: getIdentifier(jid)
+      }, function(data) {
+        $.each(data, function(i, message) {
+          var body = message['body'];
+          var from = message['from'];
+          var to = message['to'];
+          var date = message['created_at'];
+          var group = to['type']=='Community' ? 'conference.' : '';
+          var domain = '127.0.0.1';
+
+          if(from['id']==getCurrentIdentifier()) {
+            Jabber.show_message(to['id']+'@'+group+domain, $own_name, body, 'self', to['id'], date);
+          } else {
+            var target = group!='' ? to['id'] : from['id']
+            Jabber.show_message(target+'@'+group+domain, from['name'], body, 'other', from['id'], date);
+          }
+        });
+      });
    }
 
    function count_unread_messages(jid_id, hide) {
@@ -648,10 +672,3 @@ jQuery(function($) {
    }
    $('#chat #buddy-list').perfectScrollbar();
 });
-
-function checkTime(i) {
-   if (i<10) {
-      i="0" + i;
-   }
-   return i;
-}
