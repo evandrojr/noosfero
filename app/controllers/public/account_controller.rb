@@ -65,6 +65,17 @@ class AccountController < ApplicationController
     render :text => { :ok=>true, :key=>key }.to_json
   end
 
+  def custom_fields_for_template
+    custom_fields ||= environment.people.templates.find(params[:template_id]).custom_fields.keys
+    #raise custom_fields.inspect
+
+    custom_fields = [{ :name => "custom_field_4", :label => "bli"},
+                     { :name => "custom_field_5", :label => "ajsdfh"},
+                     { :name => "custom_field_6", :label => "ytytyty"}]
+
+    render :text => {:ok => true, :custom_fields => custom_fields}.to_json
+  end
+
   # action to register an user to the application
   def signup
     if @plugins.dispatch(:allow_user_registration).include?(false)

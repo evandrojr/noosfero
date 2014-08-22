@@ -31,7 +31,30 @@
 
   <script>
     function show_fields_for_template(element) {
-      // code here
+      jQuery('div#signup-form-profile div.formfieldline').remove();
+      var selected_template = element.options[element.selectedIndex].value;
+      jQuery.ajax({
+        type: "GET",
+        url: "<%= url_for :controller=>'account', :action=>'custom_fields_for_template' %>",
+        dataType: 'json',
+        data: { template_id : selected_template },
+        success: function(data) {
+          if (data.ok)  {
+            data.custom_fields.each(function(field) {
+              html = '<div class="formfieldline">' +
+                           '<label class="formlabel" for="profile_data_custom_fields_{#CUSTOM_FIELD_ID#}">{#CUSTOM_FIELD_NAME#}</label>' +
+                           '<div class="formfield type-text">' +
+                              '<input type="text" name="profile_data[custom_fields][{#CUSTOM_FIELD_ID#}]" id="profile_data_custom_fields_{#CUSTOM_FIELD_ID#}" />' +
+                           '</div>' +
+                         '</div>';
+
+              html = html.replace( /{#CUSTOM_FIELD_ID#}/g, field.name );
+              html = html.replace( /{#CUSTOM_FIELD_NAME#}/g, field.label );
+              jQuery('div#signup-form-profile').append(html);
+            });
+          };
+        }
+      });
     }
   </script>
 
