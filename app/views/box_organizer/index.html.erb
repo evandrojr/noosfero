@@ -30,9 +30,9 @@
           <br style="clear: left">
         </div>
         <div>
-          <%= image_tag(block.icon, height: '48', width: '48', class: 'block-type-icon', alt: '' ) %>
+          <%= display_icon(block) %>
         </div>
-        <span><%= _(block.description) %></span>
+        <span><%= _(block.short_description) %></span>
       </div>
 
       <%= draggable_element("block-#{block.name}", :revert => true) %>

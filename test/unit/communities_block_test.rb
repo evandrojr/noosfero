@@ -15,6 +15,15 @@ class CommunitiesBlockTest < ActiveSupport::TestCase
     assert_not_equal ProfileListBlock.description, CommunitiesBlock.description
   end
 
+  should 'describe shortly itself' do
+    assert_not_equal Block.short_description, CommunitiesBlock.short_description
+  end
+
+  should 'have a pretty name defined' do
+    pretty_name = CommunitiesBlock.name.gsub('Block','')
+    assert_not_equal pretty_name, CommunitiesBlock.pretty_name
+  end
+
   should 'list owner communities' do
     block = CommunitiesBlock.new
 

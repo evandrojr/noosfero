@@ -116,7 +116,7 @@ class Block < ActiveRecord::Base
   # Must be redefined in subclasses to match the description of each block
   # type.
   def self.description
-    '(dummy)'
+    _('nothing')
   end
 
   # returns a short description of the block, used when the user sees a list of
@@ -125,20 +125,32 @@ class Block < ActiveRecord::Base
   # Must be redefined in subclasses to match the short description of each block
   # type.
   def self.short_description
-    _('(dummy)')
+    self.pretty_name
   end
 
+  def self.pretty_name
+    self.name.gsub('Block','')
+  end
+
+  #FIXME make this test
   def self.default_preview
     "/images/block_preview.png"
   end
 
-  def self.previews
-    []
-  end
+#  #FIXME remove this code
+#  def self.previews_path
+#    previews = Dir.glob(File.join(images_filesystem_path, 'previews/*')).map do |path|
+#      File.join(images_base_url_path, 'previews', File.basename(path))
+#    end
+#  end
 
-  def self.icon
-    "/images/icon_block.png"
-  end
+#  #FIXME remove this code
+#  def self.icon_path
+#    icon_path = File.join(images_base_url_path, 'icon.png')
+#puts File.join(images_filesystem_path, 'icon.png').inspect
+##"/plugins/container_block/images/handle_e.png"
+#    File.exists?(File.join(images_filesystem_path, 'icon.png')) ? icon_path : default_icon_path
+#  end
 
   # Returns the content to be used for this block.
   #
@@ -253,6 +265,23 @@ class Block < ActiveRecord::Base
     duplicated_block.save!
     duplicated_block.insert_at(self.position + 1)
     duplicated_block
+  end
+
+  #FIXME make this test
+  def self.previews_path
+    base_name = self.name.split('::').last.underscore
+    Dir.glob(File.join('blocks', base_name,'previews/*'))
+  end
+
+  #FIXME make this test
+  def self.icon_path
+    basename = self.name.split('::').last.underscore
+    File.join('blocks', basename, 'icon.png') 
+  end
+
+  #FIXME make this test
+  def self.default_icon_path
+    'icon_block.png'
   end
 
 end

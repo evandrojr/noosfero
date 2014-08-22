@@ -1,19 +1,19 @@
 <div id="block-info-container">
 
   <div id="bs-block-header">
-    <%= image_tag(@block.icon, height: '48', width: '48', id: 'block-info-icon', alt: '' ) %>
-    <h1><%= @block.name %></h1>
+    <%= display_icon(@block) %>
+    <h1><%= @block.pretty_name %></h1>
     <p><%= @block.short_description %></p>
   </div>
 
   <div id="block-info-images">
     <div style="white-space: nowrap;">
-      <% if @block.previews.empty? %>
+      <% if @block.previews_path.empty? %>
         <% for i in 0..2 %>
           <%= image_tag(@block.default_preview, height: '240', width: '384', alt: '') %>
         <% end %>
       <% else %>
-        <% @block.previews.each do |preview| %>
+        <% @block.previews_path.each do |preview| %>
           <%= image_tag(preview, height: '240', width: '384', alt: '') %>
         <% end %>
       <% end %>
