@@ -16,7 +16,7 @@ function makeCommentable() {
   //Wraps the paragraph using the chosen class
   jQuery('#article_body_ifr').contents().find('body').children('p').each(function( index ) {
     text = jQuery(this).html().trim();
-    if(text!="" && text!="<br>"){
+    if(text!="" && text!=" " && text!="<br>"){
       paragraphsTxt+='<p><div class="macro article_comments" data-macro="comment_paragraph_plugin/allow_comment" data-macro-paragraph_id="' + index + '">' + text + '</div></p><br>'
     }
   });

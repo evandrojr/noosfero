@@ -24,10 +24,11 @@ div.article-comments-list-more{
   background-color: #FFFF66;
 }
 
-::selection {
+.comment_paragraph ::selection {
   background: #FFFF66; /* WebKit/Blink Browsers */
 }
-::-moz-selection {
+
+.comment_paragraph ::-moz-selection {
   background: #FFFF66; /* Gecko Browsers */
 }
 

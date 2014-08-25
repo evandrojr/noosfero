@@ -1,20 +1,32 @@
 var comment_paragraph_anchor;
 var lastParagraph = [];
 var lastSelectedArea = [];
+var sideCommentForm=null;
 
 function getIdCommentParagraph(paragraphId){
   var idx = paragraphId.lastIndexOf('_');
   return paragraphId.substring(idx+1, paragraphId.length)
 }
 
+function moveCommentsToTheSide(paragraphId, mouseX, mouseY){
+  $ = jQuery;
+  var element = sideCommentForm;
+  //element.detach();
+  if ( $('body #side_comment_form').size == 0){
+    $('body').append(element);
+  }
+  element.css({top: mouseY-50, left: $( window ).width()-490, position:'absolute'});
+}
+
 jQuery(document).ready(function($) {
   rangy.init();
   cssApplier = rangy.createCssClassApplier("commented-area", {normalize: false});
   
+  
   //Add marked text bubble
   $("body").append('\
       <a href="#" id="comment-bubble" style="width:120px;height:105px;text-decoration: none">\
-          <div  align="center"  class="triangle-right" >Comentar<br>+</div>\
+          <div align="center"  class="triangle-right" >Comentar<br>+</div>\
       </a>');
   $("#comment-bubble").hide();
   //Undo previous highlight from the paragraph
@@ -30,55 +42,65 @@ jQuery(document).ready(function($) {
   });
   
   $('#comment-bubble').mouseleave(function(){
-      this.hide();
-      $("#comment-bubble").css({top: 0, left: 0, position:'absolute'});
+    //this.hide();
+    $("#comment-bubble").css({top: 0, left: 0, position:'absolute'});
   });
  
    //highlight area from the paragraph
   $('.comment_paragraph').mouseup(function(event){
-      var paragraphId = getIdCommentParagraph($(this)[0].id);
-      var currentMousePos = { x: -1, y: -1 };
-      currentMousePos.x = event.pageX;
-      currentMousePos.y = event.pageY;
-      $("#comment-bubble").css({top: event.pageY-100, left: event.pageX-70, position:'absolute'});      
-      $("#comment-bubble").data("paragraphId", paragraphId)
-      var url = $('#link_to_ajax_comments_' + paragraphId).data('url');      
-      $("#comment-bubble").data("url", url)
-      $("#comment-bubble").show();
-      var rootElement = $(this).get(0);
-      lastParagraph[paragraphId] = rootElement.innerHTML;
-      var selObj = rangy.getSelection();
-      var selected_area = rangy.serializeSelection(selObj, true,rootElement); 
-      cssApplier.toggleSelection();
-      lastSelectedArea[paragraphId] = selected_area;   
-      form = jQuery(this).parent().find('form');
-      if (form.find('input.selected_area').length === 0){
-        jQuery('<input>').attr({
-          class: 'selected_area',
-          type: 'hidden',
-          name: 'comment[comment_paragraph_selected_area]',
-          value: selected_area
-        }).appendTo(form)
-      }else{
-        form.find('input.selected_area').val(selected_area)
-      }   
-      rootElement.focus();
+    var paragraphId = getIdCommentParagraph($(this)[0].id);
+    var currentMousePos = { x: -1, y: -1 };
+    currentMousePos.x = event.pageX;
+    currentMousePos.y = event.pageY;
+    $("#comment-bubble").css({top: event.pageY-100, left: event.pageX-70, position:'absolute'});      
+    $("#comment-bubble").data("paragraphId", paragraphId)
+    var url = $('#link_to_ajax_comments_' + paragraphId).data('url');      
+    $("#comment-bubble").data("url", url)
+    $("#comment-bubble").show();
+    var rootElement = $(this).get(0);
+    lastParagraph[paragraphId] = rootElement.innerHTML;
+    var selObj = rangy.getSelection();
+    var selected_area = rangy.serializeSelection(selObj, true,rootElement); 
+    cssApplier.toggleSelection();
+    lastSelectedArea[paragraphId] = selected_area;   
+    form = jQuery(this).parent().find('form');
+    if (form.find('input.selected_area').length === 0){
+      jQuery('<input>').attr({
+        class: 'selected_area',
+        type: 'hidden',
+        name: 'comment[comment_paragraph_selected_area]',
+        value: selected_area
+      }).appendTo(form)
+    }else{
+      form.find('input.selected_area').val(selected_area)
+    }
+    rootElement.focus();
   });
+  
+
+  
  
-  $('#comment-bubble').click(function(){
-    this.hide();
+  $('#comment-bubble').click(function(event){
+   // this.hide();
     $("#comment-bubble").css({top: 0, left: 0, position:'absolute'});
     var url = $("#comment-bubble").data('url');
     var paragraphId = $("#comment-bubble").data("paragraphId");
-    console.log(url);
+
     $('.comments_list_toggle_paragraph_' + paragraphId).show();
     $.ajax({
       dataType: "script",
       url: url
     }).done(function() {
-        var button = jQuery('#page-comment-form-' + paragraphId +  ' a')[0];
-        button.click();
-        window.location="#page-comment-form-" + paragraphId;
+      
+      var button = jQuery('#page-comment-form-' + paragraphId +  ' a')[0];
+      button.click();
+//        window.location="#page-comment-form-" + paragraphId;
+      //Move comments
+      sideCommentForm = $('#side_comment_form');
+      sideCommentForm.hide();
+      sideCommentForm = $('.comment_form').first();
+      sideCommentForm.attr("id",'side_comment_form');
+      moveCommentsToTheSide(paragraphId, event.pageX, event.pageY);
     });
   });
   
