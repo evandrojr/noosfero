@@ -59,3 +59,19 @@ div.article-comments-list-more{
     display: block;
     width: 0;
 }
+
+
+.side-comments-box{
+   position: absolute;
+   top: 0px;
+   border-style: solid;
+   border-width: 1px;
+   border-color: black;
+   z-index: 99;
+   width: 200px;
+   overflow-y: auto;
+}
+
+.side-comments-counter{
+    width: 20px;
+}

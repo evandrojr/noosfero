@@ -19,7 +19,11 @@
       }
     )%>
     <!-- FIXME: css file -->
-    <div align="center" id="comments_paragraph_count_<%= paragraph_id %>" style="vertical-align: middle; padding-left: 3px; padding-right: 5px; color: #5AC1FC"><span id="comment-count-<%= paragraph_id %>" class='comment-count'><%= count %></span></div>
+    <div  align="center" id="comments_paragraph_count_<%= paragraph_id %>" style="vertical-align: middle; padding-left: 3px; padding-right: 5px; color: #5AC1FC">
+      <span id="comment-count-<%= paragraph_id %>" class='comment-count'>
+        <%= count %>
+      </span>
+    </div>
   </div>
   <div class="comment-paragraph-loading-<%= paragraph_id %>"/>
   <div class="comments_list_toggle_paragraph_<%= paragraph_id %>" style="display:none">

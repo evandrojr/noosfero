@@ -9,25 +9,82 @@ function getIdCommentParagraph(paragraphId){
 }
 
 function moveCommentsToTheSide(paragraphId, mouseX, mouseY){
-  $ = jQuery;
-  var element = sideCommentForm;
+  var $ = jQuery;
+  //var element = sideCommentForm;
   //element.detach();
-  if ( $('body #side_comment_form').size == 0){
-    $('body').append(element);
-  }
-  element.css({top: mouseY-50, left: $( window ).width()-490, position:'absolute'});
+  //if ( $('body #side_comment_form').size === 0){
+//    $('body').append(element);
+//  }
+  //element.css({top: 0, border-right: 20, position:'absolute'});
+}
+
+//function buildSideCommentBlock(){
+//  var $ = jQuery;
+//  $("body").append('\
+//    <div align="left" id="side_comments_box" class="side-comments-box">\n\
+//      [side comments collumn]<BR>\n\
+//      [side comments collumn]<BR>\n\
+//    </div>\n\
+//  ');
+//  //Detects if there is any comment paragraph
+//  
+//  //  var button = jQuery('#page-comment-form-' + paragraphId +  ' a')[0];
+//}
+
+function buildSideCommentBox(id, commentCount ){
+  var $ = jQuery;
+  //Search to top of the respective paragraph
+  var top = $('#comment_paragraph_' + id).offset().top;
+  var right = $('#comment_paragraph_' + id).offset().left + $('#comment_paragraph_' + id).width() + 20;
+  var height = $('#comment_paragraph_' + id).height() + 20;
+  console.log(top);
+  var boxComments="\
+  <div class='side-comments-box'\n\
+       id='side_comment_box_" + id + "' style='top: " + top + "px; left: " + right + "px; height: " + height + "px; ' >\n\
+      <div class='triangle-right'>+</div> \n\
+      Icons and formzczk<BR> asakdlsk<BR> ajsijiasjia<BR> jkpoafdpasj<BR>papdiasp <BR> \n\\n\
+      Icons and formzczk<BR> asakdlsk<BR> ajsijiasjia<BR> jkpoafdpasj<BR>papdiasp <BR> \n\\n\\n\
+      Icons and formzczk<BR> asakdlsk<BR> ajsijiasjia<BR> jkpoafdpasj<BR>papdiasp <BR> \n\\n\
+</div>"; 
+  return boxComments;
+}
+
+function putSideComments(){
+  var $ = jQuery;
+
+  $(".comment-count").each(function(index){
+    //Include all comments except the last
+    var id = $(this).attr('id');
+    if(id != undefined ){
+      var n = id.lastIndexOf('-');
+      var id_number =  id.substr(n + 1, id.length - n +1);
+//      console.log(index);
+//      console.log(this);
+//      console.log($(this).text());
+      var commentCount = $(this).text().trim();
+      commentCount = parseInt(commentCount);
+      var box = buildSideCommentBox(id_number, commentCount);
+      $('body').append(box);
+    }
+    
+  });      
+  
+  
 }
 
 jQuery(document).ready(function($) {
   rangy.init();
   cssApplier = rangy.createCssClassApplier("commented-area", {normalize: false});
   
-  
   //Add marked text bubble
   $("body").append('\
       <a href="#" id="comment-bubble" style="width:120px;height:105px;text-decoration: none">\
           <div align="center"  class="triangle-right" >Comentar<br>+</div>\
       </a>');
+  //buildSideCommentBlock();
+  //Creates a side bubble for each paragraph with the amount of comments
+  putSideComments();
+  
   $("#comment-bubble").hide();
   //Undo previous highlight from the paragraph
   $('.comment_paragraph').mousedown(function(){
@@ -92,14 +149,14 @@ jQuery(document).ready(function($) {
       url: url
     }).done(function() {
       
-      var button = jQuery('#page-comment-form-' + paragraphId +  ' a')[0];
-      button.click();
-//        window.location="#page-comment-form-" + paragraphId;
-      //Move comments
-      sideCommentForm = $('#side_comment_form');
-      sideCommentForm.hide();
-      sideCommentForm = $('.comment_form').first();
-      sideCommentForm.attr("id",'side_comment_form');
+
+//      button.click();
+////        window.location="#page-comment-form-" + paragraphId;
+//      //Move comments
+//      sideCommentForm = $('#side_comment_form');
+//      sideCommentForm.hide();
+//      sideCommentForm = $('.comment_form').first();
+//      sideCommentForm.attr("id",'side_comment_form');
       moveCommentsToTheSide(paragraphId, event.pageX, event.pageY);
     });
   });
@@ -166,7 +223,7 @@ function toggleParagraph(paragraph) {
   var div = jQuery('div.comments_list_toggle_paragraph_'+paragraph);
   var visible = div.is(':visible');
   if(!visible)
-    jQuery('div.comment-paragraph-loading-'+paragraph).addClass('comment-button-loading');
+    jQuery('div.comment-paragraph-loading-' + paragraph).addClass('comment-button-loading');
   div.toggle('fast');
   return visible;
 }
