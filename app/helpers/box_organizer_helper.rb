@@ -4,9 +4,7 @@ module BoxOrganizerHelper
     7
   end
 
-  #FIXME make this test
   def display_icon(block)
-
     image_path = nil
     plugin = @plugins.fetch_first_plugin(:has_block?, block)
 
