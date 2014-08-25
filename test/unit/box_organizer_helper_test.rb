@@ -158,8 +158,8 @@ class BoxOrganizerHelperTest < ActionView::TestCase
     Dir.stubs(:glob).with(File.join(base_path, '*')).returns([File.join(base_path, 'p1.png'), File.join(base_path, 'p2.png')])
     doc = HTML::Document.new display_previews(block)
     assert_select doc.root, 'li' do |elements|
-      assert_match /img.* src="\/blocks\/some_block\/previews\/p1.png"/, elements[0].to_s
-      assert_match /img.* src="\/blocks\/some_block\/previews\/p2.png"/, elements[1].to_s
+      assert_match /img.* src="\/images\/blocks\/some_block\/previews\/p1.png"/, elements[0].to_s
+      assert_match /img.* src="\/images\/blocks\/some_block\/previews\/p2.png"/, elements[1].to_s
     end
   end
 

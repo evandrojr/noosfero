@@ -28,9 +28,6 @@ module BoxOrganizerHelper
 
     theme = Theme.new(environment.theme) # remove this
 
-#    images_path = Dir.glob(File.join(theme.public_path, 'images', block.previews_path, '*'))
-
-
     images_path = Dir.glob(File.join(theme.filesystem_path, 'images', block.preview_path, '*'))
     images_path = images_path.map{|path| path.gsub(theme.filesystem_path, theme.public_path) } unless images_path.empty?
 
@@ -38,7 +35,7 @@ module BoxOrganizerHelper
     images_path = images_path.map{|path| path.gsub(File.join(Rails.root, 'public'), '') } unless images_path.empty?
 
     images_path = Dir.glob(File.join(Rails.root, 'public', 'images', block.preview_path, '*')) if images_path.empty?
-    images_path = images_path.map{|path| path.gsub(File.join(Rails.root, 'public', 'images'), '') } unless images_path.empty?
+    images_path = images_path.map{|path| path.gsub(File.join(Rails.root, 'public'), '') } unless images_path.empty?
 
     images_path = 1.upto(3).map{block.default_preview_path} if images_path.empty?
 
