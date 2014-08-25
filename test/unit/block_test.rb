@@ -292,11 +292,9 @@ class BlockTest < ActiveSupport::TestCase
     assert Block.respond_to?(:pretty_name)
   end
 
-  should 'previews_path return the array of preview images' do
+  should 'previews_path return the apth to preview images' do
     class NewBlock < Block; end
-    expected = ['path/1', 'path/2']
-    Dir.expects(:glob).with('blocks/new_block/previews/*').returns(expected) 
-    assert_equivalent expected, NewBlock.previews_path
+    assert_equal 'blocks/new_block/previews', NewBlock.preview_path
   end
 
   should 'return the icon block path' do
@@ -317,11 +315,6 @@ class BlockTest < ActiveSupport::TestCase
   should 'return the default preview path for blocks without preview images' do
     class NewBlock < Block; end
     assert_equal 'block_preview.png', NewBlock.default_preview_path
-  end
-
-  should 'previews_path return an empty array if there is no preview image' do
-    class NewBlock < Block; end
-    assert_equivalent [], NewBlock.previews_path
   end
 
 end

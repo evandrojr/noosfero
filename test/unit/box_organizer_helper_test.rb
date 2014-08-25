@@ -131,8 +131,6 @@ class BoxOrganizerHelperTest < ActionView::TestCase
     assert_match 'plugins/some/images/blocks/some_block/icon.png', display_icon(block)
   end
 
-##########################################
-
   should 'display the default preview for block without previews images' do
     class SomeBlock < Block; end
     block = SomeBlock
