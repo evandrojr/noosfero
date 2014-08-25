@@ -119,69 +119,26 @@ function new_field_action(){
 
 function remove_custom_field(element) {
   jQuery(element).parent().parent().remove();
+  //field = jQuery(element).parent().parent();
+  //console.log( field );
   return false;
 }
 
 function add_new_field(profile_type) {
 
-  console.log( profile_type );
+  var custom_field_counter = jQuery('#custom-fields-container').find("div.field-with-privacy-selector").length + 1;
 
-  last_row = jQuery('#' + profile_type + '_fields_conf > tbody:last tr:last');
+  var row = '<div class="field-with-privacy-selector">' +
+              '<div class="formfieldline">' +
+                '<input id="profile_data_custom_fields_custom_field_' + custom_field_counter + '_label" name="profile_data[custom_fields][custom_field_' + custom_field_counter + '][label]" value="label" style="display:block" />' +
+                '<div class="formfield type-text" style="display: inline-block;">' +
+                  '<input id="profile_data_custom_fields_custom_field_' + custom_field_counter + '_value" name="profile_data[custom_fields][custom_field_' + custom_field_counter + '][value]" size="30" type="text">' +
+                '</div>' +
+                '<a href="#" class="button icon-delete delete-link-list-row" title="Delete" onclick="return remove_custom_field(this);"><span>Delete</span></a> ' +
+              '</div>' +
+            '</div>';
 
-  if ( last_row.find('label').length == 1 ) {
-
-    var row = '<tr>' +
-                 '<td>' +
-                    '<input id="' + profile_type + '_fields_custom_field_1_name" maxlength="20" name="' + profile_type + '_fields[custom_field_1][name]" type="text" />' +
-                 '</td>' +
-                 '<td align="center"> ' +
-                    '<input id="' + profile_type + '_fields_custom_field_1_active" name="' + profile_type + '_fields[custom_field_1][active]" type="hidden" value="false" /> ' +
-                    '<input id="' + profile_type + '_fields_custom_field_1_active" name="' + profile_type + '_fields[custom_field_1][active]" type="checkbox" value="false" /> ' +
-                 '</td> ' +
-                 '<td align="center"> ' +
-                    '<input id="' + profile_type + '_fields_custom_field_1_required" name="' + profile_type + '_fields[custom_field_1][required]" type="hidden" value="false" /> ' +
-                    '<input id="' + profile_type + '_fields_custom_field_1_required" name="' + profile_type + '_fields[custom_field_1][required]" type="checkbox" value="true" /> ' +
-                 '</td> ' +
-                 '<td align="center"> ' +
-                    '<input id="' + profile_type + '_fields_custom_field_1_signup" name="' + profile_type + '_fields[custom_field_1][signup]" type="hidden" value="false" /> ' +
-                    '<input id="' + profile_type + '_fields_custom_field_1_signup" name="' + profile_type + '_fields[custom_field_1][signup]" type="checkbox" value="true" /> ' +
-                 '</td> ' +
-                 '<td> ' +
-                    '<a href="#" class="button icon-delete delete-link-list-row" title="Delete" onclick="return remove_custom_field(this);"><span>Delete</span></a> ' +
-                 '</td> ' +
-               '</tr>';
-
-    jQuery('#' + profile_type + '_fields_conf > tbody:last').append(row);
-
-  }
-  else {
-
-    var new_field = jQuery('#' + profile_type + '_fields_conf > tbody:last tr:last').clone();
-
-    var field = new_field.find('input');
-    //var chkboxes = field.filter(':checkbox');
-
-    var re = new RegExp( '\\d', 'g' );
-    var id = field.attr('id').match(re);
-    var next_id = parseInt(id) + 1;
-
-    jQuery.each( field, function( k, v ) {
-      v.id = v.id.replace(id, next_id);
-      v.name = v.name.replace(id, next_id);
-      if (v.type == 'text') { v.value = '' }
-      if (v.type == 'checkbox') { v.value = true; }
-      if (v.type == 'hidden') { v.value = false; }
-
-    });
-
-    //field.val('');
-
-    //chkboxes.attr('onclick', chkboxes.attr('onclick').replace(id, next_id));
-    //console.log( chkboxes );
-
-    jQuery('#' + profile_type + '_fields_conf > tbody').append(new_field);
-
-  }
+  jQuery('#custom-fields-container').append(row);
 
 }
 
