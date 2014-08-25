@@ -32,4 +32,23 @@ class ProposalsDiscussionPlugin::Topic < Folder
     true
   end
 
+  def max_score
+    @max ||= [1, proposals.maximum(:comments_count)].max
+  end
+
+  def proposal_tags
+    proposals.tag_counts.inject({}) do |memo,tag|
+      memo[tag.name] = tag.count
+      memo
+    end
+  end
+
+  def proposals_per_day
+    proposals.group("date(created_at)").count
+  end
+
+  def comments_per_day
+    proposals.joins(:comments).group('date(comments.created_at)').count('comments.id')
+  end
+
 end

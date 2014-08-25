@@ -33,6 +33,13 @@
   width: 5%;
   text-align: center;
 }
+.proposal .score span {
+  background: url(/plugins/proposals_discussion/images/score.png) no-repeat;
+  display: inline-block;
+  width: 25px;
+  height: 19px;
+  position: relative;
+}
 
 .proposal .content:hover, .proposal .topic:hover {
   background: rgb(230, 230, 230);
@@ -136,12 +143,14 @@ form .proposals-discussion-plugin .body textarea {
   background-color: #7293CF;
 }
 
-#content .topic-item h2, #article .article-body-proposals-discussion-plugin_topic h2 {
+#content .topic-item h2, #article .article-body-proposals-discussion-plugin_topic h2,
+#content .topic h2 {
   background-color: #C4C4C4;
   margin: 0;
 }
 
-#content .topic-item h2 a, #article .article-body-proposals-discussion-plugin_topic h2 a {
+#content .topic-item h2 a, #article .article-body-proposals-discussion-plugin_topic h2 a,
+#content .topic h2 a {
   text-decoration: none;
   padding: 10px;
   display: inline-block;
@@ -160,4 +169,24 @@ form .proposals-discussion-plugin .body textarea {
 .proposal .content .social {
   position: absolute;
   top: -18px;
+}
+
+#content .tag_cloud a {
+  text-decoration: none;
+}
+
+#content .statistics {
+  display: inline-block;
+}
+#content .tag_cloud {
+  float: right;
+  width: 300px;
+  box-shadow: 5px 5px 5px -2px #ddd;
+  background-color: rgb(248, 248, 248);
+  min-height: 50px;
+}
+
+.graph #proposals-time {
+  height: 150px;
+  width: 300px;
 }
