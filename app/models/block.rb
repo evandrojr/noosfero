@@ -247,9 +247,9 @@ class Block < ActiveRecord::Base
     duplicated_block
   end
 
-  def self.previews_path
+  def self.preview_path
     base_name = self.name.split('::').last.underscore
-    Dir.glob(File.join('blocks', base_name,'previews/*'))
+    File.join('blocks', base_name,'previews')
   end
 
   def self.icon_path
@@ -264,6 +264,5 @@ class Block < ActiveRecord::Base
   def self.default_preview_path
     "block_preview.png"
   end
-
 
 end

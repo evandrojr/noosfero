@@ -131,4 +131,188 @@ class BoxOrganizerHelperTest < ActionView::TestCase
     assert_match 'plugins/some/images/blocks/some_block/icon.png', display_icon(block)
   end
 
+##########################################
+
+  should 'display the default preview for block without previews images' do
+    class SomeBlock < Block; end
+    block = SomeBlock
+    @plugins = mock
+    @plugins.stubs(:fetch_first_plugin).with(:has_block?, block).returns(nil)
+
+    doc = HTML::Document.new display_previews(block)
+    assert_select doc.root, 'li' do |elements|
+      assert_match /img.* src="\/images\/block_preview.png.*"/, elements[0].to_s
+      assert_match /img.* src="\/images\/block_preview.png.*"/, elements[1].to_s
+      assert_match /img.* src="\/images\/block_preview.png.*"/, elements[2].to_s
+    end
+  end
+
+  should 'display the previews of block' do
+    class SomeBlock < Block; end
+    block = SomeBlock
+    @plugins = mock
+    @plugins.stubs(:fetch_first_plugin).with(:has_block?, block).returns(nil)
+
+    Dir.stubs(:glob).returns([])
+    base_path = File.join(Rails.root, 'public', 'images', '/blocks/some_block/previews/')
+    Dir.stubs(:glob).with(File.join(base_path, '*')).returns([File.join(base_path, 'p1.png'), File.join(base_path, 'p2.png')])
+    doc = HTML::Document.new display_previews(block)
+    assert_select doc.root, 'li' do |elements|
+      assert_match /img.* src="\/blocks\/some_block\/previews\/p1.png"/, elements[0].to_s
+      assert_match /img.* src="\/blocks\/some_block\/previews\/p2.png"/, elements[1].to_s
+    end
+  end
+
+  should 'display the plugin preview images of block' do
+    class SomeBlock < Block; end
+    block = SomeBlock
+    class SomePlugin < Noosfero::Plugin; end
+    SomePlugin.stubs(:name).returns('SomePlugin')
+    @plugins = mock
+    @plugins.stubs(:fetch_first_plugin).with(:has_block?, block).returns(SomePlugin)
+
+
+    Dir.stubs(:glob).returns([])
+    base_path = File.join(Rails.root, 'public', 'plugins/some/', 'images', '/blocks/some_block/previews/')
+    Dir.stubs(:glob).with(File.join(base_path, '*')).returns([File.join(base_path, 'p1.png'), File.join(base_path, 'p2.png')])
+    doc = HTML::Document.new display_previews(block)
+    assert_select doc.root, 'li' do |elements|
+      assert_match /img.* src="\/plugins\/some\/images\/blocks\/some_block\/previews\/p1.png"/, elements[0].to_s
+      assert_match /img.* src="\/plugins\/some\/images\/blocks\/some_block\/previews\/p2.png"/, elements[1].to_s
+    end
+
+  end
+
+  should 'display the theme previews of block' do
+    class SomeBlock < Block; end
+    block = SomeBlock
+
+    @plugins = mock
+    @plugins.stubs(:fetch_first_plugin).with(:has_block?, block).returns(nil)
+
+    @environment = mock
+    @environment.stubs(:theme).returns('some_theme')
+
+
+    Dir.stubs(:glob).returns([])
+    base_path = File.join(Rails.root, 'public', 'designs/themes/some_theme/', 'images', '/blocks/some_block/previews/')
+    Dir.stubs(:glob).with(File.join(base_path, '*')).returns([File.join(base_path, 'p1.png'), File.join(base_path, 'p2.png')])
+    doc = HTML::Document.new display_previews(block)
+    assert_select doc.root, 'li' do |elements|
+      assert_match /img.* src="\/designs\/themes\/some_theme\/images\/blocks\/some_block\/previews\/p1.png"/, elements[0].to_s
+      assert_match /img.* src="\/designs\/themes\/some_theme\/images\/blocks\/some_block\/previews\/p2.png"/, elements[1].to_s
+    end
+
+  end
+
+  should 'display the theme preview images of block instead of block preview images' do
+    class SomeBlock < Block; end
+    block = SomeBlock
+
+    @plugins = mock
+    @plugins.stubs(:fetch_first_plugin).with(:has_block?, block).returns(nil)
+
+    @environment = mock
+    @environment.stubs(:theme).returns('some_theme')
+
+    Dir.stubs(:glob).returns([])
+    base_path = File.join(Rails.root, 'public', 'designs/themes/some_theme/', 'images', '/blocks/some_block/previews/')
+    Dir.stubs(:glob).with(File.join(base_path, '*')).returns([File.join(base_path, 'p1.png'), File.join(base_path, 'p2.png')])
+
+    base_path = File.join(Rails.root, 'public', 'images', '/blocks/some_block/previews/')
+    Dir.stubs(:glob).with(File.join(base_path, '*')).returns([File.join(base_path, 'p1.png'), File.join(base_path, 'p2.png')])
+
+    doc = HTML::Document.new display_previews(block)
+    assert_select doc.root, 'li' do |elements|
+      assert_match /img.* src="\/designs\/themes\/some_theme\/images\/blocks\/some_block\/previews\/p1.png"/, elements[0].to_s
+      assert_match /img.* src="\/designs\/themes\/some_theme\/images\/blocks\/some_block\/previews\/p2.png"/, elements[1].to_s
+    end
+  end
+
+  should 'display the theme preview images of block instead of plugin preview images' do
+    class SomeBlock < Block; end
+    block = SomeBlock
+
+    class SomePlugin < Noosfero::Plugin; end
+    SomePlugin.stubs(:name).returns('SomePlugin')
+    @plugins = mock
+    @plugins.stubs(:fetch_first_plugin).with(:has_block?, block).returns(SomePlugin)
+
+    @environment = mock
+    @environment.stubs(:theme).returns('some_theme')
+
+    Dir.stubs(:glob).returns([])
+    base_path = File.join(Rails.root, 'public', 'designs/themes/some_theme/', 'images', '/blocks/some_block/previews/')
+    Dir.stubs(:glob).with(File.join(base_path, '*')).returns([File.join(base_path, 'p1.png'), File.join(base_path, 'p2.png')])
+
+    base_path = File.join(Rails.root, 'public', 'plugins/some/', 'images', '/blocks/some_block/previews/')
+    Dir.stubs(:glob).with(File.join(base_path, '*')).returns([File.join(base_path, 'p1.png'), File.join(base_path, 'p2.png')])
+
+    doc = HTML::Document.new display_previews(block)
+    assert_select doc.root, 'li' do |elements|
+      assert_match /img.* src="\/designs\/themes\/some_theme\/images\/blocks\/some_block\/previews\/p1.png"/, elements[0].to_s
+      assert_match /img.* src="\/designs\/themes\/some_theme\/images\/blocks\/some_block\/previews\/p2.png"/, elements[1].to_s
+    end
+
+  end
+
+  should 'display the theme preview images of block instead of block previews and plugin previews' do
+    class SomeBlock < Block; end
+    block = SomeBlock
+
+    class SomePlugin < Noosfero::Plugin; end
+    SomePlugin.stubs(:name).returns('SomePlugin')
+    @plugins = mock
+    @plugins.stubs(:fetch_first_plugin).with(:has_block?, block).returns(SomePlugin)
+
+
+    @environment = mock
+    @environment.stubs(:theme).returns('some_theme')
+
+    Dir.stubs(:glob).returns([])
+    base_path = File.join(Rails.root, 'public', 'designs/themes/some_theme/', 'images', '/blocks/some_block/previews/')
+    Dir.stubs(:glob).with(File.join(base_path, '*')).returns([File.join(base_path, 'p1.png'), File.join(base_path, 'p2.png')])
+
+    base_path = File.join(Rails.root, 'public', 'plugins/some/', 'images', '/blocks/some_block/previews/')
+    Dir.stubs(:glob).with(File.join(base_path, '*')).returns([File.join(base_path, 'p1.png'), File.join(base_path, 'p2.png')])
+
+    base_path = File.join(Rails.root, 'public', 'images', '/blocks/some_block/previews/')
+    Dir.stubs(:glob).with(File.join(base_path, '*')).returns([File.join(base_path, 'p1.png'), File.join(base_path, 'p2.png')])
+
+    doc = HTML::Document.new display_previews(block)
+    assert_select doc.root, 'li' do |elements|
+      assert_match /img.* src="\/designs\/themes\/some_theme\/images\/blocks\/some_block\/previews\/p1.png"/, elements[0].to_s
+      assert_match /img.* src="\/designs\/themes\/some_theme\/images\/blocks\/some_block\/previews\/p2.png"/, elements[1].to_s
+    end
+
+  end
+
+  should 'display the plugin preview images of block instead of block previews' do
+    class SomeBlock < Block; end
+    block = SomeBlock
+
+    class SomePlugin < Noosfero::Plugin; end
+    SomePlugin.stubs(:name).returns('SomePlugin')
+    @plugins = mock
+    @plugins.stubs(:fetch_first_plugin).with(:has_block?, block).returns(SomePlugin)
+
+    Dir.stubs(:glob).returns([])
+    base_path = File.join(Rails.root, 'public', 'designs/themes/some_theme/', 'images', '/blocks/some_block/previews/')
+    Dir.stubs(:glob).with(File.join(base_path, '*')).returns([File.join(base_path, 'p1.png'), File.join(base_path, 'p2.png')])
+
+    base_path = File.join(Rails.root, 'public', 'plugins/some/', 'images', '/blocks/some_block/previews/')
+    Dir.stubs(:glob).with(File.join(base_path, '*')).returns([File.join(base_path, 'p1.png'), File.join(base_path, 'p2.png')])
+
+    base_path = File.join(Rails.root, 'public', 'images', '/blocks/some_block/previews/')
+    Dir.stubs(:glob).with(File.join(base_path, '*')).returns([File.join(base_path, 'p1.png'), File.join(base_path, 'p2.png')])
+
+    doc = HTML::Document.new display_previews(block)
+    assert_select doc.root, 'li' do |elements|
+      assert_match /img.* src="\/plugins\/some\/images\/blocks\/some_block\/previews\/p1.png"/, elements[0].to_s
+      assert_match /img.* src="\/plugins\/some\/images\/blocks\/some_block\/previews\/p2.png"/, elements[1].to_s
+    end
+
+  end
+
+
 end

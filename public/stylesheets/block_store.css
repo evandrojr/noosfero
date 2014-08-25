@@ -82,16 +82,25 @@ r,
 }
 
 #block-info-container #block-info-header {
-  display: inline-block;
+  float: left;
+}
+
+#block-info-container #block-info-header .block-type-icon{
   float: left;
 }
 
 #block-info-container #block-info-header h1 {
-  display: inline-block;
+  float: left;
   margin: 0;
-	font-weight: normal;
-	font-family: "Arial Black", Liberation Sans, Arial, sans-serif;
+  font-weight: normal;
+  font-family: "Arial Black", Liberation Sans, Arial, sans-serif;
+  margin-left: 5px;
 }
+
+#block-info-container #block-info-header p{
+  margin-left: 55px;
+}
+
 
 #block-info-container h2 {
   margin: 0;
@@ -110,6 +119,19 @@ r,
   padding-top: 15px;
 }
 
+#block-info-images ul{
+  margin: 0px;
+  padding: 0px;
+}
+#block-info-images li{
+  list-style: none;
+  display: inline;
+
+}
+
+
 #block-info-description {
   margin-top: 20px;
 }
+
+

@@ -23,11 +23,40 @@ module BoxOrganizerHelper
   end
 
   def display_previews(block)
-#  def self.previews_path
-#    previews = Dir.glob(File.join(images_filesystem_path, 'previews/*')).map do |path|
-#      File.join(images_base_url_path, 'previews', File.basename(path))
+    images_path = nil
+    plugin = @plugins.fetch_first_plugin(:has_block?, block)
+
+    theme = Theme.new(environment.theme) # remove this
+
+#    images_path = Dir.glob(File.join(theme.public_path, 'images', block.previews_path, '*'))
+
+
+    images_path = Dir.glob(File.join(theme.filesystem_path, 'images', block.preview_path, '*'))
+    images_path = images_path.map{|path| path.gsub(theme.filesystem_path, theme.public_path) } unless images_path.empty?
+
+    images_path = Dir.glob(File.join(Rails.root, 'public', plugin.public_path, 'images', block.preview_path, '*')) if plugin && images_path.empty?
+    images_path = images_path.map{|path| path.gsub(File.join(Rails.root, 'public'), '') } unless images_path.empty?
+
+    images_path = Dir.glob(File.join(Rails.root, 'public', 'images', block.preview_path, '*')) if images_path.empty?
+    images_path = images_path.map{|path| path.gsub(File.join(Rails.root, 'public', 'images'), '') } unless images_path.empty?
+
+    images_path = 1.upto(3).map{block.default_preview_path} if images_path.empty?
+
+#    if File.exists?(File.join(theme.filesystem_path, 'images', block.previews_path))
+#      images_path = Dir.glob(File.join(theme.public_path, 'images', block.previews_path, '*'))
+#    elsif plugin && File.exists?(File.join(Rails.root, 'public', plugin.public_path, 'images', block.previews_path))
+#      images_path = Dir.glob(File.join('/', plugin.public_path, 'images', block.previews_path, '*'))
+#    elsif File.exists?(File.join(Rails.root, 'public', 'images', block.previews_path))
+#      images_path = block.previews_path
+#    else
+#      images_path = block.default_previews_path
 #    end
-    ''
+
+    content_tag(:ul,
+      images_path.map do |preview|
+	content_tag(:li, image_tag(preview, height: '240', width: '384', alt: ''))
+      end.join("\n")
+    )
   end
 
   def icon_selector(icon = 'no-ico')
