@@ -294,69 +294,29 @@ class BlockTest < ActiveSupport::TestCase
 
   should 'previews_path return the array of preview images' do
     class NewBlock < Block; end
-    Dir.stubs(:glob).returns(['/path/1', 'path/2']) 
-    expected = ['blocks/block_test/new_block/previews/1', 'blocks/block_test/new_block/previews/2']
+    expected = ['path/1', 'path/2']
+    Dir.expects(:glob).with('blocks/new_block/previews/*').returns(expected) 
     assert_equivalent expected, NewBlock.previews_path
   end
 
   should 'return the icon block path' do
     class NewBlock < Block; end
-    File.expects(:exists?).returns(true) 
-    expected_path = 'path/icon.png'
-    File.stubs(:join).returns(expected_path) 
-    assert_equal expected_path, NewBlock.icon_path
+    assert_equal 'blocks/new_block/icon.png', NewBlock.icon_path
   end
 
-  should 'return the icon block path for plugin blocks' do
-    module SomeContext class SomeContext::CustomBlock1 < Block; end;;end
-#    class SomeContext::CustomBlock2 < Block; end;
-#BreadcrumbsPlugin::ContentBreadcrumbsBlock
-    class Plugin1 < Noosfero::Plugin
-      def self.extra_blocks
-        {
-          CustomBlock1 => {},
-          CustomBlock2 => {}
-        }
-      end
-    end
-
-#Block.stubs(:images_filesystem_path).returns('/path')
-#CustomBlock1.stubs(:images_filesystem_path).returns('/path')
-File.stubs(:exists?).with('/home/81665687568/Owncloud/projetos/noosfero/public/images/blocks/block_test/custom_block1/icon.pn').returns(true)
-#    File.exists?(File.join(images_filesystem_path, 'icon.png')) ? icon_path : default_icon_path
-
-
-#  def self.images_filesystem_path
-#    Rails.root.join('public', 'images', images_base_url_path)
-#  end
-#  
-#  def self.images_base_url_path
-#    File.join('blocks', self.name.underscore) 
-#  end
-  
-
-    Environment.destroy_all 
-    e = fast_create(Environment, :is_default => true)
-
-#    Noosfero::Plugin.stubs(:all).returns(['ProfileTest::Plugin1', 'ProfileTest::Plugin2'])
-    e.enable_plugin(Plugin1)
-
-#    class NewBlock < Block; end
-#    Dir.stubs(:glob).returns(['/path/1', 'path/2']) 
-#    expected = ['blocks/block_test/new_block/previews/1', 'blocks/block_test/new_block/previews/2']
-#    class NewBlock < Block; end
-#    File.expects(:exists?).returns(true) 
-#    expected_path = 'path/icon.png'
-#    File.stubs(:join).returns(expected_path) 
-#/plugins/container_block/images/handle_e.png
-    assert_equal '', SomeContext::CustomBlock1.icon_path
+  should 'return the icon block path for blocks inside modules' do
+    module SomeModule class NewBlock < Block; end; end
+    assert_equal 'blocks/new_block/icon.png', SomeModule::NewBlock.icon_path
   end
-
 
   should 'return the default icon for blocks without icon' do
     class NewBlock < Block; end
-    File.expects(:exists?).returns(false) 
-    assert_equal 'icon_block.png', NewBlock.icon_path
+    assert_equal 'icon_block.png', NewBlock.default_icon_path
+  end
+
+  should 'return the default preview path for blocks without preview images' do
+    class NewBlock < Block; end
+    assert_equal 'block_preview.png', NewBlock.default_preview_path
   end
 
   should 'previews_path return an empty array if there is no preview image' do

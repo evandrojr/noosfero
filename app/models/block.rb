@@ -132,26 +132,6 @@ class Block < ActiveRecord::Base
     self.name.gsub('Block','')
   end
 
-  #FIXME make this test
-  def self.default_preview
-    "/images/block_preview.png"
-  end
-
-#  #FIXME remove this code
-#  def self.previews_path
-#    previews = Dir.glob(File.join(images_filesystem_path, 'previews/*')).map do |path|
-#      File.join(images_base_url_path, 'previews', File.basename(path))
-#    end
-#  end
-
-#  #FIXME remove this code
-#  def self.icon_path
-#    icon_path = File.join(images_base_url_path, 'icon.png')
-#puts File.join(images_filesystem_path, 'icon.png').inspect
-##"/plugins/container_block/images/handle_e.png"
-#    File.exists?(File.join(images_filesystem_path, 'icon.png')) ? icon_path : default_icon_path
-#  end
-
   # Returns the content to be used for this block.
   #
   # This method can return several types of objects:
@@ -267,21 +247,23 @@ class Block < ActiveRecord::Base
     duplicated_block
   end
 
-  #FIXME make this test
   def self.previews_path
     base_name = self.name.split('::').last.underscore
     Dir.glob(File.join('blocks', base_name,'previews/*'))
   end
 
-  #FIXME make this test
   def self.icon_path
     basename = self.name.split('::').last.underscore
     File.join('blocks', basename, 'icon.png') 
   end
 
-  #FIXME make this test
   def self.default_icon_path
     'icon_block.png'
   end
+
+  def self.default_preview_path
+    "block_preview.png"
+  end
+
 
 end
