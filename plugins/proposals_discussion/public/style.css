@@ -185,3 +185,8 @@ form .proposals-discussion-plugin .body textarea {
   background-color: rgb(248, 248, 248);
   min-height: 50px;
 }
+
+.graph #proposals-time {
+  height: 150px;
+  width: 300px;
+}
