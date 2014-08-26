@@ -17,24 +17,17 @@ class FeaturesController < AdminController
 
   def manage_fields
     @person_fields = Person.fields
-    @custom_person_fields = (@environment.settings[:custom_person_fields] || {}).keys.reject {|key| ! (key =~ /^custom_field/) }
-
     @enterprise_fields = Enterprise.fields
-    @custom_enterprise_fields = (@environment.settings[:custom_enterprise_fields] || {}).keys.reject {|key| ! (key =~ /^custom_field/) }
-
     @community_fields = Community.fields
-    @custom_community_fields = (@environment.settings[:custom_community_fields] || {}).keys.reject {|key| ! (key =~ /^custom_field/) }
   end
 
   def manage_person_fields
     environment.custom_person_fields = params[:person_fields]
-
     if environment.save!
       session[:notice] = _('Person fields updated successfully.')
     else
       flash[:error] = _('Person fields not updated successfully.')
     end
-
     redirect_to :action => 'manage_fields'
   end
 

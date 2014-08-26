@@ -30,22 +30,3 @@
   <%= optional_field(profile, 'foundation_year', f.text_field(:foundation_year)) %>
 <% end %>
 <%= javascript_include_tag('city_state_validation') %>
-
-<hr />
-
-<% if profile.community? %>
-
-  <% @environment.custom_community_fields_customs.each { |key| %>
-    <% #raise @environment.custom_community_fields_customs.inspect %>
-    <% optional_field(profile, key) do %>
-      <div class="formfieldline">
-        <%= label_tag environment.custom_community_field_name(key), nil, class: 'formlabel' %>
-        <div class="formfield type-select">
-          <%= text_field_tag("profile_data[custom_fields][#{key}]", profile.custom_field_value(key)) %>
-        </div>
-      </div>
-    <% end %>
-  <% } %>
-<% end %>
-
-<hr />

@@ -1,4 +1,3 @@
-/**
 function update_active(name_active, name_required, name_signup) {
   var required = jQuery("input[name='" + name_required + "']")[1]
   var signup = jQuery("input[name='" + name_signup + "']")[1]
@@ -7,16 +6,15 @@ function update_active(name_active, name_required, name_signup) {
   if(required.checked || signup.checked)
     active.checked = true
 }
-function active_action(obj_active, name_required, name_signup) {
-  console.log( 'teste1' );
-  //var required = jQuery("input[name='" + name_required + "']")[0]
-  //var signup = jQuery("input[name='" + name_signup + "']")[0]
 
-  //required.disabled = signup.disabled = !obj_active.checked
+function active_action(obj_active, name_required, name_signup) {
+  var required = jQuery("input[name='" + name_required + "']")[0]
+  var signup = jQuery("input[name='" + name_signup + "']")[0]
+
+  required.disabled = signup.disabled = !obj_active.checked
 }
 
 function required_action(name_active, name_required, name_signup) {
-  console.log( 'teste' );
   var obj_required = jQuery("input[name='" + name_required + "']")[1]
 
   if(obj_required.checked) {
@@ -37,6 +35,7 @@ function signup_action(name_active, name_required, name_signup) {
 
   update_active(name_active, name_required, name_signup)
 }
+
 
 jQuery(document).ready(function(){
   function check_fields(check, table_id, start) {
@@ -82,71 +81,3 @@ jQuery(document).ready(function(){
     }
   })
 })
-**/
-
-/** ##################################################################### **/
-
-function send_ajax(source_url) {
-  jQuery(".link-address").autocomplete({
-    source : function(request, response){
-      jQuery.ajax({
-        type: "GET",
-        url: source_url,
-        data: {query: request.term},
-        success: function(result){
-          response(result);
-        },
-        error: function(ajax, stat, errorThrown) {
-          console.log('Link not found : ' + errorThrown);
-        }
-      });
-    },
-
-    minLength: 3
-  });
-}
-
-function new_field_action(){
-  send_ajax(jQuery("#page_url").val());
-
-  jQuery(".delete-link-list-row").click(function(){
-    jQuery(this).parent().parent().remove();
-    return false;
-  });
-
-  jQuery(document).scrollTop(jQuery('#dropable-link-list').scrollTop());
-}
-
-function remove_custom_field(element) {
-  jQuery(element).parent().parent().remove();
-  //field = jQuery(element).parent().parent();
-  //console.log( field );
-  return false;
-}
-
-function add_new_field(profile_type) {
-
-  var custom_field_counter = jQuery('#custom-fields-container').find("div.field-with-privacy-selector").length + 1;
-
-  var row = '<div class="field-with-privacy-selector">' +
-              '<div class="formfieldline">' +
-                '<input id="profile_data_custom_fields_custom_field_' + custom_field_counter + '_label" name="profile_data[custom_fields][custom_field_' + custom_field_counter + '][label]" value="label" style="display:block" />' +
-                '<div class="formfield type-text" style="display: inline-block;">' +
-                  '<input id="profile_data_custom_fields_custom_field_' + custom_field_counter + '_value" name="profile_data[custom_fields][custom_field_' + custom_field_counter + '][value]" size="30" type="text">' +
-                '</div>' +
-                '<a href="#" class="button icon-delete delete-link-list-row" title="Delete" onclick="return remove_custom_field(this);"><span>Delete</span></a> ' +
-              '</div>' +
-            '</div>';
-
-  jQuery('#custom-fields-container').append(row);
-
-}
-
-jQuery(document).ready(function(){
-  new_field_action();
-
-  //jQuery("#dropable-link-list").sortable({
-  //  revert: true,
-  //  axis: "y"
-  //});
-});

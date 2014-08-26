@@ -69,27 +69,79 @@
 
 <h2><%= _('Custom fields') %></h2>
 
-<%= javascript_include_tag "manage-fields.js" %>
+<div id="custom-fields-container">
 
-<div id="custom-fields-container" style="border:1px solid red; margin-bottom: 10px;">
-<% @person.custom_fields.each { |key,value| %>
-  <div class="field-with-privacy-selector">
-    <div class="formfieldline">
-      <%= text_field_tag( "profile_data[custom_fields][#{key}][label]", value[:label], :style => "display:block") %>
-      <div class="formfield type-text" style="display: inline-block;">
-        <%= text_field_tag( "profile_data[custom_fields][#{key}][value]", "", :size => 30 ) %>
-      </div><a href="#" class="button icon-delete" title="Delete" onclick="return remove_custom_field(this);">
-        <span>Delete</span>
-      </a>
-    </div>
-  </div>
-<% } %>
-</div>
+  <% if @person.is_template? %>
 
-<% if @person.is_template? %>
+  <%= javascript_include_tag "manage-custom-fields.js" %>
+
+  <table border="0">
+    <tr>
+      <th style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0;"><%= _('Field name') %></th>
+      <th style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0;"><%= _('Active') %></th>
+      <th style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0;"><%= _('Required') %></th>
+      <th style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0;"><%= _('Display on signup?') %></th>
+      <th style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0;">&nbsp;</th>
+    </tr>
+
+    <% @person.custom_fields.each { |key,value| %>
+        <tr>
+          <td>
+            <%= text_field_tag( "profile_data[custom_fields][#{key}][label]", value[:label], :style => "display:block") %>
+          </td>
+          <td align="center">
+            <%= check_box_tag "profile_data[custom_fields][#{key}][active]", value['active'], value['active'], :onclick => "active_action(this, 'profile_data[custom_fields][#{key}][required]', 'profile_data[custom_fields][#{key}][signup]')" %>
+          </td>
+          <td align="center">
+            <%= check_box_tag "profile_data[custom_fields][#{key}][required]", value['required'], value['required'], :onclick => "required_action('profile_data[custom_fields][#{key}][active]','profile_data[custom_fields][#{key}][required]', 'profile_data[custom_fields][#{key}][signup]')" %>
+          </td>
+          <td align="center">
+            <%= check_box_tag "profile_data[custom_fields][#{key}][signup]", value['signup'], value['signup'], :onclick => "signup_action('profile_data[custom_fields][#{key}][active]','profile_data[custom_fields][#{key}][required]', 'profile_data[custom_fields][#{key}][signup]')" %>
+          </td>
+          <td align="center">
+            <%= link_to content_tag(:span, _('Delete')), '#', onclick: "return remove_custom_field(this);", title: "Delete", class: "button icon-delete" %>
+          </td>
+        </tr>
+    <% } %>
+
+  </table>
+
   <span>
     <%= link_to_function(_('Add field'), "add_new_field('person');", :class => 'button icon-add with-text') %>
   </span>
-<% end %>
 
-<br /><br />
+  <% else %>
+
+    <% Profile.find(@person.template_id).custom_fields.each { |key,value| %>
+
+      <% if value['active'] %>
+      <div class="field-with-privacy-selector">
+        <div class="formfieldline">
+
+          <span style="display: block;">
+            <% if value['required'] %>
+              <%= label_tag value[:label] + ' (*)', nil, class: 'required' %>
+            <% else %>
+              <%= label_tag value[:label] %>
+            <% end %>
+          </span>
+
+          <div class="formfield type-text" style="display: inline-block;">
+            <%= text_field_tag( "profile_data[custom_fields][#{key}][value]", @person.custom_fields[key][:value], :size => 30 ) %>
+          </div>
+
+        </div>
+
+        <div class="field-privacy-selector">
+          <input id="checkbox-44" name="" title="This field must be public" type="checkbox" value="">
+          <label for="checkbox-44">Public</label>
+        </div>
+
+      </div>
+      <% end %>
+
+    <% } %>
+
+  <% end %>
+
+</div>

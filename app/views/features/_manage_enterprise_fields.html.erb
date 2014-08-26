@@ -12,13 +12,13 @@
     <td>
       <%= _("Check/Uncheck All")%>
     </td>
-    <td align="center">
+    <td>
       <input type="checkbox" id="enterprise_active" />
     </td>
-    <td align="center">
+    <td>
       <input type="checkbox" id="enterprise_required" />
     </td>
-    <td align="center">
+    <td>
       <input type="checkbox" id="enterprise_signup" />
     </td>
   </tr>
@@ -27,59 +27,31 @@
   <tr>
 
     <td><label for="enterprise_fields[<%= field %>][active]"><%= _(field.humanize) %></label></td>
-    <td align="center">
+    <td>
       <%= hidden_field_tag  "enterprise_fields[#{field}][active]", false %>
       <%= check_box_tag "enterprise_fields[#{field}][active]", true, environment.custom_enterprise_field(field, 'active'), :onclick => "active_action(this, 'enterprise_fields[#{field}][required]', 'enterprise_fields[#{field}][signup]')" %>
     </td>
-    <td align="center">
+    <td>
       <%= hidden_field_tag  "enterprise_fields[#{field}][required]", false %>
       <%= check_box_tag "enterprise_fields[#{field}][required]", true, environment.custom_enterprise_field(field, 'required'), :onclick => "required_action('enterprise_fields[#{field}][active]','enterprise_fields[#{field}][required]', 'enterprise_fields[#{field}][signup]')" %>
     </td>
-    <td align="center">
+    <td>
       <%= hidden_field_tag  "enterprise_fields[#{field}][signup]", false %>
       <%= check_box_tag "enterprise_fields[#{field}][signup]", true, environment.custom_enterprise_field(field, 'signup'), :onclick => "signup_action('enterprise_fields[#{field}][active]','enterprise_fields[#{field}][required]', 'enterprise_fields[#{field}][signup]')" %>
     </td>
 
   </tr>
   <% end %>
-
-  <% @custom_enterprise_fields.each do |field| %>
-  <tr>
-    <td>
-      <%= text_field_tag "enterprise_fields[#{field}][name]", environment.custom_enterprise_field_name(field) %>
-    </td>
-    <td align="center">
-      <%= hidden_field_tag  "enterprise_fields[#{field}][active]", false %>
-      <%= check_box_tag "enterprise_fields[#{field}][active]", true, environment.custom_enterprise_field(field, 'active'), :onclick => "active_action(this, 'enterprise_fields[#{field}][required]', 'enterprise_fields[#{field}][signup]')" %>
-    </td>
-    <td align="center">
-      <%= hidden_field_tag  "enterprise_fields[#{field}][required]", false %>
-      <%= check_box_tag "enterprise_fields[#{field}][required]", true, environment.custom_enterprise_field(field, 'required'), :onclick => "required_action('enterprise_fields[#{field}][active]','enterprise_fields[#{field}][required]', 'enterprise_fields[#{field}][signup]')" %>
-    </td>
-    <td align="center">
-      <%= hidden_field_tag  "enterprise_fields[#{field}][signup]", false %>
-      <%= check_box_tag "enterprise_fields[#{field}][signup]", true, environment.custom_enterprise_field(field, 'signup'), :onclick => "required_action('enterprise_fields[#{field}][active]','enterprise_fields[#{field}][required]', 'enterprise_fields[#{field}][signup]')" %>
-    </td>
-    <td>
-      <a href="#" class="button icon-delete delete-link-list-row" title="Delete" onclick="return remove_custom_field(this);"><span>Delete</span></a>
-    </td>
-  </tr>
-  <% end %>
-
 </table>
 
-<br />
-
-<%= link_to_function(_('Add field'), "add_new_field('enterprise');", :class => 'button icon-add with-text') %>
-
 <script type='text/javascript'>
-  //var trs = jQuery('#enterprise_fields_conf tr');
-  //var tr, td2;
-  //for ( var i=2; tr=trs[i]; i++ ) {
-  //  if ( td2 = tr.getElementsByTagName('td')[1] ) {
-  //    td2.getElementsByTagName('input')[1].onclick();
-  //  }
-  //}
+  var trs = jQuery('#enterprise_fields_conf tr');
+  var tr, td2;
+  for ( var i=2; tr=trs[i]; i++ ) {
+    if ( td2 = tr.getElementsByTagName('td')[1] ) {
+      td2.getElementsByTagName('input')[1].onclick();
+    }
+  }
 </script>
 
 <div>

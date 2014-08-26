@@ -11,9 +11,6 @@ class ProfileEditorController < MyProfileController
 
   # edits the profile info (posts back)
   def edit
-
-    #raise params.inspect
-
     @profile_data = profile
     @possible_domains = profile.possible_domains
     if request.post?

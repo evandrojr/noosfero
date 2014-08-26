@@ -1,7 +1,7 @@
 # Represents any organization of the system
 class Organization < Profile
 
-  attr_accessible :moderated_articles, :foundation_year, :contact_person, :acronym, :legal_form, :economic_activity, :management_information, :cnpj, :display_name, :enable_contact_us #, :custom_fields
+  attr_accessible :moderated_articles, :foundation_year, :contact_person, :acronym, :legal_form, :economic_activity, :management_information, :cnpj, :display_name, :enable_contact_us
 
   SEARCH_FILTERS += %w[
     more_popular
@@ -12,12 +12,6 @@ class Organization < Profile
   def closed?
     closed
   end
-
-  #settings_items :custom_fields
-
-  #def custom_field_value(field)
-  #  self.custom_fields[field]
-  #end
 
   before_save do |organization|
     organization.closed = true if !organization.public_profile?

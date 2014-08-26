@@ -6572,12 +6572,12 @@ li.profile-activity-item.upload_image .activity-gallery-images-count-1 img {
 }
 
 .controller-profile_editor #profile-data {
-  display: table;
+  /*display: table;*/
   width: auto;
 }
 
 .field-with-privacy-selector {
-  display: table-row;
+  /*display: table-row;*/
 }
 
 .field-with-privacy-selector:hover {
@@ -6585,14 +6585,28 @@ li.profile-activity-item.upload_image .activity-gallery-images-count-1 img {
 }
 
 .controller-profile_editor #profile-data .field-with-privacy-selector .formfieldline {
-  width: auto;
+  /*width: auto;*/
+  display: inline-block;
 }
 
 .field-privacy-selector {
-  display: table-cell;
+  /*display: table-cell;*/
+  display: inline-block;
   vertical-align: middle;
   text-align: center;
   width: 100px;
+  float: right;
+  position: relative;
+  top: 15px;
+}
+
+#custom-fields-container {
+  margin-bottom: 25px;
+}
+
+#custom-fields-container label.required {
+  font-weight: bold;
+  color: #c00;
 }
 
 #profile_change_picture {
