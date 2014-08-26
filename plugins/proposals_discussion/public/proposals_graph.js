@@ -2,14 +2,8 @@ function load_proposals_graph(data, comments_data, proposals_label, comments_lab
 
 jQuery(document).ready(function($) {
   container = $('#proposals-time')[0];
-  console.log(comments_data);
 
-  var
-    d1 = [], d2 = [],
-    start = new Date("2009/01/01 01:00").getTime(),
-    options,
-    graph,
-    i, x, o;
+  var d1 = [], d2 = [], o;
 
   data = jQuery.parseJSON(data);
   for (var key in data) {
@@ -21,7 +15,7 @@ jQuery(document).ready(function($) {
      d2.push([new Date(key).getTime(), comments_data[key]]);
   }
 
-  options = {
+  var options = {
     xaxis : {
       mode : 'time',
       labelsAngle : 45,
@@ -33,7 +27,6 @@ jQuery(document).ready(function($) {
     HtmlText : false,
   };
 
-  // Draw graph with default options, overwriting with passed options
   function drawGraph (opts) {
     // Clone the options, so the 'options' variable always keeps intact.
     o = Flotr._.extend(Flotr._.clone(options), opts || {});
@@ -48,7 +41,7 @@ jQuery(document).ready(function($) {
     );
   }
 
-  graph = drawGraph();
+  var graph = drawGraph();
 
   Flotr.EventAdapter.observe(container, 'flotr:select', function(area){
     // Draw selected area
