@@ -6609,6 +6609,16 @@ li.profile-activity-item.upload_image .activity-gallery-images-count-1 img {
   color: #c00;
 }
 
+#custom-fields-container table {
+  margin-bottom: 5px;
+  border-bottom: 1px solid #c0c0c0;
+}
+
+#custom-fields-container th {
+  border-top: 1px solid #c0c0c0;
+  border-bottom: 1px solid #c0c0c0;
+}
+
 #profile_change_picture {
   clear: both;
   margin-top: 20px;

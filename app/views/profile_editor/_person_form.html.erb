@@ -67,21 +67,21 @@
 
 <br />
 
-<h2><%= _('Custom fields') %></h2>
-
 <div id="custom-fields-container">
+
+  <h2><%= _('Custom fields') %></h2>
 
   <% if @person.is_template? %>
 
   <%= javascript_include_tag "manage-custom-fields.js" %>
 
-  <table border="0">
+  <table border="0" style="display: none;">
     <tr>
-      <th style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0;"><%= _('Field name') %></th>
-      <th style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0;"><%= _('Active') %></th>
-      <th style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0;"><%= _('Required') %></th>
-      <th style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0;"><%= _('Display on signup?') %></th>
-      <th style="border-top: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0;">&nbsp;</th>
+      <th><%= _('Field name') %></th>
+      <th><%= _('Active') %></th>
+      <th><%= _('Required') %></th>
+      <th><%= _('Display on signup?') %></th>
+      <th>&nbsp;</th>
     </tr>
 
     <% @person.custom_fields.each { |key,value| %>
@@ -105,6 +105,12 @@
     <% } %>
 
   </table>
+
+  <% if @person.custom_fields.length > 0 %>
+    <script>
+      jQuery('#custom-fields-container table').css('display', 'table');
+    </script>
+  <% end %>
 
   <span>
     <%= link_to_function(_('Add field'), "add_new_field('person');", :class => 'button icon-add with-text') %>

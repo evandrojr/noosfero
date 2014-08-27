@@ -36,8 +36,9 @@ function signup_action(name_active, name_required, name_signup) {
 
 function remove_custom_field(element) {
   jQuery(element).parent().parent().remove();
-  //field = jQuery(element).parent().parent();
-  //console.log( field );
+  if ( (jQuery('#custom-fields-container tr').length) == 1 ) {
+    jQuery('#custom-fields-container table').hide();
+  }
   return false;
 }
 
@@ -45,12 +46,14 @@ function add_new_field() {
   var next_custom_field_id;
   var re = /\d+/g;
 
-  if ( (jQuery('#custom-fields-container tr').length - 1) == 0 ) {
+  if ( (jQuery('#custom-fields-container tr').length) == 1 ) {
     next_custom_field_id = 1;
   }
   else {
     next_custom_field_id = parseInt(re.exec( jQuery('#custom-fields-container input').last().attr('id') )[0]) + 1;
   }
+
+  jQuery('#custom-fields-container table').show();
 
   new_custom_field = '' +
                     '<tr>' +
@@ -72,7 +75,6 @@ function add_new_field() {
                     '</tr>'
 
   jQuery('#custom-fields-container tbody').append(new_custom_field);
-
 }
 
 /**
