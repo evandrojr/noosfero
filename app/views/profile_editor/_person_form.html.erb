@@ -133,15 +133,13 @@
           </span>
 
           <div class="formfield type-text" style="display: inline-block;">
-            <%= text_field_tag( "profile_data[custom_fields][#{key}][value]", @person.custom_fields[key][:value], :size => 30 ) %>
+            <% valor = @person.custom_fields[key] ? @person.custom_fields[key][value] : "" %>
+            <%= text_field_tag( "profile_data[custom_fields][#{key}][value]", valor, :size => 30 ) %>
           </div>
 
         </div>
 
-        <div class="field-privacy-selector">
-          <input id="checkbox-44" name="" title="This field must be public" type="checkbox" value="">
-          <label for="checkbox-44">Public</label>
-        </div>
+        <%= profile_field_privacy_selector @person, key %>
 
       </div>
       <% end %>
