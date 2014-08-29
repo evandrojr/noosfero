@@ -11,11 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-<<<<<<< HEAD
-ActiveRecord::Schema.define(:version => 20140807134625) do
-=======
-ActiveRecord::Schema.define(:version => 20140808185510) do
->>>>>>> rails3
+ActiveRecord::Schema.define(:version => 20140827191326) do
 
   create_table "abuse_reports", :force => true do |t|
     t.integer  "reporter_id"
