@@ -117,6 +117,7 @@
             data.custom_fields.each(function(field) {
               html = '<div class="formfieldline">' +
                            '<label class="formlabel" for="profile_data_custom_fields_{#CUSTOM_FIELD_ID#}">{#CUSTOM_FIELD_NAME#}</label>' +
+                           '<input type="hidden" name="profile_data[custom_fields][{#CUSTOM_FIELD_ID#}[required]" id="profile_data_custom_fields_{#CUSTOM_FIELD_ID#}_required" value="on" />' +
                            '<input type="hidden" name="profile_data[custom_fields][{#CUSTOM_FIELD_ID#}][label]" id="profile_data_custom_fields_{#CUSTOM_FIELD_ID#}_label" value="{#CUSTOM_FIELD_NAME#}" />' +
                            '<div class="formfield type-text">' +
                               '<input type="text" name="profile_data[custom_fields][{#CUSTOM_FIELD_ID#}][value]" id="profile_data_custom_fields_{#CUSTOM_FIELD_ID#}_value" />' +
