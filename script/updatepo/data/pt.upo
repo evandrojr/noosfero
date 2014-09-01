@@ -22,3 +22,8 @@ msgid "Notification %s"# msgstr "Notificações %s"
 msgid "Notification settings"# msgstr "Configurações das notificações"
 msgid "Notifications"# msgstr "Notificações"
 msgid "Number of Comments: "# msgstr "Número de comentários: "
+msgid "Number of Participants: "# msgstr "Número de Participantes: "
+msgid "Number of Proposals: "# msgstr "Número de Propostas: 
+msgid "Oldest first"# msgstr "Mais antigos primeiro"
+msgid "Pairwise password"# msgstr "Senha do pairwise"
+msgid "Pairwise settings"# msgstr "Configurações do paiwise"
