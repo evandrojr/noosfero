@@ -1,38 +1,47 @@
 <div class="comments">
-  <div class="comment_paragraph" id="comment_paragraph_<%= paragraph_id %>" >
-    <%= inner_html %>
-  </div>
-  <div align="center">
-    <%=
-      url = { :profile => profile_identifier, :controller => 'comment_paragraph_plugin_profile', :action => 'view_comments', :paragraph_id => paragraph_id, :article_id => article_id}
-      link_to_remote(
-      image_tag("/plugins/comment_paragraph/images/comments.gif"),
-      {
-        :url => url,
-        :method => :post,
-        :condition => "!toggleParagraph(#{paragraph_id})",
-        :complete => "loadCompleted(#{paragraph_id})"
-      },
-      {
-        :id => "link_to_ajax_comments_#{paragraph_id}",
-        :'data-url' => url_for(url)  
-      }
-    )%>
-    <!-- FIXME: css file -->
-    <div  align="center" id="comments_paragraph_count_<%= paragraph_id %>" style="vertical-align: middle; padding-left: 3px; padding-right: 5px; color: #5AC1FC">
-      <span id="comment-count-<%= paragraph_id %>" class='comment-count'>
-        <%= count %>
-      </span>
-    </div>
-  </div>
-  <div class="comment-paragraph-loading-<%= paragraph_id %>"/>
-  <div class="comments_list_toggle_paragraph_<%= paragraph_id %>" style="display:none">
-    <div class="article-comments-list" id="comments_list_paragraph_<%= paragraph_id %>">
-    </div>
-    <div class ="article-comments-list-more" id="comments_list_paragraph_<%= paragraph_id %>_more">
-    </div>
-    <div id="page-comment-form-<%= paragraph_id %>" class='post_comment_box closed'>
-      <%= render :partial => 'comment/comment_form', :locals => {:comment => Comment.new, :display_link => true, :cancel_triggers_hide => true, :paragraph_id => paragraph_id}%>
-    </div>
-  </div>
-</div>
+  <table border="1">
+  <tr>
+    <td width="90%">
+      <div class="comment_paragraph" id="comment_paragraph_<%= paragraph_id %>" >
+        <%= inner_html %>
+      </div>
+    </td>
+      <td>
+        <div  align="center" class="side-comments-counter" id="side_comments_counter_<%= paragraph_id %>"  data-paragraph="<%= paragraph_id %>" style="vertical-align: middle; padding-left: 3px; padding-right: 5px; color: #5AC1FC">
+          <span id="comment-count-<%= paragraph_id %>" class='comment-count'>
+            <%= count %>
+          </span>
+        </div>
+      </td>
+      <td valign="top">
+        <div align="center">
+          <%=
+            url = { :profile => profile_identifier, :controller => 'comment_paragraph_plugin_profile', :action => 'view_comments', :paragraph_id => paragraph_id, :article_id => article_id}
+            link_to_remote(
+            image_tag("/plugins/comment_paragraph/images/comments.gif"),
+            {
+              :url => url,
+              :method => :post,
+              :condition => "!toggleParagraph(#{paragraph_id})",
+              :complete => "loadCompleted(#{paragraph_id})"
+            },
+            {
+              :id => "link_to_ajax_comments_#{paragraph_id}",
+              :'data-url' => url_for(url)  
+            }
+          )%>
+        </div>
+          <div class="side-comment" id="side_comment_<%= paragraph_id %>" data-paragraph="<%= paragraph_id %>" style="display:none">
+            <div class="comment-paragraph-loading-<%= paragraph_id %>" style="position: absolute;">
+              <div class="comments_list_toggle_paragraph_<%= paragraph_id %>" >
+                <div class="article-comments-list" id="comments_list_paragraph_<%= paragraph_id %>"></div>
+                <div class ="article-comments-list-more" id="comments_list_paragraph_<%= paragraph_id %>_more"></div>
+                <div id="page-comment-form-<%= paragraph_id %>" class='post_comment_box closed'>
+                  <%= render :partial => 'comment/comment_form', :locals => {:comment => Comment.new, :display_link => true, :cancel_triggers_hide => true, :paragraph_id => paragraph_id}%>
+                </div>
+              </div>
+            </div>
+          </div>  
+      </td>
+    </tr>
+  </table>
