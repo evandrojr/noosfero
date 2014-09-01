@@ -32,7 +32,7 @@
         <div>
           <%= display_icon(block) %>
         </div>
-        <span><%= _(block.short_description) %></span>
+        <span><%= _(block.pretty_name) %></span>
       </div>
 
       <%= draggable_element("block-#{block.name}", :revert => true) %>
