@@ -1,0 +1,76 @@
+#!/usr/bin/env ruby
+require File.dirname(__FILE__) + '/../../config/environment'
+
+orig_po_filepath = File.join(Rails.root,'po', 'pt', 'noosfero.po')
+pt_file = File.open(orig_po_filepath)
+
+tmp_dir = File.join(File.dirname(__FILE__),'tmp')
+FileUtils.mkdir_p(tmp_dir)
+tmp_filepath = File.join(tmp_dir,'noosfero.po')
+new_pt_file = File.open(tmp_filepath, 'w+')
+translations_path = File.join(File.dirname(__FILE__),'data', 'pt.upo')
+translations = {}
+File.open(translations_path, 'r').readlines.map do |l|
+  a = l.scan(/(.*)# (.*)/).first
+  translations[a[0]] = a[1]
+end
+
+fuzzy = ''
+header = ''
+msgid = ''
+msgstr = ''
+count = 0 
+total = ''
+loading_msgid = false
+loading_msgstr = false
+has_new_translation = false
+pt_file.readlines.map do |line|
+  puts line
+  if line.match('msgid')
+    loading_msgid = true
+    loading_msgstr = false
+  elsif line.match('msgstr')
+    loading_msgid = false
+    loading_msgstr = true
+  end
+  if loading_msgid && line != "\n"
+    loading_msgid = true
+    loading_msgstr = false
+    msgid += line
+    unless translations[line.chomp].nil?
+      has_new_translation = true
+      if !translations[line.chomp].match('msgstr') && !msgstr.match('msgstr')
+        msgstr += "msgstr \"\"\n" 
+      end
+      msgstr += translations[line.chomp] + "\n"
+      fuzzy = ''
+    end
+  elsif loading_msgstr && line != "\n"
+    loading_msgid = false
+    loading_msgstr = true
+    next if has_new_translation
+    msgstr += line
+  elsif line.match('fuzzy')
+    fuzzy = line
+  elsif line == "\n"
+    loading_msgid = false 
+    loading_msgstr = false
+    has_new_translation = false
+    new_pt_file.write(header)
+    new_pt_file.write(fuzzy)
+    new_pt_file.write(msgid)
+    new_pt_file.write(msgstr)
+    new_pt_file.write("\n")
+    header = ''
+    fuzzy = ''
+    msgid = ''
+    msgstr = ''
+  else
+    header += line
+  end
+end
+
+pt_file.close
+new_pt_file.close
+
+FileUtils.mv(tmp_filepath, orig_po_filepath)
