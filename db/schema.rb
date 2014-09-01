@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140808185510) do
+ActiveRecord::Schema.define(:version => 20140827191326) do
 
   create_table "abuse_reports", :force => true do |t|
     t.integer  "reporter_id"
@@ -241,6 +241,7 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
     t.string   "source_type"
     t.string   "user_agent"
     t.string   "referrer"
+    t.text     "setting"
   end
 
   add_index "comments", ["source_id", "spam"], :name => "index_comments_on_source_id_and_spam"
@@ -294,8 +295,8 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
     t.text     "signup_welcome_text"
     t.string   "languages"
     t.string   "default_language"
-    t.string   "noreply_email"
     t.string   "redirection_after_signup",     :default => "keep_on_same_page"
+    t.string   "noreply_email"
   end
 
   create_table "external_feeds", :force => true do |t|
@@ -450,6 +451,21 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
   add_index "products", ["product_category_id"], :name => "index_products_on_product_category_id"
   add_index "products", ["profile_id"], :name => "index_products_on_profile_id"
 
+  create_table "profile_suggestions", :force => true do |t|
+    t.integer  "person_id"
+    t.integer  "suggestion_id"
+    t.string   "suggestion_type"
+    t.text     "categories"
+    t.boolean  "enabled",         :default => true
+    t.float    "score",           :default => 0.0
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
+  end
+
+  add_index "profile_suggestions", ["person_id"], :name => "index_profile_suggestions_on_person_id"
+  add_index "profile_suggestions", ["score"], :name => "index_profile_suggestions_on_score"
+  add_index "profile_suggestions", ["suggestion_id"], :name => "index_profile_suggestions_on_suggestion_id"
+
   create_table "profiles", :force => true do |t|
     t.string   "name"
     t.string   "type"
@@ -483,11 +499,12 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
     t.boolean  "is_template",                           :default => false
     t.integer  "template_id"
     t.string   "redirection_after_login"
+    t.string   "personal_website"
+    t.string   "jabber_id"
     t.integer  "friends_count",                         :default => 0,     :null => false
     t.integer  "members_count",                         :default => 0,     :null => false
     t.integer  "activities_count",                      :default => 0,     :null => false
-    t.string   "personal_website"
-    t.string   "jabber_id"
+    t.integer  "welcome_page_id"
   end
 
   add_index "profiles", ["activities_count"], :name => "index_profiles_on_activities_count"
@@ -555,6 +572,31 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
     t.datetime "updated_at"
     t.integer  "context_id"
   end
+
+  create_table "search_term_occurrences", :force => true do |t|
+    t.integer  "search_term_id"
+    t.datetime "created_at"
+    t.integer  "total",          :default => 0
+    t.integer  "indexed",        :default => 0
+  end
+
+  add_index "search_term_occurrences", ["created_at"], :name => "index_search_term_occurrences_on_created_at"
+
+  create_table "search_terms", :force => true do |t|
+    t.string  "term"
+    t.integer "context_id"
+    t.string  "context_type"
+    t.string  "asset",            :default => "all"
+    t.float   "score",            :default => 0.0
+    t.float   "relevance_score",  :default => 0.0
+    t.float   "occurrence_score", :default => 0.0
+  end
+
+  add_index "search_terms", ["asset"], :name => "index_search_terms_on_asset"
+  add_index "search_terms", ["occurrence_score"], :name => "index_search_terms_on_occurrence_score"
+  add_index "search_terms", ["relevance_score"], :name => "index_search_terms_on_relevance_score"
+  add_index "search_terms", ["score"], :name => "index_search_terms_on_score"
+  add_index "search_terms", ["term"], :name => "index_search_terms_on_term"
 
   create_table "sessions", :force => true do |t|
     t.string   "session_id", :null => false
@@ -635,23 +677,25 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
   create_table "users", :force => true do |t|
     t.string   "login"
     t.string   "email"
-    t.string   "crypted_password",          :limit => 40
-    t.string   "salt",                      :limit => 40
+    t.string   "crypted_password",           :limit => 40
+    t.string   "salt",                       :limit => 40
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "remember_token"
     t.datetime "remember_token_expires_at"
     t.text     "terms_of_use"
-    t.string   "terms_accepted",            :limit => 1
+    t.string   "terms_accepted",             :limit => 1
     t.integer  "environment_id"
     t.string   "password_type"
-    t.boolean  "enable_email",                            :default => false
-    t.string   "last_chat_status",                        :default => ""
-    t.string   "chat_status",                             :default => ""
+    t.boolean  "enable_email",                             :default => false
+    t.string   "last_chat_status",                         :default => ""
+    t.string   "chat_status",                              :default => ""
     t.datetime "chat_status_at"
-    t.string   "activation_code",           :limit => 40
+    t.string   "activation_code",            :limit => 40
     t.datetime "activated_at"
     t.string   "return_to"
+    t.string   "private_token"
+    t.datetime "private_token_generated_at"
   end
 
   create_table "validation_infos", :force => true do |t|
