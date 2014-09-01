@@ -90,11 +90,11 @@ r,
 }
 
 #block-info-container #block-info-header h1 {
-  float: left;
   margin: 0;
   font-weight: normal;
   font-family: "Arial Black", Liberation Sans, Arial, sans-serif;
   margin-left: 5px;
+  white-space: nowrap;
 }
 
 #block-info-container #block-info-header p{
