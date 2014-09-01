@@ -40,4 +40,27 @@ module ProfileHelper
     end
   end
 
+  def display_custom_field(title, profile, field, force = false)
+    unless force || profile.may_display_field_to?(field, user)
+      return
+    end
+    value = profile.custom_fields[field][:value]
+    if !value.blank?
+      if block_given?
+        value = yield(value)
+      end
+      content_tag('tr', content_tag('td', title, :class => 'field-name') + content_tag('td', value))
+    else
+      ''
+    end
+  end
+
+  def display_custom_fields(profile)
+    fields = []
+    profile.custom_fields.each { |key,value|
+      fields << display_custom_field(value[:label], profile, key)
+    }
+    content_tag('tr', content_tag('th', _('Custom Fields'), { :colspan => 2 })) + fields.join.html_safe
+  end
+
 end

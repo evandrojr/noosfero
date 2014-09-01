@@ -18,6 +18,8 @@
   <% cache_timeout(profile.relationships_cache_key, 4.hours) do %>
     <%= display_work_info profile %>
 
+  <%= display_custom_fields(profile) %>
+
     <tr>
       <th colspan='2'><%= _('Network')%></th>
     </tr>
@@ -40,4 +42,3 @@
 
   <% end %>
 </table>
-
