@@ -39,7 +39,6 @@ jQuery(document).ready(function($) {
     } 
   }  
   
-  
   //Hides old style ballons
   $("img[alt|=Comments]").hide();
   rangy.init();
@@ -86,7 +85,7 @@ jQuery(document).ready(function($) {
   
   
   $('#comment-bubble').click(function(event){
-    this.hide();
+    $(this).hide();
     hideAllComments();
     $("#comment-bubble").css({top: 0, left: 0, position:'absolute'});
     var url = $("#comment-bubble").data('url');
@@ -103,19 +102,11 @@ jQuery(document).ready(function($) {
   });  
    
   function alignSideComments(paragraphId){
-//    var top = $('#comment_paragraph_' + paragraphId).offset().top;
-//    var right = $('#comment_paragraph_' + paragraphId).offset().left + $('#comment_paragraph_' + paragraphId).width();
-//    top += -120;
-//    right+= -500;
-//    $('.comments_list_toggle_paragraph_' + paragraphId).css('position','absolute');
-//    $('.comments_list_toggle_paragraph_' + paragraphId).css('display','inline');
-//    $('.comments_list_toggle_paragraph_' + paragraphId).css('top',top);
-//    $('.comments_list_toggle_paragraph_' + paragraphId).css('left',right);
     $('.comments_list_toggle_paragraph_' + paragraphId).css('background','#FFFFFF');
     $('label[for|=comment_title]').hide();
     $('label[for|=comment_body]').css({top: -30, left: +20, position:'relative'});
     $('.comment_form p').hide();
-    $('.comments_list_toggle_paragraph_' + paragraphId).width('250px');
+    $('.comments_list_toggle_paragraph_' + paragraphId).width('350px');
     $('.required-field').removeClass("required-field");
   } 
    
@@ -126,7 +117,8 @@ jQuery(document).ready(function($) {
   $("#comment-bubble").hide();
   //Undo previous highlight from the paragraph
   $('.comment_paragraph').mousedown(function(){
-    var paragraphId = getIdCommentParagraph($(this)[0].id);
+    //var paragraphId = getIdCommentParagraph($(this)[0].id);
+    var paragraphId = $(this).data('paragraph');
     $(this).find('.commented-area').replaceWith(function() {
       return $(this).html();
     });
@@ -138,22 +130,34 @@ jQuery(document).ready(function($) {
 
    //highlight area from the paragraph
   $('.comment_paragraph').mouseup(function(event){
-    var paragraphId = getIdCommentParagraph($(this)[0].id);
+    deselectAll();
+    var paragraphId = $(this).data('paragraph');
     var currentMousePos = { x: -1, y: -1 };
     currentMousePos.x = event.pageX;
     currentMousePos.y = event.pageY;
-    $("#comment-bubble").css({top: event.pageY-100, left: event.pageX-70, position:'absolute'});      
+    $("#comment-bubble").css({top: event.pageY-100, left: event.pageX-70, position:'absolute'});
+    //Relates a bubble to the mouse up paragraph
     $("#comment-bubble").data("paragraphId", paragraphId)
+    //Prepare to open the div
     var url = $('#link_to_ajax_comments_' + paragraphId).data('url');      
     $("#comment-bubble").data("url", url)
     $("#comment-bubble").show();
     var rootElement = $(this).get(0);
+    //Stores the lastParagraph of paragraph for some reason
     lastParagraph[paragraphId] = rootElement.innerHTML;
-    var selObj = rangy.getSelection();
-    var selected_area = rangy.serializeSelection(selObj, true,rootElement); 
-    cssApplier.toggleSelection();
+    //Maybe it is needed to handle exceptions here
+    try{
+      var selObj = rangy.getSelection();
+      var selected_area = rangy.serializeSelection(selObj, true,rootElement); 
+      cssApplier.toggleSelection();
+    }catch(e){
+      console.log(e);
+      //$.flash("A sele");
+      return;
+    }
+    //Register the area the has been selected at input.selected_area
     lastSelectedArea[paragraphId] = selected_area;   
-    form = jQuery(this).parent().find('form');
+    form = $('#page-comment-form-' + paragraphId).find('form');
     if (form.find('input.selected_area').length === 0){
       jQuery('<input>').attr({
         class: 'selected_area',
@@ -167,9 +171,14 @@ jQuery(document).ready(function($) {
     rootElement.focus();
   });
   
-  $('.article-body').mousedown(function(event){
-    $( ".commented-area" ).contents().unwrap();
-  });
+  function deselectAll(){
+    $(".commented-area").contents().unwrap();
+  }
+  
+  
+//  $('.article-body').mousedown(function(event){
+//      deselectAll();
+//  });
 
   function processAnchor(){
     var anchor = window.location.hash;
@@ -196,8 +205,6 @@ jQuery(document).ready(function($) {
   processAnchor();
  
   $(document).on('mouseover', 'li.article-comment', function(){
-    console.log("mouseover");
-    
     var selected_area = $(this).find('input.paragraph_comment_area').val();
     var paragraph_id =  $(this).find('input.paragraph_id').val();
     var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
@@ -215,7 +222,7 @@ jQuery(document).ready(function($) {
   });
  
   $(document).on('mouseout', 'li.article-comment', function(){
-    console.log("mouseout");
+    deselectAll();
     var paragraph_id =  $(this).find('input.paragraph_id').val();
     var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
   
@@ -230,12 +237,6 @@ jQuery(document).ready(function($) {
       sel.removeAllRanges();
     }
   });
-  
-//  $('.icon-cancel').unbind('click').click(function(e){
-//    e.preventDefault();
-//    $(this).closest("textarea[name^='comment'").text("");
-//    $(this).closest("div[class^='comments_list_toggle_paragraph_']").hide(); 
-//  });
 }); // End of jQuery(document).ready(function($)
 
 function toggleParagraph(paragraph) {

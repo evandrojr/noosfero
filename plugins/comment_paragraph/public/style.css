@@ -104,7 +104,7 @@ width: 0;
 
 
 #comment_title{
-    display: none;
+   display: none;
 }
 
 div[class^='comments_list_toggle_paragraph_'] {
@@ -112,11 +112,21 @@ div[class^='comments_list_toggle_paragraph_'] {
    border-width: 1px;
    border-color: black;
    padding: 5px;
+   background-color: whitesmoke;
 }
 
-label[for="comment_title"]{
-   display: none;
+div[class^='comment-paragraph-loading-'] {
+/*   border-style: solid;
+   border-width: 1px;
+   border-color: black;
+   padding: 5px;*/
+   background-color: whitesmoke;
+   z-index: 99;
 }
+
+/*label[for="comment_title"]{
+   display: none;
+}*/
 
 #comments_list{
    display: none;    
