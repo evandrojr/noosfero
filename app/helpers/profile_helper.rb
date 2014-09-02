@@ -45,22 +45,16 @@ module ProfileHelper
       return
     end
     value = profile.custom_fields[field][:value]
-    if !value.blank?
-      if block_given?
-        value = yield(value)
-      end
-      content_tag('tr', content_tag('td', title, :class => 'field-name') + content_tag('td', value))
-    else
-      ''
-    end
+    !value.blank? ? content_tag('tr', content_tag('td', title) + content_tag('td', value)) : ''
   end
 
   def display_custom_fields(profile)
     fields = []
-    profile.custom_fields.each { |key,value|
-      fields << display_custom_field(value[:label], profile, key)
+    profile.custom_fields.each { |custom_field_key,custom_field_data|
+      fields << display_custom_field(custom_field_data[:title], profile, custom_field_key)
     }
-    content_tag('tr', content_tag('th', _('Custom Fields'), { :colspan => 2 })) + fields.join.html_safe
+    fields.reject!(&:blank?)
+    fields.size >= 1 ? content_tag('tr', content_tag('th', _('Custom Fields'), { :colspan => 2 })) + fields.join.html_safe : ''
   end
 
 end
