@@ -51,9 +51,10 @@ module ProfileHelper
   def display_custom_fields(profile)
     fields = []
     profile.custom_fields.each { |custom_field_key,custom_field_data|
-      fields << display_custom_field(custom_field_data[:title], profile, custom_field_key)
+      if !profile.fields_privacy.blank? && profile.fields_privacy.include?(custom_field_key)
+        fields << display_custom_field(custom_field_data[:title], profile, custom_field_key) if profile.fields_privacy[custom_field_key] == 'public'
+      end
     }
-    fields.reject!(&:blank?)
     fields.size >= 1 ? content_tag('tr', content_tag('th', _('Custom Fields'), { :colspan => 2 })) + fields.join.html_safe : ''
   end
 

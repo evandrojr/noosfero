@@ -114,24 +114,50 @@
 
     <% template_custom_fields.each { |key,value| %>
 
-      <div class="field-with-privacy-selector">
-        <div class="formfieldline">
+      <% if @person.custom_fields.include?(key) %>
 
-          <span style="display: block;">
-            <%= label_tag value[:label] %>
-          </span>
+        <div class="field-with-privacy-selector">
+          <div class="formfieldline">
 
-          <div class="formfield type-text" style="display: inline-block;">
-            <%= hidden_field_tag "profile_data[custom_fields][#{key}[title]", @person.custom_fields[key][:title] %>
-            <% valor = @person.custom_fields[key] ? @person.custom_fields[key][:value] : "" %>
-            <%= text_field_tag( "profile_data[custom_fields][#{key}][value]", valor, :size => 30 ) %>
+            <span style="display: block;">
+              <%= label_tag value[:label] %>
+            </span>
+
+            <div class="formfield type-text" style="display: inline-block;">
+              <%= hidden_field_tag "profile_data[custom_fields][#{key}[title]", @person.custom_fields[key][:title] %>
+              <% valor = @person.custom_fields[key] ? @person.custom_fields[key][:value] : "" %>
+              <%= text_field_tag( "profile_data[custom_fields][#{key}][value]", valor, :size => 30 ) %>
+            </div>
+
           </div>
+
+          <%= profile_field_privacy_selector @person, key %>
 
         </div>
 
-        <%= profile_field_privacy_selector @person, key %>
+      <% else %>
 
-      </div>
+        <div class="field-with-privacy-selector">
+          <div class="formfieldline">
+
+            <span style="display: block;">
+              <%= label_tag value[:label] %>
+            </span>
+
+            <div class="formfield type-text" style="display: inline-block;">
+              <%= hidden_field_tag "profile_data[custom_fields][#{key}[title]", value[:label] %>
+              <% valor = key ? value[:value] : "" %>
+              <%= text_field_tag( "profile_data[custom_fields][#{key}][value]", valor, :size => 30 ) %>
+            </div>
+
+          </div>
+
+          <%= profile_field_privacy_selector @person, key %>
+
+        </div>
+
+
+      <% end %>
 
     <% } %>
 

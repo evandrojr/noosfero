@@ -61,9 +61,6 @@ function add_new_field() {
                         '<input id="profile_data_custom_fields_custom_field_' + next_custom_field_id + '_label" name="profile_data[custom_fields][custom_field_' + next_custom_field_id + '][label]" style="display:block" type="text" value="">' +
                       '</td>' +
                       '<td align="center">' +
-                        '<input id="profile_data_custom_fields_custom_field_' + next_custom_field_id + '_required" name="profile_data[custom_fields][custom_field_' + next_custom_field_id + '][required]" onclick="required_action("profile_data[custom_fields][custom_field_' + next_custom_field_id + '][active]","profile_data[custom_fields][custom_field_' + next_custom_field_id + '][required]", "profile_data[custom_fields][custom_field_' + next_custom_field_id + '][signup]")" type="checkbox">' +
-                      '</td>' +
-                      '<td align="center">' +
                         '<input id="profile_data_custom_fields_custom_field_' + next_custom_field_id + '_signup" name="profile_data[custom_fields][custom_field_' + next_custom_field_id + '][signup]" onclick="signup_action("profile_data[custom_fields][custom_field_' + next_custom_field_id + '][active]","profile_data[custom_fields][custom_field_' + next_custom_field_id + '][required]", "profile_data[custom_fields][custom_field_' + next_custom_field_id + '][signup]")" type="checkbox">' +
                       '</td>' +
                       '<td align="center">' +
