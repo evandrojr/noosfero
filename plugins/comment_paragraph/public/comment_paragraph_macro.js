@@ -1,14 +1,6 @@
 var comment_paragraph_anchor;
 var lastParagraph = [];
 var lastSelectedArea = [];
-var sideCommentForm=null;
-var firstTimeOpenParagraph = Array();
-var commentParagraphIds = Array();
-
-function getIdCommentParagraph(paragraphId){
-  var idx = paragraphId.lastIndexOf('_');
-  return paragraphId.substring(idx+1, paragraphId.length);
-}
 
 jQuery(document).ready(function($) {
   $('.display-comment-form').unbind();
@@ -28,7 +20,7 @@ jQuery(document).ready(function($) {
     var page_comment_form = $button.parents('.page-comment-form');
     page_comment_form.find('.errorExplanation').remove();
     $(this).closest("textarea[name^='comment'").text("");
-    $(this).closest("div[class^='side-comment']").hide(); 
+    $(this).closest("div[class^='side-comment']").hide();
     return false;
   });
 
@@ -36,9 +28,9 @@ jQuery(document).ready(function($) {
     if(div.hasClass('closed')) {
       div.removeClass('closed');
       div.addClass('opened');
-    } 
-  }  
-  
+    }
+  }
+
   //Hides old style ballons
   $("img[alt|=Comments]").hide();
   rangy.init();
@@ -49,21 +41,6 @@ jQuery(document).ready(function($) {
           <div align="center"  class="triangle-right" >Comentar<br>+</div>\
       </a>');
 
-  //Creates a side bubble for each paragraph with the amount of comments
-  //putSideComments();
-
-  $('.comment_paragraph').mouseover(function(){
-    var paragraphId = getIdCommentParagraph($(this)[0].id);
-    $('#side_comment_counter_' + paragraphId).show();
-  });
-  
-  $('.comment_paragraph').mouseleave(function(){
-    var paragraphId = getIdCommentParagraph($(this)[0].id);
-//    if($('#side_comment_counter_' + paragraphId).text() == '+'){
-//      $('#side_comment_counter_' + paragraphId).hide();
-//    }
-  });
-  
   $('.side-comments-counter').click(function(){
     hideAllComments();
     var paragraphId = $(this).data('paragraph')
@@ -71,8 +48,7 @@ jQuery(document).ready(function($) {
     $('#comments_list_toggle_paragraph_' + paragraphId).show();
     console.log(paragraphId);
     //Loads the comments
-    var url = $('#link_to_ajax_comments_' + paragraphId).data('url'); 
-    firstTimeOpenParagraph[paragraphId]=false;
+    var url = $('#link_to_ajax_comments_' + paragraphId).data('url');
     $.ajax({
       dataType: "script",
       url: url
@@ -82,8 +58,8 @@ jQuery(document).ready(function($) {
       alignSideComments(paragraphId);
     });
   });
-  
-  
+
+
   $('#comment-bubble').click(function(event){
     $(this).hide();
     hideAllComments();
@@ -97,10 +73,10 @@ jQuery(document).ready(function($) {
     }).done(function() {
       var button = $('#page-comment-form-' + paragraphId + ' a').get(0);
       button.click();
-      alignSideComments(paragraphId);  
+      alignSideComments(paragraphId);
     });
-  });  
-   
+  });
+
   function alignSideComments(paragraphId){
     $('.comments_list_toggle_paragraph_' + paragraphId).css('background','#FFFFFF');
     $('label[for|=comment_title]').hide();
@@ -108,16 +84,15 @@ jQuery(document).ready(function($) {
     $('.comment_form p').hide();
     $('.comments_list_toggle_paragraph_' + paragraphId).width('350px');
     $('.required-field').removeClass("required-field");
-  } 
-   
+  }
+
   function hideAllComments(){
     $(".side-comment").hide();
-  } 
-  
+  }
+
   $("#comment-bubble").hide();
   //Undo previous highlight from the paragraph
   $('.comment_paragraph').mousedown(function(){
-    //var paragraphId = getIdCommentParagraph($(this)[0].id);
     var paragraphId = $(this).data('paragraph');
     $(this).find('.commented-area').replaceWith(function() {
       return $(this).html();
@@ -139,7 +114,7 @@ jQuery(document).ready(function($) {
     //Relates a bubble to the mouse up paragraph
     $("#comment-bubble").data("paragraphId", paragraphId)
     //Prepare to open the div
-    var url = $('#link_to_ajax_comments_' + paragraphId).data('url');      
+    var url = $('#link_to_ajax_comments_' + paragraphId).data('url');
     $("#comment-bubble").data("url", url)
     $("#comment-bubble").show();
     var rootElement = $(this).get(0);
@@ -148,15 +123,15 @@ jQuery(document).ready(function($) {
     //Maybe it is needed to handle exceptions here
     try{
       var selObj = rangy.getSelection();
-      var selected_area = rangy.serializeSelection(selObj, true,rootElement); 
+      var selected_area = rangy.serializeSelection(selObj, true,rootElement);
       cssApplier.toggleSelection();
     }catch(e){
-      console.log(e);
-      //$.flash("A sele");
+      //Translate this mesage
+      display_notice("Região não permitida para seleção");
       return;
     }
     //Register the area the has been selected at input.selected_area
-    lastSelectedArea[paragraphId] = selected_area;   
+    lastSelectedArea[paragraphId] = selected_area;
     form = $('#page-comment-form-' + paragraphId).find('form');
     if (form.find('input.selected_area').length === 0){
       jQuery('<input>').attr({
@@ -170,16 +145,11 @@ jQuery(document).ready(function($) {
     }
     rootElement.focus();
   });
-  
+
   function deselectAll(){
     $(".commented-area").contents().unwrap();
   }
   
-  
-//  $('.article-body').mousedown(function(event){
-//      deselectAll();
-//  });
-
   function processAnchor(){
     var anchor = window.location.hash;
     if(anchor.length==0) return;
@@ -198,17 +168,17 @@ jQuery(document).ready(function($) {
     }).done(function() {
       var button = $('#page-comment-form-' + comment_id + ' a').get(0)
       button.click();
-      //alignSideComments(paragraphId); 
+      //alignSideComments(paragraphId);
     });
   }
- 
+
   processAnchor();
- 
+
   $(document).on('mouseover', 'li.article-comment', function(){
     var selected_area = $(this).find('input.paragraph_comment_area').val();
     var paragraph_id =  $(this).find('input.paragraph_id').val();
     var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
-   
+
     if(lastParagraph[paragraph_id] == null || lastParagraph[paragraph_id] == 'undefined'){
       lastParagraph[paragraph_id] = rootElement.innerHTML;
     }
@@ -220,12 +190,12 @@ jQuery(document).ready(function($) {
       cssApplier.toggleSelection();
     }
   });
- 
+
   $(document).on('mouseout', 'li.article-comment', function(){
     deselectAll();
     var paragraph_id =  $(this).find('input.paragraph_id').val();
     var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
-  
+
     if(lastSelectedArea[paragraph_id] != null && lastSelectedArea[paragraph_id] != 'undefined' ){
       rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
       rootElement.innerHTML = lastParagraph[paragraph_id];
