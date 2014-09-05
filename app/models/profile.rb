@@ -25,8 +25,26 @@ class Profile < ActiveRecord::Base
 
   settings_items :custom_fields, :default => {}
 
-  def custom_field_value(key)
-    self.custom_fields[key]
+  def custom_field_value(field)
+    self.custom_fields[field][:value]
+  end
+
+  def custom_field_title(field)
+    if !self.custom_fields.blank?
+      self.custom_fields[field][:title]
+    else
+      ''
+    end
+  end
+
+  def custom_fields_template
+    fields = {}
+    fields = self.template.custom_fields unless self.template.blank?
+    fields
+  end
+
+  def custom_fields_template_title(field)
+    self.template.custom_fields[field][:title]
   end
 
   def self.default_search_display

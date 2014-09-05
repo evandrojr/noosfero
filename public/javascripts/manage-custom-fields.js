@@ -58,7 +58,7 @@ function add_new_field() {
   new_custom_field = '' +
                     '<tr>' +
                       '<td>' +
-                        '<input id="profile_data_custom_fields_custom_field_' + next_custom_field_id + '_label" name="profile_data[custom_fields][custom_field_' + next_custom_field_id + '][label]" style="display:block" type="text" value="">' +
+                        '<input id="profile_data_custom_fields_custom_field_' + next_custom_field_id + '_title" name="profile_data[custom_fields][custom_field_' + next_custom_field_id + '][title]" style="display:block" type="text" value="">' +
                       '</td>' +
                       '<td align="center">' +
                         '<input id="profile_data_custom_fields_custom_field_' + next_custom_field_id + '_signup" name="profile_data[custom_fields][custom_field_' + next_custom_field_id + '][signup]" onclick="signup_action("profile_data[custom_fields][custom_field_' + next_custom_field_id + '][active]","profile_data[custom_fields][custom_field_' + next_custom_field_id + '][required]", "profile_data[custom_fields][custom_field_' + next_custom_field_id + '][signup]")" type="checkbox">' +
@@ -70,50 +70,3 @@ function add_new_field() {
 
   jQuery('#custom-fields-container tbody').append(new_custom_field);
 }
-
-/**
-jQuery(document).ready(function(){
-  function check_fields(check, table_id, start) {
-    var checkboxes = jQuery("#" + table_id + " tbody tr td input[type='checkbox']")
-    for (var i = start; i < checkboxes.length; i+=3) {
-      checkboxes[i].checked = check
-    }
-  }
-
-  function verify_checked(fields_id){
-    var checkboxes = jQuery("#" + fields_id + "_fields_conf tbody tr td input[type='checkbox']")
-    for (var i = 2; i >= 0; i--) {
-      var allchecked = true
-      for (var j = i+3; j < checkboxes.length; j+=3) {
-        if(!checkboxes[j].checked) {
-          allchecked = false
-          break
-        }
-      }
-
-      var checkbox = jQuery(checkboxes[i+3]).attr("id").split("_")
-      jQuery("#" + checkbox.first() + "_" + checkbox.last()).attr("checked", allchecked)
-    }
-  }
-
-  function check_all(fields_id) {
-    jQuery("#" + fields_id + "_active").click(function (){check_fields(this.checked, fields_id + "_fields_conf", 0)})
-    jQuery("#" + fields_id + "_required").click(function (){check_fields(this.checked, fields_id + "_fields_conf", 1)})
-    jQuery("#" + fields_id +"_signup").click(function (){check_fields(this.checked, fields_id + "_fields_conf", 2)})
-    verify_checked(fields_id)
-  }
-
-  //check_all("person")
-  //check_all("enterprise")
-  //check_all("community")
-
-  jQuery("input[type='checkbox']").click(function (){
-    var checkbox = jQuery(this).attr("id").split("_")
-    verify_checked(checkbox.first())
-
-    if(this.checked == false) {
-      jQuery("#" + checkbox.first() + "_" + checkbox.last()).attr("checked", false)
-    }
-  })
-})
-**/

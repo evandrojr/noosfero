@@ -67,7 +67,7 @@ class AccountController < ApplicationController
 
   def custom_fields_for_template
     custom_fields ||= environment.people.templates.find(params[:template_id]).custom_fields.map { |k,v|
-      { :name => k, :label => v[:label] } if v['signup']
+      { :name => k, :title => v[:title] } if v['signup']
     }.compact
     render :text => {:ok => true, :custom_fields => custom_fields}.to_json
   end
