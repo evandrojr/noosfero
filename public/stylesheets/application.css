@@ -5937,6 +5937,7 @@ li.profile-activity-item.upload_image .activity-gallery-images-count-1 img {
   -webkit-border-radius: 8px;
   margin: 60px auto 5px;
   position: relative;
+  width: 400px;
 }
 
 #signup-form input.invalid_input {
@@ -5985,7 +5986,7 @@ li.profile-activity-item.upload_image .activity-gallery-images-count-1 img {
 #signup-form select {
   height: auto;
   padding-right: 3px;
-  width: 365px;
+  width: 100%;
 }
 
 #signup-form .select-birth-date select {
@@ -6366,12 +6367,12 @@ li.profile-activity-item.upload_image .activity-gallery-images-count-1 img {
 }
 
 .controller-profile_editor #profile-data {
-  display: table;
+  /*display: table;*/
   width: auto;
 }
 
 .field-with-privacy-selector {
-  display: table-row;
+  /*display: table-row;*/
 }
 
 .field-with-privacy-selector:hover {
@@ -6379,14 +6380,38 @@ li.profile-activity-item.upload_image .activity-gallery-images-count-1 img {
 }
 
 .controller-profile_editor #profile-data .field-with-privacy-selector .formfieldline {
-  width: auto;
+  /*width: auto;*/
+  display: inline-block;
 }
 
 .field-privacy-selector {
-  display: table-cell;
+  /*display: table-cell;*/
+  display: inline-block;
   vertical-align: middle;
   text-align: center;
   width: 100px;
+  float: right;
+  position: relative;
+  top: 15px;
+}
+
+#custom-fields-container {
+  margin-bottom: 25px;
+}
+
+#custom-fields-container label.required {
+  font-weight: bold;
+  color: #c00;
+}
+
+#custom-fields-container table {
+  margin-bottom: 5px;
+  border-bottom: 1px solid #c0c0c0;
+}
+
+#custom-fields-container th {
+  border-top: 1px solid #c0c0c0;
+  border-bottom: 1px solid #c0c0c0;
 }
 
 #profile_change_picture {

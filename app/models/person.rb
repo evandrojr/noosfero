@@ -152,7 +152,7 @@ class Person < Profile
   organization
   organization_website
   contact_phone
-  contact_information
+  contact_informatioin
   ]
 
   validates_multiparameter_assignments

@@ -3,7 +3,7 @@
 # which by default is the one returned by Environment:default.
 class Profile < ActiveRecord::Base
 
-  attr_accessible :name, :identifier, :public_profile, :nickname, :custom_footer, :custom_header, :address, :zip_code, :contact_phone, :image_builder, :description, :closed, :template_id, :environment, :lat, :lng, :is_template, :fields_privacy, :preferred_domain_id, :category_ids, :country, :city, :state, :national_region_code, :email, :contact_email, :redirect_l10n, :notification_time, :redirection_after_login
+  attr_accessible :name, :identifier, :public_profile, :nickname, :custom_footer, :custom_header, :address, :zip_code, :contact_phone, :image_builder, :description, :closed, :template_id, :environment, :lat, :lng, :is_template, :fields_privacy, :preferred_domain_id, :category_ids, :country, :city, :state, :national_region_code, :email, :contact_email, :redirect_l10n, :notification_time, :redirection_after_login, :custom_fields
 
   # use for internationalizable human type names in search facets
   # reimplement on subclasses
@@ -22,6 +22,30 @@ class Profile < ActiveRecord::Base
   ]
 
   SEARCH_DISPLAYS = %w[compact]
+
+  settings_items :custom_fields, :default => {}
+
+  def custom_field_value(field)
+    self.custom_fields[field][:value]
+  end
+
+  def custom_field_title(field)
+    if !self.custom_fields.blank?
+      self.custom_fields[field][:title]
+    else
+      ''
+    end
+  end
+
+  def custom_fields_template
+    fields = {}
+    fields = self.template.custom_fields unless self.template.blank?
+    fields
+  end
+
+  def custom_fields_template_title(field)
+    self.template.custom_fields[field][:title]
+  end
 
   def self.default_search_display
     'compact'
