@@ -82,7 +82,7 @@ jQuery(document).ready(function($) {
     $('label[for|=comment_title]').hide();
     $('label[for|=comment_body]').css({top: -30, left: +20, position:'relative'});
     $('.comment_form p').hide();
-    $('.comments_list_toggle_paragraph_' + paragraphId).width('350px');
+    $('.comments_list_toggle_paragraph_' + paragraphId).width('250px');
     $('.required-field').removeClass("required-field");
   }
 

@@ -1,3 +1,10 @@
+
+#article .article-comments-list, 
+#article .article-comments-list ul, 
+#article .article-comments-list li {
+	margin: 10px 0 10px 0;
+}
+
 div.article-comments-list-more{
   width: 100%;
   height: 30px;
@@ -102,7 +109,15 @@ display: block;
 width: 0;
 }*/
 
-
+.comment-picture {width: 50px;}
+.comment-text {display: inline-block;}
+.comment-replies .comment-text {display: inline-block;}
+.comment-from-owner .comment-created-at {
+	display: block;
+	width: 100%;}
+.comment-replies .comment-text {display: block;}
+#article .article-comment .comment-details h4 {display: none;}
+#article .article-comments-list .comment-replies {padding-left: 20px;}
 #comment_title{
    display: none;
 }
@@ -110,9 +125,10 @@ width: 0;
 div[class^='comments_list_toggle_paragraph_'] {
    border-style: solid;
    border-width: 1px;
-   border-color: black;
+   border-color: #ccc;
    padding: 5px;
    background-color: whitesmoke;
+	 width: 250px;
 }
 
 div[class^='comment-paragraph-loading-'] {
@@ -122,15 +138,33 @@ div[class^='comment-paragraph-loading-'] {
    padding: 5px;*/
    background-color: whitesmoke;
    z-index: 99;
+	 right: -230px;
 }
+
+#content .comment-balloon div[class^='comment-wrapper-']{
+	background: none;
+}
+
+.article-comment-inner {border-bottom: 1px solid #ddd;}
 
 /*label[for="comment_title"]{
    display: none;
 }*/
 
+#article .comment-replies .article-comment{background: white; border: 0px; border-top: 1px solid #ddd;}
+.comment-replies .comment-from-owner.comment-content {background: none;}
+
 #comments_list{
    display: none;    
 }
+
+.article-comment .comment-details {margin-bottom: 10px;}
+
+#content .comment-actions .menu-submenu ul {
+	right: 100%;
+	position: absolute;
+}
+
 
 /*  Hides old style counter*/
 /*.comment-count{
