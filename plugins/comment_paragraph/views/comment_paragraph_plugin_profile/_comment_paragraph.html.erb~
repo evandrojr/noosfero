@@ -7,7 +7,7 @@
       </div>
     </td>
       <td>
-        <div  align="center" class="side-comments-counter" id="side_comments_counter_<%= paragraph_id %>"  data-paragraph="<%= paragraph_id %>" style="vertical-align: middle; padding-left: 3px; padding-right: 5px;">
+        <div  align="center" class="side-comments-counter" id="side_comments_counter_<%= paragraph_id %>"  data-paragraph="<%= paragraph_id %>" style="vertical-align: middle; padding-left: 3px; padding-right: 5px;>
           <span id="comment-count-<%= paragraph_id %>" class='comment-count'>
             <%= count %>
           </span>

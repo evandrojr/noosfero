@@ -123,7 +123,7 @@ div[class^='comment-paragraph-loading-'] {
 	border: 1px solid #57ad68;
 	padding: 3px;
 	border-radius: 3px;
-	color: #666;
+	color: #ccc;
 }
 
 #comments_list{
