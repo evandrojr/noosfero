@@ -1,3 +1,10 @@
+
+#article .article-comments-list, 
+#article .article-comments-list ul, 
+#article .article-comments-list li {
+	margin: 10px 0 10px 0;
+}
+
 div.article-comments-list-more{
   width: 100%;
   height: 30px;
@@ -76,33 +83,15 @@ div.article-comments-list-more{
     border-radius: 10px;
 }
 
-
-/*.side-comments-counter{
-   top: 10px;
-   border-style: solid;
-   border-width: 1px;
-   position: absolute;
-   left: -5px;
-   background: #075698;
-   z-index: 199;
-   color: #FFFFFF;
-   display: none;
-   padding: 5px;
-}*/
-
-/*.side-comments-counter:before {
-content: "";
-position: absolute;
-bottom: -20px;
-left: 40px;
-border-width: 20px 20px 0;
-border-style: solid;
-border-color: #5a8f00 transparent;
-display: block;
-width: 0;
-}*/
-
-
+.comment-picture {width: 50px;}
+.comment-text {display: inline-block;}
+.comment-replies .comment-text {display: inline-block;}
+.comment-from-owner .comment-created-at {
+	display: block;
+	width: 100%;}
+.comment-replies .comment-text {display: block;}
+#article .article-comment .comment-details h4 {display: none;}
+#article .article-comments-list .comment-replies {padding-left: 20px;}
 #comment_title{
    display: none;
 }
@@ -110,18 +99,20 @@ width: 0;
 div[class^='comments_list_toggle_paragraph_'] {
    border-style: solid;
    border-width: 1px;
-   border-color: black;
+   border-color: #ccc;
    padding: 5px;
    background-color: whitesmoke;
+   width: 250px;
 }
 
 div[class^='comment-paragraph-loading-'] {
-/*   border-style: solid;
-   border-width: 1px;
-   border-color: black;
-   padding: 5px;*/
    background-color: whitesmoke;
    z-index: 99;
+   right: -230px;
+}
+
+#content .comment-balloon div[class^='comment-wrapper-']{
+	background: none;
 }
 
 .side-comment{
@@ -131,3 +122,21 @@ div[class^='comment-paragraph-loading-'] {
 #comments_list{
    display: none;    
 }
+
+.article-comment-inner {border-bottom: 1px solid #ddd;}
+
+/*label[for="comment_title"]{
+   display: none;
+}*/
+
+#article .comment-replies .article-comment{background: white; border: 0px; border-top: 1px solid #ddd;}
+
+.comment-replies .comment-from-owner.comment-content {background: none;}
+
+.article-comment .comment-details {margin-bottom: 10px;}
+
+#content .comment-actions .menu-submenu ul {
+    right: 100%;
+    position: absolute;
+}
+
