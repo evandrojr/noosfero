@@ -42,11 +42,12 @@ jQuery(document).ready(function($) {
       </a>');
 
   $('.side-comments-counter').click(function(){
-    hideAllComments();
-    var paragraphId = $(this).data('paragraph')
-    $('#side_comment_' + paragraphId).show();
-    $('#comments_list_toggle_paragraph_' + paragraphId).show();
-    console.log(paragraphId);
+    var paragraphId = $(this).data('paragraph');
+    hideAllCommentsExcept(paragraphId);
+    hideAllSelectedAreasExcept(paragraphId);
+    $('#comment-bubble').hide();
+    $('#side_comment_' + paragraphId).toggle();
+    $('#side_comment_' + paragraphId).find().toggle();
     //Loads the comments
     var url = $('#link_to_ajax_comments_' + paragraphId).data('url');
     $.ajax({
@@ -62,10 +63,10 @@ jQuery(document).ready(function($) {
 
   $('#comment-bubble').click(function(event){
     $(this).hide();
-    hideAllComments();
     $("#comment-bubble").css({top: 0, left: 0, position:'absolute'});
     var url = $("#comment-bubble").data('url');
     var paragraphId = $("#comment-bubble").data("paragraphId");
+    hideAllCommentsExcept(paragraphId);
     $('#side_comment_' + paragraphId).show();
     $.ajax({
       dataType: "script",
@@ -86,8 +87,29 @@ jQuery(document).ready(function($) {
     $('.required-field').removeClass("required-field");
   }
 
-  function hideAllComments(){
-    $(".side-comment").hide();
+//  function hideAllComments(){
+//    $(".side-comment").hide();
+//    $(".side-comment").find().hide();
+//  }
+ 
+  function hideAllCommentsExcept(clickedParagraph){
+    $(".side-comment").each(function(){
+      paragraph = $(this).data('paragraph');
+      if(paragraph != clickedParagraph){
+        $(this).hide();
+        $(this).find().hide();
+      }        
+    });
+  }
+
+  function hideAllSelectedAreasExcept(clickedParagraph){
+    $(".comment_paragraph").each(function(){
+      paragraph = $(this).data('paragraph');
+      if(paragraph != clickedParagraph){
+//        $(".commented-area").contents().unwrap();
+        $(this).find(".commented-area").contents().unwrap();
+      }
+    });
   }
 
   $("#comment-bubble").hide();
@@ -153,13 +175,11 @@ jQuery(document).ready(function($) {
   function processAnchor(){
     var anchor = window.location.hash;
     if(anchor.length==0) return;
-
     var val = anchor.split('-'); //anchor format = #comment-\d+
     if(val.length!=2 || val[0]!='#comment') return;
     if($('div[data-macro=comment_paragraph_plugin\\/allow_comment]').length==0) return; //comment_paragraph_plugin/allow_comment div must exists
     var comment_id = val[1];
     if(!/^\d+$/.test(comment_id)) return; //test for integer
-
     comment_paragraph_anchor = anchor;
     var url = '/plugin/comment_paragraph/public/comment_paragraph/'+comment_id;
     $.ajax({
@@ -209,19 +229,21 @@ jQuery(document).ready(function($) {
   });
 }); // End of jQuery(document).ready(function($)
 
-function toggleParagraph(paragraph) {
-  var div = jQuery('div.comments_list_toggle_paragraph_'+paragraph);
-  var visible = div.is(':visible');
-  if(!visible)
-    jQuery('div.comment-paragraph-loading-' + paragraph).addClass('comment-button-loading');
-  div.toggle('fast');
-  return visible;
-}
+//Seens that this code is not beeing used anymore
 
-function loadCompleted(paragraph) {
-  jQuery('div.comment-paragraph-loading-'+paragraph).removeClass('comment-button-loading')
-  if(comment_paragraph_anchor) {
-    jQuery.scrollTo(jQuery(comment_paragraph_anchor));
-    comment_paragraph_anchor = null;
-  }
-}
+//function toggleParagraph(paragraph) {
+//  var div = jQuery('div.comments_list_toggle_paragraph_'+paragraph);
+//  var visible = div.is(':visible');
+//  if(!visible)
+//    jQuery('div.comment-paragraph-loading-' + paragraph).addClass('comment-button-loading');
+//  div.toggle('fast');
+//  return visible;
+//}
+
+//function loadCompleted(paragraph) {
+//  jQuery('div.comment-paragraph-loading-'+paragraph).removeClass('comment-button-loading')
+//  if(comment_paragraph_anchor) {
+//    jQuery.scrollTo(jQuery(comment_paragraph_anchor));
+//    comment_paragraph_anchor = null;
+//  }
+//}

@@ -124,54 +124,10 @@ div[class^='comment-paragraph-loading-'] {
    z-index: 99;
 }
 
-/*label[for="comment_title"]{
-   display: none;
-}*/
+.side-comment{
+    z-index: 199;
+}
 
 #comments_list{
    display: none;    
 }
-
-/*  Hides old style counter*/
-/*.comment-count{
-   display: none;    
-}*/
-
-
-
-
-
-
-/*.comment-details{
-    width: 365px;
-}*/
-
-/*.side-comments-text{
-    word-wrap: break-word;
-}*/
-
-/*.side-comments-box{
-   position: absolute;
-   top: 0px;
-   border-style: solid;
-   border-width: 1px;
-   border-color: black;
-   z-index: 99;
-   width: 350px;
-   height: auto;
-   overflow-y: auto;
-   display: none;
-   background: #FFFFFF;
-}*/
-
-
-/*
-element.style {
-position: relative;
-right: -442px;
-width: 365px;
-top: -56px;
-background: gray;
-border: 1px solid;
-}
-*/
