@@ -231,20 +231,20 @@ jQuery(document).ready(function($) {
 
 //Seens that this code is not beeing used anymore
 
-//function toggleParagraph(paragraph) {
-//  var div = jQuery('div.comments_list_toggle_paragraph_'+paragraph);
-//  var visible = div.is(':visible');
-//  if(!visible)
-//    jQuery('div.comment-paragraph-loading-' + paragraph).addClass('comment-button-loading');
-//  div.toggle('fast');
-//  return visible;
-//}
+function toggleParagraph(paragraph) {
+  var div = jQuery('div.comments_list_toggle_paragraph_'+paragraph);
+  var visible = div.is(':visible');
+  if(!visible)
+    jQuery('div.comment-paragraph-loading-' + paragraph).addClass('comment-button-loading');
+  div.toggle('fast');
+  return visible;
+}
 
-//function loadCompleted(paragraph) {
-//  jQuery('div.comment-paragraph-loading-'+paragraph).removeClass('comment-button-loading')
-//  if(comment_paragraph_anchor) {
-//    jQuery.scrollTo(jQuery(comment_paragraph_anchor));
-//    comment_paragraph_anchor = null;
-//  }
-//}
+function loadCompleted(paragraph) {
+  jQuery('div.comment-paragraph-loading-'+paragraph).removeClass('comment-button-loading')
+  if(comment_paragraph_anchor) {
+    jQuery.scrollTo(jQuery(comment_paragraph_anchor));
+    comment_paragraph_anchor = null;
+  }
+}
 
