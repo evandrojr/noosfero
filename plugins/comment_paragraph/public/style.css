@@ -46,6 +46,8 @@ div.article-comments-list-more{
 
 .article-body{
   word-wrap: break-word;
+  display: inline-block;
+  word-break: break-all;
 }
 
 .triangle-right {
