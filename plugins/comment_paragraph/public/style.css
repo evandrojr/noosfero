@@ -40,7 +40,12 @@ div.article-comments-list-more{
 }
 
 .comment_paragraph{
-    padding: 0px;
+  padding: 0px;
+ 
+}
+
+.article-body{
+  word-wrap: break-word;
 }
 
 .triangle-right {
