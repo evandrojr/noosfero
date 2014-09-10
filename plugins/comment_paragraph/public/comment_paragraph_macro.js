@@ -248,3 +248,10 @@ function loadCompleted(paragraph) {
   }
 }
 
+jQuery(document).keyup(function(e) {
+  // on press ESC key...
+  if (e.which == 27) {
+    // closing side comment box
+    side_comment_box_opened = jQuery("div.side-comment").filter("div[style!='display: block;']").css('display', 'none');
+  }
+});
