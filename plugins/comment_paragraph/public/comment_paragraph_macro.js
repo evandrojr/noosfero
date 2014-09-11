@@ -54,6 +54,7 @@ jQuery(document).ready(function($) {
       dataType: "script",
       url: url
     }).done(function() {
+      $('#fancybox-loading').hide();
       var button = $('#page-comment-form-' + paragraphId + ' a').get(0);
       button.click();
       alignSideComments(paragraphId);
@@ -72,6 +73,7 @@ jQuery(document).ready(function($) {
       dataType: "script",
       url: url
     }).done(function() {
+      $('#fancybox-loading').hide();
       var button = $('#page-comment-form-' + paragraphId + ' a').get(0);
       button.click();
       alignSideComments(paragraphId);
@@ -86,11 +88,6 @@ jQuery(document).ready(function($) {
     $('.comments_list_toggle_paragraph_' + paragraphId).width('250px');
     $('.required-field').removeClass("required-field");
   }
-
-//  function hideAllComments(){
-//    $(".side-comment").hide();
-//    $(".side-comment").find().hide();
-//  }
  
   function hideAllCommentsExcept(clickedParagraph){
     $(".side-comment").each(function(){
@@ -106,7 +103,6 @@ jQuery(document).ready(function($) {
     $(".comment_paragraph").each(function(){
       paragraph = $(this).data('paragraph');
       if(paragraph != clickedParagraph){
-//        $(".commented-area").contents().unwrap();
         $(this).find(".commented-area").contents().unwrap();
       }
     });
@@ -149,7 +145,9 @@ jQuery(document).ready(function($) {
       cssApplier.toggleSelection();
     }catch(e){
       //Translate this mesage
-      display_notice("Região não permitida para seleção");
+      deselectAll();
+      rangy.init();
+      cssApplier = rangy.createCssClassApplier("commented-area", {normalize: false});      
       return;
     }
     //Register the area the has been selected at input.selected_area

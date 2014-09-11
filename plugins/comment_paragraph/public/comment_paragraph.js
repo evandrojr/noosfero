@@ -12,7 +12,6 @@ function makeCommentable() {
   jQuery('#article_body_ifr').contents().find('body').children().each(function( index ) {
     //Check if there are other texts not selected  
     var element=jQuery(this).prop('outerHTML'); 
-    console.log(element);
     if(element.startsWith('<div')){
       selectedTextCount++;
     }else{
