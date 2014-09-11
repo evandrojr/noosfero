@@ -37,8 +37,8 @@ jQuery(document).ready(function($) {
   cssApplier = rangy.createCssClassApplier("commented-area", {normalize: false});
   //Add marked text bubble
   $("body").append('\
-      <a id="comment-bubble" style="width:120px;text-decoration: none">\
-          <div align="center"  class="triangle-right" >Comentar<br>+</div>\
+      <a id="comment-bubble" style="width:90px;text-decoration: none">\
+          <div align="center"  class="triangle-right" >Comentar</div>\
       </a>');
 
   $('.side-comments-counter').click(function(){
@@ -54,9 +54,9 @@ jQuery(document).ready(function($) {
       dataType: "script",
       url: url
     }).done(function() {
-      $('#fancybox-loading').hide();
       var button = $('#page-comment-form-' + paragraphId + ' a').get(0);
       button.click();
+      $('#fancybox-loading').hide();
       alignSideComments(paragraphId);
     });
   });
@@ -73,9 +73,9 @@ jQuery(document).ready(function($) {
       dataType: "script",
       url: url
     }).done(function() {
-      $('#fancybox-loading').hide();
       var button = $('#page-comment-form-' + paragraphId + ' a').get(0);
       button.click();
+      $('#fancybox-loading').hide();      
       alignSideComments(paragraphId);
     });
   });
@@ -88,14 +88,14 @@ jQuery(document).ready(function($) {
     $('.comments_list_toggle_paragraph_' + paragraphId).width('250px');
     $('.required-field').removeClass("required-field");
   }
- 
+
   function hideAllCommentsExcept(clickedParagraph){
     $(".side-comment").each(function(){
       paragraph = $(this).data('paragraph');
       if(paragraph != clickedParagraph){
         $(this).hide();
         $(this).find().hide();
-      }        
+      }
     });
   }
 
@@ -128,7 +128,7 @@ jQuery(document).ready(function($) {
     var currentMousePos = { x: -1, y: -1 };
     currentMousePos.x = event.pageX;
     currentMousePos.y = event.pageY;
-    $("#comment-bubble").css({top: event.pageY-100, left: event.pageX-70, position:'absolute'});
+    $("#comment-bubble").css({top: event.pageY-70, left: event.pageX-70, position:'absolute'});
     //Relates a bubble to the mouse up paragraph
     $("#comment-bubble").data("paragraphId", paragraphId)
     //Prepare to open the div
@@ -136,7 +136,7 @@ jQuery(document).ready(function($) {
     $("#comment-bubble").data("url", url)
     $("#comment-bubble").show();
     var rootElement = $(this).get(0);
-    //Stores the lastParagraph of paragraph for some reason
+    //Stores the HTML content of the lastParagraph
     lastParagraph[paragraphId] = rootElement.innerHTML;
     //Maybe it is needed to handle exceptions here
     try{
@@ -147,7 +147,7 @@ jQuery(document).ready(function($) {
       //Translate this mesage
       deselectAll();
       rangy.init();
-      cssApplier = rangy.createCssClassApplier("commented-area", {normalize: false});      
+      cssApplier = rangy.createCssClassApplier("commented-area", {normalize: false});
       return;
     }
     //Register the area the has been selected at input.selected_area
@@ -169,7 +169,7 @@ jQuery(document).ready(function($) {
   function deselectAll(){
     $(".commented-area").contents().unwrap();
   }
-  
+
   function processAnchor(){
     var anchor = window.location.hash;
     if(anchor.length==0) return;
@@ -211,7 +211,7 @@ jQuery(document).ready(function($) {
 
   $(document).on('mouseout', 'li.article-comment', function(){
     deselectAll();
-    var paragraph_id =  $(this).find('input.paragraph_id').val();
+    var paragraph_id = $(this).find('input.paragraph_id').val();
     var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
 
     if(lastSelectedArea[paragraph_id] != null && lastSelectedArea[paragraph_id] != 'undefined' ){
