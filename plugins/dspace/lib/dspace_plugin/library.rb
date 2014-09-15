@@ -24,8 +24,8 @@ class DspacePlugin::Library < Blog
     end
   end
 
-  def bli
-    'bli'
+  def communities
+    []
   end
 
 end
