@@ -1,0 +1,24 @@
+<h1><%= _('DSpace Community') %></h1>
+
+<%= required_fields_message %>
+
+<%= required f.text_field('name', :size => '64', :maxlength => 150) %>
+
+<%= hidden_field_tag 'article[parent_id]', @article.parent_id %>
+
+<% dspace_client = Dspace::Client.new('') %>
+
+<% communities = dspace_client.get_communities %>
+
+<%
+communities_2 = communities.map { |community|
+  item = [_(community.name), community.id]
+}
+%>
+
+<%= labelled_form_field(_('Communities:'),
+      select(:article,
+             :dspace_community_id,
+             options_for_select_with_title(communities_2))) %>
+
+<% #raise collections_2.inspect %>

@@ -1,0 +1,24 @@
+<h1><%= _('DSpace Collection') %></h1>
+
+<%= required_fields_message %>
+
+<%= required f.text_field('name', :size => '64', :maxlength => 150) %>
+
+<%= hidden_field_tag 'article[parent_id]', @article.parent_id %>
+
+<% dspace_client = Dspace::Client.new('') %>
+
+<% collections = dspace_client.get_collections %>
+
+<%
+collections_2 = collections.map { |collection|
+  item = [_(collection.name), collection.id]
+}
+%>
+
+<%= labelled_form_field(_('Collections:'),
+      select(:article,
+             :dspace_collection_id,
+             options_for_select_with_title(collections_2))) %>
+
+<% #raise collections_2.inspect %>

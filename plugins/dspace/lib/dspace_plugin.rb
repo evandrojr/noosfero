@@ -8,12 +8,24 @@ class DspacePlugin < Noosfero::Plugin
     _("A plugin that add a DSpace library feature to noosfero.")
   end
 
-  def self.extra_blocks
-    { DspacePlugin::DspaceBlock => {:type => ['community', 'profile'] } }
+  def content_types
+    if context.respond_to?(:params) && context.params
+      types = []
+      parent_id = context.params[:parent_id]
+      types << DspacePlugin::Library if context.profile.community? && !parent_id
+      parent = parent_id ? context.profile.articles.find(parent_id) : nil
+      if parent.kind_of?(DspacePlugin::Library)
+        types << DspacePlugin::Collection
+        types << DspacePlugin::Communityy
+      end
+      types
+    else
+      [DspacePlugin::Library, DspacePlugin::Collection, DspacePlugin::Communityy]
+    end
   end
 
   def stylesheet?
-    true
+    false
   end
 
   def self.has_admin_url?

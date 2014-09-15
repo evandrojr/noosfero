@@ -1,0 +1,34 @@
+<div id="dspace_library">
+
+  <%= content_tag 'div', dspace_library.body %>
+
+  <h3><%= _("Communities") %></h3>
+
+  <% if true %>
+
+  <div class="library_actions">
+    <%= content_tag('a', :href => url_for({:controller => 'cms', :action => 'new', :type => "DspacePlugin::Communityy", :parent_id => dspace_library.id}), :class => 'button with-text icon-add') do %>
+          <%= _("New %s") % DspacePlugin::Communityy.short_description %>
+    <% end %>
+  </div>
+
+  <% end %>
+
+  <ul id="sortable" class="step_list">
+    <%= render :partial => 'community_item', :collection => dspace_library.bli %>
+  </ul>
+
+
+  <h3><%= _("Collections") %></h3>
+
+  <% if true %>
+
+  <div class="library_actions">
+    <%= content_tag('a', :href => url_for({:controller => 'cms', :action => 'new', :type => "DspacePlugin::Collection", :parent_id => dspace_library.id}), :class => 'button with-text icon-add') do %>
+          <%= _("New %s") % DspacePlugin::Collection.short_description %>
+    <% end %>
+  </div>
+
+  <% end %>
+
+</div>
