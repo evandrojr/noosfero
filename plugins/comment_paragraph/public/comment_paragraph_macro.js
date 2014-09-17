@@ -111,6 +111,7 @@ jQuery(document).ready(function($) {
   $("#comment-bubble").hide();
   //Undo previous highlight from the paragraph
   $('.comment_paragraph').mousedown(function(){
+    $("#comment-bubble").hide();
     var paragraphId = $(this).data('paragraph');
     $(this).find('.commented-area').replaceWith(function() {
       return $(this).html();
@@ -120,10 +121,23 @@ jQuery(document).ready(function($) {
       rootElement.innerHTML = lastParagraph[paragraphId];
     }
   });
+  
+  function getSelectionText() {
+    var text = "";
+    if (window.getSelection) {
+        text = window.getSelection().toString();
+    } else if (document.selection && document.selection.type != "Control") {
+        text = document.selection.createRange().text;
+    }
+    return text;
+  }
 
    //highlight area from the paragraph
   $('.comment_paragraph').mouseup(function(event){
     deselectAll();
+    //Don't do anything if there is no selected text
+    if(getSelectionText().length == 0)
+      return;
     var paragraphId = $(this).data('paragraph');
     var currentMousePos = { x: -1, y: -1 };
     currentMousePos.x = event.pageX;
@@ -250,6 +264,6 @@ jQuery(document).keyup(function(e) {
   // on press ESC key...
   if (e.which == 27) {
     // closing side comment box
-    side_comment_box_opened = jQuery("div.side-comment").filter("div[style!='display: block;']").css('display', 'none');
+    side_comment_box_opened = jQuery("div.side-comment").hide();
   }
 });
