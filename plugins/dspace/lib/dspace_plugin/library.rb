@@ -25,7 +25,11 @@ class DspacePlugin::Library < Blog
   end
 
   def communities
-    []
+    DspacePlugin::Communities.find(:all)
+  end
+
+  def collections
+    DspacePlugin::Collection.find(:all)
   end
 
 end

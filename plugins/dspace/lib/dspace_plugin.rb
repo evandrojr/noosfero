@@ -25,7 +25,7 @@ class DspacePlugin < Noosfero::Plugin
   end
 
   def stylesheet?
-    false
+    true
   end
 
   def self.has_admin_url?

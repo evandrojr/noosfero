@@ -23,4 +23,8 @@ class DspacePlugin::Collection < Article
     end
   end
 
+  def items(dspace_server, collection_id)
+    Dspace::Collection.get_all_items_from dspace_server, collection_id
+  end
+
 end

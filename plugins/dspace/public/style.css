@@ -1,0 +1,8 @@
+#dspace_library ul {
+  margin: 0;
+  padding: 0 0 0 20px;
+}
+
+#dspace_library li {
+  list-style-image: url(/designs/themes/base/imgs/li-recent.gif);
+}

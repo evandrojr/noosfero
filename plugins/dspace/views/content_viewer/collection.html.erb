@@ -1,9 +1,10 @@
-<% dspace_collection_id = 7 %>
+<% collection_id = dspace_collection.dspace_collection_id %>
+<% dspace_server = dspace_collection.parent.server_url %>
 
-<% dspace_items_from_collection = Dspace::Collection.get_items(dspace_collection_id) %>
-
-<% dspace_items_from_collection.each { |item| %>
-<br />
-<%= item.name %>
-<br />
-<% } %>
+<div id="dspace_library">
+  <div id="dspace_collection">
+    <ul id="items_list" class="items_list">
+      <%= render :partial => 'item', :collection => dspace_collection.items(dspace_server, collection_id) %>
+    </ul>
+  </div>
+</div>

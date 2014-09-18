@@ -1,10 +1,11 @@
 class Dspace::Client
 
-  def initialize(dspace_server_url)
+  def initialize(server_url)
+    @server_url = server_url
   end
 
   def get_collections
-    Dspace::Collection.find(:all)
+    Dspace::Collection.get_all_collections_from @server_url
   end
 
   def get_communities
