@@ -126,11 +126,37 @@ div[class^='comment-paragraph-loading-'] {
 }
 
 .side-comments-counter {
-  border: 1px solid #57ad68;
-  padding: 3px;
-  border-radius: 3px;
-  color: #666;
+  position: relative;
+  width: 20px;
+  height: 19px;
+  padding: 0px;
+  background: #b3b2d4;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
   cursor: pointer;
+  z-index: 1;
+}
+
+.side-comments-counter:hover{
+  color: white; 
+}
+
+.side-comments-counter:after {
+  content: "";
+  position: absolute;
+  bottom: -9px;
+  left: 8px;
+  border-style: solid;
+  border-width: 12px 5px 0;
+  border-color: #b3b2d4 transparent;
+  display: block;
+  width: 0;
+}
+
+.comment-count{
+  position: relative;
+  top: 3px;
 }
 
 #comments_list{
@@ -138,10 +164,6 @@ div[class^='comment-paragraph-loading-'] {
 }
 
 .article-comment-inner {border-bottom: 1px solid #ddd;}
-
-/*label[for="comment_title"]{
-   display: none;
-}*/
 
 #article .comment-replies .article-comment{background: white; border: 0px; border-top: 1px solid #ddd;}
 

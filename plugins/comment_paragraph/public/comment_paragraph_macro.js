@@ -2,7 +2,16 @@ var comment_paragraph_anchor;
 var lastParagraph = [];
 var lastSelectedArea = [];
 
+function setPlusIfZeroComments($){
+  $('.comment-count').each(function(){
+    var commentCount = $(this).text().trim();
+    if(commentCount=='0')
+      $(this).text("+");
+  });
+}
+
 jQuery(document).ready(function($) {
+  setPlusIfZeroComments($);
   $('.display-comment-form').unbind();
   $('.display-comment-form').click(function(){
     var $button = $(this);
