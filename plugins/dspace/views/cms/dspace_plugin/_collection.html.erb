@@ -6,7 +6,7 @@
 
 <%= hidden_field_tag 'article[parent_id]', @article.parent_id %>
 
-<% dspace_server_url = @article.parent.server_url %>
+<% dspace_server_url = @article.parent.dspace_server_url %>
 
 <% dspace_client = Dspace::Client.new(dspace_server_url) %>
 
