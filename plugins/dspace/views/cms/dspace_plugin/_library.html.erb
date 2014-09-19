@@ -67,7 +67,7 @@
 
 <%= labelled_form_field(_('Items per page:'), f.select(:posts_per_page, Blog.posts_per_page_options)) %>
 
-<%= labelled_form_field(_('Address of DSpace library:'), text_field(:article, :server_url)) %>
+<%= required f.text_field(:dspace_server_url, :size => '150', :maxlength => 150) %>
 
 <%= content_tag( 'div', radio_button( :article, :gather_option, 'collections' ) + content_tag('label', _('Get collections'), :for => 'article_get_collections')) %>
 

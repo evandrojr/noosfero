@@ -1,9 +1,15 @@
 class DspacePlugin::Library < Blog
 
-  settings_items :server_url, :type => :string, :default => "http://dspace.example.com/"
+  settings_items :dspace_server_url, :type => :string
   settings_items :gather_option, :type => :string, :default => "collections"
 
-  attr_accessible :server_url, :gather_option
+  attr_accessible :dspace_server_url, :gather_option
+
+  def dspace_server_url_valid
+    errors.add(self.dspace_server_url, _("is not a valid URL. Please correct it and resubmit.")) unless url_valid?(self.dspace_server_url)
+  end
+
+  validate :dspace_server_url_valid
 
   def self.icon_name(article = nil)
     'dspace'
@@ -30,6 +36,13 @@ class DspacePlugin::Library < Blog
 
   def collections
     DspacePlugin::Collection.find(:all)
+  end
+
+  protected
+
+  def url_valid?(url)
+    url = URI.parse(url) rescue false
+    url.kind_of?(URI::HTTP) || url.kind_of?(URI::HTTPS)
   end
 
 end
