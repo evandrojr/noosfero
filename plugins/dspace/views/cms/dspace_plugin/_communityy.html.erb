@@ -6,19 +6,13 @@
 
 <%= hidden_field_tag 'article[parent_id]', @article.parent_id %>
 
-<% dspace_client = Dspace::Client.new('') %>
+<% dspace_server_url = @article.parent.server_url %>
 
-<% communities = dspace_client.get_communities %>
+<% dspace_client = Dspace::Client.new(dspace_server_url) %>
 
-<%
-communities_2 = communities.map { |community|
-  item = [_(community.name), community.id]
-}
-%>
+<% communities = dspace_client.get_communities.map { |community| item = [_(community.name), community.id] } %>
 
 <%= labelled_form_field(_('Communities:'),
       select(:article,
              :dspace_community_id,
-             options_for_select_with_title(communities_2))) %>
-
-<% #raise collections_2.inspect %>
+             options_for_select_with_title(communities))) %>

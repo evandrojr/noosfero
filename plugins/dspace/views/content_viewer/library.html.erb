@@ -4,11 +4,9 @@
 
   <% if dspace_library.gather_option == "communities" %>
 
-  <h3><%= _("Communities") %></h3>
-
   <% if true %>
 
-  <div class="library_actions">
+  <div id="actions">
     <%= content_tag('a', :href => url_for({:controller => 'cms', :action => 'new', :type => "DspacePlugin::Communityy", :parent_id => dspace_library.id}), :class => 'button with-text icon-add') do %>
           <%= _("New %s") % DspacePlugin::Communityy.short_description %>
     <% end %>
@@ -16,19 +14,19 @@
 
   <% end %>
 
+  <% communities = dspace_library.communities %>
+
   <ul id="sortable" class="communities_list">
-    <%= render :partial => 'community_item', :collection => dspace_library.communities %>
+    <%= render :partial => 'community_item', :collection => communities %>
   </ul>
 
   <% end %>
 
   <% if dspace_library.gather_option == "collections" %>
 
-  <h3><%= _("Collections") %></h3>
-
     <% if true %>
 
-  <div class="library_actions">
+  <div id="actions">
     <%= content_tag('a', :href => url_for({:controller => 'cms', :action => 'new', :type => "DspacePlugin::Collection", :parent_id => dspace_library.id}), :class => 'button with-text icon-add') do %>
           <%= _("New %s") % DspacePlugin::Collection.short_description %>
     <% end %>
@@ -36,9 +34,13 @@
 
     <% end %>
 
-  <ul id="collections_list" class="collections_list">
-    <%= render :partial => 'collection_item', :collection => dspace_library.collections %>
-  </ul>
+  <% collections = dspace_library.collections %>
+
+    <% unless collections.blank? %>
+    <ul id="collections_list" class="collections_list">
+      <%= render :partial => 'collection_item', :collection => collections  %>
+    </ul>
+    <% end %>
 
   <% end %>
 

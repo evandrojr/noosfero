@@ -25,7 +25,7 @@ class DspacePlugin::Library < Blog
   end
 
   def communities
-    DspacePlugin::Communities.find(:all)
+    DspacePlugin::Communityy.find(:all)
   end
 
   def collections

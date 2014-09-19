@@ -1,9 +1,10 @@
-<% dspace_community_id = 5 %>
+<% community_id = dspace_community.dspace_community_id %>
+<% dspace_server = dspace_community.parent.server_url %>
 
-<% dspace_collections_from_community = Dspace::Community.get_collections(dspace_community_id) %>
-
-<% dspace_collections_from_community.each { |collection| %>
-<br />
-<%= collection.name %>
-<br />
-<% } %>
+<div id="dspace_library">
+  <div id="dspace_community">
+    <ul id="collection_list">
+      <%= render :partial => 'collection', :collection => dspace_community.collections(dspace_server, community_id) %>
+    </ul>
+  </div>
+</div>

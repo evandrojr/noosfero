@@ -6,3 +6,18 @@
 #dspace_library li {
   list-style-image: url(/designs/themes/base/imgs/li-recent.gif);
 }
+
+#dspace_library li.item,
+#dspace_library li.collection {
+  margin: 10px 0;
+}
+
+#dspace_library li.item span.name,
+#dspace_library li.collection span.title,
+#dspace_library li.community span.title {
+  font-weight: bold;
+}
+
+#dspace_library div#actions {
+  margin: 10px 0;
+}

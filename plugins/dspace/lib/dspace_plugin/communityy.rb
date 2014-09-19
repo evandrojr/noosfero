@@ -23,4 +23,8 @@ class DspacePlugin::Communityy < Article
     end
   end
 
+  def collections(dspace_server, community_id)
+    Dspace::Community.get_all_collections_from dspace_server, community_id
+  end
+
 end

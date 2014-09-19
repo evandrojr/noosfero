@@ -9,7 +9,7 @@ class Dspace::Client
   end
 
   def get_communities
-    Dspace::Community.find(:all)
+    Dspace::Community.get_all_communities_from @server_url
   end
 
 end

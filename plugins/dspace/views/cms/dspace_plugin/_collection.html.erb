@@ -8,8 +8,6 @@
 
 <% dspace_server_url = @article.parent.server_url %>
 
-<%#= hidden_field_tag 'article[server_url]', dspace_server_url %>
-
 <% dspace_client = Dspace::Client.new(dspace_server_url) %>
 
 <% collections = dspace_client.get_collections.map { |collection| item = [_(collection.name), collection.id] } %>
@@ -18,5 +16,3 @@
       select(:article,
              :dspace_collection_id,
              options_for_select_with_title(collections))) %>
-
-<% #raise collections_2.inspect %>
