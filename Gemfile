@@ -18,8 +18,7 @@ gem 'rake', :require => false
 gem 'grape', '0.2.1'
 gem 'rest-client'
 gem 'exception_notification'
-gem 'gettext_i18n_rails'
-gem 'gettext', '>=3.0.2', :require => false, :group => :development
+gem 'gettext', :require => false, :group => :development
 
 # FIXME list here all actual dependencies (i.e. the ones in debian/control),
 # with their GEM names (not the Debian package names)
