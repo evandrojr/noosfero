@@ -6,11 +6,15 @@
 
 <%= hidden_field_tag 'article[parent_id]', @article.parent_id %>
 
-<% dspace_server_url = @article.parent.dspace_server_url %>
+<%= hidden_field_tag 'article[dspace_community_id]', @article.parent.dspace_community_id %>
 
-<% dspace_client = Dspace::Client.new(dspace_server_url) %>
+<% dspace_server_url = @article.parent.parent.dspace_server_url %>
 
-<% collections = dspace_client.get_collections.map { |collection| item = [_(collection.name), collection.id] } %>
+<% community_id = @article.parent.dspace_community_id %>
+
+<% #dspace_client = Dspace::Client.new(dspace_server_url) %>
+
+<% collections = Dspace::Community.get_all_collections_from( dspace_server_url, community_id ).map { |collection| item = [_(collection.name), collection.id] } %>
 
 <%= labelled_form_field(_('Collections:'),
       select(:article,

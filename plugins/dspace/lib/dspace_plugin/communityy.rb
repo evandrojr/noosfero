@@ -24,7 +24,7 @@ class DspacePlugin::Communityy < Article
   end
 
   def collections(dspace_server, community_id)
-    Dspace::Community.get_all_collections_from dspace_server, community_id
+    DspacePlugin::Collection.find(:all)
   end
 
 end

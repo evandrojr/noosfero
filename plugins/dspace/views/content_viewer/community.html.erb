@@ -2,9 +2,24 @@
 <% dspace_server = dspace_community.parent.dspace_server_url %>
 
 <div id="dspace_library">
+
+  <% if true %>
+
+  <div id="actions">
+    <%= content_tag('a', :href => url_for({:controller => 'cms', :action => 'new', :type => "DspacePlugin::Collection", :parent_id => dspace_community.id}), :class => 'button with-text icon-add') do %>
+          <%= _("Add %s") % DspacePlugin::Collection.short_description %>
+    <% end %>
+  </div>
+
+  <% end %>
+
+  <% collections = dspace_community.collections dspace_server, community_id %>
+
   <div id="dspace_community">
     <ul id="collection_list">
-      <%= render :partial => 'collection', :collection => dspace_community.collections(dspace_server, community_id) %>
+      <%= render :partial => 'collection', :collection => collections %>
     </ul>
   </div>
+
 </div>
+

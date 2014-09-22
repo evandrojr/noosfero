@@ -1,9 +1,8 @@
 class DspacePlugin::Library < Blog
 
   settings_items :dspace_server_url, :type => :string
-  settings_items :gather_option, :type => :string, :default => "collections"
 
-  attr_accessible :dspace_server_url, :gather_option
+  attr_accessible :dspace_server_url
 
   def dspace_server_url_valid
     errors.add(self.dspace_server_url, _("is not a valid URL. Please correct it and resubmit.")) unless url_valid?(self.dspace_server_url)
@@ -32,10 +31,6 @@ class DspacePlugin::Library < Blog
 
   def communities
     DspacePlugin::Communityy.find(:all)
-  end
-
-  def collections
-    DspacePlugin::Collection.find(:all)
   end
 
   protected

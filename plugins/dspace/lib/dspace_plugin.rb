@@ -17,6 +17,8 @@ class DspacePlugin < Noosfero::Plugin
       if parent.kind_of?(DspacePlugin::Library)
         types << DspacePlugin::Collection
         types << DspacePlugin::Communityy
+      elsif parent.kind_of?(DspacePlugin::Communityy)
+        types << DspacePlugin::Collection
       end
       types
     else

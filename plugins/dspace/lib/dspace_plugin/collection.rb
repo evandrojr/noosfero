@@ -1,8 +1,9 @@
 class DspacePlugin::Collection < Article
 
   settings_items :dspace_collection_id, :type => :string
+  settings_items :dspace_community_id, :type => :integer
 
-  attr_accessible :dspace_collection_id
+  attr_accessible :dspace_collection_id, :dspace_community_id
 
   def self.icon_name(article = nil)
     'dspace'

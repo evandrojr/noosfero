@@ -6,6 +6,8 @@
 
 <%= required f.text_field(:name, :size => '64', :maxlength => 150, :onchange => "updateUrlField(this, 'article_slug')") %>
 
+<%= required f.text_field(:dspace_server_url, :size => '150', :maxlength => 150) %>
+
 <%= render :partial => 'general_fields' %>
 
 <script type="text/javascript">
@@ -66,10 +68,3 @@
 <%= labelled_form_field(_('Show catalog as:'), f.select(:visualization_format, [ [ _('Listing with thumbnail'), 'full'], [ _('Listing without thumbnail'), 'short'], [ _('Type catalog'), 'catalog'] ])) %>
 
 <%= labelled_form_field(_('Items per page:'), f.select(:posts_per_page, Blog.posts_per_page_options)) %>
-
-<%= required f.text_field(:dspace_server_url, :size => '150', :maxlength => 150) %>
-
-<%= content_tag( 'div', radio_button( :article, :gather_option, 'collections' ) + content_tag('label', _('Get collections'), :for => 'article_get_collections')) %>
-
-<%= content_tag( 'div', radio_button( :article, :gather_option, 'communities' ) + content_tag('label', _('Get communities'), :for => 'article_get_collections')) %>
-
