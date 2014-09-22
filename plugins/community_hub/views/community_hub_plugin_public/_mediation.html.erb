@@ -11,7 +11,7 @@
       <% elsif mediation.source == 'facebook' %>
         <%= image_tag('/plugins/community_hub/icons/logo_facebook_50x50.png', :alt => "Facebook") %>
       <% else %>
-        <%= image_tag(profile_icon(mediation.author, :minor)) if mediation.author %>
+        <%= image_tag(profile_icon(mediation.created_by, :minor)) if mediation.created_by %>
       <% end %>
     </li>
     <li class="message"><span class="author"><%= mediation.setting[:author_name] %>:</span> <%= mediation.body %></li>
@@ -24,8 +24,8 @@
         <% if mediation.source != 'twitter' && mediation.source != 'facebook' %>
 
         <li class="promote">
-          <% if !promoted?(hub, mediation.author.id) %>
-          <a id="<%= mediation.id %>" href="#" onclick="promote_user(<%= mediation.id %>,<%= mediation.author.id %>); return false;">
+          <% if !promoted?(hub, mediation.created_by.id) %>
+          <a id="<%= mediation.id %>" href="#" onclick="promote_user(<%= mediation.id %>,<%= mediation.created_by.id %>); return false;">
             <img class="not-promoted" src="/plugins/community_hub/icons/hub-not-promote-icon.png" title="<%= _("User not promoted") %>" />
           </a>
           <% else %>
