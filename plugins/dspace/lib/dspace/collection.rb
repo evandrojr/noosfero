@@ -23,7 +23,7 @@ class Dspace::Collection < Dspace::Resource
         metadata = item_metadata[3].attributes
         if metadata != {}
           metadata = Hash[[metadata.map{|k,v| v}]]
-          date_issued = metadata.has_key?('dc.date.issued') ? metadata['dc.date.issued'] : nil
+          issue_date = metadata.has_key?('dc.date.issued') ? metadata['dc.date.issued'] : nil
         end
 
         item = DspacePlugin::Item.new
@@ -31,7 +31,7 @@ class Dspace::Collection < Dspace::Resource
         item.id = element.id
         item.name = element.name
         item.author = author
-        item.date_issued = date_issued
+        item.issue_date = issue_date
 
         item_list << item
 

@@ -21,3 +21,32 @@
 #dspace_library div#actions {
   margin: 10px 0;
 }
+
+#dspace_library_item {
+  /*8border: 1px solid green;*/
+}
+
+.dspace_item_section {
+  margin-left: 20px;
+}
+
+.dspace_item_section_title {
+  margin: 0px;
+  font-weight: bold;
+  border-bottom: 1px solid #c0c0c0;
+}
+
+#dspace_library_item ul {
+  list-style-type: none;
+}
+
+#dspace_library_item ul#item_files_list,
+#dspace_library_item ul.item_file_attributes_list {
+  margin: 0;
+  padding: 0;
+}
+
+#dspace_library_item ul#item_files_list > li {
+  margin: 5px 0;
+}
+
