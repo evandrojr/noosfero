@@ -1,6 +1,6 @@
 <div id="dspace_library">
 
-  <% if true %>
+  <% if dspace_library.allow_create?(user) %>
 
   <div id="actions">
     <%= content_tag('a', :href => url_for({:controller => 'cms', :action => 'new', :type => "DspacePlugin::Communityy", :parent_id => dspace_library.id}), :class => 'button with-text icon-add') do %>
