@@ -58,11 +58,6 @@ class PersonNotifier
       Person.find(person_id).notifier.notify
     end
 
-    def failure(job)
-      person = Person.find(person_id)
-      person.notifier.dispatch_notification_mail
-    end
-
   end
 
   class Mailer < ActionMailer::Base
