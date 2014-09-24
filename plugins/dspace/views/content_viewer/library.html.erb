@@ -4,7 +4,7 @@
 
   <div id="actions">
     <%= content_tag('a', :href => url_for({:controller => 'cms', :action => 'new', :type => "DspacePlugin::Communityy", :parent_id => dspace_library.id}), :class => 'button with-text icon-add') do %>
-          <%= _("Add %s") % DspacePlugin::Communityy.short_description %>
+          <%= _("Add a %s") % DspacePlugin::Communityy.short_description %>
     <% end %>
   </div>
 
