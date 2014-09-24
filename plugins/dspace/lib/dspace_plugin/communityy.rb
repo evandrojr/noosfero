@@ -5,15 +5,15 @@ class DspacePlugin::Communityy < Article
   attr_accessible :dspace_community_id
 
   def self.icon_name(article = nil)
-    'dspace'
+    'dspace-community'
   end
 
   def self.short_description
-    _("Community")
+    _("DSpace community")
   end
 
   def self.description
-    _("Defines a community on DSpace library")
+    _("Defines a DSpace community")
   end
 
   def to_html(options = {})

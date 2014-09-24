@@ -50,3 +50,12 @@
   margin: 5px 0;
 }
 
+.icon-newdspace-library,
+.icon-dspace-library,
+.icon-newdspace-community,
+.icon-dspace-community,
+.icon-newdspace-collection,
+.icon-dspace-collection {
+  background-image: url(/plugins/dspace/icons/dspace.png)
+}
+

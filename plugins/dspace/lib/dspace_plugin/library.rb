@@ -11,7 +11,7 @@ class DspacePlugin::Library < Blog
   validate :dspace_server_url_valid
 
   def self.icon_name(article = nil)
-    'dspace'
+    'dspace-library'
   end
 
   def self.short_description

@@ -6,15 +6,15 @@ class DspacePlugin::Collection < Article
   attr_accessible :dspace_collection_id, :dspace_community_id
 
   def self.icon_name(article = nil)
-    'dspace'
+    'dspace-collection'
   end
 
   def self.short_description
-    _("Collection")
+    _("DSpace collection")
   end
 
   def self.description
-    _("Defines a collection on DSpace library")
+    _("Defines a DSpace collection")
   end
 
   def to_html(options = {})
