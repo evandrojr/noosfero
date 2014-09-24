@@ -15,7 +15,6 @@ class DspacePlugin < Noosfero::Plugin
       types << DspacePlugin::Library if context.profile.community? && !parent_id
       parent = parent_id ? context.profile.articles.find(parent_id) : nil
       if parent.kind_of?(DspacePlugin::Library)
-        types << DspacePlugin::Collection
         types << DspacePlugin::Communityy
       elsif parent.kind_of?(DspacePlugin::Communityy)
         types << DspacePlugin::Collection
