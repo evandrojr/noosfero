@@ -69,7 +69,7 @@ class ContentViewerController < ApplicationController
     if params[:slideshow]
       render :action => 'slideshow', :layout => 'slideshow'
     else
-      render :file => @page.view_page, :layout => true
+      render :file => @page.view_page, :layout => true, :formats => [:html]
     end
   end
 
