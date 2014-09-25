@@ -127,9 +127,9 @@ class ContentViewerController < ApplicationController
 
     if params[:slideshow]
       render :action => 'slideshow', :layout => 'slideshow'
-    else
-      render :file => @page.view_page, :layout => true
+      return
     end
+    render @page.view_page, :formats => [:html]
   end
 
   def versions_diff
