@@ -74,8 +74,6 @@ class Dspace::Item < Dspace::Resource
       bitstream.format = bs.attributes[:format]
       bitstream.link = bs.attributes[:link]
 
-      #raise bitstream.to_yaml
-
       item.files << bitstream
 
     end

@@ -8,7 +8,8 @@
 }
 
 #dspace_library li.item,
-#dspace_library li.collection {
+#dspace_library li.collection,
+#dspace_library li.community {
   margin: 10px 0;
 }
 

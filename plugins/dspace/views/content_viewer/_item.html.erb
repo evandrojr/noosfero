@@ -1,5 +1,4 @@
 <li class="item">
-  <!--span class="name"><%#= item.name %></span><br /-->
   <span class="name"><%= link_to item.name, :controller => 'dspace_plugin', :action => 'view_item', :id => item.id, :collection_id => @page.id %></span><br />
   <span class="authors"><%= item.author %></span> <span class="date_issued">(<%= item.issue_date %>)</span>
 </li>
