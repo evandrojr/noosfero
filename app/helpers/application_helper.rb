@@ -1306,11 +1306,23 @@ module ApplicationHelper
   end
 
   def template_options(kind, field_name)
-    templates = environment.send(kind).templates
+    templates = environment.send(kind).templates.order('name')
     return '' if templates.count == 0
-    return hidden_field_tag("#{field_name}[template_id]", templates.first.id) if templates.count == 1
-    options = options_for_select(templates.collect{ |template| [template.name, template.id]})
-    content_tag('div', content_tag('label', _('Profile organization'), :class => 'formlabel') + (select_tag 'profile_data[template_id]', options, :onchange => 'show_fields_for_template(this);'))
+    if templates.count == 1
+      if templates.first.custom_fields == {}
+        return hidden_field_tag("#{field_name}[template_id]", templates.first.id)
+      else
+        custom_fields = ""
+        templates.first.custom_fields.each { |field, value|
+          custom_fields += content_tag('div', content_tag('label', value[:title].capitalize, :class => 'formlabel') +
+                             content_tag('div', text_field_tag( "profile_data[custom_fields][#{field}][title]", ''), :class => 'formfield type-text'), :class => "formfieldline" ) if value[:signup] == 'on'
+        }
+        content_tag('div', custom_fields)
+      end
+    else
+      options = options_for_select(templates.collect{ |template| [template.name, template.id]})
+      content_tag('div', content_tag('label', _('Profile organization'), :class => 'formlabel') + (select_tag 'profile_data[template_id]', options, :onchange => 'show_fields_for_template(this);'))
+    end
   end
 
   def expirable_content_reference(content, action, text, url, options = {})
