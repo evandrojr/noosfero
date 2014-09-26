@@ -1,7 +1,7 @@
 class DspacePluginMyprofileController < CmsController
   append_view_path File.join(File.dirname(__FILE__) + '/../views')
 
-  def new_dspace_content
+  def new
 
     @success_back_to = params[:success_back_to]
 

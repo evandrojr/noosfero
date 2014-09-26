@@ -6,7 +6,7 @@
   <% if dspace_community.allow_create?(user) %>
 
   <div id="actions">
-    <%= content_tag('a', :href => url_for({:controller => 'dspace_plugin_myprofile', :action => 'new', :type => "DspacePlugin::Collection", :parent_id => dspace_community.id}), :class => 'button with-text icon-add') do %>
+    <%= content_tag('a', :href => url_for({:controller => 'cms', :action => 'new', :type => "DspacePlugin::Collection", :parent_id => dspace_community.id}), :class => 'button with-text icon-add') do %>
           <%= _("Add a %s") % DspacePlugin::Collection.short_description %>
     <% end %>
   </div>

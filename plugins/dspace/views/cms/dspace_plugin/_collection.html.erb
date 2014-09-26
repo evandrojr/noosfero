@@ -1,8 +1,4 @@
-<h1><%= _('DSpace Collection') %></h1>
-
-<%#= required_fields_message %>
-
-<%#= required f.text_field('name', :size => '64', :maxlength => 150) %>
+<h1><%= _('DSpace Collections') %></h1>
 
 <%= hidden_field_tag 'article[parent_id]', @article.parent_id %>
 
@@ -12,27 +8,31 @@
 
 <% community_id = @article.parent.dspace_community_id %>
 
-<% #dspace_client = Dspace::Client.new(dspace_server_url) %>
-
 <% collections = Dspace::Community.get_all_collections_from( dspace_server_url, community_id ).map { |collection| item = [_(collection.name), collection.id] } %>
 
-<table border="0">
-  <tr>
-    <th><%= check_box_tag "article[dspace_collection_id]", true %></th>
-    <th align="left"><%= _('DSpace Collection') %></th>
+<table border="0" style="border-bottom: 1px solid #c0c0c0;">
+  <tr style="background-color: #f0f0f0; border-bottom: 1px solid #c0c0c0;">
+    <th style="border-bottom: none;">&nbsp;</th>
+    <th style="border-bottom: none;" align="left"><%= _('Collection name') %></th>
   </tr>
+
+  <% dspace_collections_ids = DspacePlugin::Collection.find(:all, :conditions => { :parent_id => @article.parent_id}).map { |collection| ids = collection.dspace_collection_id.to_i } %>
+
   <% collections.each do |collection| %>
+
   <tr>
-    <td align="center"><%= check_box_tag "article[dspace_collection_id][]", collection[1] %> </td>
+    <% if dspace_collections_ids.include? collection[1] %>
+    <td align="center"><%= check_box_tag "article[dspace_collections_ids][]", collection[1], true, :disabled => 'disabled', :onclick => "selectCollection(this,'#{collection[0]}')" %> </td>
+    <% else %>
+    <td align="center"><%= check_box_tag "article[dspace_collections_ids][]", collection[1], false, :onclick => "selectCollection(this,'#{collection[0]}')" %> </td>
+    <% end %>
     <td>
-      <%= hidden_field_tag "article[dspace_collection_name][]", collection[0].to_slug %>
       <%= collection[0] %>
     </td>
   </tr>
+
   <% end %>
+
 </table>
 
-<%#= labelled_form_field(_('Collections:'),
-      select(:article,
-             :dspace_collection_id,
-             options_for_select_with_title(collections))) %>
+<%= javascript_include_tag 'plugins/dspace/javascripts/dspace_plugin' %>

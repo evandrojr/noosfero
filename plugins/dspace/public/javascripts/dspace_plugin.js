@@ -20,3 +20,13 @@ function selectCollection(element, collection_slug) {
   jQuery(hidden_field).insertAfter(element);
 }
 
+jQuery(document).ready(function() {
+  url_base = window.location.protocol + '//' + window.location.host;
+  forms = jQuery('form');
+  forms.each( function(f) {
+    url_action = forms[f].action;
+    if (url_action.indexOf("/cms/new") > -1) {
+      forms[f].action = url_action.replace("/cms/new", "/plugin/dspace/new").replace(url_base,'');
+    }
+  });
+});
