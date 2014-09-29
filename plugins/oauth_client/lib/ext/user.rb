@@ -28,11 +28,7 @@ class User
   end
 
   def make_activation_code_with_oauth
-    if oauth_providers.blank?
-      nil
-    else
-      make_activation_code_without_oauth
-    end
+    oauth_providers.blank? ? make_activation_code_without_oauth : nil
   end
 
   alias_method_chain :make_activation_code, :oauth

@@ -20,7 +20,7 @@ class OauthClientPlugin < Noosfero::Plugin
 
     proc do
       unless (plugin.context.params[:user]||{})[:oauth_providers].blank?
-        render :partial => 'oauth_signup'
+        render :partial => 'account/oauth_signup'
       else
         ''
       end
