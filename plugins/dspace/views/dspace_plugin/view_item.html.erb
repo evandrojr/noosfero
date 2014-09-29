@@ -1,8 +1,4 @@
-<% dspace_server_url = @collection.parent.parent.dspace_server_url %>
-
-<% if dspace_server_url =~ /\/$/ %>
-  <% dspace_server_url.gsub!(/\/$/,'') %>
-<% end %>
+<% extend DspacePlugin::ItemHelper %>
 
 <div id="article-parent">
   <%= button(:back, _('Go back to %s') % @collection.short_title, @collection.url) %>
@@ -11,58 +7,22 @@
 <div id="dspace_library_item">
 
   <div id="dspace_item_title">
-    <%= content_tag 'h1', @item.name, :class => 'title' %>
+    <h1 class="title"><%= @item.name %></h1>
   </div>
 
-  <br />
+  <% item_files = render :partial => 'item_file',
+               :locals => { :dspace_server_url => remove_slash_at_end_url(@collection.parent.parent.dspace_server_url) },
+               :collection => @item.files %>
 
-  <div class="dspace_item_section">
-    <%= content_tag 'div', _('Authors:'), :class => 'dspace_item_section_title' %>
-    <%= content_tag 'div', @item.author, :class => 'dspace_item_section_value' %>
-  </div>
+  <% item_files_content = content_tag('ul', item_files, :id => 'item_files_list') %>
 
-  <br />
 
-  <div class="dspace_item_section">
-    <%= content_tag 'div', _('Issue date:'), :class => 'dspace_item_section_title' %>
-    <%= content_tag 'div', @item.issue_date, :class => 'dspace_item_section_value' %>
-  </div>
-  <br />
+  <%= render :partial => 'item_section',
+             :collection => [ { :title => _('Authors:'), :content => @item.author },
+                              { :title => _('Issue date:'), :content => @item.issue_date },
+                              { :title => _('Abstract:'), :content => @item.abstract },
+                              { :title => _('Description:'), :content => @item.description },
+                              { :title => _('URI:'), :content => link_to(@item.uri, @item.uri, :target => '_blank') },
+                              { :title => _('Files in this item'), :content => item_files_content } ] %>
 
-  <div class="dspace_item_section">
-    <%= content_tag 'div', _('Abstract:'), :class => 'dspace_item_section_title' %>
-    <%= content_tag 'div', @item.abstract, :class => 'dspace_item_section_value' %>
-  </div>
-
-  <br />
-
-  <div class="dspace_item_section">
-    <%= content_tag 'div', _('Description:'), :class => 'dspace_item_section_title' %>
-    <%= content_tag 'div', @item.description, :class => 'dspace_item_section_value' %>
-  </div>
-
-  <br />
-
-  <div class="dspace_item_section">
-    <%= content_tag 'div', _('URI:'), :class => 'dspace_item_section_title' %>
-    <%= content_tag 'div', link_to(@item.uri, @item.uri), :class => 'dspace_item_section_value' %>
-  </div>
-
-  <br />
-
-  <div class="dspace_item_section">
-    <%= content_tag 'div', _('Files in this item'), :class => 'dspace_item_section_title' %>
-    <ul id="item_files_list">
-    <% @item.files.each do |file| %>
-      <li>
-        <ul class="item_file_attributes_list">
-          <li><span>File:</span> <%= link_to file.name, dspace_server_url + file.retrieve_link %></li>
-          <li><span>Description:</span> <%= file.description %></li>
-          <li><span>Size:</span> <%= number_to_human_size( file.size_bytes ) %></li>
-        </ul>
-      </li>
-    <% end %>
-    </ul>
-  </div>
-
-<div>
+</div>

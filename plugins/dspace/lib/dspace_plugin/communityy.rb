@@ -1,4 +1,4 @@
-class DspacePlugin::Communityy < Article
+class DspacePlugin::Communityy < Folder
 
   settings_items :dspace_community_id, :type => :string
 
@@ -17,9 +17,9 @@ class DspacePlugin::Communityy < Article
   end
 
   def to_html(options = {})
-    dspace_community = self
+    dspace_content = self
     proc do
-      render :file => 'content_viewer/community', :locals => {:dspace_community => dspace_community}
+      render :file => 'content_viewer/dspace_content', :locals => { :dspace_content => dspace_content }
     end
   end
 

@@ -18,9 +18,9 @@ class DspacePlugin::Collection < Article
   end
 
   def to_html(options = {})
-    dspace_collection = self
+    dspace_content = self
     proc do
-      render :file => 'content_viewer/collection', :locals => {:dspace_collection => dspace_collection}
+      render :file => 'content_viewer/dspace_content', :locals => { :dspace_content => dspace_content }
     end
   end
 

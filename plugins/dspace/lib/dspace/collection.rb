@@ -7,34 +7,9 @@ class Dspace::Collection < Dspace::Resource
     item_list = []
 
     if result.items.count > 0
-
       result.items.each { |element|
-
-        item_metadata = Dspace::Item.get_all_item_metadata_from dspace_server, element.id
-
-        # author
-        metadata = item_metadata[0].attributes
-        if metadata != {}
-          metadata = Hash[[metadata.map{|k,v| v}]]
-          author =  metadata.has_key?('dc.contributor.author') ? metadata['dc.contributor.author'] : nil
-        end
-
-        # date issued
-        metadata = item_metadata[3].attributes
-        if metadata != {}
-          metadata = Hash[[metadata.map{|k,v| v}]]
-          issue_date = metadata.has_key?('dc.date.issued') ? metadata['dc.date.issued'] : nil
-        end
-
-        item = DspacePlugin::Item.new
-
-        item.id = element.id
-        item.name = element.name
-        item.author = author
-        item.issue_date = issue_date
-
+        item = Dspace::Item.get_item_by_id dspace_server, element.id
         item_list << item
-
       }
     end
 

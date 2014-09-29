@@ -6,8 +6,8 @@ class Dspace::Item < Dspace::Resource
     result.metadata
   end
 
-  def self.get_item_by_id(item_id)
-    self.site = 'http://dspace.maljr.net/rest/'
+  def self.get_item_by_id(dspace_server, item_id)
+    self.site = dspace_server
     result = self.find item_id, :params => { :expand => 'metadata' }
 
     item_metadata = Dspace::Item.get_all_item_metadata_from self.site, result.id

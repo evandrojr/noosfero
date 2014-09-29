@@ -1,6 +1,8 @@
 class DspacePlugin::Item
 
-  attr_accessor :id, :name, :author, :issue_date, :abstract, :description, :uri, :files
+  include DspacePlugin::ItemHelper
+
+  attr_accessor :id, :name, :author, :issue_date, :abstract, :description, :uri, :files, :mimetype
 
   def initialize
     self.files = []

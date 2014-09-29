@@ -1,4 +1,16 @@
 <li class="item">
-  <span class="name"><%= link_to item.name, :controller => 'dspace_plugin', :action => 'view_item', :id => item.id, :collection_id => @page.id %></span><br />
-  <span class="authors"><%= item.author %></span> <span class="date_issued">(<%= item.issue_date %>)</span>
+  <div>
+
+    <% if item.files.first.mimetype == 'application/pdf' %>
+      <img src="/plugins/dspace/icons/pdf.png" style="display: inline-block;"/>
+    <% else %>
+      <img src="/plugins/dspace/icons/text.png" style="display: inline-block;"/>
+    <% end %>
+
+    <div style="display: inline-block; width: 92%;">
+      <span class="name"><%= link_to item.name, :controller => 'dspace_plugin', :action => 'view_item', :id => item.id, :collection_id => @page.id %></span><br />
+      <span class="authors"><%= item.author %></span> <span class="date_issued">(<%= item.issue_date %>)</span>
+    </div>
+
+  </div>
 </li>

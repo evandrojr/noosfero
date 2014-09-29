@@ -10,10 +10,14 @@
 
 <% collections = Dspace::Community.get_all_collections_from( dspace_server_url, community_id ).map { |collection| item = [_(collection.name), collection.id] } %>
 
-<table border="0" style="border-bottom: 1px solid #c0c0c0;">
-  <tr style="background-color: #f0f0f0; border-bottom: 1px solid #c0c0c0;">
-    <th style="border-bottom: none;">&nbsp;</th>
-    <th style="border-bottom: none;" align="left"><%= _('Collection name') %></th>
+<table id="collection_fields_conf" border="0" style="border-bottom: 1px solid #c0c0c0;">
+  <tr style="background-color: #f0f0f0; border-top: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0;">
+    <td style="font-style: italic">
+      <%= _("Check/Uncheck All Unlocked")%>
+    </td>
+    <td align="center">
+      <input type="checkbox" id="collection_active" />
+    </td>
   </tr>
 
   <% dspace_collections_ids = DspacePlugin::Collection.find(:all, :conditions => { :parent_id => @article.parent_id}).map { |collection| ids = collection.dspace_collection_id.to_i } %>
@@ -21,14 +25,22 @@
   <% collections.each do |collection| %>
 
   <tr>
-    <% if dspace_collections_ids.include? collection[1] %>
-    <td align="center"><%= check_box_tag "article[dspace_collections_ids][]", collection[1], true, :disabled => 'disabled', :onclick => "selectCollection(this,'#{collection[0]}')" %> </td>
-    <% else %>
-    <td align="center"><%= check_box_tag "article[dspace_collections_ids][]", collection[1], false, :onclick => "selectCollection(this,'#{collection[0]}')" %> </td>
-    <% end %>
     <td>
       <%= collection[0] %>
     </td>
+
+    <% if dspace_collections_ids.include? collection[1] %>
+    <td align="center">
+      <%= check_box_tag "article[dspace_collections][][id]", collection[1], true, :disabled => 'disabled', :id => "collection_id_#{collection[1]}" %>
+      <%= hidden_field_tag "article[dspace_collections][][name]", collection[0], :disabled => 'disabled' %>
+    </td>
+    <% else %>
+    <td align="center">
+      <%= check_box_tag "article[dspace_collections][][id]", collection[1], false, :id => "collection_id_#{collection[1]}" %>
+     <%= hidden_field_tag "article[dspace_collections][][name]", collection[0], :disabled => 'disabled', :id => "collection_name_#{collection[1]}" %>
+    </td>
+    <% end %>
+
   </tr>
 
   <% end %>

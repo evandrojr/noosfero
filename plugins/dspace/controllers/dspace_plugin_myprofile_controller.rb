@@ -31,20 +31,12 @@ class DspacePluginMyprofileController < CmsController
     article_data.merge!(params[:article]) if params[:article]
 
     if @type == 'DspacePlugin::Collection'
-      ids_list = 'dspace_collections_ids'
-      names_list = 'dspace_collections_names'
+      dspace_objects = article_data['dspace_collections']
     elsif @type == 'DspacePlugin::Communityy'
-      ids_list = 'dspace_communities_ids'
-      names_list = 'dspace_communities_names'
+      dspace_objects = article_data['dspace_communities']
     end
 
-    index = -1
-
-    article_data[ids_list].each do |id|
-
-      index += 1
-
-      name = article_data[names_list][index]
+    dspace_objects.each do |object|
 
       entity = klass.new
 
@@ -55,18 +47,19 @@ class DspacePluginMyprofileController < CmsController
         parent_id = parent.id
       end
 
-      entity.dspace_community_id = id if @type == 'DspacePlugin::Communityy'
-
-      if @type == 'DspacePlugin::Collection'
-        entity.dspace_collection_id = id
+      if @type == 'DspacePlugin::Communityy'
+        entity.dspace_community_id = object['id']
+      elsif @type == 'DspacePlugin::Collection'
         entity.dspace_community_id = article_data['dspace_community_id']
+        entity.dspace_collection_id = object['id']
+        entity.accept_comments = false
       end
 
+      entity.name = object['name']
       entity.profile = profile
       entity.author = user
       entity.last_changed_by = user
       entity.created_by = user
-      entity.name = name
 
       entity.save!
 

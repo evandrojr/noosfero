@@ -6,10 +6,14 @@
 
 <% communities = Dspace::Community.get_all_communities_from(dspace_server_url).map { |community| item = [_(community.name), community.id] } %>
 
-<table border="0" style="border-bottom: 1px solid #c0c0c0;">
-  <tr style="background-color: #f0f0f0; border-bottom: 1px solid #c0c0c0;">
-    <th style="border-bottom: none;">&nbsp;</th>
-    <th style="border-bottom: none;" align="left"><%= _('Community name') %></th>
+<table id="community_fields_conf" border="0" style="border-bottom: 1px solid #c0c0c0;">
+  <tr style="background-color: #f0f0f0; border-top: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0;">
+    <td style="font-style: italic">
+      <%= _("Check/Uncheck All Unlocked")%>
+    </td>
+    <td align="center">
+      <input type="checkbox" id="community_active" />
+    </td>
   </tr>
 
   <% dspace_communities_ids = DspacePlugin::Communityy.find(:all, :conditions => { :parent_id => @article.parent_id }).map { |community| ids = community.dspace_community_id.to_i } %>
@@ -17,14 +21,22 @@
   <% communities.each do |community| %>
 
   <tr>
-    <% if dspace_communities_ids.include? community[1] %>
-      <td align="center"><%= check_box_tag "article[dspace_communities_ids][]", community[1], true, :disabled => 'disabled', :onclick => "selectCommunity(this,'#{community[0]}')" %> </td>
-    <% else %>
-      <td align="center"><%= check_box_tag "article[dspace_communities_ids][]", community[1], false, :onclick => "selectCommunity(this,'#{community[0]}')" %> </td>
-    <% end %>
     <td>
       <%= community[0] %>
     </td>
+
+    <% if dspace_communities_ids.include? community[1] %>
+    <td align="center">
+      <%= check_box_tag "article[dspace_communities][][id]", community[1], true, :disabled => 'disabled', :id => "community_id_#{community[1]}" %>
+      <%= hidden_field_tag "article[dspace_communities][][name]", community[0], :disabled => 'disabled' %>
+    </td>
+    <% else %>
+    <td align="center">
+      <%= check_box_tag "article[dspace_communities][][id]", community[1], false, :id => "community_id_#{community[1]}" %>
+      <%= hidden_field_tag "article[dspace_communities][][name]", community[0], :disabled => 'disabled', :id => "community_name_#{community[1]}" %>
+    </td>
+    <% end %>
+
   </tr>
 
   <% end %>
