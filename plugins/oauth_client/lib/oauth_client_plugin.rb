@@ -69,4 +69,8 @@ class OauthClientPlugin < Noosfero::Plugin
     end
   end
 
+  def account_controller_filters
+    {:type => 'before_filter', :method_name => 'signup', :block => proc { raise "Wrong email for oauth signup" if request.post? && session[:oauth_email].present? && session[:oauth_email] != params[:user][:email] } }
+  end
+
 end
