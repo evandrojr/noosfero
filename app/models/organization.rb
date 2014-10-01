@@ -123,7 +123,7 @@ class Organization < Profile
     [
       [MainBlock.new],
       [ProfileImageBlock.new, LinkListBlock.new(:links => links)],
-      [MembersBlock.new, RecentDocumentsBlock.new]
+      [RecentDocumentsBlock.new]
     ]
   end
 
@@ -135,7 +135,11 @@ class Organization < Profile
   end
 
   def notification_emails
-    [contact_email.blank? ? nil : contact_email].compact + admins.map(&:email)
+    emails = [contact_email].select(&:present?) + admins.map(&:email)
+    if emails.empty?
+      emails << environment.contact_email
+    end
+    emails
   end
 
   def already_request_membership?(person)

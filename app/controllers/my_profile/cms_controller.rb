@@ -4,6 +4,12 @@ class CmsController < MyProfileController
 
   include ArticleHelper
 
+  def search_tags
+    arg = params[:term].downcase
+    result = ActsAsTaggableOn::Tag.find(:all, :conditions => ['LOWER(name) LIKE ?', "%#{arg}%"])
+    render :text => prepare_to_token_input_by_label(result).to_json, :content_type => 'application/json'
+  end
+
   def self.protect_if(*args)
     before_filter(*args) do |c|
       user, profile = c.send(:user), c.send(:profile)
@@ -143,7 +149,9 @@ class CmsController < MyProfileController
     end
 
     @article.profile = profile
+    @article.author = user
     @article.last_changed_by = user
+    @article.created_by = user
 
     translations if @article.translatable?
 
@@ -187,7 +195,18 @@ class CmsController < MyProfileController
     end
     if request.post? && params[:uploaded_files]
       params[:uploaded_files].each do |file|
-        @uploaded_files << UploadedFile.create({:uploaded_data => file, :profile => profile, :parent => @parent, :last_changed_by => user}, :without_protection => true) unless file == ''
+        unless file == ''
+          @uploaded_files << UploadedFile.create(
+            {
+              :uploaded_data => file,
+              :profile => profile,
+              :parent => @parent,
+              :last_changed_by => user,
+              :author => user,
+            },
+            :without_protection => true
+          )
+        end
       end
       @errors = @uploaded_files.select { |f| f.errors.any? }
       if @errors.any?
@@ -208,7 +227,7 @@ class CmsController < MyProfileController
     @article = profile.articles.find(params[:id])
     if request.post?
       @article.destroy
-      session[:notice] = _("\"#{@article.name}\" was removed.")
+      session[:notice] = _("\"%s\" was removed." % @article.name)
       referer = Rails.application.routes.recognize_path URI.parse(request.referer).path rescue nil
       if referer and referer[:controller] == 'cms' and referer[:action] != 'edit'
         redirect_to referer
@@ -231,7 +250,7 @@ class CmsController < MyProfileController
       @current_category = Category.find(params[:category_id])
       @categories = @current_category.children
     end
-    render :template => 'shared/update_categories', :locals => { :category => @current_category }
+    render :template => 'shared/update_categories', :locals => { :category => @current_category, :object_name => 'article' }
   end
 
   def publish
@@ -247,12 +266,15 @@ class CmsController < MyProfileController
     end.compact unless params[:marked_groups].nil?
     if request.post?
       @failed = {}
+      if @marked_groups.empty?
+        return session[:notice] = _("Select some group to publish your article")
+      end
       @marked_groups.each do |item|
         task = ApproveArticle.create!(:article => @article, :name => item[:name], :target => item[:group], :requestor => profile)
         begin
           task.finish unless item[:group].moderated_articles?
         rescue Exception => ex
-           @failed[ex.message] ? @failed[ex.message] << item[:group].name : @failed[ex.message] = [item[:group].name]
+          @failed[ex.message] ? @failed[ex.message] << item[:group].name : @failed[ex.message] = [item[:group].name]
         end
       end
       if @failed.blank?

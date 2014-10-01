@@ -142,7 +142,7 @@ class ExternalFeedTest < ActiveSupport::TestCase
   should 'save hour when feed was fetched' do
     external_feed = create(:external_feed)
 
-    now = Time.parse('2009-01-23 09:35')
+    now = Time.zone.parse('2009-01-23 09:35')
     Time.stubs(:now).returns(now)
 
     external_feed.finish_fetch
@@ -165,6 +165,15 @@ class ExternalFeedTest < ActiveSupport::TestCase
       dd << a.body.to_s.strip.gsub(/\s+/, ' ')
     end
     assert_equal '<img src="noosfero.png" /><p>Html content 1.</p><p>Html content 2.</p>', dd.sort.join
+  end
+
+  should 'use feed title as author name' do
+    blog = create_blog
+    e = build(:external_feed, :blog => blog, :feed_title => 'The Source')
+    e.add_item('Article title', 'http://orig.link.invalid', Time.now, '<p style="color: red">Html content 1.</p>')
+
+    assert_equal "The Source", blog.posts.first.author_name
+
   end
 
 end
