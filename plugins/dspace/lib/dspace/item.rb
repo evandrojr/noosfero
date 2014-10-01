@@ -78,6 +78,10 @@ class Dspace::Item < Dspace::Resource
 
     end
 
+    if item.files.count > 0
+      item.mimetype = item.files.first.mimetype
+    end
+
     item
 
   end
