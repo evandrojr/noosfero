@@ -11,7 +11,8 @@
 #dspace_library li.item,
 #dspace_library li.collection,
 #dspace_library li.community {
-  margin: 10px 0;
+  margin: 0;
+  padding: 10px 0;
 }
 
 #dspace_library li.item span.name,
@@ -59,5 +60,42 @@
 .icon-newdspace-collection,
 .icon-dspace-collection {
   background-image: url(/plugins/dspace/icons/dspace.png)
+}
+
+#dspace_library div.icon-item {
+  width: 32px;
+  height: 33px;
+  display: inline-block;
+  vertical-align: top;
+  border-right: 1px solid #c0c0c0;
+}
+
+#dspace_library div.icon-audio {
+  background-image: url(/plugins/dspace/icons/audio.png)
+}
+
+#dspace_library div.icon-document {
+  background-image: url(/plugins/dspace/icons/document.png)
+}
+
+#dspace_library div.icon-pdf {
+  background-image: url(/plugins/dspace/icons/pdf.png)
+}
+
+#dspace_library div.icon-picture {
+  background-image: url(/plugins/dspace/icons/picture.png)
+}
+
+#dspace_library div.icon-spreadsheet {
+  background-image: url(/plugins/dspace/icons/spreadsheet.png)
+}
+
+#dspace_library div.icon-text,
+#dspace_library div.icon-other {
+  background-image: url(/plugins/dspace/icons/text.png)
+}
+
+#dspace_library div.icon-video {
+  background-image: url(/plugins/dspace/icons/video.png)
 }
 
