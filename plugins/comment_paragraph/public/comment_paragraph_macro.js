@@ -10,7 +10,26 @@ function setPlusIfZeroComments($){
   });
 }
 
+function hideUndesiredStuff($){
+  $('.comment-created-at').hide();
+  $('#comment_title').hide();
+  $('.formlabel').attr('for', 'comment_title').hide();
+  if($.browser.mozilla){
+    $('#fancybox-loading').hide();      
+  }
+}   
+
+function removeUndesiredStuff($){
+  $('#comments_list').last().remove();
+  $('.formlabel').attr('for', 'comment_title').remove();
+}   
+
 jQuery(document).ready(function($) {
+  //Quit if does not detect a comment for that plugin
+  if($('.comment_paragraph').size() < 1)
+    return;
+  
+  removeUndesiredStuff($);
   setPlusIfZeroComments($);
   $('.display-comment-form').unbind();
   $('.display-comment-form').click(function(){
@@ -50,6 +69,8 @@ jQuery(document).ready(function($) {
           <div align="center"  class="triangle-right" >Comentar</div>\
       </a>');
 
+ 
+
   $('.side-comments-counter').click(function(){
     var paragraphId = $(this).data('paragraph');
     hideAllCommentsExcept(paragraphId);
@@ -65,8 +86,8 @@ jQuery(document).ready(function($) {
     }).done(function() {
       var button = $('#page-comment-form-' + paragraphId + ' a').get(0);
       button.click();
-      $('#fancybox-loading').hide();
       alignSideComments(paragraphId);
+      hideUndesiredStuff($);
     });
   });
 
@@ -84,8 +105,9 @@ jQuery(document).ready(function($) {
     }).done(function() {
       var button = $('#page-comment-form-' + paragraphId + ' a').get(0);
       button.click();
-      $('#fancybox-loading').hide();      
+      
       alignSideComments(paragraphId);
+      hideUndesiredStuff($);
     });
   });
 
@@ -209,6 +231,7 @@ jQuery(document).ready(function($) {
     }).done(function() {
       var button = $('#page-comment-form-' + comment_id + ' a').get(0)
       button.click();
+      hideUndesiredStuff($);
       //alignSideComments(paragraphId);
     });
   }

@@ -88,19 +88,23 @@ div.article-comments-list-more{
   border-radius: 10px;
 }
 
-.comment-picture {width: 50px;}
-.comment-text {display: inline-block;}
-.comment-replies .comment-text {display: inline-block;}
-.comment-from-owner .comment-created-at {
+.side-comment .comment-picture {width: 50px;}
+.side-comment .comment-text {display: inline-block;}
+.side-comment .comment-replies .comment-text {display: inline-block;}
+.side-comment .comment-from-owner .comment-created-at {
   display: block;
   width: 100%;
 }
-.comment-replies .comment-text {display: block;}
-#article .article-comment .comment-details h4 {display: none;}
-#article .article-comments-list .comment-replies {padding-left: 20px;}
-#comment_title{
- display: none;
-}
+/*.comment-replies .comment-text {display: block;}*/
+/*.side-comment .comment-details  {display: none;}*/
+.side-comment .comment-created-at{display: none;}
+.side-comment #comment_title{display: none;}
+.side-comment .comment_title{display: none;}
+.side-comment label[for="comment_title"] {display: none;}
+
+
+.side-comment .article-comments-list .comment-replies {padding-left: 20px;}
+
 
 div[class^='comments_list_toggle_paragraph_'] {
  border-style: solid;
@@ -118,7 +122,7 @@ div[class^='comment-paragraph-loading-'] {
 }
 
 #content .comment-balloon div[class^='comment-wrapper-']{
-    background: none;
+  background: none;
 }
 
 .side-comment{
@@ -159,10 +163,6 @@ div[class^='comment-paragraph-loading-'] {
   top: 3px;
 }
 
-#comments_list{
-  display: none;    
-}
-
 .article-comment-inner {border-bottom: 1px solid #ddd;}
 
 #article .comment-replies .article-comment{background: white; border: 0px; border-top: 1px solid #ddd;}
@@ -175,4 +175,3 @@ div[class^='comment-paragraph-loading-'] {
   right: 100%;
   position: absolute;
 }
-
