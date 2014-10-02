@@ -40,7 +40,13 @@ class OauthClientPluginTest < ActiveSupport::TestCase
     request = mock
     stubs(:request).returns(request)
     request.expects(:post?).returns(true)
-    stubs(:session).returns({:oauth_email => 'test@example.com'})
+
+    oauth_data = mock
+    info = mock
+    oauth_data.stubs(:info).returns(info)
+    info.stubs(:email).returns('test@example.com')
+    stubs(:session).returns({:oauth_data => oauth_data})
+
     params[:user] = {:email => 'test2@example.com'}
     assert_raises RuntimeError do
       instance_eval(&plugin.account_controller_filters[:block])
@@ -51,12 +57,18 @@ class OauthClientPluginTest < ActiveSupport::TestCase
     request = mock
     stubs(:request).returns(request)
     request.expects(:post?).returns(true)
-    stubs(:session).returns({:oauth_email => 'test@example.com'})
+
+    oauth_data = mock
+    info = mock
+    oauth_data.stubs(:info).returns(info)
+    info.stubs(:email).returns('test@example.com')
+    stubs(:session).returns({:oauth_data => oauth_data})
+
     params[:user] = {:email => 'test@example.com'}
     instance_eval(&plugin.account_controller_filters[:block])
   end
 
-  should 'do not raise error if oauth email is not set' do
+  should 'do not raise error if oauth session is not set' do
     request = mock
     stubs(:request).returns(request)
     request.expects(:post?).returns(true)

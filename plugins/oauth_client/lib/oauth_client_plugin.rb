@@ -19,7 +19,7 @@ class OauthClientPlugin < Noosfero::Plugin
     plugin = self
 
     proc do
-      unless (plugin.context.params[:user]||{})[:oauth_providers].blank?
+      if plugin.context.session[:oauth_data].present?
         render :partial => 'account/oauth_signup'
       else
         ''
@@ -70,7 +70,19 @@ class OauthClientPlugin < Noosfero::Plugin
   end
 
   def account_controller_filters
-    {:type => 'before_filter', :method_name => 'signup', :block => proc { raise "Wrong email for oauth signup" if request.post? && session[:oauth_email].present? && session[:oauth_email] != params[:user][:email] } }
+    {
+      :type => 'before_filter', :method_name => 'signup',
+      :block => proc {
+        auth = session[:oauth_data]
+
+        if auth.present? && params[:user].present?
+          params[:user][:oauth_providers] = [{:provider => auth.provider, :uid => auth.uid}]
+          if request.post? && auth.info.email != params[:user][:email]
+            raise "Wrong email for oauth signup"
+          end
+        end
+      }
+    }
   end
 
 end

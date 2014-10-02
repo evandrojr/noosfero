@@ -1,11 +1,7 @@
-<%= hidden_field_tag 'user[oauth_providers][][provider]', @user.oauth_providers.first[:provider] %>
-<%= hidden_field_tag 'user[oauth_providers][][uid]', @user.oauth_providers.first[:uid] %>
 <%= hidden_field_tag 'return_to', '/' %>
 
 <style>
-  #signup-password,
-  #signup-password-confirmation,
-  #signup-email {
+  #signup-password, #signup-password-confirmation, #signup-email {
     display: none;
   }
 </style>
