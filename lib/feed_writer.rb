@@ -19,7 +19,7 @@ class FeedWriter
         for article in articles
           xml.item do
             xml.title(article.name)
-            xml.description(article.to_html)
+            xml.description(article.to_html(:feed => true))
             if article.created_at
               # rfc822
               xml.pubDate(article.created_at.rfc2822)
