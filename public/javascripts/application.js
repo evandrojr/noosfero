@@ -1086,6 +1086,7 @@ function toggle_fullwidth(itemId){
     jQuery("#fullscreen-btn").hide()
     fullwidth = true;
   }
+  jQuery(window).trigger("toggleFullwidth", fullwidth);
 }
 
 function fullscreenPageLoad(itemId){
