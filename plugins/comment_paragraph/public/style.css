@@ -1,9 +1,3 @@
-#article .article-comments-list, 
-#article .article-comments-list ul, 
-#article .article-comments-list li {
-  margin: 10px 0 10px 0;
-}
-
 div.article-comments-list-more{
   width: 100%;
   height: 30px;
@@ -40,12 +34,6 @@ div.article-comments-list-more{
 
 .comment_paragraph{
   padding: 0px;
-}
-
-.article-body{
-  word-wrap: break-word;
-  display: inline-block;
-  word-break: break-all;
 }
 
 .triangle-right {
@@ -88,22 +76,11 @@ div.article-comments-list-more{
   border-radius: 10px;
 }
 
-.side-comment .comment-picture {width: 50px;}
-.side-comment .comment-text {display: inline-block;}
-.side-comment .comment-replies .comment-text {display: inline-block;}
-.side-comment .comment-from-owner .comment-created-at {
-  display: block;
-  width: 100%;
-}
-/*.comment-replies .comment-text {display: block;}*/
-/*.side-comment .comment-details  {display: none;}*/
 .side-comment .comment-created-at{display: none;}
 .side-comment #comment_title{display: none;}
 .side-comment .comment_title{display: none;}
 .side-comment label[for="comment_title"] {display: none;}
 
-
-.side-comment .article-comments-list .comment-replies {padding-left: 20px;}
 
 
 div[class^='comments_list_toggle_paragraph_'] {
@@ -121,7 +98,7 @@ div[class^='comment-paragraph-loading-'] {
  right: -230px;
 }
 
-#content .comment-balloon div[class^='comment-wrapper-']{
+#content .side-comment .comment-balloon div[class^='comment-wrapper-']{
   background: none;
 }
 
@@ -143,7 +120,7 @@ div[class^='comment-paragraph-loading-'] {
 }
 
 .side-comments-counter:hover{
-  color: white; 
+  color: white;
 }
 
 .side-comments-counter:after {
@@ -165,13 +142,52 @@ div[class^='comment-paragraph-loading-'] {
 
 .article-comment-inner {border-bottom: 1px solid #ddd;}
 
-#article .comment-replies .article-comment{background: white; border: 0px; border-top: 1px solid #ddd;}
+#article .side-comment .comment-replies .article-comment{background: white; border: 0px; border-top: 1px solid #ddd;}
 
 .comment-replies .comment-from-owner.comment-content {background: none;}
 
-.article-comment .comment-details {margin-bottom: 10px;}
 
-#content .comment-actions .menu-submenu ul {
-  right: 100%;
-  position: absolute;
+
+
+.side-comment .comment-balloon-content {
+  margin: 0;
+}
+
+#article .side-comment .article-comments-list {
+  margin: 0;
+}
+#article .side-comment .article-comments-list .article-comment {
+  margin: 0;
+}
+.side-comment .comment-details {
+  margin: 0;
+  padding: 0;
+}
+.side-comment .comment-text {
+  padding: 0;
+  width: 100%;
+  text-align: left;
+}
+.side-comment .comment-text p {
+  margin: 0;
+}
+#content #article .article-body .side-comment img {
+  max-width: 30px;
+}
+#content #article .article-body .side-comment span.comment-info {
+  position: relative;
+  top: -10px;
+  left: 36px;
+  line-height: 0;
+  font-weight: bold;
+}
+.side-comment .comment-wrapper-1 {
+  margin-left: 36px;
+}
+#article .side-comment .article-comments-list .comment-replies {
+  padding-left: 25px;
+}
+#article .side-comment .comment-picture {
+  width: 75%;
+  height: auto;
 }
