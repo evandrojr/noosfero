@@ -5,7 +5,7 @@ require 'user_activation_job'
 # Rails generator.
 class User < ActiveRecord::Base
 
-  attr_accessible :login, :email, :password, :password_confirmation
+  attr_accessible :login, :email, :password, :password_confirmation, :activated_at
 
   N_('Password')
   N_('Password confirmation')
@@ -16,14 +16,17 @@ class User < ActiveRecord::Base
   end
 
   # FIXME ugly workaround
-  def self.human_attribute_name(attrib, options={})
+  def self.human_attribute_name_with_customization(attrib, options={})
     case attrib.to_sym
       when :login
         return [_('Username'), _('Email')].join(' / ')
       when :email
         return _('e-Mail')
-      else _(self.superclass.human_attribute_name(attrib))
+      else _(self.human_attribute_name_without_customization(attrib))
     end
+  end
+  class << self
+    alias_method_chain :human_attribute_name, :customization
   end
 
   before_create do |user|
@@ -47,8 +50,12 @@ class User < ActiveRecord::Base
 
       user.person = p
     end
-    if user.environment.enabled?('skip_new_user_email_confirmation')
-      user.activate
+    if user.environment.enabled?('skip_new_user_email_confirmation') 
+      if user.environment.enabled?('admin_must_approve_new_users')
+        create_moderate_task
+      else
+        user.activate
+      end
     end
   end
   after_create :deliver_activation_code
@@ -135,6 +142,15 @@ class User < ActiveRecord::Base
     else
       true
     end
+  end
+
+  def create_moderate_task
+    @task = ModerateUserRegistration.new
+    @task.user_id = self.id
+    @task.name = self.name
+    @task.email = self.email
+    @task.target = self.environment
+    @task.save
   end
 
   def activated?

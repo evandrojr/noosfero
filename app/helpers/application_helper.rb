@@ -312,13 +312,13 @@ module ApplicationHelper
     raise ArgumentError, 'No partial for object. Is there a partial for any class in the inheritance hierarchy?'
   end
 
-  def view_for_profile_actions(klass)
-    raise ArgumentError, 'No profile actions view for this class.' if klass.nil?
-
-    name = klass.name.underscore
-    return "blocks/profile_info_actions/" + name + '.html.erb' if File.exists?(Rails.root.join('app', 'views', 'blocks', 'profile_info_actions', name + '.html.erb'))
-
-    view_for_profile_actions(klass.superclass)
+  def render_profile_actions klass
+    name = klass.to_s.underscore
+    begin
+      render "blocks/profile_info_actions/#{name}"
+    rescue ActionView::MissingTemplate
+      render_profile_actions klass.superclass
+    end
   end
 
   def user
@@ -482,7 +482,12 @@ module ApplicationHelper
             '/images/icons-app/enterprise-'+ size.to_s() +'.png'
           end
         else
-          '/images/icons-app/person-'+ size.to_s() +'.png'
+          pixels = Image.attachment_options[:thumbnails][size].split('x').first
+          gravatar_profile_image_url(
+            profile.email,
+            :size => pixels,
+            :d => gravatar_default
+          )
         end
       filename = default_or_themed_icon(icon)
     end
@@ -602,7 +607,7 @@ module ApplicationHelper
   end
 
   def gravatar_default
-    (respond_to?(:theme_option) && theme_option.present? && theme_option['gravatar']) || NOOSFERO_CONF['gravatar']
+    (respond_to?(:theme_option) && theme_option.present? && theme_option['gravatar']) || NOOSFERO_CONF['gravatar'] || 'mm'
   end
 
   attr_reader :environment
@@ -671,7 +676,7 @@ module ApplicationHelper
 
   def theme_javascript_ng
     script = File.join(theme_path, 'theme.js')
-    if File.join(Rails.root, 'public', script)
+    if File.exists?(File.join(Rails.root, 'public', script))
       javascript_include_tag script
     else
       nil
@@ -1095,7 +1100,7 @@ module ApplicationHelper
     result
   end
 
-  def manage_link(list, kind)
+  def manage_link(list, kind, title)
     if list.present?
       link_to_all = nil
       if list.count > 5
@@ -1108,19 +1113,19 @@ module ApplicationHelper
       if link_to_all
         link << link_to_all
       end
-      render :partial => "shared/manage_link", :locals => {:link => link, :kind => kind.to_s}
+      render :partial => "shared/manage_link", :locals => {:link => link, :kind => kind.to_s, :title => title}
     end
   end
 
   def manage_enterprises
     return '' unless user && user.environment.enabled?(:display_my_enterprises_on_user_menu)
-    manage_link(user.enterprises, :enterprises).to_s
+    manage_link(user.enterprises, :enterprises, _('My enterprises')).to_s
   end
 
   def manage_communities
     return '' unless user && user.environment.enabled?(:display_my_communities_on_user_menu)
     administered_communities = user.communities.more_popular.select {|c| c.admins.include? user}
-    manage_link(administered_communities, :communities).to_s
+    manage_link(administered_communities, :communities, _('My communities')).to_s
   end
 
   def admin_link
@@ -1223,22 +1228,9 @@ module ApplicationHelper
   end
 
   def add_zoom_to_images
-    stylesheet_link_tag('fancybox') +
-    javascript_include_tag('jquery.fancybox-1.3.4.pack') +
-    javascript_tag("jQuery(function($) {
-      $(window).load( function() {
-        $('#article .article-body img').each( function(index) {
-          var original = original_image_dimensions($(this).attr('src'));
-          if ($(this).width() < original['width'] || $(this).height() < original['height']) {
-            $(this).wrap('<div class=\"zoomable-image\" />');
-            $(this).parent('.zoomable-image').attr('style', $(this).attr('style'));
-            $(this).attr('style', '');
-            $(this).after(\'<a href=\"' + $(this).attr('src') + '\" class=\"zoomify-image\"><span class=\"zoomify-text\">%s</span></a>');
-          }
-        });
-        $('.zoomify-image').fancybox();
-      });
-    });" % _('Zoom in'))
+    stylesheet_link_tag('jquery.fancybox') +
+    javascript_include_tag('jquery.fancybox.pack') +
+    javascript_tag("apply_zoom_to_images(#{_('Zoom in').to_json})")
   end
 
   def render_dialog_error_messages(instance_name)
@@ -1294,9 +1286,9 @@ module ApplicationHelper
 
   def delete_article_message(article)
     if article.folder?
-      _("Are you sure that you want to remove the folder \"#{article.name}\"? Note that all the items inside it will also be removed!")
+      _("Are you sure that you want to remove the folder \"%s\"? Note that all the items inside it will also be removed!") % article.name
     else
-      _("Are you sure that you want to remove the item \"#{article.name}\"?")
+      _("Are you sure that you want to remove the item \"%s\"?") % article.name
     end
   end
 
@@ -1373,7 +1365,7 @@ module ApplicationHelper
       @message = _("The content here is available to %s's friends only.") % profile.short_name
     else
       @action = :join
-      @message = _('The contents in this community is available to members only.')
+      @message = _('The contents in this profile is available to members only.')
     end
     @no_design_blocks = true
   end
@@ -1413,6 +1405,16 @@ module ApplicationHelper
 
   def display_article_versions(article, version = nil)
     content_tag('ul', article.versions.map {|v| link_to("r#{v.version}", @page.url.merge(:version => v.version))})
+  end
+
+  def labelled_colorpicker_field(human_name, object_name, method, options = {})
+    options[:id] ||= 'text-field-' + FormsHelper.next_id_number
+    content_tag('label', human_name, :for => options[:id], :class => 'formlabel') +
+    colorpicker_field(object_name, method, options.merge(:class => 'colorpicker_field'))
+  end
+
+  def colorpicker_field(object_name, method, options = {})
+    text_field(object_name, method, options.merge(:class => 'colorpicker_field'))
   end
 
 end
