@@ -3,11 +3,11 @@ class VideoGallery < Folder
   def self.type_name
     _('Video Gallery')
   end
-  
+
   settings_items :thumbnail_width, :type => :integer, :default => 50
   settings_items :thumbnail_height, :type => :integer, :default => 50
   settings_items :videos_per_row, :type => :integer, :default => 5
-  
+
   validate :not_belong_to_blog
 
   def not_belong_to_blog
@@ -22,7 +22,7 @@ class VideoGallery < Folder
   filter_iframes :body
   def iframe_whitelist
     profile && profile.environment && profile.environment.trusted_sites_for_iframe
-  end  
+  end
 
   def self.short_description
     _('Video Gallery')
@@ -31,19 +31,19 @@ class VideoGallery < Folder
   def self.description
     _('A gallery of link to videos that are hosted elsewhere.')
   end
- 
+
   include ActionView::Helpers::TagHelper
   def to_html(options = {})
     video_gallery = self
     proc do
-      render :file => 'content_viewer/video_gallery', :locals => {:video_gallery => video_gallery}
+      render :partial => 'content_viewer/video_gallery', :locals => {:video_gallery => video_gallery}
     end
-  end  
+  end
 
   def video_gallery?
     true
   end
-  
+
   def can_display_hits?
     false
   end
@@ -58,6 +58,6 @@ class VideoGallery < Folder
 
   def news(limit = 30, highlight = false)
     profile.recent_documents(limit, ["articles.type != ? AND articles.highlighted = ? AND articles.parent_id = ?", 'Folder', highlight, id])
-  end  
-  
+  end
+
 end

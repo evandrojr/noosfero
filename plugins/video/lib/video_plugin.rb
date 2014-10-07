@@ -44,7 +44,7 @@ class VideoPlugin < Noosfero::Plugin
         content_tag('a', _("New Video"),
         { :id=>"new-video-btn",
           :class=>"button with-text icon-new",
-          :href=>url_for(:action => 'new', :type=>'Video', :controller=>'cms'),
+          :href=>url_for(:action => 'new', :type=>'Video', :controller=>'cms', :parent_id => content.id),
           :title=>_("New Video")
         })
       end        

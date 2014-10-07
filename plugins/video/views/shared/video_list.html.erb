@@ -5,17 +5,14 @@
       <div class="video-gallery-thumbnail">
         <div class="video-gallery-top-box">
           <%= link_to content.view_url do %>
-            <img  width="<%= content.thumbnail_fitted_width %>" height="<%= content.thumbnail_fitted_width %>" src='<%= content.video_thumbnail_url %>'/>
+            <img  width="<%= content.thumbnail_fitted_width %>" height="<%= content.thumbnail_fitted_width %>" src='<%= content.video_thumbnail_url %>' class="disable-zoom"/>
           <% end  %>
-        </div>            
-        <div class="video-gallery-botton-box">  
+        </div>
+        <div class="video-gallery-botton-box">
           <font size="1em"><%= content.title %></font>
-        </div>  
-        <% if content.video_duration != 0 %>
-          <span class="video-duration"><%= content.video_duration %></span>
-        <% end %>
+        </div>
       </div>
     <% end %>
   <% end %>
 <p><%= pagination_links contents, :param_name => 'npage', :page_links => true %></p>
-</div>  
+</div>

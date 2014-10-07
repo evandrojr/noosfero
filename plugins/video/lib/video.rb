@@ -2,7 +2,6 @@ require 'noosfero/translatable_content'
 require 'application_helper'
 require 'net/http'
 
-# a base class for all text article types.  
 class Video < Article
 
   settings_items :video_url,    :type => :string, :default => 'http://'
@@ -13,14 +12,14 @@ class Video < Article
   settings_items :video_format,      :type => :string
   settings_items :video_id,          :type => :string
   settings_items :video_thumbnail_url,    :type => :string, :default => '/plugins/video/images/video_generic_thumbnail.jpg'
-  settings_items :video_thumbnail_width,  :type=> :integer    
+  settings_items :video_thumbnail_width,  :type=> :integer
   settings_items :video_thumbnail_height, :type=> :integer
   settings_items :video_duration, :type=> :integer, :default => 0
-  
+
   attr_accessible :video_url
 
   before_save :detect_video
-  
+
   def self.type_name
     _('Video')
   end
@@ -28,7 +27,7 @@ class Video < Article
   def can_display_versions?
     true
   end
-  
+
   def self.short_description
     _('Embedded Video')
   end
@@ -41,10 +40,10 @@ class Video < Article
   def to_html(options={})
     article = self
     proc do
-      render :file => 'content_viewer/video', :locals => {:article => article}
+      render :partial => 'content_viewer/video', :locals => {:article => article}
     end
-  end  
-  
+  end
+
   def fitted_width
     499
   end
