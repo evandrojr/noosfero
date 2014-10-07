@@ -10,9 +10,9 @@ jQuery(document).ready(function($) {
   });
 
   function proposalsScroll() {
-    var scroll = $('.article-body-proposals-discussion-plugin_topic .topic-content .proposals_list');
+    var scroll = $('.article-body-proposals-discussion-plugin_topic .topic-content .proposals_list .proposals');
     var nextSelector = 'div.more a';
-    if(scroll.data('jscroll')) scroll.jscroll.destroy();
+    if(scroll.data('jscroll')) scroll.data('jscroll', null);
 
     if(scroll.find(nextSelector).length > 0) {
       scroll.jscroll({
@@ -31,6 +31,12 @@ jQuery(document).ready(function($) {
     $('.topics').masonry();
   });
   $('.topics').masonry();
+  $(window).resize(function() {
+    $('.topics').masonry();
+  });
+  $(window).bind('toggleFullwidth', function() {
+    $('.topics').masonry();
+  });
 });
 
 function loadSocialButtons() {

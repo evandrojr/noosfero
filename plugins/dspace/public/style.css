@@ -1,0 +1,101 @@
+#dspace_library ul {
+  margin: 0;
+  padding: 0 0 0 5px;
+}
+
+#dspace_library li {
+  /**list-style-image: url(/designs/themes/base/imgs/li-recent.gif);*/
+  list-style-type: none;
+}
+
+#dspace_library li.item,
+#dspace_library li.collection,
+#dspace_library li.community {
+  margin: 0;
+  padding: 10px 0;
+}
+
+#dspace_library li.item span.name,
+#dspace_library li.collection span.title,
+#dspace_library li.community span.title {
+  font-weight: bold;
+}
+
+#dspace_library div#actions {
+  margin: 10px 0;
+}
+
+#dspace_library_item {
+  /*8border: 1px solid green;*/
+}
+
+.dspace_item_section {
+  margin: 15px;
+}
+
+.dspace_item_section_title {
+  margin: 0px;
+  font-weight: bold;
+  border-bottom: 1px solid #c0c0c0;
+}
+
+#dspace_library_item ul {
+  list-style-type: none;
+}
+
+#dspace_library_item ul#item_files_list,
+#dspace_library_item ul.item_file_attributes_list {
+  margin: 0;
+  padding: 0;
+}
+
+#dspace_library_item ul#item_files_list > li {
+  margin: 5px 0;
+}
+
+.icon-newdspace-library,
+.icon-dspace-library,
+.icon-newdspace-community,
+.icon-dspace-community,
+.icon-newdspace-collection,
+.icon-dspace-collection {
+  background-image: url(/plugins/dspace/icons/dspace.png)
+}
+
+#dspace_library div.icon-item {
+  width: 32px;
+  height: 33px;
+  display: inline-block;
+  vertical-align: top;
+  border-right: 1px solid #c0c0c0;
+}
+
+#dspace_library div.icon-audio {
+  background-image: url(/plugins/dspace/icons/audio.png)
+}
+
+#dspace_library div.icon-document {
+  background-image: url(/plugins/dspace/icons/document.png)
+}
+
+#dspace_library div.icon-pdf {
+  background-image: url(/plugins/dspace/icons/pdf.png)
+}
+
+#dspace_library div.icon-picture {
+  background-image: url(/plugins/dspace/icons/picture.png)
+}
+
+#dspace_library div.icon-spreadsheet {
+  background-image: url(/plugins/dspace/icons/spreadsheet.png)
+}
+
+#dspace_library div.icon-text,
+#dspace_library div.icon-other {
+  background-image: url(/plugins/dspace/icons/text.png)
+}
+
+#dspace_library div.icon-video {
+  background-image: url(/plugins/dspace/icons/video.png)
+}
+

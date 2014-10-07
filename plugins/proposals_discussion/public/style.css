@@ -156,10 +156,13 @@ form .proposals-discussion-plugin .body textarea {
 #content .topic-item h2 a, #article .article-body-proposals-discussion-plugin_topic h2 a,
 #content .topic h2 a {
   text-decoration: none;
-  padding: 10px;
   display: inline-block;
   width: 94%;
   color: white;
+}
+#content .topic-title h2 span {
+  padding: 10px;
+  display: inline-block;
 }
 .topic-item .topic-content, #article .article-body-proposals-discussion-plugin_topic .topic-content {
   padding: 5px 7px 5px 2px;
@@ -177,7 +180,7 @@ form .proposals-discussion-plugin .body textarea {
   margin: 1px 0 0 0;
 }
 
-#content .tag_cloud a {
+#content .article-body-proposals-discussion-plugin_topic .tag_cloud a {
   text-decoration: none;
 }
 
@@ -199,7 +202,7 @@ form .proposals-discussion-plugin .body textarea {
 #content .statistics h5 {
   color: rgb(95, 95, 95);
 }
-#content .tag_cloud {
+#content .article-body-proposals-discussion-plugin_topic .tag_cloud {
   float: right;
   width: 300px;
   box-shadow: 5px 5px 5px -2px #ddd;
@@ -218,4 +221,14 @@ form .proposals-discussion-plugin .body textarea {
 .article-body-proposals-discussion-plugin_topic .topic.actions {
   clear: both;
   padding-top: 10px;
+}
+
+.proposal .actions .fb-share-button {
+  top: -3px;
+}
+
+.topic-title h2 img {
+  max-height: 36px;
+  vertical-align: middle;
+  padding: 4px 0 4px 4px;
 }

@@ -1,6 +1,7 @@
 class ProposalsDiscussionPlugin::Proposal < TinyMceArticle
 
   scope :private, lambda {|user| {:conditions => {:last_changed_by_id => user.id, :published => false}}}
+  scope :from_discussion, lambda {|discussion| joins(:parent).where(['parents_articles.parent_id = ?', discussion.id])}
 
   alias :topic :parent
 
@@ -16,8 +17,12 @@ class ProposalsDiscussionPlugin::Proposal < TinyMceArticle
 
 
   def to_html(options = {})
-    proc do
-      render :file => 'content_viewer/proposal'
+    unless options[:feed]
+      proc do
+        render :file => 'content_viewer/proposal'
+      end
+    else
+      body
     end
   end
 
@@ -37,5 +42,9 @@ class ProposalsDiscussionPlugin::Proposal < TinyMceArticle
     cache_key_without_person + (user && created_by == user ? "-#{user.identifier}" : '')
   end
   alias_method_chain :cache_key, :person
+
+  def can_display_versions?
+    false
+  end
 
 end
