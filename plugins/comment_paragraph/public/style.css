@@ -191,3 +191,15 @@ div[class^='comment-paragraph-loading-'] {
   width: 75%;
   height: auto;
 }
+#article .side-comment .article-comment .comment-details > h4 {
+  display: none;
+}
+.side-comment .formlabel[for='comment_body'] {
+  display: none;
+}
+.side-comment > div > div {
+  background: #FFFFFF;
+}
+.side-comment .comment_form p {
+  display: none;
+}

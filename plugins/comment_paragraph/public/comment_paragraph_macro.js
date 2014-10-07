@@ -10,26 +10,19 @@ function setPlusIfZeroComments($){
   });
 }
 
-function hideUndesiredStuff($){
-  $('.comment-created-at').hide();
-  $('#comment_title').hide();
-  $('.formlabel').attr('for', 'comment_title').hide();
-  if($.browser.mozilla){
-    $('#fancybox-loading').hide();      
-  }
-}   
-
-function removeUndesiredStuff($){
-  $('#comments_list').last().remove();
-  $('.formlabel').attr('for', 'comment_title').remove();
-}   
-
 jQuery(document).ready(function($) {
   //Quit if does not detect a comment for that plugin
   if($('.comment_paragraph').size() < 1)
     return;
-  
-  removeUndesiredStuff($);
+
+  $(document).keyup(function(e) {
+    // on press ESC key...
+    if (e.which == 27) {
+      // closing side comment box
+      $("div.side-comment").hide();
+    }
+  });
+
   setPlusIfZeroComments($);
   $('.display-comment-form').unbind();
   $('.display-comment-form').click(function(){
@@ -41,15 +34,8 @@ jQuery(document).ready(function($) {
   });
 
   $('#cancel-comment').die();
-  $('#cancel-comment').live("click", function(){
-    var $button = $(this);
-    showBox($button.parents('.post_comment_box'));
-    show_display_comment_button();
-    var page_comment_form = $button.parents('.page-comment-form');
-    page_comment_form.find('.errorExplanation').remove();
-    $(this).closest("textarea[name^='comment'").text("");
-    $(this).closest("div[class^='side-comment']").hide();
-    return false;
+  $(document.body).on("click", '#cancel-comment', function(){
+    $("div.side-comment").hide();
   });
 
   function showBox(div){
@@ -69,7 +55,6 @@ jQuery(document).ready(function($) {
           <div align="center"  class="triangle-right" >Comentar</div>\
       </a>');
 
- 
 
   $('.side-comments-counter').click(function(){
     var paragraphId = $(this).data('paragraph');
@@ -86,8 +71,6 @@ jQuery(document).ready(function($) {
     }).done(function() {
       var button = $('#page-comment-form-' + paragraphId + ' a').get(0);
       button.click();
-      alignSideComments(paragraphId);
-      hideUndesiredStuff($);
     });
   });
 
@@ -105,20 +88,8 @@ jQuery(document).ready(function($) {
     }).done(function() {
       var button = $('#page-comment-form-' + paragraphId + ' a').get(0);
       button.click();
-      
-      alignSideComments(paragraphId);
-      hideUndesiredStuff($);
     });
   });
-
-  function alignSideComments(paragraphId){
-    $('.comments_list_toggle_paragraph_' + paragraphId).css('background','#FFFFFF');
-    $('label[for|=comment_title]').hide();
-    $('label[for|=comment_body]').css({top: -30, left: +20, position:'relative'});
-    $('.comment_form p').hide();
-    $('.comments_list_toggle_paragraph_' + paragraphId).width('250px');
-    $('.required-field').removeClass("required-field");
-  }
 
   function hideAllCommentsExcept(clickedParagraph){
     $(".side-comment").each(function(){
@@ -152,7 +123,7 @@ jQuery(document).ready(function($) {
       rootElement.innerHTML = lastParagraph[paragraphId];
     }
   });
-  
+
   function getSelectionText() {
     var text = "";
     if (window.getSelection) {
@@ -199,7 +170,7 @@ jQuery(document).ready(function($) {
     lastSelectedArea[paragraphId] = selected_area;
     form = $('#page-comment-form-' + paragraphId).find('form');
     if (form.find('input.selected_area').length === 0){
-      jQuery('<input>').attr({
+      $('<input>').attr({
         class: 'selected_area',
         type: 'hidden',
         name: 'comment[comment_paragraph_selected_area]',
@@ -231,8 +202,6 @@ jQuery(document).ready(function($) {
     }).done(function() {
       var button = $('#page-comment-form-' + comment_id + ' a').get(0)
       button.click();
-      hideUndesiredStuff($);
-      //alignSideComments(paragraphId);
     });
   }
 
@@ -271,31 +240,21 @@ jQuery(document).ready(function($) {
       sel.removeAllRanges();
     }
   });
-}); // End of jQuery(document).ready(function($)
 
-//Seens that this code is not beeing used anymore
-
-function toggleParagraph(paragraph) {
-  var div = jQuery('div.comments_list_toggle_paragraph_'+paragraph);
-  var visible = div.is(':visible');
-  if(!visible)
-    jQuery('div.comment-paragraph-loading-' + paragraph).addClass('comment-button-loading');
-  div.toggle('fast');
-  return visible;
-}
-
-function loadCompleted(paragraph) {
-  jQuery('div.comment-paragraph-loading-'+paragraph).removeClass('comment-button-loading')
-  if(comment_paragraph_anchor) {
-    jQuery.scrollTo(jQuery(comment_paragraph_anchor));
-    comment_paragraph_anchor = null;
+  function toggleParagraph(paragraph) {
+    var div = $('div.comments_list_toggle_paragraph_'+paragraph);
+    var visible = div.is(':visible');
+    if(!visible)
+      $('div.comment-paragraph-loading-' + paragraph).addClass('comment-button-loading');
+    div.toggle('fast');
+    return visible;
   }
-}
 
-jQuery(document).keyup(function(e) {
-  // on press ESC key...
-  if (e.which == 27) {
-    // closing side comment box
-    side_comment_box_opened = jQuery("div.side-comment").hide();
+  function loadCompleted(paragraph) {
+    $('div.comment-paragraph-loading-'+paragraph).removeClass('comment-button-loading')
+    if(comment_paragraph_anchor) {
+      $.scrollTo($(comment_paragraph_anchor));
+      comment_paragraph_anchor = null;
+    }
   }
 });
