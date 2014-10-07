@@ -1,0 +1,59 @@
+<div id="dspace_library">
+
+  <% if dspace_content.allow_create?(user) %>
+
+  <div id="actions">
+
+    <% if dspace_content.is_a? DspacePlugin::Library %>
+
+      <%= content_tag('a', :href => url_for({:controller => 'cms', :action => 'new', :type => "DspacePlugin::Communityy", :parent_id => dspace_content.id}), :class => 'button with-text icon-add') do %>
+        <%= _("Add %s") % DspacePlugin::Communityy.short_description %>
+      <% end %>
+
+    <% elsif dspace_content.is_a? DspacePlugin::Communityy %>
+
+      <%= content_tag('a', :href => url_for({:controller => 'cms', :action => 'new', :type => "DspacePlugin::Collection", :parent_id => dspace_content.id}), :class => 'button with-text icon-add') do %>
+        <%= _("Add %s") % DspacePlugin::Collection.short_description %>
+      <% end %>
+
+    <% end %>
+
+  </div>
+
+  <% end %>
+
+  <% if dspace_content.is_a? DspacePlugin::Library %>
+
+    <% communities = dspace_content.communities %>
+
+  <ul id="communities_list">
+    <%= render :partial => 'community', :collection => communities %>
+  </ul>
+
+  <% elsif dspace_content.is_a? DspacePlugin::Communityy %>
+
+    <% community_id = dspace_content.dspace_community_id %>
+    <% dspace_server = dspace_content.parent.dspace_server_url %>
+
+    <% collections = dspace_content.collections dspace_server, community_id %>
+
+  <ul id="collections_list">
+    <%= render :partial => 'collection', :collection => collections %>
+  </ul>
+
+  <% elsif dspace_content.is_a? DspacePlugin::Collection %>
+
+    <% collection_id = dspace_content.dspace_collection_id %>
+    <% dspace_server = dspace_content.parent.parent.dspace_server_url %>
+
+    <div id="dspace_library">
+      <div id="dspace_collection">
+        <ul id="items_list">
+          <%= render :partial => 'item', :collection => dspace_content.items(dspace_server, collection_id) %>
+        </ul>
+      </div>
+    </div>
+
+  <% end %>
+
+</div>
