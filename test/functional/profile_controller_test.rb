@@ -11,14 +11,6 @@ class ProfileControllerTest < ActionController::TestCase
   end
   attr_reader :profile
 
-  def test_local_files_reference
-    assert_local_files_reference
-  end
-
-  def test_valid_xhtml
-    assert_valid_xhtml
-  end
-
   noosfero_test :profile => 'testuser'
 
   should 'list friends' do
@@ -86,7 +78,7 @@ class ProfileControllerTest < ActionController::TestCase
 
   should 'actually add friend' do
     login_as(@profile.identifier)
-    person = fast_create(Person)
+    person = create_user.person
     assert_difference 'AddFriend.count' do
       post :add, :profile => person.identifier
     end
@@ -154,7 +146,7 @@ class ProfileControllerTest < ActionController::TestCase
     community = Community.create!(:name => 'my test community')
     community.add_admin(@profile)
     get :index, :profile => community.identifier
-    assert_tag :tag => 'a', :attributes => { :href => /\/myprofile\/\{login\}/ }, :content => 'Control panel'
+    assert_tag :tag => 'a', :attributes => { :href => /\/myprofile\/my-test-community/ }, :content => 'Control panel'
   end
 
   should 'show create community in own profile' do
@@ -225,30 +217,6 @@ class ProfileControllerTest < ActionController::TestCase
     assert @profile.is_a_friend?(friend)
     get :index, :profile => friend.identifier
     assert_no_match /Add friend/, @response.body
-  end
-
-  should 'show message for disabled enterprise' do
-    login_as(@profile.identifier)
-    ent = fast_create(Enterprise, :name => 'my test enterprise', :identifier => 'my-test-enterprise', :enabled => false)
-    get :index, :profile => ent.identifier
-    assert_tag :tag => 'div', :attributes => { :id => 'profile-disabled' }, :content => /#{Environment.default.message_for_disabled_enterprise}/
-  end
-
-  should 'not show message for disabled enterprise to non-enterprises' do
-    login_as(@profile.identifier)
-    @profile.enabled = false; @profile.save!
-    get :index, :profile => @profile.identifier
-    assert_no_tag :tag => 'div', :attributes => { :id => 'profile-disabled' }, :content => Environment.default.message_for_disabled_enterprise
-  end
-
-  should 'not show message for disabled enterprise if there is a block for it' do
-    login_as(@profile.identifier)
-    ent = fast_create(Enterprise, :name => 'my test enterprise', :identifier => 'my-test-enterprise', :enabled => false)
-    ent.boxes << Box.new
-    ent.boxes[0].blocks << DisabledEnterpriseMessageBlock.new
-    ent.save
-    get :index, :profile => ent.identifier
-    assert_no_tag :tag => 'div', :attributes => {:class => 'blocks'}, :descendant => { :tag => 'div', :attributes => { :id => 'profile-disabled' }}
   end
 
   should 'display "Products" link for enterprise' do
@@ -398,10 +366,10 @@ class ProfileControllerTest < ActionController::TestCase
     assert profile.memberships.include?(community), 'profile should be actually added to the community'
   end
 
-  should 'create task when join to closed organization with members' do
+  should 'create a task when joining a closed organization with members' do
     community = fast_create(Community)
     community.update_attribute(:closed, true)
-    admin = fast_create(Person)
+    admin = create_user.person
     community.add_member(admin)
 
     login_as profile.identifier
@@ -474,17 +442,23 @@ class ProfileControllerTest < ActionController::TestCase
     assert_equal "/profile/#{community.identifier}", @request.session[:previous_location]
   end
 
-  should 'redirect to location before login after join community' do
+  should 'redirect to login after user not logged asks to join a community' do
     community = Community.create!(:name => 'my test community')
 
-    @request.expects(:referer).returns("/profile/#{community.identifier}/to_go")
+    get :join_not_logged, :profile => community.identifier
+
+    assert_equal community.identifier, @request.session[:join]
+    assert_redirected_to :controller => :account, :action => :login
+  end
+
+  should 'redirect to join after user logged asks to join_not_logged a community' do
+    community = Community.create!(:name => 'my test community')
+
     login_as(profile.identifier)
+    get :join_not_logged, :profile => community.identifier
 
-    post :join_not_logged, :profile => community.identifier
-
-    assert_redirected_to "/profile/#{community.identifier}/to_go"
-
-    assert_nil @request.session[:previous_location]
+    assert_equal community.identifier, @request.session[:join]
+    assert_redirected_to :controller => :profile, :action => :join
   end
 
   should 'show number of published events in index' do
@@ -613,7 +587,7 @@ class ProfileControllerTest < ActionController::TestCase
   should "leave a scrap on another profile" do
     login_as(profile.identifier)
     count = Scrap.count
-    another_person = fast_create(Person)
+    another_person = create_user.person
     assert another_person.scraps_received.empty?
     post :leave_scrap, :profile => another_person.identifier, :scrap => {:content => 'something'}
     assert_equal count + 1, Scrap.count
@@ -671,7 +645,7 @@ class ProfileControllerTest < ActionController::TestCase
   should "the sender be the logged user by default" do
     login_as(profile.identifier)
     count = Scrap.count
-    another_person = fast_create(Person)
+    another_person = create_user.person
     post :leave_scrap, :profile => another_person.identifier, :scrap => {:content => 'something'}
     last = Scrap.last
     assert_equal profile, last.sender
@@ -680,7 +654,7 @@ class ProfileControllerTest < ActionController::TestCase
  should "the receiver be the current profile by default" do
     login_as(profile.identifier)
     count = Scrap.count
-    another_person = fast_create(Person)
+    another_person = create_user.person
     post :leave_scrap, :profile => another_person.identifier, :scrap => {:content => 'something'}
     last = Scrap.last
     assert_equal another_person, last.receiver
@@ -712,8 +686,8 @@ class ProfileControllerTest < ActionController::TestCase
   end
 
   should 'not display activities of the current profile when he is not followed by the viewer' do
-    p1= fast_create(Person)
-    p2= fast_create(Person)
+    p1= create_user.person
+    p2= create_user.person
 
     UserStampSweeper.any_instance.stubs(:current_user).returns(p1)
     scrap1 = create(Scrap, defaults_for_scrap(:sender => p1, :receiver => p2))
@@ -740,9 +714,9 @@ class ProfileControllerTest < ActionController::TestCase
   end
 
   should 'not see the friends activities in the current profile' do
-    p2= fast_create(Person)
+    p2 = create_user.person
     assert !profile.is_a_friend?(p2)
-    p3= fast_create(Person)
+    p3 = create_user.person
     p3.add_friend(profile)
     assert p3.is_a_friend?(profile)
     ActionTracker::Record.destroy_all
@@ -763,13 +737,13 @@ class ProfileControllerTest < ActionController::TestCase
   end
 
   should 'see all the activities in the current profile network' do
-    p1= fast_create(Person)
-    p2= fast_create(Person)
+    p1= create_user.person
+    p2= create_user.person
     assert !p1.is_a_friend?(p2)
 
-    p3= fast_create(Person)
+    p3= create_user.person
     p3.add_friend(p1)
-    assert p3.is_a_friend?(p1)
+    p1.add_friend(p3)
 
     ActionTracker::Record.delete_all
 
@@ -785,27 +759,21 @@ class ProfileControllerTest < ActionController::TestCase
     create(Scrap, defaults_for_scrap(:sender => p3, :receiver => p1))
     a3 = ActionTracker::Record.last
 
-    @controller.stubs(:logged_in?).returns(true)
-    user = mock()
-    user.stubs(:person).returns(p3)
-    user.stubs(:login).returns('some')
-    @controller.stubs(:current_user).returns(user)
-    Person.any_instance.stubs(:follows?).returns(true)
-
     process_delayed_job_queue
-    get :index, :profile => p1.identifier
 
+    login_as p3.user.login
+    get :index, :profile => p1.identifier
     assert_equivalent [a1,a3].map(&:id), assigns(:network_activities).map(&:id)
   end
 
   should 'the network activity be visible only to profile followers' do
-    p1= fast_create(Person)
-    p2= fast_create(Person)
+    p1= create_user.person
+    p2= create_user.person
     assert !p1.is_a_friend?(p2)
 
-    p3= fast_create(Person)
+    p3= create_user.person
     p3.add_friend(p1)
-    assert p3.is_a_friend?(p1)
+    p1.add_friend(p3)
 
     ActionTracker::Record.delete_all
 
@@ -821,24 +789,11 @@ class ProfileControllerTest < ActionController::TestCase
     create(Scrap, defaults_for_scrap(:sender => p3, :receiver => p1))
     a3 = ActionTracker::Record.last
 
-    @controller.stubs(:logged_in?).returns(true)
-    user = mock()
-    user.stubs(:person).returns(p2)
-    user.stubs(:login).returns('some')
-    @controller.stubs(:current_user).returns(user)
-
-    get :index, :profile => p1.identifier
-    assert assigns(:network_activities).blank?
-
-    user = mock()
-    user.stubs(:person).returns(p3)
-    user.stubs(:login).returns('some')
-    @controller.stubs(:current_user).returns(user)
-    Person.any_instance.stubs(:follows?).returns(true)
     process_delayed_job_queue
 
-    get :index, :profile => p3.identifier
-    assert_equivalent [a1,a3], assigns(:network_activities)
+    login_as p2.user.login
+    get :index, :profile => p1.identifier
+    assert assigns(:network_activities).blank?
   end
 
   should 'the network activity be paginated' do
@@ -855,10 +810,10 @@ class ProfileControllerTest < ActionController::TestCase
   end
 
   should 'the network activity be visible only to logged users' do
-    p1= fast_create(Person)
-    p2= fast_create(Person)
+    p1= create_user.person
+    p2= create_user.person
     assert !p1.is_a_friend?(p2)
-    p3= fast_create(Person)
+    p3= create_user.person
     p3.add_friend(p1)
     assert p3.is_a_friend?(p1)
     ActionTracker::Record.destroy_all
@@ -917,10 +872,10 @@ class ProfileControllerTest < ActionController::TestCase
   end
 
   should 'the self activity not crashes with user not logged in' do
-    p1= fast_create(Person)
-    p2= fast_create(Person)
+    p1= create_user.person
+    p2= create_user.person
     assert !p1.is_a_friend?(p2)
-    p3= fast_create(Person)
+    p3= create_user.person
     p3.add_friend(p1)
     assert p3.is_a_friend?(p1)
     ActionTracker::Record.destroy_all
@@ -1186,7 +1141,7 @@ class ProfileControllerTest < ActionController::TestCase
     20.times {comment = fast_create(Comment, :source_id => article, :title => 'a comment', :body => 'lalala', :created_at => Time.now)}
     article.reload
     get :index, :profile => profile.identifier
-    assert_tag 'ul', :attributes => {:class => 'profile-wall-activities-comments'}, :children => {:count => 0 } 
+    assert_tag 'ul', :attributes => {:class => 'profile-wall-activities-comments'}, :children => {:count => 0 }
   end
 
   should "view more comments paginated" do
@@ -1212,7 +1167,7 @@ class ProfileControllerTest < ActionController::TestCase
     20.times {fast_create(Scrap, :sender_id => profile.id, :receiver_id => profile.id, :scrap_id => scrap.id)}
     profile.reload
     get :index, :profile => profile.identifier
-    assert_tag 'ul', :attributes => {:class => 'profile-wall-activities-comments scrap-replies'}, :children => {:count => 0 } 
+    assert_tag 'ul', :attributes => {:class => 'profile-wall-activities-comments scrap-replies'}, :children => {:count => 0 }
   end
 
   should "view more replies paginated" do
@@ -1267,15 +1222,6 @@ class ProfileControllerTest < ActionController::TestCase
     assert_tag :tag => 'div', :content => /#{instance_eval(&plugin1.profile_tabs[:content])}/, :attributes => {:id => /#{plugin1.profile_tabs[:id]}/}
     assert_tag :tag => 'a', :content => /#{plugin2.profile_tabs[:title]}/, :attributes => {:href => /#{plugin2.profile_tabs[:id]}/}
     assert_tag :tag => 'div', :content => /#{instance_eval(&plugin2.profile_tabs[:content])}/, :attributes => {:id => /#{plugin2.profile_tabs[:id]}/}
-  end
-
-  should 'redirect to profile page when try to request join_not_logged via GET method' do
-    community = Community.create!(:name => 'my test community')
-    login_as(profile.identifier)
-    get :join_not_logged, :profile => community.identifier
-    assert_nothing_raised do
-      assert_redirected_to community.url
-    end
   end
 
   should 'check different profile from the domain profile' do

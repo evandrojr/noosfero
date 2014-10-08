@@ -20,14 +20,6 @@ class CategoriesControllerTest < ActionController::TestCase
 
   attr_reader :env, :cat1, :cat2
 
-  def test_local_files_reference
-    assert_local_files_reference
-  end
-  
-  def test_valid_xhtml
-    assert_valid_xhtml
-  end
-  
   def test_index
     login_as(create_admin_user(Environment.default))
     get :index
@@ -49,7 +41,7 @@ class CategoriesControllerTest < ActionController::TestCase
   end
 
   def test_edit_save
-    post :edit, :id => cat1.id, :category => { :name => 'new name for category' }
+    post :edit, :id => cat1.id, :category => { :name => 'new name for category', :display_color => nil }
     assert_redirected_to :action => 'index'
     assert_equal 'new name for category', Category.find(cat1.id).name
   end
@@ -142,7 +134,7 @@ class CategoriesControllerTest < ActionController::TestCase
     env.save!
     get :new
 
-    assert_no_tag :tag => 'select', :attributes => { :name => "category[display_color]" }
+    assert_no_tag :tag => 'input', :attributes => { :name => "category[display_color]" }
   end
 
   should 'display color selection if environment.categories_menu is true' do
@@ -150,7 +142,7 @@ class CategoriesControllerTest < ActionController::TestCase
     env.save!
     get :new
 
-    assert_tag :tag => 'select', :attributes => { :name => "category[display_color]" }
+    assert_tag :tag => 'input', :attributes => { :name => "category[display_color]" }
   end
 
   should 'not list regions and product categories' do

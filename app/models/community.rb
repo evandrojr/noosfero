@@ -1,6 +1,6 @@
 class Community < Organization
 
-  attr_accessible :accessor_id, :accessor_type, :role_id, :resource_id, :resource_type
+  attr_accessible :accessor_id, :accessor_type, :role_id, :resource_id, :resource_type, :address_reference, :district, :tag_list, :language
   after_destroy :check_invite_member_for_destroy
 
   def self.type_name
@@ -83,10 +83,6 @@ class Community < Organization
 
   def news(limit = 30, highlight = false)
     recent_documents(limit, ["articles.type != ? AND articles.highlighted = ?", 'Folder', highlight])
-  end
-
-  def blocks_to_expire_cache
-    [MembersBlock]
   end
 
   def each_member(offset=0)

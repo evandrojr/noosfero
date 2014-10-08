@@ -1152,21 +1152,6 @@ class PersonTest < ActiveSupport::TestCase
     assert_includes Person.more_active, profile
   end
 
-  should 'handle multiparameter attribute exception on birth date field' do
-    assert_nothing_raised ActiveRecord::MultiparameterAssignmentErrors do
-      p = Person.new(
-        :name => 'birthday', :identifier => 'birthday',
-        'birth_date(1i)' => '', 'birth_date(2i)' => '6', 'birth_date(3i)' => '16'
-      )
-    end
-  end
-
-  should 'not accept an empty year on birth date' do
-    p = Person.new(:birth_date => "1115")
-    p.valid?
-    assert p.errors[:birth_date.to_s].present?
-  end
-
   should 'associate report with the correct complaint' do
     p1 = create_user('user1').person
     p2 = create_user('user2').person
@@ -1213,8 +1198,8 @@ class PersonTest < ActiveSupport::TestCase
 
   should 'return tracked_actions and scraps as activities' do
     ActionTracker::Record.destroy_all
-    person = fast_create(Person)
-    another_person = fast_create(Person)
+    person = create_user.person
+    another_person = create_user.person
 
     UserStampSweeper.any_instance.stubs(:current_user).returns(another_person)
     scrap = create(Scrap, defaults_for_scrap(:sender => another_person, :receiver => person, :content => 'A scrap'))

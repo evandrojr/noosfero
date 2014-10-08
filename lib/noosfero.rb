@@ -2,8 +2,6 @@
 
 require 'fast_gettext'
 module Noosfero
-  PROJECT = 'noosfero'
-  VERSION = '0.47.1'
 
   def self.pattern_for_controllers_in_directory(dir)
     disjunction = controllers_in_directory(dir).join('|')
@@ -52,7 +50,7 @@ module Noosfero
   end
 
   def self.identifier_format
-    '[a-z0-9][a-z0-9~.]*([_-][a-z0-9~.]+)*'
+    '[a-z0-9][a-z0-9~.]*([_\-][a-z0-9~.]+)*'
   end
 
   def self.default_hostname
@@ -95,5 +93,6 @@ module Noosfero
 
 end
 
+require 'noosfero/version'
 require 'noosfero/constants'
 require 'noosfero/core_ext'

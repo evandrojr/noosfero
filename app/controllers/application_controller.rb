@@ -7,6 +7,18 @@ class ApplicationController < ActionController::Base
   before_filter :detect_stuff_by_domain
   before_filter :init_noosfero_plugins
   before_filter :allow_cross_domain_access
+  before_filter :login_required, :if => :private_environment?
+  before_filter :verify_members_whitelist, :if => [:private_environment?, :user]
+
+  def verify_members_whitelist
+    render_access_denied unless user.is_admin? || environment.in_whitelist?(user)
+  end
+
+  after_filter :set_csrf_cookie
+
+  def set_csrf_cookie
+    cookies['_noosfero_.XSRF-TOKEN'] = form_authenticity_token if protect_against_forgery? && logged_in?
+  end
 
   def allow_cross_domain_access
     origin = request.headers['Origin']
@@ -28,7 +40,7 @@ class ApplicationController < ActionController::Base
 
     theme_layout = theme_option(:layout)
     if theme_layout
-      theme_view_file('layouts/'+theme_layout) || theme_layout
+      (theme_view_file('layouts/'+theme_layout) || theme_layout).to_s
     else
      'application'
     end
@@ -90,6 +102,10 @@ class ApplicationController < ActionController::Base
   helper_method :current_person, :current_person
 
   protected
+
+  def verified_request?
+    super || form_authenticity_token == request.headers['X-XSRF-TOKEN']
+  end
 
   def setup_multitenancy
     Noosfero::MultiTenancy.setup!(request.host)
@@ -175,6 +191,10 @@ class ApplicationController < ActionController::Base
     scope = scope.like_search(query) unless query.blank?
     scope = scope.send(options[:filter]) unless options[:filter].blank?
     {:results => scope.paginate(paginate_options)}
+  end
+
+  def private_environment?
+    @environment.enabled?(:restrict_to_members)
   end
 
 end

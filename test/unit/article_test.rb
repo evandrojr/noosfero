@@ -154,7 +154,7 @@ class ArticleTest < ActiveSupport::TestCase
     assert a4.errors[:slug.to_s].present?
   end
 
-  should 'record who did the last change' do
+  should 'last_changed_by be a person' do
     a = profile.articles.build(:name => 'test')
 
     # must be a person
@@ -163,6 +163,19 @@ class ArticleTest < ActiveSupport::TestCase
     end
     assert_nothing_raised do
       a.last_changed_by = Person.new
+      a.save!
+    end
+  end
+
+  should 'created_by be a person' do
+    a = profile.articles.build(:name => 'test')
+
+    # must be a person
+    assert_raise ActiveRecord::AssociationTypeMismatch do
+      a.created_by = Profile.new
+    end
+    assert_nothing_raised do
+      a.created_by = Person.new
       a.save!
     end
   end
@@ -802,7 +815,7 @@ class ArticleTest < ActiveSupport::TestCase
   should 'allow author to edit if is publisher' do
     c = fast_create(Community)
     p = create_user_with_permission('test_user', 'publish_content', c)
-    a = create(Article, :name => 'a test article', :last_changed_by => p, :profile_id => c.id)
+    a = create(Article, :name => 'a test article', :author => p, :profile_id => c.id)
 
     assert a.allow_post_content?(p)
   end
@@ -1064,8 +1077,11 @@ class ArticleTest < ActiveSupport::TestCase
   end
 
   should 'create the notification to organization and all organization members' do
+    Profile.delete_all
+    ActionTracker::Record.delete_all
+
     community = fast_create(Community)
-    member_1 = Person.first
+    member_1 = fast_create(Person)
     community.add_member(member_1)
 
     article = create TinyMceArticle, :name => 'Tracked Article 1', :profile_id => community.id
@@ -1380,17 +1396,17 @@ class ArticleTest < ActiveSupport::TestCase
 
   should "the author_name returns the name of the article's author" do
     author = fast_create(Person)
-    a = create(Article, :name => 'a test article', :last_changed_by => author, :profile_id => profile.id)
+    a = create(Article, :name => 'a test article', :author => author, :profile_id => profile.id)
     assert_equal author.name, a.author_name
     author.destroy
-    a.reload
+    a = Article.find(a.id)
     a.author_name = 'some name'
     assert_equal 'some name', a.author_name
   end
 
   should 'retrieve latest info from topic when has no comments' do
     forum = fast_create(Forum, :name => 'Forum test', :profile_id => profile.id)
-    post = fast_create(TextileArticle, :name => 'First post', :profile_id => profile.id, :parent_id => forum.id, :updated_at => Time.now, :last_changed_by_id => profile.id)
+    post = fast_create(TextileArticle, :name => 'First post', :profile_id => profile.id, :parent_id => forum.id, :updated_at => Time.now, :author_id => profile.id)
     assert_equal post.updated_at, post.info_from_last_update[:date]
     assert_equal profile.name, post.info_from_last_update[:author_name]
     assert_equal profile.url, post.info_from_last_update[:author_url]
@@ -1662,6 +1678,18 @@ class ArticleTest < ActiveSupport::TestCase
     a.allow_members_to_edit = true
     assert !a.allow_edit?(nil)
   end
+ 
+  should 'allow author to edit topic' do
+    community = fast_create(Community)
+    admin = fast_create(Person)
+    community.add_member(admin)
+    author = fast_create(Person)
+    community.add_member(author)
+    forum = Forum.create(:profile => community, :name => 'Forum test', :body => 'Forum test')
+    post = fast_create(TextileArticle, :name => 'First post', :profile_id => community.id, :parent_id => forum.id, :author_id => author.id)
+
+    assert post.allow_edit?(author)
+  end
 
   should 'has a empty list of followers by default' do
     a = Article.new
@@ -1744,43 +1772,32 @@ class ArticleTest < ActiveSupport::TestCase
 
   should 'set author_name before creating article if there is an author' do
     author = fast_create(Person)
-    article = create(Article, :name => 'Test', :profile => profile, :last_changed_by => author)
+    article = create(Article, :name => 'Test', :profile => profile, :author => author)
     assert_equal author.name, article.author_name
 
     author_name = author.name
     author.destroy
-    article.reload
+    article = Article.find(article.id)
     assert_equal author_name, article.author_name
   end
 
   should "author_id return the author id of the article's author" do
     author = fast_create(Person)
-    article = create(Article, :name => 'Test', :profile => profile, :last_changed_by => author)
+    article = create(Article, :name => 'Test', :profile => profile, :author => author)
     assert_equal author.id, article.author_id
   end
 
   should "author_id return nil if there is no article's author" do
-    article = create(Article, :name => 'Test', :profile => profile, :last_changed_by => nil)
+    article = create(Article, :name => 'Test', :profile => profile, :author => nil)
     assert_nil article.author_id
-  end
-
-  should "return the author of a specific version" do
-    author1 = fast_create(Person)
-    author2 = fast_create(Person)
-    article = create(Article, :name => 'first version', :profile => profile, :last_changed_by => author1)
-    article.name = 'second version'
-    article.last_changed_by = author2
-    article.save
-    assert_equal author1, article.author(1)
-    assert_equal author2, article.author(2)
   end
 
   should "return the author_name of a specific version" do
     author1 = fast_create(Person)
     author2 = fast_create(Person)
-    article = create(Article, :name => 'first version', :profile => profile, :last_changed_by => author1)
+    article = create(Article, :name => 'first version', :profile => profile, :author => author1)
     article.name = 'second version'
-    article.last_changed_by = author2
+    article.author = author2
     article.save
     assert_equal author1.name, article.author_name(1)
     assert_equal author2.name, article.author_name(2)
@@ -1815,7 +1832,7 @@ class ArticleTest < ActiveSupport::TestCase
     end
   end
 
- should 'return articles with specific types' do
+  should 'return articles with specific types' do
     Article.delete_all
 
     c1 = fast_create(TinyMceArticle, :name => 'Testing article 1', :body => 'Article body 1', :profile_id => profile.id)
@@ -1826,6 +1843,45 @@ class ArticleTest < ActiveSupport::TestCase
 
     assert_equivalent [c1,c2], Article.with_types(['TinyMceArticle', 'TextArticle'])
     assert_equivalent [c3], Article.with_types(['Event'])
+  end
+
+  should 'not create version when receive a comment' do
+    a = Article.new(:name => 'my article', :body => 'my text')
+    a.profile = profile
+    a.save!
+    Comment.create!(:title => 'test', :body => 'asdsad', :author => profile, :source => a)
+    assert_equal 1, a.versions.count
+  end
+
+  should 'get specific version' do
+    article = Article.create!(:name => 'first version', :profile => profile)
+    article.name = 'second version'
+    article.save!
+    article.name = 'third version'
+    article.save!
+
+    assert_equal 'first version',  article.get_version(1).name
+    assert_equal 'second version', article.get_version(2).name
+    assert_equal 'third version',  article.get_version(3).name
+  end
+
+  should 'get author by version' do
+    p1 = fast_create(Person)
+    p2 = fast_create(Person)
+    p3 = fast_create(Person)
+    article = create(Article, :name => 'first version', :profile => profile, :author => p1)
+
+    article.name = 'second version'
+    article.author = p2
+    article.save!
+
+    article.author = p3
+    article.name = 'third version'
+    article.save!
+
+    assert_equal p1, article.author_by_version(1)
+    assert_equal p2, article.author_by_version(2)
+    assert_equal p3, article.author_by_version(3)
   end
 
 end
