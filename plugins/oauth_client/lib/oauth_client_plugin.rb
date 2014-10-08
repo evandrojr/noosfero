@@ -1,3 +1,5 @@
+require 'omniauth/strategies/noosfero_oauth2'
+
 class OauthClientPlugin < Noosfero::Plugin
 
   def self.plugin_name
@@ -39,6 +41,9 @@ class OauthClientPlugin < Noosfero::Plugin
     },
     :google_oauth2 => {
       :name => 'Google'
+    },
+    :noosfero_oauth2 => {
+      :name => 'Noosfero'
     }
   }
 

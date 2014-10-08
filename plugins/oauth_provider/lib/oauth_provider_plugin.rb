@@ -13,17 +13,22 @@ class OauthProviderPlugin < Noosfero::Plugin
     # Currently supported options are :active_record, :mongoid2, :mongoid3, :mongo_mapper
     orm :active_record
 
-    domain = Domain.find_by_name(request.host)
-    environment = domain ? domain.environment : Environment.default
-
     # This block will be called to check whether the resource owner is authenticated or not.
     resource_owner_authenticator do
+      domain = Domain.find_by_name(request.host)
+      environment = domain ? domain.environment : Environment.default
       environment.users.find_by_id(session[:user]) || redirect_to('/account/login')
     end
 
     # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
     admin_authenticator do
-      environment.users.find_by_id(session[:user]) || redirect_to('/account/login')
+      domain = Domain.find_by_name(request.host)
+      environment = domain ? domain.environment : Environment.default
+      user = environment.users.find_by_id(session[:user])
+      unless user && user.person.is_admin?(environment)
+        redirect_to('/account/login')
+      end
+      user
     end
 
     # Authorization Code expiration time (default 10 minutes).
