@@ -74,10 +74,11 @@
   padding: 10px 0;
 	border-width: 0 !important;
 	border-radius: 10px;
+  position: relative;
 }
 
-#pairwise_main .prompt:hover {
-	background: url("images/prompt_bg_hover.png") no-repeat 50% top #548A1C;
+#pairwise_main .prompt a:hover {
+	background-color: #2D4D0D;
 }
 
 #pairwise_main .prompt.left{
@@ -91,12 +92,24 @@
 }
 
 #pairwise_main .prompt a{
-	color: #2a2d28 !important;
-	font-size: 12px;
+	color: rgb(243, 243, 243) !important;
+  font-weight: bold;
+	font-size: 18px;
 	display: block;
-	max-width: 349px;
 	padding: 10px;
-  height: 100%;
+  width: 80%;
+  height: 21px;
+	background-color: #548A1C;
+  position: absolute;
+  bottom: 10px;
+  left: 5%;
+  border-radius: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#pairwise_main .prompt .choice-text {
+  color: #2a2d28;
+  font-size: 15px;
 }
 
 #pairwise_main .separator {
@@ -229,7 +242,6 @@ div#pairwise_form_fields textarea {
 }
 
 #pairwise_main  div.prompt  a {
-	width:100%;
 	color:white;
 	display: block;
 	text-decoration: none;

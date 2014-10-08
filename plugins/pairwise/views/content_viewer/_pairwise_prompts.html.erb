@@ -10,8 +10,12 @@
      });
     </script>
   <% else %>
-      <div class="prompt left"><%= choose_left_link(pairwise_content, question, question.prompt, embeded, source, question.appearance_id) %></div>
-      <div class="separator"></div>
-     <div class="prompt right"><%= choose_right_link(pairwise_content, question, question.prompt, embeded, source, question.appearance_id  ) %></div>
+    <div class="prompt left">
+      <%= choose_left_link(pairwise_content, question, question.prompt, embeded, source, question.appearance_id) %>
+    </div>
+    <div class="separator"></div>
+    <div class="prompt right">
+      <%= choose_right_link(pairwise_content, question, question.prompt, embeded, source, question.appearance_id  ) %>
+    </div>
   <% end %>
 </div>
