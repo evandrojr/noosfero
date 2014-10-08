@@ -77,7 +77,7 @@
   position: relative;
 }
 
-#pairwise_main .prompt a:hover {
+#pairwise_main .prompt a.vote-link:hover {
 	background-color: #2D4D0D;
 }
 
@@ -91,7 +91,8 @@
 	float: right;
 }
 
-#pairwise_main .prompt a{
+#pairwise_main .prompt a.vote-link {
+  text-decoration: none;
 	color: rgb(243, 243, 243) !important;
   font-weight: bold;
 	font-size: 18px;
@@ -109,7 +110,8 @@
 }
 #pairwise_main .prompt .choice-text {
   color: #2a2d28;
-  font-size: 15px;
+  font-size: 14px;
+  padding: 1px;
 }
 
 #pairwise_main .separator {
@@ -240,13 +242,6 @@ div#pairwise_form_fields textarea {
 	vertical-align: top;
 
 }
-
-#pairwise_main  div.prompt  a {
-	color:white;
-	display: block;
-	text-decoration: none;
-}
-
 
 #pairwise_main div#suggestions_box {
 	padding: 10px;

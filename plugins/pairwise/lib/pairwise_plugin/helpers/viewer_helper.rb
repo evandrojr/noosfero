@@ -10,7 +10,7 @@ module PairwisePlugin::Helpers::ViewerHelper
     loading_javascript = pairwise_spinner_show_function_call(pairwise_content) + pairwise_hide_skip_call(pairwise_content)
 
     content_tag(:div, prompt.send("#{direction}_choice_text"), :class => 'choice-text') +
-      link_to_remote(_('Vote'), :loading => loading_javascript, :url => link_target)
+      link_to_remote(_('Vote'), :loading => loading_javascript, :url => link_target, :html => {:class => 'vote-link'})
   end
 
   def choose_right_link(pairwise_content, question, prompt, embeded = false, source = nil, appearance_id = nil)
