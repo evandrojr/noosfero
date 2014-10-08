@@ -1,10 +1,5 @@
 module PairwisePlugin::Helpers::ViewerHelper
 
-  def pairwise_plugin_stylesheet
-    plugin_style_sheet_path = PairwisePlugin.public_path('style.css')
-    stylesheet_link_tag  plugin_style_sheet_path, :cache => "cache/plugins-#{Digest::MD5.hexdigest plugin_style_sheet_path.to_s}"
-  end
-
   def choose_link(direction, pairwise_content, question, prompt, embeded = false, source = nil, appearance_id = nil)
     link_target = { :controller => 'pairwise_plugin_profile',
           :profile => pairwise_content.profile.identifier,
