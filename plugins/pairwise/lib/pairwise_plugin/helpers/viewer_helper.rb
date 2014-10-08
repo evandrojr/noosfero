@@ -1,19 +1,24 @@
 module PairwisePlugin::Helpers::ViewerHelper
 
-  def pairwise_plugin_stylesheet
-    plugin_style_sheet_path = PairwisePlugin.public_path('style.css')
-    stylesheet_link_tag  plugin_style_sheet_path, :cache => "cache/plugins-#{Digest::MD5.hexdigest plugin_style_sheet_path.to_s}"
+  def choose_link(direction, pairwise_content, question, prompt, embeded = false, source = nil, appearance_id = nil)
+    link_target = { :controller => 'pairwise_plugin_profile',
+          :profile => pairwise_content.profile.identifier,
+          :action => 'choose', :id => pairwise_content.id,  :question_id => question.id , :prompt_id => prompt.id,
+          :choice_id => prompt.send("#{direction}_choice_id"), :direction => direction, :appearance_id => appearance_id}
+    link_target.merge!(:embeded => 1) if embeded
+    link_target.merge!(:source => source) if source
+    loading_javascript = pairwise_spinner_show_function_call(pairwise_content) + pairwise_hide_skip_call(pairwise_content)
+
+    content_tag(:div, prompt.send("#{direction}_choice_text"), :class => 'choice-text') +
+      link_to_remote(_('Vote'), :loading => loading_javascript, :url => link_target)
+  end
+
+  def choose_right_link(pairwise_content, question, prompt, embeded = false, source = nil, appearance_id = nil)
+    choose_link('right', pairwise_content, question, prompt, embeded, source, appearance_id)
   end
 
   def choose_left_link(pairwise_content, question, prompt, embeded = false, source = nil, appearance_id = nil)
-    link_target = {:controller => 'pairwise_plugin_profile',
-          :profile => pairwise_content.profile.identifier,
-          :action => 'choose', :id => pairwise_content.id,:question_id => question.id , :prompt_id => prompt.id,
-          :choice_id => prompt.left_choice_id , :direction => 'left', :appearance_id => appearance_id}
-     link_target.merge!(:embeded => 1) if embeded
-     link_target.merge!(:source => source) if source
-     loading_javascript = pairwise_spinner_show_function_call(pairwise_content) + pairwise_hide_skip_call(pairwise_content)
-     link_to_remote prompt.left_choice_text,  :loading => loading_javascript, :url => link_target
+    choose_link('left', pairwise_content, question, prompt, embeded, source, appearance_id)
   end
 
   def skip_vote_open_function(pairwise_content)
@@ -91,17 +96,6 @@ module PairwisePlugin::Helpers::ViewerHelper
     textarea =  text_area_tag 'embeded_code', embeded_code, {:style => "width: 100%; background-color: #ccc; font-weight:bold", :rows => 7}
     hint = content_tag :quote, _("You can put this iframe in your site. Replace <b>source</b> param with your site address and make any needed adjusts in width and height.")
     label + textarea + hint + "<hr/>"
-  end
-
-  def choose_right_link(pairwise_content, question, prompt, embeded = false, source = nil, appearance_id = nil)
-    link_target = { :controller => 'pairwise_plugin_profile',
-          :profile => pairwise_content.profile.identifier,
-          :action => 'choose', :id => pairwise_content.id,  :question_id => question.id , :prompt_id => prompt.id,
-          :choice_id => prompt.right_choice_id , :direction => 'right' , :appearance_id => appearance_id}
-    link_target.merge!(:embeded => 1) if embeded
-    link_target.merge!(:source => source) if source
-    loading_javascript = pairwise_spinner_show_function_call(pairwise_content) + pairwise_hide_skip_call(pairwise_content)
-    link_to_remote prompt.right_choice_text, :loading => loading_javascript, :url => link_target
   end
 
   def pairwise_edit_link(label, pairwise_content)
