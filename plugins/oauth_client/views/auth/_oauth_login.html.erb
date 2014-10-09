@@ -1,0 +1,13 @@
+<div class="oauth-login">
+  <% providers.each do |provider, options| %>
+    <span class="provider">
+      <%= render :partial => "auth/#{provider}", :locals => {:app_id => options['client_id'] } %>
+    </span>
+  <% end %>
+
+  <span class="provider">
+    <% unless Rails.env.production? %>
+      <%= link_to _('Developer Login'), "/plugin/oauth/developer", :class => 'developer' %>
+    <% end %>
+  </span>
+</div>
