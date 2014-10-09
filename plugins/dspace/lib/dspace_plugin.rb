@@ -33,4 +33,35 @@ class DspacePlugin < Noosfero::Plugin
     false
   end
 
+  def cms_controller_filters
+    block = proc do
+
+      dspace_content_type = params[:type]
+
+      case dspace_content_type
+
+        when 'DspacePlugin::Communityy'
+          parent = DspacePlugin::Library.find_by_id(params[:parent_id])
+          children = Dspace::Community.get_all_communities_from parent.dspace_server_url
+
+        when 'DspacePlugin::Collection'
+          parent = DspacePlugin::Communityy.find_by_id(params[:parent_id])
+          children = Dspace::Collection.get_all_collections_from parent.parent.dspace_server_url
+
+      end
+
+      if dspace_content_type == 'DspacePlugin::Communityy' || dspace_content_type == 'DspacePlugin::Collection'
+        if children.nil?
+          session[:notice] = _('Unable to contact DSpace server')
+          redirect_to parent.view_url
+        end
+      end
+
+    end
+
+    { :type => 'before_filter',
+      :method_name => 'new',
+      :block => block }
+  end
+
 end
