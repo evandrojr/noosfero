@@ -20,10 +20,8 @@ module OmniAuth
       end
 
       def raw_info
-        #@raw_info ||= access_token.get('/api/v1/me.json').parsed
-        #FIXME
-        #raise access_token.inspect
-        User['vfcosta'].attributes
+        #FIXME access the noosfero api (coming soon)
+        @raw_info ||= access_token.get('/plugin/oauth_provider/public/me').parsed
       end
     end
   end
