@@ -55,7 +55,7 @@ class OauthClientPlugin < Noosfero::Plugin
 
   Rails.application.config.middleware.use OmniAuth::Builder do
     PROVIDERS.each do |provider, options|
-      provider provider, :setup => lambda { |env|
+      setup = lambda { |env|
         request = Rack::Request.new env
         strategy = env['omniauth.strategy']
 
@@ -66,7 +66,12 @@ class OauthClientPlugin < Noosfero::Plugin
 
         strategy.options.client_id = providers[provider][:client_id]
         strategy.options.client_secret = providers[provider][:client_secret]
-      }, :path_prefix => '/plugin/oauth_client', :callback_path => "/plugin/oauth_client/public/callback/#{provider}"
+      }
+
+      provider provider, :setup => setup,
+        :path_prefix => '/plugin/oauth_client',
+        :callback_path => "/plugin/oauth_client/public/callback/#{provider}",
+        :client_options => { :connection_opts => { :proxy => ENV["HTTP_PROXY"] || ENV["http_proxy"] || ENV["HTTPS_PROXY"] || ENV["https_proxy"] } }
     end
 
     unless Rails.env.production?

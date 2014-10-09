@@ -17,6 +17,7 @@ class OauthClientPluginPublicController < PublicController
   end
 
   def failure
+    session[:notice] = _('Failed to login')
     redirect_to root_url
   end
 
