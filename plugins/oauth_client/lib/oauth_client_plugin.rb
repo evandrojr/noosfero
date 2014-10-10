@@ -63,9 +63,7 @@ class OauthClientPlugin < Noosfero::Plugin
         environment = domain.environment rescue Environment.default
         settings = Noosfero::Plugin::Settings.new(environment, OauthClientPlugin)
         providers = settings.get_setting(:providers)
-
-        strategy.options.client_id = providers[provider][:client_id]
-        strategy.options.client_secret = providers[provider][:client_secret]
+        strategy.options.merge!(providers[provider][:options].symbolize_keys)
       }
 
       provider provider, :setup => setup,

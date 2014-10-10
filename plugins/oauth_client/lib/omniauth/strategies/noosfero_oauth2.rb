@@ -5,17 +5,11 @@ module OmniAuth
     class NoosferoOauth2 < OmniAuth::Strategies::OAuth2
       option :name, :noosfero_oauth2
 
-      option :client_options, {
-        :site => "http://noosfero.com:3001",
-        :authorize_url => "/oauth/authorize"
-      }
-
       uid { raw_info["id"] }
 
       info do
         {
           :email => raw_info["email"]
-          # and anything else you want to return to your API consumers
         }
       end
 

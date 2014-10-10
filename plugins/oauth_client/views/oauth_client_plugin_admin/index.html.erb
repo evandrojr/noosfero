@@ -7,13 +7,15 @@
 
     <% OauthClientPlugin::PROVIDERS.each do |available_provider, options| %>
       <% provider = OpenStruct.new(@providers[available_provider]) %>
+      <% provider.options ||= {} %>
 
-      <%= p.fields_for available_provider, provider do |o| %>
+      <%= p.fields_for available_provider, provider do |a| %>
         <div class="provider">
           <div class="name">
-            <h4><%= o.check_box :enabled, {:class => 'enable', :checked => provider.enabled=='true'}, true, false %>
+            <h4><%= a.check_box :enabled, {:class => 'enable', :checked => provider.enabled=='true'}, true, false %>
             <%= options[:name] %></h4>
           </div>
+          <%= a.fields_for :options, OpenStruct.new(provider.options) do |o| %>
           <div class="options" style="<%= provider.enabled=='true' ? '':'display:none' %>">
             <div class="client-id">
               <span class="label"><%= _('Client ID') %></span>
@@ -23,7 +25,11 @@
               <span class="label"><%= _('Client Secret') %></span>
               <span class="value"><%= o.text_field :client_secret %></span>
             </div>
+            <% if File.exists?(File.join(File.dirname(__FILE__), "_#{available_provider}.html.erb")) %>
+              <%= render :partial => "#{available_provider}", :locals => {:options => o, :provider => provider} %>
+            <% end %>
           </div>
+          <% end %>
         </div>
       <% end %>
     <% end %>
