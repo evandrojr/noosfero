@@ -13,7 +13,7 @@ class OauthClientPlugin < Noosfero::Plugin
   def login_extra_contents
     plugin = self
     proc do
-      render :partial => 'auth/oauth_login', :locals => {:providers => plugin.enabled_providers}
+      render :partial => 'auth/oauth_login', :locals => {:providers => environment.oauth_providers.enabled}
     end
   end
 
@@ -27,12 +27,6 @@ class OauthClientPlugin < Noosfero::Plugin
         ''
       end
     end
-  end
-
-  def enabled_providers
-    settings = Noosfero::Plugin::Settings.new(context.environment, OauthClientPlugin)
-    providers = settings.get_setting(:providers)
-    providers.select {|provider, options| options[:enabled]}
   end
 
   PROVIDERS = {
@@ -58,12 +52,14 @@ class OauthClientPlugin < Noosfero::Plugin
       setup = lambda { |env|
         request = Rack::Request.new env
         strategy = env['omniauth.strategy']
+        identifier = request.path.split('/').last
 
         domain = Domain.find_by_name(request.host)
         environment = domain.environment rescue Environment.default
-        settings = Noosfero::Plugin::Settings.new(environment, OauthClientPlugin)
-        providers = settings.get_setting(:providers)
-        strategy.options.merge!(providers[provider][:options].symbolize_keys)
+
+        provider_id = request.session['omniauth.params'] ? request.session['omniauth.params']['id'] : request.params['id']
+        provider = environment.oauth_providers.find(provider_id)
+        strategy.options.merge!(provider.options.symbolize_keys)
       }
 
       provider provider, :setup => setup,

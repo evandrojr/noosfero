@@ -1,14 +1,26 @@
 class OauthClientPluginAdminController < AdminController
 
   def index
-    settings = params[:settings] || {}
+  end
 
-    @settings = Noosfero::Plugin::Settings.new(environment, OauthClientPlugin, settings)
-    @providers = @settings.get_setting(:providers) || {}
+  def new
+    @provider = environment.oauth_providers.new
+    render :file => 'oauth_client_plugin_admin/edit'
+  end
+
+  def remove
+    environment.oauth_providers.find(params[:id]).destroy
+    redirect_to :action => 'index'
+  end
+
+  def edit
+    @provider = params[:id] ? environment.oauth_providers.find(params[:id]) : environment.oauth_providers.new
     if request.post?
-      @settings.save!
-      session[:notice] = 'Settings succefully saved.'
-      redirect_to :action => 'index'
+      if @provider.update_attributes(params['oauth_client_plugin_provider'])
+        session[:notice] = _('Saved!')
+      else
+        session[:notice] = _('Error!')
+      end
     end
   end
 

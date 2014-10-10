@@ -8,7 +8,7 @@ class User
 
   def self.find_with_omniauth(auth)
     user = self.find_by_email(auth.info.email)
-    if user && !user.oauth_providers.empty? #FIXME save new oauth providers
+    if user# && !user.oauth_providers.empty? #FIXME save new oauth providers
       user
     else
       nil

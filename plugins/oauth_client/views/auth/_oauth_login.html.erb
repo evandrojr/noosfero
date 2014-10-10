@@ -1,7 +1,7 @@
 <div class="oauth-login">
-  <% providers.each do |provider, options| %>
+  <% providers.each do |provider| %>
     <span class="provider">
-      <%= render :partial => "auth/#{provider}", :locals => {:app_id => options['client_id'] } %>
+      <%= link_to _('Login with %s' % provider.name), "/plugin/oauth_client/#{provider.strategy}?id=#{provider.id}", :class => provider.strategy %>
     </span>
   <% end %>
 
