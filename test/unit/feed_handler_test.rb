@@ -141,4 +141,10 @@ class FeedHandlerTest < ActiveSupport::TestCase
     end
   end
 
+  should 'set proxy when FEED_HTTP_PROXY is setted from env' do
+    ENV.stubs('[]').with('FEED_HTTP_PROXY').returns('http://127.0.0.1:3128')
+    handler.expects(:open).with('http://site.org/feed.xml', {"User-Agent" => "Noosfero/#{Noosfero::VERSION}", :proxy => 'http://127.0.0.1:3128'}, anything).returns('bli content')
+    assert_equal 'bli content', handler.fetch('http://site.org/feed.xml')
+  end
+
 end
