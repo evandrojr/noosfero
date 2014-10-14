@@ -9,9 +9,10 @@ class OauthClientPluginTest < ActiveSupport::TestCase
     @environment = Environment.default
     @session = {}
     @request = mock
+    @provider = OauthClientPlugin::Provider.create!(:name => 'name', :identifier => 'identifier', :strategy => 'strategy')
   end
 
-  attr_reader :params, :plugin, :environment, :session, :request
+  attr_reader :params, :plugin, :environment, :session, :request, :provider
 
   should 'has extra contents for login' do
     assert plugin.login_extra_contents
@@ -41,6 +42,7 @@ class OauthClientPluginTest < ActiveSupport::TestCase
     oauth_data.stubs(:provider).returns('provider')
     info.stubs(:email).returns('test@example.com')
     session[:oauth_data] = oauth_data
+    session[:provider_id] = provider.id
 
     params[:user] = {:email => 'test2@example.com'}
     assert_raises RuntimeError do
@@ -58,6 +60,7 @@ class OauthClientPluginTest < ActiveSupport::TestCase
     oauth_data.stubs(:provider).returns('provider')
     info.stubs(:email).returns('test@example.com')
     session[:oauth_data] = oauth_data
+    session[:provider_id] = provider.id
 
     params[:user] = {:email => 'test@example.com'}
     instance_eval(&plugin.account_controller_filters[:block])
@@ -74,6 +77,7 @@ class OauthClientPluginTest < ActiveSupport::TestCase
     oauth_data = mock
     oauth_data.stubs(:uid).returns('uid')
     oauth_data.stubs(:provider).returns('provider')
+    session[:provider_id] = provider.id
 
     session[:oauth_data] = oauth_data
     instance_eval(&plugin.account_controller_filters[:block])

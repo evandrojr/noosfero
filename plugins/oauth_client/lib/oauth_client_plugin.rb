@@ -60,6 +60,8 @@ class OauthClientPlugin < Noosfero::Plugin
         provider_id = request.session['omniauth.params'] ? request.session['omniauth.params']['id'] : request.params['id']
         provider = environment.oauth_providers.find(provider_id)
         strategy.options.merge!(provider.options.symbolize_keys)
+
+        request.session[:provider_id] = provider_id
       }
 
       provider provider, :setup => setup,
@@ -80,7 +82,7 @@ class OauthClientPlugin < Noosfero::Plugin
         auth = session[:oauth_data]
 
         if auth.present? && params[:user].present?
-          params[:user][:oauth_providers] = [{:provider => auth.provider, :uid => auth.uid}]
+          params[:user][:oauth_providers] = [OauthClientPlugin::Provider.find(session[:provider_id])]
           if request.post? && auth.info.email != params[:user][:email]
             raise "Wrong email for oauth signup"
           end
