@@ -104,8 +104,17 @@ class OauthProviderPlugin < Noosfero::Plugin
     # wildcard_redirect_uri false
   end
 
-  Rails.application.routes.prepend do
-    use_doorkeeper
+  Rails.configuration.to_prepare do
+    Rails.application.routes.prepend do
+      scope 'oauth_provider' do
+        use_doorkeeper do
+          controllers ({
+            :applications => 'oauth_provider_applications',
+            :authorized_applications => 'oauth_provider_authorized_applications'
+          })
+        end
+      end
+    end
   end
 
 end

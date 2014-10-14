@@ -4,6 +4,10 @@ module OmniAuth
   module Strategies
     class NoosferoOauth2 < OmniAuth::Strategies::OAuth2
       option :name, :noosfero_oauth2
+      option :client_options, {
+        :authorize_url => '/oauth_provider/oauth/authorize',
+        :token_url     => '/oauth_provider/oauth/token'
+      }
 
       uid { raw_info["id"] }
 
