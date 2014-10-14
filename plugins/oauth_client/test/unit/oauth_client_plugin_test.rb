@@ -3,13 +3,15 @@ require File.dirname(__FILE__) + '/../test_helper'
 class OauthClientPluginTest < ActiveSupport::TestCase
 
   def setup
-    @plugin = OauthClientPlugin.new
+    @plugin = OauthClientPlugin.new(self)
     @params = {}
     @plugin.stubs(:context).returns(self)
     @environment = Environment.default
+    @session = {}
+    @request = mock
   end
 
-  attr_reader :params, :plugin, :environment
+  attr_reader :params, :plugin, :environment, :session, :request
 
   should 'has extra contents for login' do
     assert plugin.login_extra_contents
@@ -19,17 +21,10 @@ class OauthClientPluginTest < ActiveSupport::TestCase
     assert_equal '', instance_eval(&plugin.signup_extra_contents)
   end
 
-  should 'has signup extra contents if there is enabled providers' do
-    params[:user] = {:oauth_providers => [:provider]}
+  should 'has signup extra contents if oauth_data exists in session' do
+    session[:oauth_data] = {:oauth => 'test'}
     expects(:render).with(:partial => 'account/oauth_signup').once
     instance_eval(&plugin.signup_extra_contents)
-  end
-
-  should 'list enabled providers' do
-    settings = Noosfero::Plugin::Settings.new(environment, OauthClientPlugin)
-    providers = {:test => {:enabled => true}, :test2 => {:enabled => false}}
-    settings.set_setting(:providers, providers)
-    assert_equal({:test => {:enabled => true}}, plugin.enabled_providers)
   end
 
   should 'define before filter for account controller' do
@@ -37,15 +32,15 @@ class OauthClientPluginTest < ActiveSupport::TestCase
   end
 
   should 'raise error if oauth email was changed' do
-    request = mock
-    stubs(:request).returns(request)
     request.expects(:post?).returns(true)
 
     oauth_data = mock
     info = mock
     oauth_data.stubs(:info).returns(info)
+    oauth_data.stubs(:uid).returns('uid')
+    oauth_data.stubs(:provider).returns('provider')
     info.stubs(:email).returns('test@example.com')
-    stubs(:session).returns({:oauth_data => oauth_data})
+    session[:oauth_data] = oauth_data
 
     params[:user] = {:email => 'test2@example.com'}
     assert_raises RuntimeError do
@@ -54,32 +49,33 @@ class OauthClientPluginTest < ActiveSupport::TestCase
   end
 
   should 'do not raise error if oauth email was not changed' do
-    request = mock
-    stubs(:request).returns(request)
     request.expects(:post?).returns(true)
 
     oauth_data = mock
     info = mock
     oauth_data.stubs(:info).returns(info)
+    oauth_data.stubs(:uid).returns('uid')
+    oauth_data.stubs(:provider).returns('provider')
     info.stubs(:email).returns('test@example.com')
-    stubs(:session).returns({:oauth_data => oauth_data})
+    session[:oauth_data] = oauth_data
 
     params[:user] = {:email => 'test@example.com'}
     instance_eval(&plugin.account_controller_filters[:block])
   end
 
   should 'do not raise error if oauth session is not set' do
-    request = mock
-    stubs(:request).returns(request)
-    request.expects(:post?).returns(true)
-    stubs(:session).returns({})
     instance_eval(&plugin.account_controller_filters[:block])
   end
 
   should 'do not raise error if it is not a post' do
-    request = mock
-    stubs(:request).returns(request)
     request.expects(:post?).returns(false)
+    params[:user] = {:email => 'test2@example.com'}
+
+    oauth_data = mock
+    oauth_data.stubs(:uid).returns('uid')
+    oauth_data.stubs(:provider).returns('provider')
+
+    session[:oauth_data] = oauth_data
     instance_eval(&plugin.account_controller_filters[:block])
   end
 
