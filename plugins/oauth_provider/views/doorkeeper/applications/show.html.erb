@@ -1,18 +1,18 @@
 <div class="page-header">
-  <h1>Application: <%= @application.name %></h1>
+  <h1><%= _('Application: %s' % @application.name) %></h1>
 </div>
 
 <div class="row">
   <div class="col-md-8">
-    <h4>Application Id:</h4>
+    <h4><%= _('Application Id:') %></h4>
 
     <p><code id="application_id"><%= @application.uid %></code></p>
 
-    <h4>Secret:</h4>
+    <h4><%= _('Secret:') %></h4>
 
     <p><code id="secret"><%= @application.secret %></code></p>
 
-    <h4>Callback urls:</h4>
+    <h4><%= _('Callback urls:') %></h4>
 
     <table>
       <% @application.redirect_uri.split.each do |uri| %>
@@ -21,7 +21,6 @@
             <code><%= uri %></code>
           </td>
           <td>
-            <%= link_to 'Authorize', oauth_authorization_path(client_id: @application.uid, redirect_uri: uri, response_type: 'code'), class: 'btn btn-success', target: '_blank' %>
           </td>
         </tr>
       <% end %>
@@ -29,9 +28,12 @@
   </div>
 
   <div class="col-md-4">
-    <h3>Actions</h3>
+    <h3><%= _('Actions') %></h3>
 
-    <p><%= link_to 'Edit', edit_oauth_application_path(@application), class: 'btn btn-primary' %></p>
+    <p>
+      <%= link_to _('Edit'), edit_oauth_application_path(@application), class: 'btn btn-primary' %>
+      <%= link_to _("Cancel"), oauth_applications_path, :class => "btn btn-default" %>
+    </p>
 
     <p><%= render 'delete_form', application: @application, submit_btn_css: 'btn btn-danger' %></p>
   </div>
