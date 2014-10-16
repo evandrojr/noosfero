@@ -12,8 +12,10 @@ class OauthClientPlugin::Provider < Noosfero::Plugin::ActiveRecord
   settings_items :client_secret, :type => :string
   settings_items :client_options, :type => Hash
 
-  attr_accessible :identifier, :name, :environment, :strategy, :client_id, :client_secret, :enabled, :client_options
+  attr_accessible :identifier, :name, :environment, :strategy, :client_id, :client_secret, :enabled, :client_options, :image_builder
 
   scope :enabled, :conditions => {:enabled => true}
+
+  acts_as_having_image
 
 end
