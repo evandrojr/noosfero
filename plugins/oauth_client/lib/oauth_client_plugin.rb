@@ -66,7 +66,7 @@ class OauthClientPlugin < Noosfero::Plugin
       provider provider, :setup => setup,
         :path_prefix => '/plugin/oauth_client',
         :callback_path => "/plugin/oauth_client/public/callback/#{provider}",
-        :client_options => { :connection_opts => { :proxy => ENV["HTTP_PROXY"] || ENV["http_proxy"] || ENV["HTTPS_PROXY"] || ENV["https_proxy"] } }
+        :client_options => { :connection_opts => { :proxy => ENV["OAUTH_HTTP_PROXY"] } }
     end
 
     unless Rails.env.production?
