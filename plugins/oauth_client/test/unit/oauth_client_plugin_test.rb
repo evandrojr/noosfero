@@ -9,7 +9,7 @@ class OauthClientPluginTest < ActiveSupport::TestCase
     @environment = Environment.default
     @session = {}
     @request = mock
-    @provider = OauthClientPlugin::Provider.create!(:name => 'name', :identifier => 'identifier', :strategy => 'strategy')
+    @provider = OauthClientPlugin::Provider.create!(:name => 'name', :strategy => 'strategy')
   end
 
   attr_reader :params, :plugin, :environment, :session, :request, :provider

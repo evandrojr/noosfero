@@ -7,7 +7,7 @@ class OauthClientPluginPublicControllerTest < ActionController::TestCase
     @auth.stubs(:info).returns(mock)
     request.env["omniauth.auth"] = @auth
     @environment = Environment.default
-    @provider = OauthClientPlugin::Provider.create!(:name => 'provider', :strategy => 'provider', :identifier =>'provider', :enabled => true)
+    @provider = OauthClientPlugin::Provider.create!(:name => 'provider', :strategy => 'provider', :enabled => true)
   end
   attr_reader :auth, :environment, :provider
 

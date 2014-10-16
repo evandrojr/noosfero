@@ -52,7 +52,6 @@ class OauthClientPlugin < Noosfero::Plugin
       setup = lambda { |env|
         request = Rack::Request.new env
         strategy = env['omniauth.strategy']
-        identifier = request.path.split('/').last
 
         domain = Domain.find_by_name(request.host)
         environment = domain.environment rescue Environment.default

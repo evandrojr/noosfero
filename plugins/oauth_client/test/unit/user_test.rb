@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 class UserTest < ActiveSupport::TestCase
 
   def setup
-    @provider = OauthClientPlugin::Provider.create!(:name => 'name', :identifier => 'identifier', :strategy => 'strategy')
+    @provider = OauthClientPlugin::Provider.create!(:name => 'name', :strategy => 'strategy')
   end
   attr_reader :provider
 

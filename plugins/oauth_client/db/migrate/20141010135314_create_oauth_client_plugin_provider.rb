@@ -4,7 +4,6 @@ class CreateOauthClientPluginProvider < ActiveRecord::Migration
     create_table :oauth_client_plugin_providers do |t|
       t.integer :environment_id
       t.string :strategy
-      t.string :identifier
       t.string :name
       t.text :options
       t.boolean :enabled
