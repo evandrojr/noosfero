@@ -1,0 +1,6 @@
+<%= f.fields_for :client_options, OpenStruct.new(provider.options[:client_options]) do |c| %>
+  <div class="client-url">
+    <span class="label"><%= _('Client Url') %></span>
+    <span class="value"><%= c.text_field :site %></span>
+  </div>
+<% end %>

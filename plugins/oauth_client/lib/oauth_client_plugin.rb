@@ -13,7 +13,7 @@ class OauthClientPlugin < Noosfero::Plugin
   def login_extra_contents
     plugin = self
     proc do
-      render :partial => 'auth/oauth_login', :locals => {:providers => plugin.enabled_providers}
+      render :partial => 'auth/oauth_login', :locals => {:providers => environment.oauth_providers.enabled}
     end
   end
 
@@ -27,12 +27,6 @@ class OauthClientPlugin < Noosfero::Plugin
         ''
       end
     end
-  end
-
-  def enabled_providers
-    settings = Noosfero::Plugin::Settings.new(context.environment, OauthClientPlugin)
-    providers = settings.get_setting(:providers)
-    providers.select {|provider, options| options[:enabled]}
   end
 
   PROVIDERS = {
@@ -55,18 +49,24 @@ class OauthClientPlugin < Noosfero::Plugin
 
   Rails.application.config.middleware.use OmniAuth::Builder do
     PROVIDERS.each do |provider, options|
-      provider provider, :setup => lambda { |env|
+      setup = lambda { |env|
         request = Rack::Request.new env
         strategy = env['omniauth.strategy']
 
         domain = Domain.find_by_name(request.host)
         environment = domain.environment rescue Environment.default
-        settings = Noosfero::Plugin::Settings.new(environment, OauthClientPlugin)
-        providers = settings.get_setting(:providers)
 
-        strategy.options.client_id = providers[provider][:client_id]
-        strategy.options.client_secret = providers[provider][:client_secret]
-      }, :path_prefix => '/plugin/oauth_client', :callback_path => "/plugin/oauth_client/public/callback/#{provider}"
+        provider_id = request.session['omniauth.params'] ? request.session['omniauth.params']['id'] : request.params['id']
+        provider = environment.oauth_providers.find(provider_id)
+        strategy.options.merge!(provider.options.symbolize_keys)
+
+        request.session[:provider_id] = provider_id
+      }
+
+      provider provider, :setup => setup,
+        :path_prefix => '/plugin/oauth_client',
+        :callback_path => "/plugin/oauth_client/public/callback/#{provider}",
+        :client_options => { :connection_opts => { :proxy => ENV["HTTP_PROXY"] || ENV["http_proxy"] || ENV["HTTPS_PROXY"] || ENV["https_proxy"] } }
     end
 
     unless Rails.env.production?
@@ -81,7 +81,7 @@ class OauthClientPlugin < Noosfero::Plugin
         auth = session[:oauth_data]
 
         if auth.present? && params[:user].present?
-          params[:user][:oauth_providers] = [{:provider => auth.provider, :uid => auth.uid}]
+          params[:user][:oauth_providers] = [OauthClientPlugin::Provider.find(session[:provider_id])]
           if request.post? && auth.info.email != params[:user][:email]
             raise "Wrong email for oauth signup"
           end

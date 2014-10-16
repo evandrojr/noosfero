@@ -2,22 +2,13 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class UserTest < ActiveSupport::TestCase
 
-  should 'find with omniauth params' do
-    user = fast_create(User)
-    user.settings[:oauth_providers] = [:test => {}]
-    user.save!
-    auth = {:info => OpenStruct.new({:email => user.email})}
-    assert_equal user, User.find_with_omniauth(OpenStruct.new(auth))
+  def setup
+    @provider = OauthClientPlugin::Provider.create!(:name => 'name', :strategy => 'strategy')
   end
-
-  should 'do not return user if there is no provider' do
-    user = fast_create(User)
-    auth = {:info => OpenStruct.new({:email => user.email})}
-    assert_equal nil, User.find_with_omniauth(OpenStruct.new(auth))
-  end
+  attr_reader :provider
 
   should 'password is not required if there is a oauth provider' do
-    User.create!(:email => 'testoauth@example.com', :login => 'testoauth', :oauth_providers => [:test])
+    User.create!(:email => 'testoauth@example.com', :login => 'testoauth', :oauth_providers => [provider])
   end
 
   should 'password is required if there is a oauth provider' do
@@ -27,7 +18,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   should 'activate user when created with oauth' do
-    user = User.create!(:email => 'testoauth@example.com', :login => 'testoauth', :oauth_providers => [:test])
+    user = User.create!(:email => 'testoauth@example.com', :login => 'testoauth', :oauth_providers => [provider])
     assert user.activated?
   end
 
@@ -37,7 +28,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   should 'not make activation code when created with oauth' do
-    user = User.create!(:email => 'testoauth@example.com', :login => 'testoauth', :oauth_providers => [:test])
+    user = User.create!(:email => 'testoauth@example.com', :login => 'testoauth', :oauth_providers => [provider])
     assert !user.activation_code
   end
 
