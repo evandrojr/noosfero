@@ -1,0 +1,205 @@
+div.article-comments-list-more{
+  width: 100%;
+  height: 30px;
+  text-align: center;
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+
+.popBox_comment_paragraph {
+  position: absolute;
+  z-index: 2;
+  background: #cccccc;
+  width: 60px;
+  padding: 0.3em;
+  position: absolute;border: 1px solid gray;
+}
+
+.span_comment_paragraph {
+  color: red;
+  font-weight: bold;
+}
+
+.commented-area {
+  background-color: lightseagreen;
+}
+
+.comment_paragraph ::selection {
+  background: lightseagreen; /* WebKit/Blink Browsers */
+}
+
+.comment_paragraph ::-moz-selection {
+  background: lightseagreen; /* Gecko Browsers */
+}
+
+.comment_paragraph{
+  padding: 0px;
+}
+
+.triangle-right {
+  position:relative;
+  padding:15px;
+  margin:1em 0 3em;
+  color:#fff;
+  background:#075698; /* default background for browsers without gradient support */
+  /* css3 */
+  background:-webkit-gradient(linear, 0 0, 0 100%, from(#2e88c4), to(#075698));
+  background:-moz-linear-gradient(#2e88c4, #075698);
+  background:-o-linear-gradient(#2e88c4, #075698);
+  background:linear-gradient(#2e88c4, #075698);
+  -webkit-border-radius:10px;
+  -moz-border-radius:10px;
+  border-radius:10px;
+}
+
+.triangle-right:after {
+  content: "";
+  position: absolute;
+  bottom: -20px;
+  left: 50px;
+  border-width: 20px 0 0 20px;
+  border-style: solid;
+  border-color: #075698 transparent;
+  display: block;
+  width: 0;
+}
+
+.triangle-border {
+  position: relative;
+  padding: 15px;
+  margin: 1em 0 3em;
+  border: 5px solid #5a8f00;
+  color: #333;
+  background: #fff;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+}
+
+.side-comment .comment-created-at{display: none;}
+.side-comment #comment_title{display: none;}
+.side-comment .comment_title{display: none;}
+.side-comment label[for="comment_title"] {display: none;}
+
+
+
+div[class^='comments_list_toggle_paragraph_'] {
+ border-style: solid;
+ border-width: 1px;
+ border-color: #ccc;
+ padding: 5px;
+ background-color: whitesmoke;
+ width: 250px;
+}
+
+div[class^='comment-paragraph-loading-'] {
+ background-color: whitesmoke;
+ z-index: 99;
+ right: -230px;
+}
+
+#content .side-comment .comment-balloon div[class^='comment-wrapper-']{
+  background: none;
+}
+
+.side-comment{
+  z-index: 199;
+}
+
+.side-comments-counter {
+  position: relative;
+  width: 20px;
+  height: 19px;
+  padding: 0px;
+  background: #b3b2d4;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.side-comments-counter:hover{
+  color: white;
+}
+
+.side-comments-counter:after {
+  content: "";
+  position: absolute;
+  bottom: -9px;
+  left: 8px;
+  border-style: solid;
+  border-width: 12px 5px 0;
+  border-color: #b3b2d4 transparent;
+  display: block;
+  width: 0;
+}
+
+.comment-count{
+  position: relative;
+  top: 3px;
+}
+
+.article-comment-inner {border-bottom: 1px solid #ddd;}
+
+#article .side-comment .comment-replies .article-comment{background: white; border: 0px; border-top: 1px solid #ddd;}
+
+.comment-replies .comment-from-owner.comment-content {background: none;}
+
+
+
+
+.side-comment .comment-balloon-content {
+  margin: 0;
+}
+
+#article .side-comment .article-comments-list {
+  margin: 0;
+}
+#article .side-comment .article-comments-list .article-comment {
+  margin: 0;
+}
+.side-comment .comment-details {
+  margin: 0;
+  padding: 0;
+}
+.side-comment .comment-text {
+  padding: 0;
+  width: 100%;
+  text-align: left;
+}
+.side-comment .comment-text p {
+  margin: 0;
+}
+#content #article .article-body .side-comment img {
+  max-width: 30px;
+}
+#content #article .article-body .side-comment span.comment-info {
+  position: relative;
+  top: -10px;
+  left: 36px;
+  line-height: 0;
+  font-weight: bold;
+}
+.side-comment .comment-wrapper-1 {
+  margin-left: 36px;
+}
+#article .side-comment .article-comments-list .comment-replies {
+  padding-left: 25px;
+}
+#article .side-comment .comment-picture {
+  width: 75%;
+  height: auto;
+}
+#article .side-comment .article-comment .comment-details > h4 {
+  display: none;
+}
+.side-comment .formlabel[for='comment_body'] {
+  display: none;
+}
+.side-comment > div > div {
+  background: #FFFFFF;
+}
+.side-comment .comment_form p {
+  display: none;
+}
