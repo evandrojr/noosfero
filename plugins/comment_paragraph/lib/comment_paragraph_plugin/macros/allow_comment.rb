@@ -5,7 +5,7 @@ class CommentParagraphPlugin::AllowComment < Noosfero::Plugin::Macro
   def self.configuration
     { :params => [],
       :skip_dialog => true,
-      :generator => 'makeCommentable();',
+      :generator => 'makeAllCommentable();',
       :js_files => 'comment_paragraph.js',
       :icon_path => '/plugins/comment_paragraph/images/balloons-comment.png',
       :css_files => 'comment_paragraph.css' }
