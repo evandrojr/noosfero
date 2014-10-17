@@ -42,7 +42,10 @@ class CommentParagraphPlugin < Noosfero::Plugin
   def cms_controller_filters
     block = proc do
       if params['commit'] == 'Save'
-        unless @article.id.blank?
+
+        settings = Noosfero::Plugin::Settings.new(environment, CommentParagraphPlugin, params[:settings])
+
+        if !@article.id.blank? && CommentParagraphPlugin::CommentParagraphHelper.auto_marking_enabled?(settings, @article.class.name)
 
           parsed_paragraphs = []
           paragraph_id = 0

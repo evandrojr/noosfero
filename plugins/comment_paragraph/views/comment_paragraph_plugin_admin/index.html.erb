@@ -1,0 +1,25 @@
+<h1><%= _("Comment paragraph plugin settings") %></h1>
+
+<%= form_for(:settings) do |f| %>
+
+<table>
+  <tr>
+    <th>&nbsp;</th>
+    <th align="left"><%= _('Article type') %></th>
+    <th align="left"><%= _('Article type description') %></th>
+  </tr>
+  <% @article_types.each do |type| %>
+  <tr>
+    <td><%= check_box_tag 'settings[article_types_with_auto_marking][]', type[:class_name], CommentParagraphPlugin::CommentParagraphHelper.auto_marking_enabled?(@settings, type[:class_name]) %></td>
+    <td><%= _(type[:class_name]) %></td>
+    <td><%= _(type[:short_description]) %></td>
+  </tr>
+  <% end %>
+</table>
+
+
+  <% button_bar do %>
+    <%= submit_button(:save, _('Save'), :cancel => {:controller => 'plugins', :action => 'index'}) %>
+  <% end %>
+
+<% end %>
