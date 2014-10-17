@@ -1,0 +1,25 @@
+.video-gallery-thumbnail {
+  position: relative;
+  display: inline-block;
+  width: 95px;
+  height: 85px;
+  margin: 1em; 
+  border: solid #F0F0F0 1px;
+  vertical-align: top;
+  text-align: center;
+  overflow: hidden;
+  padding-top: 7px;
+  margin-botton: 10px;
+}
+
+.video-gallery-top-box{
+  height: 73px;
+}
+
+.video-duration{
+  position: absolute;  
+  bottom: 0px;
+  background-color: black;
+  font-size: 1em;
+  text-color: white;
+}
