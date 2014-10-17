@@ -2,7 +2,7 @@ String.prototype.startsWith = function(needle){
   return(this.indexOf(needle) == 0);
 };
 
-function makeCommentable() {
+function makeAllCommentable() {
   var paragraphsTxt="";
   var selectedTextCount=0;
   var notSelectedTextCount=0;
