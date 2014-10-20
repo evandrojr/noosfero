@@ -1,5 +1,7 @@
 class OauthClientPluginPublicController < PublicController
 
+  skip_before_filter :login_required
+
   def callback
     auth = request.env["omniauth.auth"]
     user = environment.users.find_by_email(auth.info.email)
