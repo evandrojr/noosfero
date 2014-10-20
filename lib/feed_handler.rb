@@ -43,7 +43,11 @@ class FeedHandler
             raise InvalidUrl.new("\"%s\" is not a valid URL" % address)
           end
           header = {"User-Agent" => "Noosfero/#{Noosfero::VERSION}"}
-          header.merge!(:proxy => ENV['FEED_HTTP_PROXY']) if ENV['FEED_HTTP_PROXY']
+          if address.starts_with?("https://")
+            header.merge!(:proxy => ENV['FEED_HTTPS_PROXY']) if ENV['FEED_HTTPS_PROXY']
+          else
+            header.merge!(:proxy => ENV['FEED_HTTP_PROXY']) if ENV['FEED_HTTP_PROXY']
+          end
           open(address, header, &block)
         end
       return content
