@@ -13,6 +13,7 @@ class CommentParagraphPluginAdminController < AdminController
     end
 
     if request.post?
+      @settings.settings[:auto_marking_article_types].reject! { |type| type.blank? }
       @settings.save!
       redirect_to :controller => 'plugins', :action => 'index'
     end

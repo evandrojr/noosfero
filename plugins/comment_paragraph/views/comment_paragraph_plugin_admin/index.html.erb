@@ -1,25 +1,32 @@
+<% extend CommentParagraphPlugin::CommentParagraphHelper %>
+
 <h1><%= _("Comment paragraph plugin settings") %></h1>
 
 <%= form_for(:settings) do |f| %>
 
-<table>
+<%= hidden_field_tag 'settings[auto_marking_article_types][]' %>
+
+<table id="auto_marking_article_types_conf" border="0">
   <tr>
-    <th>&nbsp;</th>
     <th align="left"><%= _('Article type') %></th>
-    <th align="left"><%= _('Article type description') %></th>
+    <th><%= _('Automatic marking active') %></th>
+  </tr>
+  <tr style="background-color: #EEE; border-bottom: 2px solid #000;">
+    <td><span style="font-style: italic;"><%= _('Check/Uncheck All') %></span></td>
+    <td align="center"><%= check_box_tag 'article_active', '' %></td>
   </tr>
   <% @article_types.each do |type| %>
   <tr>
-    <td><%= check_box_tag 'settings[article_types_with_auto_marking][]', type[:class_name], CommentParagraphPlugin::CommentParagraphHelper.auto_marking_enabled?(@settings, type[:class_name]) %></td>
-    <td><%= _(type[:class_name]) %></td>
     <td><%= _(type[:short_description]) %></td>
+    <td align="center"><%= check_box_tag 'settings[auto_marking_article_types][]', type[:class_name], auto_marking_enabled?(@settings, type[:class_name]) %></td>
   </tr>
   <% end %>
 </table>
-
 
   <% button_bar do %>
     <%= submit_button(:save, _('Save'), :cancel => {:controller => 'plugins', :action => 'index'}) %>
   <% end %>
 
 <% end %>
+
+<%= javascript_include_tag 'plugins/comment_paragraph/comment_paragraph_admin' %>
