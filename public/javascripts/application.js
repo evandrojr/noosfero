@@ -1,8 +1,20 @@
 // Place your application-specific JavaScript functions and classes here
 // This file is automatically included by javascript_include_tag :defaults
 
+// scope for noosfero stuff
+noosfero = {
+};
+
 function noosfero_init() {
   // focus_first_field(); it is moving the page view when de form is down.
+}
+
+var __noosfero_root = null;
+function noosfero_root() {
+  if (__noosfero_root == null) {
+    __noosfero_root = jQuery('meta[property="noosfero:root"]').attr("content") || '';
+  }
+  return __noosfero_root;
 }
 
 /* If applicable, find the first field in which the user can type and move the
@@ -515,7 +527,7 @@ jQuery(function($) {
     }
   });
 
-  $.getJSON('/account/user_data', function userDataCallBack(data) {
+  $.getJSON(noosfero_root() + '/account/user_data', function userDataCallBack(data) {
     if (data.login) {
       $('head').append('<meta content="authenticity_token" name="csrf-param" />');
       $('head').append('<meta content="'+$.cookie("_noosfero_.XSRF-TOKEN")+'" name="csrf-token" />');
@@ -527,6 +539,32 @@ jQuery(function($) {
     $(window).trigger("userDataLoaded", data);
   });
 
+  function chatOnlineUsersDataCallBack(data) {
+    if ($('#chat-online-users').length == 0) {
+      return;
+    }
+    var content = '';
+    $('#chat-online-users .amount_of_friends').html(data['amount_of_friends']);
+    $('#chat-online-users').fadeIn();
+    for (var user in data['friends_list']) {
+      var name = "<span class='friend_name'>%{name}</span>";
+      var avatar = data['friends_list'][user]['avatar'];
+      var jid = data['friends_list'][user]['jid'];
+      var status_name = data['friends_list'][user]['status'] || 'offline';
+      avatar = avatar ? '<img src="' + avatar + '" />' : ''
+        name = name.replace('%{name}',data['friends_list'][user]['name']);
+      open_chat_link = "onclick='open_chat_window(this, \"#" + jid + "\")'";
+      var status_icon = "<div class='chat-online-user-status icon-menu-"+ status_name + "-11'><span>" + status_name + '</span></div>';
+      content += "<li><a href='#' class='chat-online-user' " + open_chat_link + "><div class='chat-online-user-avatar'>" + avatar + '</div>' + name + status_icon + '</a></li>';
+    }
+    content ? $('#chat-online-users-hidden-content ul').html(content) : $('#anyone-online').show();
+    $('#chat-online-users-title').click(function(){
+      if($('#chat-online-users-content').is(':visible'))
+      $('#chat-online-users-content').hide();
+      else
+      $('#chat-online-users-content').show();
+    });
+  }
 });
 
 // controls the display of contact list
@@ -569,12 +607,9 @@ function display_notice(message) {
 }
 
 function open_chat_window(self_link, anchor) {
-   if(anchor) {
-      jQuery('#chat').show('fast');
-      jQuery("#chat" ).trigger('opengroup', anchor);
-   } else {
-      jQuery('#chat').toggle('fast');
-   }
+   anchor = anchor || '#';
+   var noosfero_chat_window = window.open('/chat' + anchor,'noosfero_chat','width=900,height=500');
+   noosfero_chat_window.focus();
    return false;
 }
 
