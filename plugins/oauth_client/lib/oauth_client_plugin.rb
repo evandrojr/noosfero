@@ -50,9 +50,10 @@ class OauthClientPlugin < Noosfero::Plugin
   Rails.application.config.middleware.use OmniAuth::Builder do
     PROVIDERS.each do |provider, options|
       setup = lambda { |env|
-        request = Rack::Request.new env
+        request = Rack::Request.new(env)
         strategy = env['omniauth.strategy']
 
+        Noosfero::MultiTenancy.setup!(request.host)
         domain = Domain.find_by_name(request.host)
         environment = domain.environment rescue Environment.default
 
