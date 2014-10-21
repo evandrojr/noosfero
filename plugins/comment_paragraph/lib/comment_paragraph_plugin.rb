@@ -45,7 +45,8 @@ class CommentParagraphPlugin < Noosfero::Plugin
 
         settings = Noosfero::Plugin::Settings.new(environment, CommentParagraphPlugin, params[:settings])
 
-        if !@article.id.blank? && CommentParagraphPlugin::CommentParagraphHelper.auto_marking_enabled?(settings, @article.class.name)
+        extend CommentParagraphPlugin::CommentParagraphHelper
+        if !@article.id.blank? && self.auto_marking_enabled?(settings, @article.class.name)
 
           parsed_paragraphs = []
           paragraph_id = 0
