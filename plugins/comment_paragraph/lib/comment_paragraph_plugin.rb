@@ -53,8 +53,19 @@ class CommentParagraphPlugin < Noosfero::Plugin
 
           doc = Hpricot(@article.body)
           paragraphs = doc.search("/*").each do |paragraph|
-            parsed_paragraphs << (paragraph.to_html =~ /^\n|\r\n|<p>\W<\/p>$|(.*)paragraph_comment_spacer(.*)|<div(.*)paragraph_comment(.*)$/ ? paragraph.to_html : CommentParagraphPlugin.parse_paragraph(paragraph.to_html, paragraph_id))
+
+            if paragraph.to_html =~ /^<div(.*)paragraph_comment(.*)$/ || paragraph.to_html =~ /^<p>\W<\/p>$/
+              parsed_paragraphs << paragraph.to_html
+            else
+              if paragraph.to_html =~ /^(<div|<table|<p|<ul).*/
+                parsed_paragraphs << CommentParagraphPlugin.parse_paragraph(paragraph.to_html, paragraph_id)
+              else
+                parsed_paragraphs << paragraph.to_html
+              end
+            end
+
             paragraph_id += 1
+
           end
 
           @article.body = parsed_paragraphs.join()
@@ -75,7 +86,7 @@ class CommentParagraphPlugin < Noosfero::Plugin
       "<div class='macro article_comments paragraph_comment' " +
            "data-macro='comment_paragraph_plugin/allow_comment' " +
            "data-macro-paragraph_id='#{paragraph_id}'>#{paragraph_content}</div>\r\n" +
-      "<p class='paragraph_comment_spacer'>&nbsp;</p>\r\n"
+      "<p>&nbsp;</p>"
   end
 
 end
