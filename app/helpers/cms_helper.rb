@@ -10,9 +10,7 @@ module CmsHelper
   end
 
   def add_upload_file_field(name, locals)
-    button_to_function :add, name, nil do |page|
-      page.insert_html :bottom, :uploaded_files, CGI::escapeHTML(render(:partial => 'upload_file', :locals => locals, :object => UploadedFile.new))
-    end
+    button_to_function :add, name, ("jQuery('#uploaded_files').append(jQuery('#uploaded_files>p').last().clone())")
   end
 
   def pagination_links(collection, options={})
