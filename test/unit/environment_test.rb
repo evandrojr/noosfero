@@ -156,7 +156,7 @@ class EnvironmentTest < ActiveSupport::TestCase
 
   should 'list displayable categories' do
     env = fast_create(Environment)
-    cat1 = create(Category, :environment => env, :name => 'category one', :display_color => 1)
+    cat1 = create(Category, :environment => env, :name => 'category one', :display_color => 'ffa500')
     assert ! cat1.new_record?
 
     # subcategories should be ignored
@@ -193,6 +193,12 @@ class EnvironmentTest < ActiveSupport::TestCase
     env.contact_email = 'test@example.com'
     env.valid?
     assert !env.errors[:contact_email.to_s].present?
+  end
+
+  should 'notify contact email' do
+    env = Environment.new(:contact_email => 'foo@bar.com')
+    env.stubs(:admins).returns([])
+    assert_equal ['foo@bar.com'], env.notification_emails
   end
 
   should 'provide a default hostname' do
