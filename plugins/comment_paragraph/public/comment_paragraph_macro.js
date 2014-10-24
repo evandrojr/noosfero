@@ -111,18 +111,6 @@ jQuery(document).ready(function($) {
   }
 
   $("#comment-bubble").hide();
-  //Undo previous highlight from the paragraph
-  $('.comment_paragraph').mousedown(function(){
-    $("#comment-bubble").hide();
-    var paragraphId = $(this).data('paragraph');
-    $(this).find('.commented-area').replaceWith(function() {
-      return $(this).html();
-    });
-    var rootElement = $(this).get(0);
-    if(lastParagraph[paragraphId]){
-      rootElement.innerHTML = lastParagraph[paragraphId];
-    }
-  });
 
   function getSelectionText() {
     var text = "";
@@ -134,40 +122,70 @@ jQuery(document).ready(function($) {
     return text;
   }
 
-   //highlight area from the paragraph
-  $('.comment_paragraph').mouseup(function(event){
-    deselectAll();
+  function setCommentBubblePosition(posX, posY) {
+    $("#comment-bubble").css({
+      top: (posY - 70),
+      left: (posX - 70),
+      position:'absolute'
+    });
+  }
+
+
+  //highlight area from the paragraph
+  $('.comment_paragraph').mouseup(function(event) {
+
     //Don't do anything if there is no selected text
-    if(getSelectionText().length == 0)
+    if (getSelectionText().length == 0) {
       return;
+    }
+
     var paragraphId = $(this).data('paragraph');
-    var currentMousePos = { x: -1, y: -1 };
-    currentMousePos.x = event.pageX;
-    currentMousePos.y = event.pageY;
-    $("#comment-bubble").css({top: event.pageY-70, left: event.pageX-70, position:'absolute'});
-    //Relates a bubble to the mouse up paragraph
-    $("#comment-bubble").data("paragraphId", paragraphId)
+
+    setCommentBubblePosition( event.pageX, event.pageY );
+
     //Prepare to open the div
     var url = $('#link_to_ajax_comments_' + paragraphId).data('url');
-    $("#comment-bubble").data("url", url)
+    $("#comment-bubble").data("url", url);
+    $("#comment-bubble").data("paragraphId", paragraphId);
     $("#comment-bubble").show();
+
     var rootElement = $(this).get(0);
+
     //Stores the HTML content of the lastParagraph
-    lastParagraph[paragraphId] = rootElement.innerHTML;
+    var founded = false;
+
+    for (var i=0; i < lastParagraph.length; i++) {
+      var paragraph = lastParagraph[i];
+      if (paragraph.id == paragraphId) {
+        founded = true
+        break;
+      }
+    }
+
+    if (founded) {
+      lastParagraph[i].html = rootElement.innerHTML;
+    }
+    else {
+      oLastParagraph = { id: paragraphId, html: rootElement.innerHTML };
+      lastParagraph.push( oLastParagraph );
+    }
+
+    deselectAll();
+
     //Maybe it is needed to handle exceptions here
-    try{
+    try {
       var selObj = rangy.getSelection();
       var selected_area = rangy.serializeSelection(selObj, true,rootElement);
       cssApplier.toggleSelection();
-    }catch(e){
+    } catch(e) {
       //Translate this mesage
-      deselectAll();
       rangy.init();
       cssApplier = rangy.createCssClassApplier("commented-area", {normalize: false});
       return;
     }
+
     //Register the area the has been selected at input.selected_area
-    lastSelectedArea[paragraphId] = selected_area;
+    //lastSelectedArea[paragraphId] = selected_area;
     form = $('#page-comment-form-' + paragraphId).find('form');
     if (form.find('input.selected_area').length === 0){
       $('<input>').attr({
@@ -180,6 +198,7 @@ jQuery(document).ready(function($) {
       form.find('input.selected_area').val(selected_area)
     }
     rootElement.focus();
+
   });
 
   function deselectAll(){
@@ -207,7 +226,7 @@ jQuery(document).ready(function($) {
 
   processAnchor();
 
-  $(document).on('mouseover', 'li.article-comment', function(){
+  $(document).on('mouseover', 'li.article-comment', function() {
     var selected_area = $(this).find('input.paragraph_comment_area').val();
     var paragraph_id =  $(this).find('input.paragraph_id').val();
     var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
