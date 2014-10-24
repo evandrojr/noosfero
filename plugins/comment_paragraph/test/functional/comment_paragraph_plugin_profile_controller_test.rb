@@ -35,38 +35,16 @@ class CommentParagraphPluginProfileControllerTest < ActionController::TestCase
     assert_match /\"comment-count-0\", \"1\"/, @response.body
   end
 
-  should 'show first page comments only' do
-    comment1 = fast_create(Comment, :created_at => Time.now - 1.days, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'secondpage', :paragraph_id => 0)
-    comment2 = fast_create(Comment, :created_at => Time.now - 2.days, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'firstpage 1', :paragraph_id => 0)
-    comment3 = fast_create(Comment, :created_at => Time.now - 3.days, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'firstpage 2', :paragraph_id => 0)
-    comment4 = fast_create(Comment, :created_at => Time.now - 4.days, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'firstpage 3', :paragraph_id => 0)
+  should 'be able to show all comments of a paragraph' do
+    comment1 = fast_create(Comment, :created_at => Time.now - 1.days, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'a comment', :paragraph_id => 0)
+    comment2 = fast_create(Comment, :created_at => Time.now - 2.days, :source_id => article, :author_id => profile, :title => 'b comment', :body => 'b comment', :paragraph_id => 0)
+    comment3 = fast_create(Comment, :created_at => Time.now - 3.days, :source_id => article, :author_id => profile, :title => 'c comment', :body => 'c comment', :paragraph_id => 0)
+    comment4 = fast_create(Comment, :created_at => Time.now - 4.days, :source_id => article, :author_id => profile, :title => 'd comment', :body => 'd comment', :paragraph_id => 0)
     xhr :get, :view_comments, :profile => @profile.identifier, :article_id => article.id, :paragraph_id => 0
-    assert_match /firstpage 1/, @response.body
-    assert_match /firstpage 2/, @response.body
-    assert_match /firstpage 3/, @response.body
-    assert_no_match /secondpage/, @response.body
-  end
-
-  should 'show link to display more comments' do
-    comment = fast_create(Comment, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'lalala', :paragraph_id => 0)
-    comment = fast_create(Comment, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'lalala', :paragraph_id => 0)
-    comment = fast_create(Comment, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'lalala', :paragraph_id => 0)
-    comment = fast_create(Comment, :source_id => article, :author_id => profile, :title => 'secondpage', :body => 'secondpage', :paragraph_id => 0)
-    xhr :get, :view_comments, :profile => @profile.identifier, :article_id => article.id, :paragraph_id => 0
-    assert_match /paragraph_comment_page=2/, @response.body
-  end
-
-  should 'do not show link to display more comments if do not have more pages' do
-    comment = fast_create(Comment, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'lalala', :paragraph_id => 0)
-    comment = fast_create(Comment, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'lalala', :paragraph_id => 0)
-    comment = fast_create(Comment, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'lalala', :paragraph_id => 0)
-    xhr :get, :view_comments, :profile => @profile.identifier, :article_id => article.id, :paragraph_id => 0
-    assert_no_match /paragraph_comment_page/, @response.body
-  end
-
-  should 'do not show link to display more comments if do not have any comments' do
-    xhr :get, :view_comments, :profile => @profile.identifier, :article_id => article.id, :paragraph_id => 0
-    assert_no_match /paragraph_comment_page/, @response.body
+    assert_match /a comment/, @response.body
+    assert_match /b comment/, @response.body
+    assert_match /c comment/, @response.body
+    assert_match /d comment/, @response.body
   end
 
 end
