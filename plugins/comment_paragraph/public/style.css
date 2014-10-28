@@ -204,7 +204,10 @@ div[class^='comment-paragraph-loading-'] {
   display: none;
 }
 
-
 .side-comment .post_comment_box.opened {
   padding-bottom: 15px;
+}
+
+.side-comment .comment-count {
+  bg-color: #b3b2d4;
 }
