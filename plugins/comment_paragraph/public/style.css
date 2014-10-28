@@ -203,3 +203,8 @@ div[class^='comment-paragraph-loading-'] {
 .side-comment .comment_form p {
   display: none;
 }
+
+
+.side-comment .post_comment_box.opened {
+  padding-bottom: 15px;
+}
