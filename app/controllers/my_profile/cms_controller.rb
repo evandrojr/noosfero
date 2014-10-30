@@ -59,7 +59,7 @@ class CmsController < MyProfileController
       conditions = ['type != ?', 'RssFeed']
     end
 
-    @articles = @article.children.reorder("case when type = 'Folder' then 0 when type ='Blog' then 1 else 2 end, updated_at DESC, name").paginate(
+    @articles = @article.children.includes(:parent).reorder("case when type = 'Folder' then 0 when type ='Blog' then 1 else 2 end, updated_at DESC, name").paginate(
       :conditions => conditions,
       :per_page => per_page,
       :page => params[:npage]

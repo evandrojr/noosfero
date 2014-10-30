@@ -228,7 +228,7 @@ class Profile < ActiveRecord::Base
   belongs_to :preferred_domain, :class_name => 'Domain', :foreign_key => 'preferred_domain_id'
   belongs_to :environment
 
-  has_many :articles, :dependent => :destroy
+  has_many :articles, :dependent => :destroy, :include => [:profile]
   belongs_to :home_page, :class_name => Article.name, :foreign_key => 'home_page_id'
 
   has_many :files, :class_name => 'UploadedFile'
