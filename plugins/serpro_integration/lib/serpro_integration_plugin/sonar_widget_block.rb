@@ -72,7 +72,7 @@ class SerproIntegrationPlugin::SonarWidgetBlock < Block
 
     block = self
 
-    lambda do
+    proc do
       render :file => 'sonar_widget_block', :locals => { :block => block }
     end
 
