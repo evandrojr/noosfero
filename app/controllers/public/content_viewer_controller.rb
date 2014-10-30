@@ -260,7 +260,7 @@ class ContentViewerController < ApplicationController
   end
 
   def process_comments(params)
-    @comments = @page.comments.without_spam.includes(:source)
+    @comments = @page.comments.without_spam
     @comments = @plugins.filter(:unavailable_comments, @comments)
     @comments_count = @comments.count
     @comments = @comments.without_reply.paginate(:per_page => per_page, :page => params[:comment_page] )
