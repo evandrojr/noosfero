@@ -58,10 +58,10 @@ class Article < ActiveRecord::Base
   belongs_to :last_changed_by, :class_name => 'Person', :foreign_key => 'last_changed_by_id'
   belongs_to :created_by, :class_name => 'Person', :foreign_key => 'created_by_id'
 
-  has_many :comments, :class_name => 'Comment', :foreign_key => 'source_id', :dependent => :destroy, :order => 'created_at asc'
+  has_many :comments, :class_name => 'Comment', :foreign_key => 'source_id', :dependent => :destroy, :order => 'comments.created_at asc', :include => [:author, :children]
 
   has_many :article_categorizations, :conditions => [ 'articles_categories.virtual = ?', false ]
-  has_many :categories, :through => :article_categorizations
+  has_many :categories, :through => :article_categorizations, :include => [:environment]
 
   has_many :article_categorizations_including_virtual, :class_name => 'ArticleCategorization'
   has_many :categories_including_virtual, :through => :article_categorizations_including_virtual, :source => :category
@@ -251,7 +251,7 @@ class Article < ActiveRecord::Base
   # retrieves all articles belonging to the given +profile+ that are not
   # sub-articles of any other article.
   scope :top_level_for, lambda { |profile|
-    {:conditions => [ 'parent_id is null and profile_id = ?', profile.id ]}
+    {:conditions => [ 'parent_id is null and profile_id = ?', profile.id ], :include => [:profile]}
   }
 
   scope :public,
@@ -475,7 +475,7 @@ class Article < ActiveRecord::Base
   end
 
   scope :published, :conditions => ['articles.published = ?', true]
-  scope :folders, lambda {|profile|{:conditions => ['articles.type IN (?)', profile.folder_types] }}
+  scope :folders, lambda {|profile|{:conditions => ['articles.type IN (?)', profile.folder_types], :include => [:parent] }}
   scope :no_folders, lambda {|profile|{:conditions => ['articles.type NOT IN (?)', profile.folder_types]}}
   scope :galleries, :conditions => [ "articles.type IN ('Gallery')" ]
   scope :images, :conditions => { :is_image => true }
@@ -484,7 +484,7 @@ class Article < ActiveRecord::Base
 
   scope :more_popular, :order => 'hits DESC'
   scope :more_comments, :order => "comments_count DESC"
-  scope :more_recent, :order => "created_at DESC"
+  scope :more_recent, :order => "articles.created_at DESC"
 
   def self.display_filter(user, profile)
     return {:conditions => ['articles.published = ?', true]} if !user
