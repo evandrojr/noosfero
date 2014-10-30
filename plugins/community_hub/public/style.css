@@ -558,7 +558,7 @@ textarea#message_body {
   margin-left: 80px;
 }
 
-.comment-count {
+.post .comment-count {
   margin-left: 80px;
   padding: 5px 10px;
   background-color: white;
