@@ -1,6 +1,6 @@
 var comment_paragraph_anchor;
-var lastParagraph = [];
 var lastSelectedArea = [];
+var original_paragraphs = [];
 
 function setPlusIfZeroComments($){
   $('.comment-count').each(function(){
@@ -14,6 +14,13 @@ jQuery(document).ready(function($) {
   //Quit if does not detect a comment for that plugin
   if($('.comment_paragraph').size() < 1)
     return;
+
+  all_paragraphs = $('.comment_paragraph');
+  all_paragraphs.each( function(paragraph) {
+    var paragraph_id = $( all_paragraphs.get(paragraph) ).attr('data-paragraph');
+    var paragraph_content = all_paragraphs.get(paragraph).innerHTML;
+    original_paragraphs.push( { id: paragraph_id, content: paragraph_content } );
+  });
 
   $(document).keyup(function(e) {
     // on press ESC key...
@@ -124,15 +131,16 @@ jQuery(document).ready(function($) {
 
   function setCommentBubblePosition(posX, posY) {
     $("#comment-bubble").css({
-      top: (posY - 70),
+      top: (posY - 80),
       left: (posX - 70),
       position:'absolute'
     });
   }
 
-
   //highlight area from the paragraph
   $('.comment_paragraph').mouseup(function(event) {
+
+    $('#comment-bubble').hide();
 
     //Don't do anything if there is no selected text
     if (getSelectionText().length == 0) {
@@ -151,41 +159,15 @@ jQuery(document).ready(function($) {
 
     var rootElement = $(this).get(0);
 
-    //Stores the HTML content of the lastParagraph
-    var founded = false;
-
-    for (var i=0; i < lastParagraph.length; i++) {
-      var paragraph = lastParagraph[i];
-      if (paragraph.id == paragraphId) {
-        founded = true
-        break;
-      }
-    }
-
-    if (founded) {
-      lastParagraph[i].html = rootElement.innerHTML;
-    }
-    else {
-      oLastParagraph = { id: paragraphId, html: rootElement.innerHTML };
-      lastParagraph.push( oLastParagraph );
-    }
-
-    deselectAll();
-
     //Maybe it is needed to handle exceptions here
     try {
       var selObj = rangy.getSelection();
-      var selected_area = rangy.serializeSelection(selObj, true,rootElement);
-      cssApplier.toggleSelection();
+      var selected_area = rangy.serializeSelection(selObj, true, rootElement);
     } catch(e) {
-      //Translate this mesage
-      rangy.init();
-      cssApplier = rangy.createCssClassApplier("commented-area", {normalize: false});
       return;
     }
 
     //Register the area the has been selected at input.selected_area
-    //lastSelectedArea[paragraphId] = selected_area;
     form = $('#page-comment-form-' + paragraphId).find('form');
     if (form.find('input.selected_area').length === 0){
       $('<input>').attr({
@@ -200,10 +182,6 @@ jQuery(document).ready(function($) {
     rootElement.focus();
 
   });
-
-  function deselectAll(){
-    $(".commented-area").contents().unwrap();
-  }
 
   function processAnchor(){
     var anchor = window.location.hash;
@@ -226,38 +204,26 @@ jQuery(document).ready(function($) {
 
   processAnchor();
 
-  $(document).on('mouseover', 'li.article-comment', function() {
+  $(document).on('mouseenter', 'li.article-comment', function() {
     var selected_area = $(this).find('input.paragraph_comment_area').val();
     var paragraph_id =  $(this).find('input.paragraph_id').val();
-    var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
+    var rootElement = $('#comment_paragraph_' + paragraph_id).get(0);
 
-    if(lastParagraph[paragraph_id] == null || lastParagraph[paragraph_id] == 'undefined'){
-      lastParagraph[paragraph_id] = rootElement.innerHTML;
-    }
-    else {
-      rootElement.innerHTML = lastParagraph[paragraph_id] ;
-    }
     if(selected_area != ""){
       rangy.deserializeSelection(selected_area, rootElement);
       cssApplier.toggleSelection();
     }
   });
 
-  $(document).on('mouseout', 'li.article-comment', function(){
-    deselectAll();
+  $(document).on('mouseleave', 'li.article-comment', function() {
     var paragraph_id = $(this).find('input.paragraph_id').val();
     var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
 
-    if(lastSelectedArea[paragraph_id] != null && lastSelectedArea[paragraph_id] != 'undefined' ){
-      rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
-      rootElement.innerHTML = lastParagraph[paragraph_id];
-      rangy.deserializeSelection(lastSelectedArea[paragraph_id], rootElement);
-      cssApplier.toggleSelection();
-    } else {
-      cssApplier.toggleSelection();
-      var sel = rangy.getSelection();
-      sel.removeAllRanges();
-    }
+    original_paragraphs.each( function(paragraph) {
+      if (paragraph.id == paragraph_id) {
+        rootElement.innerHTML = paragraph.content;
+      }
+    });
   });
 
   function toggleParagraph(paragraph) {
