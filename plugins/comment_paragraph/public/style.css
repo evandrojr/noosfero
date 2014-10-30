@@ -89,7 +89,7 @@ div[class^='comments_list_toggle_paragraph_'] {
  border-color: #ccc;
  padding: 5px;
  background-color: whitesmoke;
- width: 250px;
+ width: 270px;
 }
 
 div[class^='comment-paragraph-loading-'] {
@@ -204,7 +204,10 @@ div[class^='comment-paragraph-loading-'] {
   display: none;
 }
 
-
 .side-comment .post_comment_box.opened {
   padding-bottom: 15px;
+}
+
+.side-comment .comment-count {
+  bg-color: #b3b2d4;
 }
