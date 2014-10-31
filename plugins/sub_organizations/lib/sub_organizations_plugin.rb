@@ -38,7 +38,7 @@ class SubOrganizationsPlugin < Noosfero::Plugin
   end
 
   def has_permission?(person, permission, target)
-    if !target.kind_of?(Environment) && target.organization?
+    if !target.kind_of?(Environment) && !target.nil? && target.organization?
       Organization.parents(target).map do |parent|
         person.has_permission_without_plugins?(permission, parent)
       end.include?(true)
