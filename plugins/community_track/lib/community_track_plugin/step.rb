@@ -61,7 +61,7 @@ class CommunityTrackPlugin::Step < Folder
   end
 
   def self.enabled_tools
-    [TinyMceArticle, Forum]
+    [TinyMceArticle, Forum, CommunityHubPlugin::Hub]
   end
 
   def to_html(options = {})
