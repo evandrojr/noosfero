@@ -70,7 +70,7 @@ class ContentViewerController < ApplicationController
       render :action => 'slideshow', :layout => 'slideshow'
       return
     end
-    render :view_page, :formats => [:html]
+    render @page.view_page, :formats => [:html]
   end
 
   def versions_diff
