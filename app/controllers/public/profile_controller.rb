@@ -18,6 +18,7 @@ class ProfileController < PublicController
     @tags = profile.article_tags
     unless profile.display_info_to?(user)
       profile.visible? ? private_profile : invisible_profile
+      render :action => 'index', :status => 403
     end
   end
 
@@ -315,7 +316,7 @@ class ProfileController < PublicController
         abuse_report = AbuseReport.new(params[:abuse_report])
         if !params[:content_type].blank?
           article = params[:content_type].constantize.find(params[:content_id])
-          abuse_report.content = instance_eval(&article.reported_version)
+          abuse_report.content = article_reported_version(article)
         end
 
         user.register_report(abuse_report, profile)
