@@ -51,9 +51,7 @@ jQuery(document).ready(function($) {
       div.addClass('opened');
     }
   }
-
-  //Hides old style ballons
-  $("img[alt|=Comments]").hide();
+  
   rangy.init();
   cssApplier = rangy.createCssClassApplier("commented-area", {normalize: false});
   //Add marked text bubble
