@@ -1,7 +1,6 @@
 module API
   module V1
     class Articles < Grape::API
-      before { detect_stuff_by_domain }
       before { authenticate! }
 
       resource :articles do
@@ -19,7 +18,6 @@ module API
 #      :params => API::Entities::Article.documentation
 #    }
         get do
-  
           articles = select_filtered_collection_of(environment, 'articles', params)
           present articles, :with => Entities::Article 
         end
