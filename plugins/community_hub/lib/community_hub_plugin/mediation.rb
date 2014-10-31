@@ -12,4 +12,12 @@ class CommunityHubPlugin::Mediation < Article
     "hub-mediation-#{(Time.now.to_f * 1000).to_i}"
   end
 
+  def self.description
+    _('Hub mediation')
+  end
+
+  def self.short_description
+    _('Hub mediation')
+  end
+
 end
