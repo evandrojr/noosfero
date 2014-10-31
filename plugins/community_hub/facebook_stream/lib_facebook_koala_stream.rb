@@ -7,7 +7,7 @@ require 'json'
 #'CAAD8cd4tMVkBAO3sh2DrzwZCDfeQq9ZAvTz7Jz24ZC26KtMfBoljqaXhD2vBV1zpP0bjrpxXUBzJvKKcFzOm6rMG9Sok7iNVUaxt5iwr7dfMqCvHpMboKpqrqgeLrfCH5ITVTAdezA6ZBSr9iOJrqyCSOYfui0zTmbXJ3FqtshwNRrRy4NPH'
 # BACKUP TOKEN 'CAAEhsewl0ZAcBAHhipXszZCURSwWLmgvceDbs9mB5baJdLriFxYMEzywmF2fvZBuThuA2Mm7QF8wPd3E6R5pVqVEnC2VhcBb4VrfAnkZC73ZC5g1NRUnKZCB2e6CaRiUBDatR2nf505PeKp7Aj5XxvTdfSqdZCsXxQFYZApPNSUUgkUWm6HwL4rp21MRJXb612sZD'
 
-def facebook_comments(hub, author_id, page_id, pooling_time, token, proxy_url)
+def deprecated_facebook_comments(hub, author_id, page_id, pooling_time, token, proxy_url)
   pooling_time ||= 5
   Koala.http_service.http_options = { :proxy => proxy_url } unless proxy_url.blank?
 

@@ -2,6 +2,13 @@ require 'rubygems'
 require 'twitter'
 require 'iconv'
 
+#disable address resolv to avoid problems with proxy
+class Resolv
+  def self.getaddress(host)
+    host
+  end
+end
+
 #Filters non-UTF8 octets
 def UTF8Filter(string)
     ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')
@@ -57,7 +64,6 @@ def listen_twitter_stream(hub, author_id)
     rescue => e
       puts "Error reading twitter stream #{e.inspect}"
       sleep (10 + 2 ** tries)
-      break
     end
   end
 end
