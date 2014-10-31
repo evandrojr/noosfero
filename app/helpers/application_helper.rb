@@ -304,7 +304,7 @@ module ApplicationHelper
   def partial_for_class(klass, prefix=nil, suffix=nil)
     raise ArgumentError, 'No partial for object. Is there a partial for any class in the inheritance hierarchy?' if klass.nil?
     name = klass.name.underscore
-    controller.view_paths.reverse_each do |view_path|
+    controller.view_paths.each do |view_path|
       partial = partial_for_class_in_view_path(klass, view_path, prefix, suffix)
       return partial if partial
     end
@@ -312,13 +312,13 @@ module ApplicationHelper
     raise ArgumentError, 'No partial for object. Is there a partial for any class in the inheritance hierarchy?'
   end
 
-  def view_for_profile_actions(klass)
-    raise ArgumentError, 'No profile actions view for this class.' if klass.nil?
-
-    name = klass.name.underscore
-    return "blocks/profile_info_actions/" + name + '.html.erb' if File.exists?(Rails.root.join('app', 'views', 'blocks', 'profile_info_actions', name + '.html.erb'))
-
-    view_for_profile_actions(klass.superclass)
+  def render_profile_actions klass
+    name = klass.to_s.underscore
+    begin
+      render "blocks/profile_info_actions/#{name}"
+    rescue ActionView::MissingTemplate
+      render_profile_actions klass.superclass
+    end
   end
 
   def user
@@ -482,7 +482,12 @@ module ApplicationHelper
             '/images/icons-app/enterprise-'+ size.to_s() +'.png'
           end
         else
-          '/images/icons-app/person-'+ size.to_s() +'.png'
+          pixels = Image.attachment_options[:thumbnails][size].split('x').first
+          gravatar_profile_image_url(
+            profile.email,
+            :size => pixels,
+            :d => gravatar_default
+          )
         end
       filename = default_or_themed_icon(icon)
     end
@@ -602,7 +607,7 @@ module ApplicationHelper
   end
 
   def gravatar_default
-    (respond_to?(:theme_option) && theme_option.present? && theme_option['gravatar']) || NOOSFERO_CONF['gravatar']
+    (respond_to?(:theme_option) && theme_option.present? && theme_option['gravatar']) || NOOSFERO_CONF['gravatar'] || 'mm'
   end
 
   attr_reader :environment
@@ -671,7 +676,7 @@ module ApplicationHelper
 
   def theme_javascript_ng
     script = File.join(theme_path, 'theme.js')
-    if File.exists?(Rails.root.join('public', script))
+    if File.exists?(File.join(Rails.root, 'public', script))
       javascript_include_tag script
     else
       nil
@@ -1002,17 +1007,26 @@ module ApplicationHelper
   def display_category_menu(block, categories, root = true)
     categories = categories.sort{|x,y| x.name <=> y.name}
     return "" if categories.blank?
-    content_tag(:ul,
+    content_tag(:ul) do
       categories.map do |category|
         category_path = category.kind_of?(ProductCategory) ? {:controller => 'search', :action => 'assets', :asset => 'products', :product_category => category.id} : { :controller => 'search', :action => 'category_index', :category_path => category.explode_path }
-        category.display_in_menu? ?
-        content_tag(:li,
-          ( !category.is_leaf_displayable_in_menu? ? content_tag(:a, collapsed_item_icon, :href => "#", :id => "block_#{block.id}_category_#{category.id}", :class => 'category-link-expand ' + (root ? 'category-root' : 'category-no-root'), :onclick => "expandCategory(#{block.id}, #{category.id}); return false", :style => 'display: none') : leaf_item_icon) +
-          link_to(content_tag(:span, category.name, :class => 'category-name'), category_path, :class => ("category-leaf" if category.is_leaf_displayable_in_menu?)) +
-          content_tag(:div, display_category_menu(block, category.children, false), :id => "block_#{block.id}_category_content_#{category.id}", :class => 'child-category')
-        ) : ''
-      end
-    ) +
+        if category.display_in_menu?
+          content_tag(:li) do
+            if !category.is_leaf_displayable_in_menu?
+              content_tag(:a, collapsed_item_icon, :href => "#", :id => "block_#{block.id}_category_#{category.id}", :class => "category-link-expand " + (root ? "category-root" : "category-no-root"), :onclick => "expandCategory(#{block.id}, #{category.id}); return false", :style => "display: none")
+            else
+              leaf_item_icon
+            end +
+            link_to(content_tag(:span, category.name, :class => "category-name"), category_path, :class => ("category-leaf" if category.is_leaf_displayable_in_menu?)) +
+            content_tag(:div, :id => "block_#{block.id}_category_content_#{category.id}", :class => 'child-category') do
+              display_category_menu(block, category.children, false)
+            end
+          end
+        else
+          ""
+        end
+      end.join.html_safe
+    end +
     content_tag(:p) +
     (root ? javascript_tag("
       jQuery('.child-category').hide();
@@ -1034,7 +1048,7 @@ module ApplicationHelper
     end
 
     link_to(content_tag(:span, _('Contents'), :class => 'icon-menu-articles'), {:controller => "search", :action => 'contents', :category_path => nil}, :id => 'submenu-contents') +
-    link_to(content_tag(:span, _('Contents menu')), '#', :onclick => "toggleSubmenu(this,'',#{j links.to_json}); return false", :class => 'menu-submenu-trigger up', :id => 'submenu-contents-trigger')
+    link_to(content_tag(:span, _('Contents menu')), '#', :onclick => "toggleSubmenu(this,'',#{CGI::escapeHTML(links.to_json)}); return false", :class => 'menu-submenu-trigger up', :id => 'submenu-contents-trigger')
   end
   alias :browse_contents_menu :search_contents_menu
 
@@ -1050,7 +1064,7 @@ module ApplicationHelper
      end
 
     link_to(content_tag(:span, _('People'), :class => 'icon-menu-people'), {:controller => "search", :action => 'people', :category_path => ''}, :id => 'submenu-people') +
-    link_to(content_tag(:span, _('People menu')), '#', :onclick => "toggleSubmenu(this,'',#{j links.to_json}); return false", :class => 'menu-submenu-trigger up', :id => 'submenu-people-trigger')
+    link_to(content_tag(:span, _('People menu')), '#', :onclick => "toggleSubmenu(this,'',#{CGI::escapeHTML(links.to_json)}); return false", :class => 'menu-submenu-trigger up', :id => 'submenu-people-trigger')
   end
   alias :browse_people_menu :search_people_menu
 
@@ -1066,7 +1080,7 @@ module ApplicationHelper
      end
 
     link_to(content_tag(:span, _('Communities'), :class => 'icon-menu-community'), {:controller => "search", :action => 'communities'}, :id => 'submenu-communities') +
-    link_to(content_tag(:span, _('Communities menu')), '#', :onclick => "toggleSubmenu(this,'',#{j links.to_json}); return false", :class => 'menu-submenu-trigger up', :id => 'submenu-communities-trigger')
+    link_to(content_tag(:span, _('Communities menu')), '#', :onclick => "toggleSubmenu(this,'',#{CGI::escapeHTML(links.to_json)}); return false", :class => 'menu-submenu-trigger up', :id => 'submenu-communities-trigger')
   end
   alias :browse_communities_menu :search_communities_menu
 
@@ -1086,47 +1100,51 @@ module ApplicationHelper
     result
   end
 
-  def manage_link(list, kind)
+  def manage_link(list, kind, title)
     if list.present?
       link_to_all = nil
       if list.count > 5
         list = list.first(5)
-        link_to_all = link_to(content_tag('strong', _('See all')), :controller => 'memberships', :profile => current_user.login)
+        link_to_all = link_to(content_tag('strong', _('See all')), :controller => 'memberships', :profile => user.identifier)
       end
       link = list.map do |element|
-        link_to(content_tag('strong', [_('<span>Manage</span> %s') % element.short_name(25)]), @environment.top_url + "/myprofile/#{element.identifier}", :class => "icon-menu-"+element.class.identification.underscore, :title => [_('Manage %s') % element.short_name])
+        link_to(content_tag('strong', _('<span>Manage</span> %s') % element.short_name(25)), element.admin_url, :class => "icon-menu-"+element.class.identification.underscore, :title => _('Manage %s') % element.short_name)
       end
       if link_to_all
         link << link_to_all
       end
-      render :partial => "shared/manage_link", :locals => {:link => link, :kind => kind.to_s}
+      render :partial => "shared/manage_link", :locals => {:link => link, :kind => kind.to_s, :title => title}
     end
   end
 
   def manage_enterprises
-    return unless user && user.environment.enabled?(:display_my_enterprises_on_user_menu)
-    manage_link(user.enterprises, :enterprises)
+    return '' unless user && user.environment.enabled?(:display_my_enterprises_on_user_menu)
+    manage_link(user.enterprises, :enterprises, _('My enterprises')).to_s
   end
 
   def manage_communities
-    return unless user && user.environment.enabled?(:display_my_communities_on_user_menu)
+    return '' unless user && user.environment.enabled?(:display_my_communities_on_user_menu)
     administered_communities = user.communities.more_popular.select {|c| c.admins.include? user}
-    manage_link(administered_communities, :communities)
+    manage_link(administered_communities, :communities, _('My communities')).to_s
+  end
+
+  def admin_link
+    user.is_admin?(environment) ? link_to('<i class="icon-menu-admin"></i><strong>' + _('Administration') + '</strong>', environment.admin_url, :title => _("Configure the environment"), :class => 'admin-link') : ''
   end
 
   def usermenu_logged_in
     pending_tasks_count = ''
     count = user ? Task.to(user).pending.count : -1
     if count > 0
-      pending_tasks_count = link_to(count.to_s, @environment.top_url + '/myprofile/{login}/tasks', :id => 'pending-tasks-count', :title => _("Manage your pending tasks"))
+      pending_tasks_count = link_to(count.to_s, user.tasks_url, :id => 'pending-tasks-count', :title => _("Manage your pending tasks"))
     end
 
-    (_("<span class='welcome'>Welcome,</span> %s") % link_to('<i style="background-image:url({avatar})"></i><strong>{login}</strong>', @environment.top_url + '/{login}', :id => "homepage-link", :title => _('Go to your homepage'))) +
+    (_("<span class='welcome'>Welcome,</span> %s") % link_to("<i style='background-image:url(#{user.profile_custom_icon(gravatar_default)})'></i><strong>#{user.identifier}</strong>", user.public_profile_url, :id => "homepage-link", :title => _('Go to your homepage'))) +
     render_environment_features(:usermenu) +
-    link_to('<i class="icon-menu-admin"></i><strong>' + _('Administration') + '</strong>', @environment.top_url + '/admin', :title => _("Configure the environment"), :class => 'admin-link', :style => 'display: none') +
-    manage_enterprises.to_s +
-    manage_communities.to_s +
-    link_to('<i class="icon-menu-ctrl-panel"></i><strong>' + _('Control panel') + '</strong>', @environment.top_url + '/myprofile/{login}', :class => 'ctrl-panel', :title => _("Configure your personal account and content")) +
+    admin_link +
+    manage_enterprises +
+    manage_communities +
+    link_to('<i class="icon-menu-ctrl-panel"></i><strong>' + _('Control panel') + '</strong>', user.admin_url, :class => 'ctrl-panel', :title => _("Configure your personal account and content")) +
     pending_tasks_count +
     link_to('<i class="icon-menu-logout"></i><strong>' + _('Logout') + '</strong>', { :controller => 'account', :action => 'logout'} , :id => "logout", :title => _("Leave the system"))
   end
@@ -1210,22 +1228,9 @@ module ApplicationHelper
   end
 
   def add_zoom_to_images
-    stylesheet_link_tag('fancybox') +
-    javascript_include_tag('jquery.fancybox-1.3.4.pack') +
-    javascript_tag("jQuery(function($) {
-      $(window).load( function() {
-        $('#article .article-body img').each( function(index) {
-          var original = original_image_dimensions($(this).attr('src'));
-          if ($(this).width() < original['width'] || $(this).height() < original['height']) {
-            $(this).wrap('<div class=\"zoomable-image\" />');
-            $(this).parent('.zoomable-image').attr('style', $(this).attr('style'));
-            $(this).attr('style', '');
-            $(this).after(\'<a href=\"' + $(this).attr('src') + '\" class=\"zoomify-image\"><span class=\"zoomify-text\">%s</span></a>');
-          }
-        });
-        $('.zoomify-image').fancybox();
-      });
-    });" % _('Zoom in'))
+    stylesheet_link_tag('jquery.fancybox') +
+    javascript_include_tag('jquery.fancybox.pack') +
+    javascript_tag("apply_zoom_to_images(#{_('Zoom in').to_json})")
   end
 
   def render_dialog_error_messages(instance_name)
@@ -1281,9 +1286,9 @@ module ApplicationHelper
 
   def delete_article_message(article)
     if article.folder?
-      _("Are you sure that you want to remove the folder \"#{article.name}\"? Note that all the items inside it will also be removed!")
+      _("Are you sure that you want to remove the folder \"%s\"? Note that all the items inside it will also be removed!") % article.name
     else
-      _("Are you sure that you want to remove the item \"#{article.name}\"?")
+      _("Are you sure that you want to remove the item \"%s\"?") % article.name
     end
   end
 
@@ -1360,7 +1365,7 @@ module ApplicationHelper
       @message = _("The content here is available to %s's friends only.") % profile.short_name
     else
       @action = :join
-      @message = _('The contents in this community is available to members only.')
+      @message = _('The contents in this profile is available to members only.')
     end
     @no_design_blocks = true
   end
@@ -1400,6 +1405,16 @@ module ApplicationHelper
 
   def display_article_versions(article, version = nil)
     content_tag('ul', article.versions.map {|v| link_to("r#{v.version}", @page.url.merge(:version => v.version))})
+  end
+
+  def labelled_colorpicker_field(human_name, object_name, method, options = {})
+    options[:id] ||= 'text-field-' + FormsHelper.next_id_number
+    content_tag('label', human_name, :for => options[:id], :class => 'formlabel') +
+    colorpicker_field(object_name, method, options.merge(:class => 'colorpicker_field'))
+  end
+
+  def colorpicker_field(object_name, method, options = {})
+    text_field(object_name, method, options.merge(:class => 'colorpicker_field'))
   end
 
 end

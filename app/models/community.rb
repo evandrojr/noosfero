@@ -1,6 +1,6 @@
 class Community < Organization
 
-  attr_accessible :accessor_id, :accessor_type, :role_id, :resource_id, :resource_type
+  attr_accessible :accessor_id, :accessor_type, :role_id, :resource_id, :resource_type, :address_reference, :district, :tag_list, :language
   after_destroy :check_invite_member_for_destroy
 
   def self.type_name
@@ -50,16 +50,6 @@ class Community < Organization
     super + FIELDS
   end
 
-  validate :presence_of_required_fieds
-
-  def presence_of_required_fieds
-    self.required_fields.each do |field|
-      if self.send(field).blank?
-        self.errors.add_on_blank(field)
-      end
-    end
-  end
-
   def active_fields
     environment ? environment.active_community_fields : []
   end
@@ -83,10 +73,6 @@ class Community < Organization
 
   def news(limit = 30, highlight = false)
     recent_documents(limit, ["articles.type != ? AND articles.highlighted = ?", 'Folder', highlight])
-  end
-
-  def blocks_to_expire_cache
-    [MembersBlock]
   end
 
   def each_member(offset=0)

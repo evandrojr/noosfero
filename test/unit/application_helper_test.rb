@@ -43,17 +43,24 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal 'test/application_helper_test/school/project', partial_for_class(School::Project)
   end
 
-  should 'look for superclasses on view_for_profile actions' do
-    File.stubs(:exists?).returns(false)
-    File.expects(:exists?).with(Rails.root.join('app', 'views', 'blocks', 'profile_info_actions', 'numeric.html.erb')).returns(true)
-
-    assert_equal 'blocks/profile_info_actions/numeric.html.erb', view_for_profile_actions(Float)
-  end
-
   should 'give error when there is no partial for class' do
     assert_raises ArgumentError do
       partial_for_class(nil)
     end
+  end
+
+  should 'plugins path take precedence over core path' do
+    core_path = 'core/'
+    plugin_path = 'path/'
+    @controller = mock()
+    @controller.stubs(:view_paths).returns([plugin_path, core_path])
+    self.stubs(:params).returns({:controller => 'test'})
+
+    File.stubs(:exists?).returns(false)
+    File.stubs(:exists?).with(core_path+"test/_block.html.erb").returns(true)
+    File.stubs(:exists?).with(plugin_path+"test/_raw_html_block.html.erb").returns(true)
+
+    assert_equal 'raw_html_block', partial_for_class(RawHTMLBlock)
   end
 
   should 'generate link to stylesheet' do
@@ -472,13 +479,13 @@ class ApplicationHelperTest < ActionView::TestCase
     profile = mock
     profile.stubs(:theme).returns('some-theme')
     stubs(:profile).returns(profile)
-    with_constants :NOOSFERO_CONF => {'gravatar' => 'crazyvatar'} do
-      assert_equal gravatar_default, 'crazyvatar'
-    end
+
+    NOOSFERO_CONF.stubs(:[]).with('gravatar').returns('crazyvatar')
+    assert_equal gravatar_default, 'crazyvatar'
+
     stubs(:theme_option).returns('gravatar' => 'nicevatar')
-    with_constants :NOOSFERO_CONF => {'gravatar' => 'crazyvatar'} do
-      assert_equal gravatar_default, 'nicevatar'
-    end
+    NOOSFERO_CONF.stubs(:[]).with('gravatar').returns('nicevatar')
+    assert_equal gravatar_default, 'nicevatar'
   end
 
   should 'use theme passed via param when in development mode' do
@@ -604,6 +611,22 @@ class ApplicationHelperTest < ActionView::TestCase
     expects(:render).with(:file => file, :use_full_path => false).returns('Open chat')
 
     assert_equal 'Open chat', render_environment_features(:usermenu)
+  end
+
+  should 'not inlude administration link if user is not an environment administrator' do
+    user = mock()
+    stubs(:environment).returns(Environment.default)
+    user.stubs(:is_admin?).with(environment).returns(false)
+    stubs(:user).returns(user)
+    assert admin_link.blank?
+  end
+
+  should 'inlude administration link if user is an environment administrator' do
+    user = mock()
+    stubs(:environment).returns(Environment.default)
+    user.stubs(:is_admin?).with(environment).returns(true)
+    stubs(:user).returns(user)
+    assert admin_link.present?
   end
 
   should 'not return mime type of profile icon if not requested' do
@@ -841,6 +864,78 @@ class ApplicationHelperTest < ActionView::TestCase
 
     expects(:convert_macro).never
     filter_html(article.body, article)
+  end
+
+  should 'not display enterprises if not logged' do
+    @controller = ApplicationController.new
+    profile = create_user('testuser').person
+    profile.environment.enable('display_my_enterprises_on_user_menu')
+    enterprise = fast_create(Enterprise)
+    enterprise.add_admin(profile)
+
+    stubs(:user).returns(nil)
+    expects(:manage_link).with(profile.enterprises, :enterprises, _('My enterprises')).never
+    assert_equal '', manage_enterprises
+  end
+
+  should 'display enterprises if logged and enabled on environment' do
+    @controller = ApplicationController.new
+    profile = create_user('testuser').person
+    profile.environment.enable('display_my_enterprises_on_user_menu')
+    enterprise = fast_create(Enterprise)
+    enterprise.add_admin(profile)
+
+    stubs(:user).returns(profile)
+    expects(:manage_link).with(profile.enterprises, :enterprises, _('My enterprises')).returns('enterprises list')
+    assert_equal 'enterprises list', manage_enterprises
+  end
+
+  should 'not display enterprises if logged and disabled on environment' do
+    @controller = ApplicationController.new
+    profile = create_user('testuser').person
+    profile.environment.disable('display_my_enterprises_on_user_menu')
+    enterprise = fast_create(Enterprise)
+    enterprise.add_admin(profile)
+
+    stubs(:user).returns(profile)
+    expects(:manage_link).with(profile.enterprises, :enterprises, _('My enterprises')).never
+    assert_equal '', manage_enterprises
+  end
+
+  should 'not display communities if not logged' do
+    @controller = ApplicationController.new
+    profile = create_user('testuser').person
+    profile.environment.enable('display_my_communities_on_user_menu')
+    community = fast_create(Community)
+    community.add_admin(profile)
+
+    stubs(:user).returns(nil)
+    expects(:manage_link).with(profile.communities, :communities, _('My communities')).never
+    assert_equal '', manage_communities
+  end
+
+  should 'display communities if logged and enabled on environment' do
+    @controller = ApplicationController.new
+    profile = create_user('testuser').person
+    profile.environment.enable('display_my_communities_on_user_menu')
+    community = fast_create(Community)
+    community.add_admin(profile)
+
+    stubs(:user).returns(profile)
+    expects(:manage_link).with(profile.communities, :communities, _('My communities')).returns('communities list')
+    assert_equal 'communities list', manage_communities
+  end
+
+  should 'not display communities if logged and disabled on environment' do
+    @controller = ApplicationController.new
+    profile = create_user('testuser').person
+    profile.environment.disable('display_my_communities_on_user_menu')
+    community = fast_create(Community)
+    community.add_admin(profile)
+
+    stubs(:user).returns(profile)
+    expects(:manage_link).with(profile.communities, :communities, _('My communities')).never
+    assert_equal '', manage_communities
   end
 
   protected

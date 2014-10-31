@@ -6,7 +6,7 @@ class ProfileEditorController; def rescue_action(e) raise e end; end
 
 class ProfileEditorControllerTest < ActionController::TestCase
   all_fixtures
-  
+
   def setup
     @controller = ProfileEditorController.new
     @request    = ActionController::TestRequest.new
@@ -17,14 +17,6 @@ class ProfileEditorControllerTest < ActionController::TestCase
   end
   attr_reader :profile
 
-  def test_local_files_reference
-    assert_local_files_reference :get, :index, :profile => profile.identifier
-  end
-  
-  def test_valid_xhtml
-    assert_valid_xhtml
-  end
-  
   def test_index
     get :index, :profile => profile.identifier
     assert_template 'index'
@@ -50,7 +42,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
   end
 
   should 'saving profile info' do
-    person = profile 
+    person = profile
     post :edit, :profile => profile.identifier, :profile_data => { 'name' => 'new person', 'contact_information' => 'new contact information', 'address' => 'new address', 'sex' => 'female' }
     assert_redirected_to :controller => 'profile_editor', :action => 'index'
     person = Person.find(person.id)
@@ -58,6 +50,15 @@ class ProfileEditorControllerTest < ActionController::TestCase
     assert_equal 'new contact information', person.contact_information
     assert_equal 'new address', person.address
     assert_equal 'female', person.sex
+  end
+
+  should 'mass assign all environment configurable person fields' do
+    person = profile
+
+    post :edit, :profile => profile.identifier, :profile_data => { "nickname" => "ze", "description" => "Just a regular ze.", "contact_information" => "What?", "contact_phone" => "+0551133445566", "cell_phone" => "+0551188889999", "comercial_phone" => "+0551144336655", "jabber_id" => "ze1234", "personal_website" => "http://ze.com.br", "sex" => "male", "birth_date" => "2014-06-04", "nationality" => "Brazilian", "country" => "BR", "state" => "DF", "city" => "Brasilia", "zip_code" => "70300-010", "address" => "Palacio do Planalto", "address_reference" => "Praca dos tres poderes", "district" => "DF", "schooling" => "Undergraduate", "schooling_status" => "Concluded", "formation" => "Engineerings", "area_of_study" => "Metallurgy", "professional_activity" => "Metallurgic", "organization" => "Metal Corp.", "organization_website" => "http://metal.com" }
+
+    assert_response :redirect
+    assert_redirected_to :controller => 'profile_editor', :action => 'index'
   end
 
   should 'not permmit if not logged' do
@@ -164,6 +165,15 @@ class ProfileEditorControllerTest < ActionController::TestCase
     assert_tag :tag => 'input', :attributes => { :name => 'profile_data[contact_person]', :value => 'my contact' }
   end
 
+  should 'mass assign all environment configurable community fields' do
+    cmm = fast_create(Community)
+
+    post :edit, :profile => cmm.identifier, :profile_data => { "name" => "new name", "display_name" => "N&w N@me", "description"=>"We sell food and other stuff.", "contact_person"=>"Joseph of the Jungle", "contact_email"=>"sac@company.net", "contact_phone"=>"+0551133445566", "legal_form"=>"New Name corp.", "economic_activity"=>"Food", "management_information"=>"No need for that here.", "address"=>"123, baufas street", "address_reference"=>"Next to baufas house", "district"=>"DC", "zip_code"=>"123456", "city"=>"Whashington", "state"=>"DC", "country"=>"US", "tag_list"=>"food, corporations", "language"=>"English" }
+
+    assert_response :redirect
+    assert_redirected_to :controller => 'profile_editor', :action => 'index'
+  end
+
   should 'show field values on edit enterprise info' do
     Enterprise.any_instance.expects(:active_fields).returns(['contact_person']).at_least_once
     org = fast_create(Enterprise)
@@ -171,6 +181,15 @@ class ProfileEditorControllerTest < ActionController::TestCase
     org.save!
     get :edit, :profile => org.identifier
     assert_tag :tag => 'input', :attributes => { :name => 'profile_data[contact_person]', :value => 'my contact' }
+  end
+
+  should 'mass assign all environment configurable enterprise fields' do
+    enterprise = fast_create(Enterprise)
+
+    post :edit, :profile => enterprise.identifier, :profile_data => { "name"=>"Enterprise", "display_name"=>"Enterprise name", "business_name"=>"Enterprise", "description"=>"Hello IT.", "contact_person"=>"Joseph", "contact_email"=>"joe@enterprise.net", "contact_phone"=>"+0551133445566", "legal_form"=>"Enterprise corp.", "economic_activity"=>"Food", "management_information"=>"None.", "address"=>"123, baufas street", "address_reference"=>"Next to baufas house", "district"=>"DC", "zip_code"=>"123456", "city"=>"Washington", "state"=>"DC", "country"=>"US", "tag_list"=>"food, corporations", "organization_website"=>"http://enterprise.net", "historic_and_current_context"=>"Historic.", "activities_short_description"=>"Activies.", "acronym"=>"E", "foundation_year"=>"1995",}
+
+    assert_response :redirect
+    assert_redirected_to :controller => 'profile_editor', :action => 'index'
   end
 
   should 'display profile publication option in edit profile screen' do
@@ -211,14 +230,14 @@ class ProfileEditorControllerTest < ActionController::TestCase
 
   should 'back when update community info fail' do
     org = fast_create(Community)
-    Community.any_instance.stubs(:update_attributes!).returns(false)
+    Community.any_instance.stubs(:update_attributes).returns(false)
     post :edit, :profile => org.identifier
     assert_template 'edit'
   end
 
   should 'back when update enterprise info fail' do
     org = fast_create(Enterprise)
-    Enterprise.any_instance.stubs(:update_attributes!).returns(false)
+    Enterprise.any_instance.stubs(:update_attributes).returns(false)
     post :edit, :profile => org.identifier
     assert_template 'edit'
   end
@@ -426,7 +445,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
     get :index, :profile => ent.identifier
     assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{ent.identifier}/profile_editor/enable" }
   end
-  
+
   should 'link to disable enterprise' do
     ent = fast_create(Enterprise, :enabled => true)
     get :index, :profile => ent.identifier
@@ -744,7 +763,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
   should 'not crash if identifier is left blank' do
     c = fast_create(Community)
     assert_nothing_raised do
-      post :edit, :profile => c.identifier, :profile_data => c.attributes.merge('identifier' => '')
+      post :edit, :profile => c.identifier, :profile_data => {:identifier => ''}
     end
   end
 
@@ -846,7 +865,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
 
   should 'not be able to destroy enterprise if is a regular member' do
     enterprise = fast_create(Enterprise)
-    enterprise.add_member(fast_create(Person)) # first member is admin by default
+    enterprise.add_member(create_user.person) # first member is admin by default
 
     person = create_user('foo').person
     enterprise.add_member(person)
@@ -883,6 +902,23 @@ class ProfileEditorControllerTest < ActionController::TestCase
     class TestProfileEditPlugin < Noosfero::Plugin
       def profile_editor_extras
         "<input id='field_added_by_plugin' value='value_of_field_added_by_plugin'/>"
+      end
+    end
+    Noosfero::Plugin.stubs(:all).returns([TestProfileEditPlugin.to_s])
+
+    Noosfero::Plugin::Manager.any_instance.stubs(:enabled_plugins).returns([TestProfileEditPlugin.new])
+
+    get :edit, :profile => profile.identifier
+
+    assert_tag :tag => 'input', :attributes => {:id => 'field_added_by_plugin', :value => 'value_of_field_added_by_plugin'}
+  end
+
+  should 'add extra content with block provided by plugins on edit' do
+    class TestProfileEditPlugin < Noosfero::Plugin
+      def profile_editor_extras
+        lambda do
+          render :text => "<input id='field_added_by_plugin' value='value_of_field_added_by_plugin'/>"
+        end
       end
     end
     Noosfero::Plugin.stubs(:all).returns([TestProfileEditPlugin.to_s])
@@ -1034,4 +1070,25 @@ class ProfileEditorControllerTest < ActionController::TestCase
                :descendant => {:tag => 'input', :attributes => {:id => 'profile_data_products_per_catalog_page'} }
   end
 
+  should 'show head and footer for admin' do
+    login_as('default_user')
+    get :index, :profile => profile.identifier
+    assert_tag :tag => 'div', :descendant => { :tag => 'a', :content => 'Edit Header and Footer' }
+  end
+
+  should 'not display header and footer for user when feature is enable' do
+    user = create_user('user').person
+    login_as('user')
+    profile.environment.enable('disable_header_and_footer')
+    get :index, :profile => user.identifier
+    assert_no_tag :tag => 'div', :descendant => { :tag => 'a', :content => 'Edit Header and Footer' }
+  end
+
+  should 'display header and footer for user when feature is disabled ' do
+    user = create_user('user').person
+    login_as('user')
+    profile.environment.disable('disable_header_and_footer')
+    get :index, :profile => user.identifier
+    assert_tag :tag => 'div', :descendant => { :tag => 'a', :content => 'Edit Header and Footer' }
+  end
 end

@@ -5,7 +5,7 @@ require 'user_activation_job'
 # Rails generator.
 class User < ActiveRecord::Base
 
-  attr_accessible :login, :email, :password, :password_confirmation
+  attr_accessible :login, :email, :password, :password_confirmation, :activated_at
 
   N_('Password')
   N_('Password confirmation')
@@ -16,14 +16,17 @@ class User < ActiveRecord::Base
   end
 
   # FIXME ugly workaround
-  def self.human_attribute_name(attrib, options={})
+  def self.human_attribute_name_with_customization(attrib, options={})
     case attrib.to_sym
       when :login
         return [_('Username'), _('Email')].join(' / ')
       when :email
         return _('e-Mail')
-      else _(self.superclass.human_attribute_name(attrib))
+      else _(self.human_attribute_name_without_customization(attrib))
     end
+  end
+  class << self
+    alias_method_chain :human_attribute_name, :customization
   end
 
   before_create do |user|
@@ -47,8 +50,12 @@ class User < ActiveRecord::Base
 
       user.person = p
     end
-    if user.environment.enabled?('skip_new_user_email_confirmation')
-      user.activate
+    if user.environment.enabled?('skip_new_user_email_confirmation') 
+      if user.environment.enabled?('admin_must_approve_new_users')
+        create_moderate_task
+      else
+        user.activate
+      end
     end
   end
   after_create :deliver_activation_code
@@ -63,43 +70,8 @@ class User < ActiveRecord::Base
     self.person.preferred_domain && self.person.preferred_domain.name || self.environment.default_hostname(true)
   end
 
-  class Mailer < ActionMailer::Base
-    def activation_email_notify(user)
-      user_email = "#{user.login}@#{user.email_domain}"
-      recipients user_email
-      from "#{user.environment.name} <#{user.environment.noreply_email}>"
-      subject _("[%{environment}] Welcome to %{environment} mail!") % { :environment => user.environment.name }
-      body :name => user.name,
-        :email => user_email,
-        :webmail => MailConf.webmail_url(user.login, user.email_domain),
-        :environment => user.environment.name,
-        :url => url_for(:host => user.environment.default_hostname, :controller => 'home')
-    end
-
-    def activation_code(user)
-      recipients user.email
-
-      from "#{user.environment.name} <#{user.environment.noreply_email}>"
-      subject _("[%s] Activate your account") % [user.environment.name]
-      body :recipient => user.name,
-        :activation_code => user.activation_code,
-        :environment => user.environment.name,
-        :url => user.environment.top_url,
-        :redirection => (true if user.return_to)
-    end
-
-    def signup_welcome_email(user)
-      email_body = user.environment.signup_welcome_text_body.gsub('{user_name}', user.name)
-      email_subject = user.environment.signup_welcome_text_subject
-
-      content_type 'text/html'
-      recipients user.email
-
-      from "#{user.environment.name} <#{user.environment.noreply_email}>"
-      subject email_subject.blank? ? _("Welcome to environment %s") % [user.environment.name] : email_subject
-      body email_body
-    end
-  end
+  # virtual attribute used to stash which community to join on signup or login
+  attr_accessor :community_to_join
 
   def signup!
     User.transaction do
@@ -170,6 +142,15 @@ class User < ActiveRecord::Base
     else
       true
     end
+  end
+
+  def create_moderate_task
+    @task = ModerateUserRegistration.new
+    @task.user_id = self.id
+    @task.name = self.name
+    @task.email = self.email
+    @task.target = self.environment
+    @task.save
   end
 
   def activated?

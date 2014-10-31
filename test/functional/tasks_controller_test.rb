@@ -22,14 +22,6 @@ class TasksControllerTest < ActionController::TestCase
     super({ :controller => 'tasks', :profile => profile.identifier }.merge(options))
   end
 
-  def test_local_files_reference
-    assert_local_files_reference
-  end
-  
-  def test_valid_xhtml
-    assert_valid_xhtml
-  end
-  
   should 'list pending tasks' do
     get :index
 

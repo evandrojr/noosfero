@@ -20,7 +20,7 @@ module Noosfero
     require 'noosfero/plugin'
 
     # Adds custom attributes to the Set of allowed html attributes for the #sanitize helper
-    config.action_view.sanitized_allowed_attributes = 'align', 'border', 'alt', 'vspace', 'hspace', 'width', 'heigth', 'value', 'type', 'data', 'style', 'target', 'codebase', 'archive', 'classid', 'code', 'flashvars', 'scrolling', 'frameborder', 'controls', 'autoplay'
+    config.action_view.sanitized_allowed_attributes = 'align', 'border', 'alt', 'vspace', 'hspace', 'width', 'heigth', 'value', 'type', 'data', 'style', 'target', 'codebase', 'archive', 'classid', 'code', 'flashvars', 'scrolling', 'frameborder', 'controls', 'autoplay', 'colspan', 'rowspan'
 
     # Adds custom tags to the Set of allowed html tags for the #sanitize helper
     config.action_view.sanitized_allowed_tags = 'object', 'embed', 'param', 'table', 'tr', 'th', 'td', 'applet', 'comment', 'iframe', 'audio', 'video', 'source'
@@ -108,12 +108,18 @@ module Noosfero
 
     # Your secret key for verifying cookie session data integrity.
     # If you change this key, all old sessions will become invalid!
-    # Make sure the secret is at least 30 characters and all random, 
+    # Make sure the secret is at least 30 characters and all random,
     # no regular words or you'll be exposed to dictionary attacks.
     config.secret_token = noosfero_session_secret
     config.action_dispatch.session = {
       :key    => '_noosfero_session',
     }
+
+    config.time_zone = File.read('/etc/timezone').split("\n").first
+    config.active_record.default_timezone = :local
+
+    config.paths['db/migrate'] += Dir.glob "#{Rails.root}/{baseplugins,config/plugins}/*/db/migrate"
+    config.i18n.load_path += Dir.glob "#{Rails.root}/{baseplugins,config/plugins}/*/locales/*.{rb,yml}"
 
     Noosfero::Plugin.setup(config)
 

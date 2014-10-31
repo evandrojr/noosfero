@@ -156,7 +156,7 @@ class EnvironmentTest < ActiveSupport::TestCase
 
   should 'list displayable categories' do
     env = fast_create(Environment)
-    cat1 = create(Category, :environment => env, :name => 'category one', :display_color => 1)
+    cat1 = create(Category, :environment => env, :name => 'category one', :display_color => 'ffa500')
     assert ! cat1.new_record?
 
     # subcategories should be ignored
@@ -193,6 +193,12 @@ class EnvironmentTest < ActiveSupport::TestCase
     env.contact_email = 'test@example.com'
     env.valid?
     assert !env.errors[:contact_email.to_s].present?
+  end
+
+  should 'notify contact email' do
+    env = Environment.new(:contact_email => 'foo@bar.com')
+    env.stubs(:admins).returns([])
+    assert_equal ['foo@bar.com'], env.notification_emails
   end
 
   should 'provide a default hostname' do
@@ -1381,5 +1387,33 @@ class EnvironmentTest < ActiveSupport::TestCase
     environment.languages = ['pt', 'en']
     environment.save!
     assert_equal ['en', 'pt'], environment.available_locales
+  end
+
+  should 'not consider custom welcome screen text if not defined' do
+    env = Environment.default
+    assert !env.has_custom_welcome_screen?
+  end
+
+  should 'not consider custom welcome screen text if nil' do
+    env = Environment.default
+
+    env.signup_welcome_screen_body = nil
+    assert !env.has_custom_welcome_screen?
+  end
+
+  should 'consider signup welcome screen if body is defined' do
+    env = Environment.default
+    env.signup_welcome_screen_body  = 'Welcome to the environment'
+    assert env.has_custom_welcome_screen?
+  end
+
+  should 'store custom welcome screen body' do
+    environment = Environment.default
+
+    environment.signup_welcome_screen_body = 'Welcome to the environment'
+    environment.save
+    environment.reload
+
+    assert_equal 'Welcome to the environment', environment.signup_welcome_screen_body
   end
 end

@@ -19,14 +19,6 @@ class MembershipsControllerTest < ActionController::TestCase
   end
   attr_reader :profile
 
-  def test_local_files_reference
-    assert_local_files_reference :get, :index, :profile => profile.identifier
-  end
-
-  def test_valid_xhtml
-    assert_valid_xhtml
-  end
-
   should 'list current memberships' do
     get :index, :profile => profile.identifier
 

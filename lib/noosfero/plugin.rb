@@ -12,6 +12,12 @@ class Noosfero::Plugin
 
     attr_writer :should_load
 
+    # Called for each ActiveRecord class with parents
+    # See http://apidock.com/rails/ActiveRecord/ModelSchema/ClassMethods/full_table_name_prefix
+    def table_name_prefix
+      @table_name_prefix ||= "#{name.to_s.underscore}_"
+    end
+
     def should_load
       @should_load.nil? && true || @boot
     end
@@ -62,14 +68,16 @@ class Noosfero::Plugin
           path << File.join(dir, 'lib')
           # load vendor/plugins
           Dir.glob(File.join(dir, '/vendor/plugins/*')).each do |vendor_plugin|
-            path << "#{vendor_plugin}/lib" 
-            init = "#{vendor_plugin}/init.rb"
-            require init.gsub(/.rb$/, '') if File.file? init
-         end
+            path << "#{vendor_plugin}/lib"
+          end
+        end
+        Dir.glob(File.join(dir, '/vendor/plugins/*')).each do |vendor_plugin|
+          init = "#{vendor_plugin}/init.rb"
+          require init.gsub(/.rb$/, '') if File.file? init
         end
 
         # add view path
-        ActionController::Base.view_paths.unshift(File.join(dir, 'views'))
+        config.paths['app/views'].unshift File.join(dir, 'views')
       end
     end
 
@@ -104,13 +112,17 @@ class Noosfero::Plugin
 
     def available_plugins
       unless @available_plugins
-        path = File.join(Rails.root, 'config', 'plugins', '*')
+        path = File.join(Rails.root, '{baseplugins,config/plugins}', '*')
         @available_plugins = Dir.glob(path).select{ |i| File.directory?(i) }
         if Rails.env.test? && !@available_plugins.include?(File.join(Rails.root, 'config', 'plugins', 'foo'))
           @available_plugins << File.join(Rails.root, 'plugins', 'foo')
         end
       end
       @available_plugins
+    end
+
+    def available_plugin_names
+      available_plugins.map { |f| File.basename(f).camelize }
     end
 
     def all
@@ -233,7 +245,7 @@ class Noosfero::Plugin
     nil
   end
 
-  # -> Adds content to calalog item
+  # -> Adds content to catalog item
   # returns = lambda block that creates html code
   def catalog_item_extras(item)
     nil
@@ -245,7 +257,7 @@ class Noosfero::Plugin
     nil
   end
 
-  # -> Adds content to calalog list item
+  # -> Adds content to catalog list item
   # returns = lambda block that creates html code
   def catalog_list_item_extras(item)
     nil
@@ -274,6 +286,12 @@ class Noosfero::Plugin
   # -> Adds content to the beginning of the page
   # returns = lambda block that creates html code or raw rhtml/html.erb
   def body_beginning
+    nil
+  end
+
+  # -> Adds content to the ending of the page
+  # returns = lambda block that creates html code or raw rhtml/html.erb
+  def body_ending
     nil
   end
 
@@ -389,7 +407,7 @@ class Noosfero::Plugin
   end
 
   # -> Adds fields to the signup form
-  # returns = lambda block that creates html code
+  # returns = proc that creates html code
   def signup_extra_contents
     nil
   end
@@ -464,7 +482,7 @@ class Noosfero::Plugin
   end
 
   # -> Adds fields to the login form
-  # returns = lambda block that creates html code
+  # returns = proc that creates html code
   def login_extra_contents
     nil
   end

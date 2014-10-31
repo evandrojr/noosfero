@@ -2,7 +2,7 @@ require 'hpricot'
 
 class Article < ActiveRecord::Base
 
-  attr_accessible :name, :body, :abstract, :profile, :tag_list, :parent, :allow_members_to_edit, :translation_of_id, :language, :license_id, :parent_id, :display_posts_in_current_language, :category_ids, :posts_per_page, :moderate_comments, :accept_comments, :feed, :published, :source, :highlighted, :notify_comments, :display_hits, :slug, :external_feed_builder, :display_versions
+  attr_accessible :name, :body, :abstract, :profile, :tag_list, :parent, :allow_members_to_edit, :translation_of_id, :language, :license_id, :parent_id, :display_posts_in_current_language, :category_ids, :posts_per_page, :moderate_comments, :accept_comments, :feed, :published, :source, :highlighted, :notify_comments, :display_hits, :slug, :external_feed_builder, :display_versions, :external_link, :image_builder
 
   acts_as_having_image
 
@@ -41,8 +41,8 @@ class Article < ActiveRecord::Base
   before_save :sanitize_tag_list
 
   before_create do |article|
-    if article.last_changed_by_id
-      article.author_name = Person.find(article.last_changed_by_id).name
+    if article.author
+      article.author_name = article.author.name
     end
   end
 
@@ -54,7 +54,9 @@ class Article < ActiveRecord::Base
 
   validates_uniqueness_of :slug, :scope => ['profile_id', 'parent_id'], :message => N_('The title (article name) is already being used by another article, please use another title.'), :if => lambda { |article| !article.slug.blank? }
 
+  belongs_to :author, :class_name => 'Person'
   belongs_to :last_changed_by, :class_name => 'Person', :foreign_key => 'last_changed_by_id'
+  belongs_to :created_by, :class_name => 'Person', :foreign_key => 'created_by_id'
 
   has_many :comments, :class_name => 'Comment', :foreign_key => 'source_id', :dependent => :destroy, :order => 'created_at asc'
 
@@ -89,6 +91,11 @@ class Article < ActiveRecord::Base
         article.parent = article.profile.blog
       end
     end
+
+    if article.created_by
+      article.author_name = article.created_by.name
+    end
+
   end
 
   after_destroy :destroy_activity
@@ -150,13 +157,16 @@ class Article < ActiveRecord::Base
     self.profile
   end
 
-  def self.human_attribute_name(attrib, options = {})
+  def self.human_attribute_name_with_customization(attrib, options={})
     case attrib.to_sym
     when :name
       _('Title')
     else
-      _(self.superclass.human_attribute_name(attrib))
+      _(self.human_attribute_name_without_customization(attrib))
     end
+  end
+  class << self
+    alias_method_chain :human_attribute_name, :customization
   end
 
   def css_class_list
@@ -204,6 +214,10 @@ class Article < ActiveRecord::Base
 
   acts_as_versioned
   self.non_versioned_columns << 'setting'
+
+  def version_condition_met?
+    (['name', 'body', 'abstract', 'filename', 'start_date', 'end_date', 'image_id', 'license_id'] & changed).length > 0
+  end
 
   def comment_data
     comments.map {|item| [item.title, item.body].join(' ') }.join(' ')
@@ -269,13 +283,6 @@ class Article < ActiveRecord::Base
     else
       body || ''
     end
-  end
-
-  def reported_version(options = {})
-    article = self
-    search_path = Rails.root.join('app', 'views', 'shared', 'reported_versions')
-    partial_path = File.join('shared', 'reported_versions', partial_for_class_in_view_path(article.class, search_path))
-    lambda { render_to_string(:partial => partial_path, :locals => {:article => article}) }
   end
 
   # returns the data of the article. Must be overriden in each subclass to
@@ -452,10 +459,10 @@ class Article < ActiveRecord::Base
     ['TextArticle', 'TextileArticle', 'TinyMceArticle']
   end
 
-  scope :published, :conditions => { :published => true }
-  scope :folders, lambda {|profile|{:conditions => { :type => profile.folder_types} }}
-  scope :no_folders, lambda {|profile|{:conditions => ['type NOT IN (?)', profile.folder_types]}}
-  scope :galleries, :conditions => { :type => 'Gallery' }
+  scope :published, :conditions => ['articles.published = ?', true]
+  scope :folders, lambda {|profile|{:conditions => ['articles.type IN (?)', profile.folder_types] }}
+  scope :no_folders, lambda {|profile|{:conditions => ['articles.type NOT IN (?)', profile.folder_types]}}
+  scope :galleries, :conditions => [ "articles.type IN ('Gallery')" ]
   scope :images, :conditions => { :is_image => true }
   scope :text_articles, :conditions => [ 'articles.type IN (?)', text_article_types ]
   scope :with_types, lambda { |types| { :conditions => [ 'articles.type IN (?)', types ] } }
@@ -465,7 +472,7 @@ class Article < ActiveRecord::Base
   scope :more_recent, :order => "created_at DESC"
 
   def self.display_filter(user, profile)
-    return {:conditions => ['published = ?', true]} if !user
+    return {:conditions => ['articles.published = ?', true]} if !user
     {:conditions => ["  articles.published = ? OR
                         articles.last_changed_by_id = ? OR
                         articles.profile_id = ? OR
@@ -492,6 +499,7 @@ class Article < ActiveRecord::Base
   end
 
   def allow_post_content?(user = nil)
+    return true if allow_edit_topic?(user)
     user && (user.has_permission?('post_content', profile) || allow_publish_content?(user) && (user == author))
   end
 
@@ -511,7 +519,12 @@ class Article < ActiveRecord::Base
   end
 
   def allow_edit?(user)
+    return true if allow_edit_topic?(user)
     allow_post_content?(user) || user && allow_members_to_edit && user.is_member_of?(profile)
+  end
+
+  def allow_edit_topic?(user)
+    self.belongs_to_forum? && (user == author) && user.present? && user.is_member_of?(profile)
   end
 
   def moderate_comments?
@@ -628,39 +641,36 @@ class Article < ActiveRecord::Base
     can_display_versions? && display_versions
   end
 
-  def author(version_number = nil)
-    if version_number
-      version = versions.find_by_version(version_number)
-      author_id = version.last_changed_by_id if version
-      Person.exists?(author_id) ? Person.find(author_id) : nil
-    else
-      if versions.empty?
-        last_changed_by
-      else
-        author_id = versions.first.last_changed_by_id
-        Person.exists?(author_id) ? Person.find(author_id) : nil
-      end
-    end
+  def get_version(version_number = nil)
+    version_number ? versions.find(:first, :order => 'version', :offset => version_number - 1) : versions.earliest
+  end
+
+  def author_by_version(version_number = nil)
+    version_number ? profile.environment.people.find_by_id(get_version(version_number).author_id) : author
   end
 
   def author_name(version_number = nil)
-    person = author(version_number)
-    person ? person.name : (setting[:author_name] || _('Unknown'))
+    person = author_by_version(version_number)
+    if version_number
+      person ? person.name : _('Unknown')
+    else
+      person ? person.name : (setting[:author_name] || _('Unknown'))
+    end
   end
 
   def author_url(version_number = nil)
-    person = author(version_number)
+    person = author_by_version(version_number)
     person ? person.url : nil
   end
 
   def author_id(version_number = nil)
-    person = author(version_number)
+    person = author_by_version(version_number)
     person ? person.id : nil
   end
 
   def version_license(version_number = nil)
     return license if version_number.nil?
-    profile.environment.licenses.find_by_id(versions.find_by_version(version_number).license_id)
+    profile.environment.licenses.find_by_id(get_version(version_number).license_id)
   end
 
   alias :active_record_cache_key :cache_key

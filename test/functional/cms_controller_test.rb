@@ -18,14 +18,6 @@ class CmsControllerTest < ActionController::TestCase
 
   attr_reader :profile
 
-  def test_local_files_reference
-    assert_local_files_reference :get, :index, :profile => profile.identifier
-  end
-
-  def test_valid_xhtml
-    assert_valid_xhtml
-  end
-
   should 'list top level documents on index' do
     get :index, :profile => profile.identifier
 
@@ -327,6 +319,14 @@ class CmsControllerTest < ActionController::TestCase
 
     assert_not_nil f.children[0]
     assert_equal 'test.txt', f.children[0].name
+  end
+
+  should 'set author of uploaded files' do
+    f = Folder.new(:name => 'f'); profile.articles << f; f.save!
+    post :upload_files, :profile => profile.identifier, :parent_id => f.id, :uploaded_files => [fixture_file_upload('/files/test.txt', 'text/plain')]
+
+    uf = profile.articles.find_by_name('test.txt')
+    assert_equal profile, uf.author
   end
 
   should 'display destination folder of files when uploading file in root folder' do
@@ -653,10 +653,10 @@ class CmsControllerTest < ActionController::TestCase
     assert_match /<img.*align="right".*\/>/, saved.body
   end
 
-  should 'not be able to add image with alignment when textile' do
+  should 'be able to add image with alignment when textile' do
     post :new, :type => 'TextileArticle', :profile => profile.identifier, :article => { :name => 'image-alignment', :body => "the text of the article with image <img src='#' align='right'/> right align..." }
     saved = TextileArticle.find_by_name('image-alignment')
-    assert_no_match /align="right"/, saved.body
+    assert_match /align="right"/, saved.body
   end
 
   should 'be able to create a new event document' do
@@ -1217,7 +1217,7 @@ class CmsControllerTest < ActionController::TestCase
   should 'not allow user edit article if he is owner but has no publish permission' do
     c = Community.create!(:name => 'test_comm', :identifier => 'test_comm')
     u = create_user_with_permission('test_user', 'bogus_permission', c)
-    a = create(Article, :profile => c, :name => 'test_article', :last_changed_by => u)
+    a = create(Article, :profile => c, :name => 'test_article', :author => u)
     login_as :test_user
 
     get :edit, :profile => c.identifier, :id => a.id
@@ -1228,7 +1228,7 @@ class CmsControllerTest < ActionController::TestCase
   should 'allow user edit article if he is owner and has publish permission' do
     c = Community.create!(:name => 'test_comm', :identifier => 'test_comm')
     u = create_user_with_permission('test_user', 'publish_content', c)
-    a = create(Article, :profile => c, :name => 'test_article', :last_changed_by => u)
+    a = create(Article, :profile => c, :name => 'test_article', :author => u)
     login_as :test_user
     @controller.stubs(:user).returns(u)
 
@@ -1772,6 +1772,56 @@ class CmsControllerTest < ActionController::TestCase
 
     post :edit, :profile => profile.identifier, :id => article.id, :version => 1
     assert_equal 'first version', Article.find(article.id).name
+  end
+
+  should 'set created_by when creating article' do
+    login_as(profile.identifier)
+
+    post :new, :type => 'TinyMceArticle', :profile => profile.identifier, :article => { :name => 'changed by me', :body => 'content ...' }
+
+    a = profile.articles.find_by_path('changed-by-me')
+    assert_not_nil a
+    assert_equal profile, a.created_by
+  end
+
+  should 'not change created_by when updating article' do
+    other_person = create_user('otherperson').person
+
+    a = profile.articles.build(:name => 'my article')
+    a.created_by = other_person
+    a.save!
+
+    login_as(profile.identifier)
+    post :edit, :profile => profile.identifier, :id => a.id, :article => { :body => 'new content for this article' }
+
+    a.reload
+
+    assert_equal other_person, a.created_by
+  end
+
+  should 'continue on the same page, when no group is selected' do
+    c = Community.create!(:name => 'test comm', :identifier => 'test_comm')
+    c.affiliate(profile, Profile::Roles.all_roles(c.environment.id))
+    article = profile.articles.create!(:name => 'something intresting', :body => 'ruby on rails')
+    post :publish, :profile => profile.identifier, :id => article.id, :marked_groups => {c.id.to_s => {}}
+    assert_template 'cms/publish'
+  end
+
+  should 'response of search_tags be json' do
+    get :search_tags, :profile => profile.identifier, :term => 'linux'
+    assert_equal 'application/json', @response.content_type
+  end
+
+  should 'return empty json if does not find tag' do
+    get :search_tags, :profile => profile.identifier, :term => 'linux'
+    assert_equal "[]", @response.body
+  end
+
+  should 'return tags found' do
+    tag = mock; tag.stubs(:name).returns('linux')
+    ActsAsTaggableOn::Tag.stubs(:find).returns([tag])
+    get :search_tags, :profile => profile.identifier, :term => 'linux'
+    assert_equal '[{"label":"linux","value":"linux"}]', @response.body
   end
 
   protected
