@@ -1,11 +1,11 @@
 <div class="comments">
   <table border="0">
-  <tr>
-    <td width="90%">
-      <div class="comment_paragraph" id="comment_paragraph_<%= paragraph_id %>" data-paragraph="<%= paragraph_id %>">
-        <%= inner_html %>
-      </div>
-    </td>
+    <tr>
+      <td width="90%">
+        <div class="comment_paragraph" id="comment_paragraph_<%= paragraph_id %>" data-paragraph="<%= paragraph_id %>">
+          <%= inner_html %>
+        </div>
+      </td>
       <td>
         <div  align="center" class="side-comments-counter" id="side_comments_counter_<%= paragraph_id %>"  data-paragraph="<%= paragraph_id %>" style="vertical-align: middle; padding-left: 3px; padding-right: 5px;">
           <span id="comment-count-<%= paragraph_id %>" class='comment-count'>
@@ -15,10 +15,11 @@
       </td>
       <td valign="top">
         <div align="center">
+        <% if logged_in? %>
           <%=
             url = { :profile => profile_identifier, :controller => 'comment_paragraph_plugin_profile', :action => 'view_comments', :paragraph_id => paragraph_id, :article_id => article_id}
             link_to_remote(
-            image_tag("/plugins/comment_paragraph/images/comments.gif"),
+            '',
             {
               :url => url,
               :method => :post,
@@ -30,6 +31,7 @@
               :'data-url' => url_for(url)  
             }
           )%>
+        <% end %>    
         </div>
           <div class="side-comment" id="side_comment_<%= paragraph_id %>" data-paragraph="<%= paragraph_id %>" style="display:none">
             <div class="comment-paragraph-loading-<%= paragraph_id %>" style="position: absolute;">
