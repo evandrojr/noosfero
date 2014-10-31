@@ -22,7 +22,7 @@ class CommentParagraphPluginAdminController < AdminController
   protected
 
   def available_article_types
-    articles = [TinyMceArticle, TextileArticle] + @plugins.dispatch(:content_types)
+    articles = [TinyMceArticle] + @plugins.dispatch(:content_types)
     articles
   end
 
