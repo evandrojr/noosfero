@@ -54,7 +54,7 @@ class CommunityHubPlugin::Hub < Folder
   end
 
   def view_page
-    "content_viewer/hub.rhtml"
+    "content_viewer/hub"
   end
 
   def mediator?(user)
