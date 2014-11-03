@@ -1321,7 +1321,9 @@ module ApplicationHelper
       end
     else
       options = options_for_select(templates.collect{ |template| [template.name, template.id]})
-      content_tag('div', content_tag('label', _('Profile organization'), :class => 'formlabel') + (select_tag 'profile_data[template_id]', options, :onchange => 'show_fields_for_template(this);'))
+      content_tag('div',
+        content_tag('div', content_tag('label', _('Profile organization'), :class => 'formlabel') + (select_tag 'profile_data[template_id]', options, :onchange => 'show_fields_for_template(this);')),
+        :id => 'template-options')
     end
   end
 
