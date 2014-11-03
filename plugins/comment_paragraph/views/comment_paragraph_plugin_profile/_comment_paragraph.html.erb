@@ -15,7 +15,6 @@
       </td>
       <td valign="top">
         <div align="center">
-        <% if logged_in? %>
           <%=
             url = { :profile => profile_identifier, :controller => 'comment_paragraph_plugin_profile', :action => 'view_comments', :paragraph_id => paragraph_id, :article_id => article_id}
             link_to_remote(
@@ -31,7 +30,6 @@
               :'data-url' => url_for(url)  
             }
           )%>
-        <% end %>    
         </div>
           <div class="side-comment" id="side_comment_<%= paragraph_id %>" data-paragraph="<%= paragraph_id %>" style="display:none">
             <div class="comment-paragraph-loading-<%= paragraph_id %>" style="position: absolute;">
