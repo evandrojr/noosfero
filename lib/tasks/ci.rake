@@ -6,10 +6,8 @@ namespace :ci do
     current_branch = `git rev-parse --abbrev-ref HEAD`.strip
     from = ENV['PREV_HEAD'] || "origin/#{current_branch}"
     to = ENV['HEAD'] || current_branch
-    changed_files = `git diff --name-only #{from}..#{to}`.split
-
-    unless $stdout.isatty
-      sh "git", "log", "--name-status", "#{from}..#{to}"
+    changed_files = `git diff --name-only #{from}..#{to}`.split.select do |f|
+      File.exist?(f)
     end
 
     # explicitly changed tests
@@ -26,7 +24,7 @@ namespace :ci do
       end
     end
 
-    sh 'testrb', *tests unless tests.empty?
+    sh 'testrb', '-Itest', *tests unless tests.empty?
     sh 'cucumber', *features unless features.empty?
     sh 'cucumber', '-p', 'selenium', *features unless features.empty?
   end
