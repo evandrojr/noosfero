@@ -2,7 +2,7 @@ module API
   module Entities
 
     Grape::Entity.format_with :timestamp do |date|
-      date.strftime('%Y/%m/%d %H:%M:%S')
+      date.strftime('%Y/%m/%d %H:%M:%S') if date
     end
 
     class Image < Grape::Entity

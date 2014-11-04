@@ -46,7 +46,7 @@ class Comment < ActiveRecord::Base
   
   acts_as_having_settings :field => :setting
 
-  xss_terminate :only => [ :body, :title, :name ], :with => 'white_list', :on => 'validation'
+  xss_terminate :only => [ :body, :title, :name ], :on => 'validation'
 
   def comment_root
     (reply_of && reply_of.comment_root) || self
