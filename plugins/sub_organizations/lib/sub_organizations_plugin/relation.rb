@@ -27,7 +27,7 @@ class SubOrganizationsPlugin::Relation < Noosfero::Plugin::ActiveRecord
 
   class << self
     def add_children(parent, *children)
-      children.each {|child| create!(:parent_id => parent.id, :child_id => child.id)}
+      children.each {|child| create!(:parent => parent, :child => child)}
     end
 
     def remove_children(parent, *children)
