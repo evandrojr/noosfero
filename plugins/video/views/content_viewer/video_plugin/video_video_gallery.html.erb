@@ -1,4 +1,4 @@
-<%  
+<%
 def self.list_videos(configure={})
     configure[:recursive] ||= false
     configure[:list_type] ||= :folder
@@ -12,7 +12,7 @@ def self.list_videos(configure={})
     else
       content_tag('em', _('(empty folder)'))
     end
-  end  
+  end
 %>
 <% unless video_gallery.body.blank? %>
   <div>
