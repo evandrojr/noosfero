@@ -25,14 +25,12 @@ class SubOrganizationsPlugin::Relation < Noosfero::Plugin::ActiveRecord
     end
   end
 
-  class << self
-    def add_children(parent, *children)
-      children.each {|child| create!(:parent_id => parent.id, :child_id => child.id)}
-    end
+  def self.add_children(parent, *children)
+    children.each {|child| SubOrganizationsPlugin::Relation.create!(:parent => parent, :child => child)}
+  end
 
-    def remove_children(parent, *children)
-      children.flatten.each {|child| find_by_parent_id_and_child_id(parent.id, child.id).destroy}
-    end
+  def self.remove_children(parent, *children)
+    children.flatten.each {|child| find_by_parent_id_and_child_id(parent.id, child.id).destroy}
   end
 
 end
