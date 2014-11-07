@@ -15,7 +15,7 @@ class VirtuosoPluginAdminController < AdminController
 
   def force_harvest
     harvest = VirtuosoPlugin::DspaceHarvest.new(environment)
-    harvest.start
+    harvest.start(params[:from_start])
     session[:notice] = _('Harvest started')
     redirect_to :action => :index
   end

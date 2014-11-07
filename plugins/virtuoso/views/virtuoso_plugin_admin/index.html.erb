@@ -29,6 +29,7 @@
       <%= _('Running...') %>
     <% else %>
       <%= button :next, _('Force harvest'), :action => :force_harvest %>
+      <%= button :next, _('Force harvest from start'), :action => :force_harvest, :from_start => true %>
     <% end %>
   </div>
 </div>

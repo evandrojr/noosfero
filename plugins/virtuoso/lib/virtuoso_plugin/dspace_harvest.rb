@@ -49,8 +49,13 @@ class VirtuosoPlugin::DspaceHarvest
     puts "ending harvest #{harvest_time}"
   end
 
-  def start
+  def start(from_start = false)
     if find_job.empty?
+      if from_start
+        settings.last_harvest = nil
+        settings.save!
+      end
+
       job = VirtuosoPlugin::DspaceHarvest::Job.new(@environment.id)
       Delayed::Job.enqueue(job)
     end
