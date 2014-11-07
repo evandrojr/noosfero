@@ -23,7 +23,7 @@
   <video id="embedded_video" class="video-js vjs-default-skin vjs-big-play-centered"
     height="353" width="499"
     controls preload="auto"
-    data-setup='{"example_option":true}'>
+    data-setup='<%=CGI::escapeHTML("{ \"example_option\":true}") %>'>
    <source src="<%= @page.video_url %>" type='<%= @page.video_format %>' />
    <%= @page.no_browser_support_message %>
   </video>
