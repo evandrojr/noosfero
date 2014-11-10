@@ -7,16 +7,16 @@ class VirtuosoPlugin::DspaceHarvest
     @environment = environment
   end
 
-  def settings
-    @settings ||= Noosfero::Plugin::Settings.new(@environment, VirtuosoPlugin)
+  attr_reader :environment
+
+  def plugin
+    @plugin ||= VirtuosoPlugin.new(self)
   end
+
+  delegate :settings, :to => :plugin
 
   def dspace_client
     @dspace_client ||= OAI::Client.new("#{settings.dspace_uri}/oai/request")
-  end
-
-  def virtuoso_client
-    @virtuoso_client ||= RDF::Virtuoso::Repository.new("#{settings.virtuoso_uri}/sparql", :update_uri => "#{settings.virtuoso_uri}/sparql-auth", :username => settings.virtuoso_username, :password => settings.virtuoso_password, :auth_method => 'digest', :timeout => 30)
   end
 
   def triplify(record)
