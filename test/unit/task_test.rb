@@ -29,7 +29,9 @@ class TaskTest < ActiveSupport::TestCase
   end
 
   def test_should_call_perform_in_finish
-    TaskMailer.expects(:generic_message).with('task_finished', anything)
+    mail = mock
+    mail.expects(:deliver)
+    TaskMailer.expects(:generic_message).with('task_finished', anything).returns(mail)
     t = Task.create
     t.requestor = sample_user
     t.expects(:perform)
@@ -38,7 +40,9 @@ class TaskTest < ActiveSupport::TestCase
   end
 
   def test_should_have_cancelled_status_after_cancel
-    TaskMailer.expects(:generic_message).with('task_cancelled', anything)
+    mail = mock
+    mail.expects(:deliver)
+    TaskMailer.expects(:generic_message).with('task_cancelled', anything).returns(mail)
     t = Task.create
     t.requestor = sample_user
     t.cancel
@@ -54,7 +58,9 @@ class TaskTest < ActiveSupport::TestCase
     t = Task.create
     t.requestor = sample_user
 
-    TaskMailer.expects(:generic_message).with('task_finished', t)
+    mail = mock
+    mail.expects(:deliver)
+    TaskMailer.expects(:generic_message).with('task_finished', t).returns(mail)
 
     t.finish
   end
@@ -63,7 +69,9 @@ class TaskTest < ActiveSupport::TestCase
     t = Task.create
     t.requestor = sample_user
 
-    TaskMailer.expects(:generic_message).with('task_cancelled', t)
+    mail = mock
+    mail.expects(:deliver)
+    TaskMailer.expects(:generic_message).with('task_cancelled', t).returns(mail)
 
     t.cancel
   end
@@ -93,7 +101,9 @@ class TaskTest < ActiveSupport::TestCase
     task = Task.new
     task.requestor = sample_user
 
-    TaskMailer.expects(:generic_message).with('task_created', task)
+    mail = mock
+    mail.expects(:deliver)
+    TaskMailer.expects(:generic_message).with('task_created', task).returns(mail)
     task.save!
   end
 
@@ -281,7 +291,9 @@ class TaskTest < ActiveSupport::TestCase
     task.requestor = sample_user
     task.save!
 
-    TaskMailer.expects(:generic_message).with('task_activated', task)
+    mail = mock
+    mail.expects(:deliver)
+    TaskMailer.expects(:generic_message).with('task_activated', task).returns(mail)
     task.activate
   end
 
