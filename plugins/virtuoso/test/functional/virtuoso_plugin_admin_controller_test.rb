@@ -35,4 +35,11 @@ class VirtuosoPluginAdminControllerTest < ActionController::TestCase
     assert harvest.find_job.present?
   end
 
+  should 'force harvest from start' do
+    get :force_harvest, :from_start => true
+    harvest = VirtuosoPlugin::DspaceHarvest.new(environment)
+    assert harvest.find_job.present?
+    assert_equal nil, harvest.settings.last_harvest
+  end
+
 end

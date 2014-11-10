@@ -35,14 +35,18 @@ class VirtuosoPlugin::DspaceHarvest
   def run
     harvest_time = Time.now.utc
     params = settings.last_harvest ? {:from => settings.last_harvest.utc} : {}
-    puts "starting harvest #{params}"
+    puts "starting harvest #{params} #{settings.dspace_uri} #{settings.virtuoso_uri}"
     begin
       records = dspace_client.list_records(params)
       records.each do |record|
         triplify(record)
       end
-    rescue Exception => ex
+    rescue OAI::Exception => ex
       puts ex.to_s
+      if ex.code != 'noRecordsMatch'
+        puts "unexpected error"
+        raise ex
+      end
     end
     settings.last_harvest = harvest_time
     settings.save!
