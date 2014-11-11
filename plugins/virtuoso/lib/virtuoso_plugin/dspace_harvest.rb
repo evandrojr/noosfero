@@ -7,16 +7,16 @@ class VirtuosoPlugin::DspaceHarvest
     @environment = environment
   end
 
-  def settings
-    @settings ||= Noosfero::Plugin::Settings.new(@environment, VirtuosoPlugin)
+  attr_reader :environment
+
+  def plugin
+    @plugin ||= VirtuosoPlugin.new(self)
   end
+
+  delegate :settings, :to => :plugin
 
   def dspace_client
     @dspace_client ||= OAI::Client.new("#{settings.dspace_uri}/oai/request")
-  end
-
-  def virtuoso_client
-    @virtuoso_client ||= RDF::Virtuoso::Repository.new("#{settings.virtuoso_uri}/sparql", :update_uri => "#{settings.virtuoso_uri}/sparql-auth", :username => settings.virtuoso_username, :password => settings.virtuoso_password, :auth_method => 'digest', :timeout => 30)
   end
 
   def triplify(record)
@@ -27,7 +27,7 @@ class VirtuosoPlugin::DspaceHarvest
       values = [metadata.send(c)].flatten.compact
       values.each do |value|
         query = RDF::Virtuoso::Query.insert_data([RDF::URI.new(metadata.identifier), RDF::URI.new("http://purl.org/dc/elements/1.1/#{c}"), value]).graph(RDF::URI.new(settings.dspace_uri))
-        virtuoso_client.insert(query)
+        plugin.virtuoso_client.insert(query)
       end
     end
   end

@@ -9,7 +9,7 @@ class VirtuosoPlugin::DublinCoreMetadata
     @creator = xpath(element, './/dc:creator')
     @subject = xpath_all(element, './/dc:subject').map(&:text)
     @description = xpath(element, './/dc:description')
-    @date = xpath_all(element, './/dc:date').map(&:text)
+    @date = xpath(element, './/dc:date')
     @type = xpath(element, './/dc:type')
     @identifier = xpath(element, './/dc:identifier')
     @language = xpath(element, './/dc:language')
