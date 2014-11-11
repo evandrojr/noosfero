@@ -25,8 +25,9 @@ class VirtuosoPlugin::TriplesTemplate < Article
   end
 
   def template_content
-    plugin.virtuoso_client.query(query).map do |r|
-      template % r
+    result = plugin.virtuoso_client.query(query)
+    result.map do |r|
+      template.gsub(/%\{.*\}/) {|s| r["#{s.delete('%|{|}')}"]}
     end.join
   end
 

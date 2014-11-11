@@ -6,5 +6,5 @@
 <%= labelled_form_field(_('SPARQL Query'), text_area(:article, :query, :style => 'width: 98%; height: 120px;')) %>
 <%= labelled_form_field(_('Template'), text_area(:article, :template, :style => 'width: 98%; height: 200px;', :class => 'mceEditor')) %>
 
-<%= render :partial => 'general_fields' %>
 <%= render :partial => 'shared/lead_and_body', :locals => {:tiny_mce => true} %>
+<%= render :partial => 'general_fields' %>
