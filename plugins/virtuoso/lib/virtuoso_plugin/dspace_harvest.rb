@@ -27,7 +27,7 @@ class VirtuosoPlugin::DspaceHarvest
       values = [metadata.send(c)].flatten.compact
       values.each do |value|
         query = RDF::Virtuoso::Query.insert_data([RDF::URI.new(metadata.identifier), RDF::URI.new("http://purl.org/dc/elements/1.1/#{c}"), value]).graph(RDF::URI.new(settings.dspace_uri))
-        virtuoso_client.insert(query)
+        plugin.virtuoso_client.insert(query)
       end
     end
   end
