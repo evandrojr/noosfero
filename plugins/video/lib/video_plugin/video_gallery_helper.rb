@@ -1,4 +1,4 @@
-module VideoGalleryHelper
+module VideoPlugin::VideoGalleryHelper
 
   def list_videos(configure={})
       configure[:recursive] ||= false

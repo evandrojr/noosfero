@@ -1,7 +1,3 @@
-require_dependency File.dirname(__FILE__) + '/video_block'
-require_dependency File.dirname(__FILE__) + '/video'
-require_dependency File.dirname(__FILE__) + '/video_gallery'
-
 class VideoPlugin < Noosfero::Plugin
 
   def self.plugin_name
@@ -14,7 +10,7 @@ class VideoPlugin < Noosfero::Plugin
 
   def self.extra_blocks
   {
-      VideoBlock => {}
+      VideoPlugin::VideoBlock => {}
   }
   end
 

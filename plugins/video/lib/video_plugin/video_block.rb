@@ -1,4 +1,4 @@
-class VideoBlock < Block
+class VideoPlugin::VideoBlock < Block
 
   attr_accessible :url, :width, :height
 

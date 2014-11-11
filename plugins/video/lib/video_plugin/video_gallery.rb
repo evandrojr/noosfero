@@ -1,4 +1,4 @@
-class VideoGallery < Folder
+class VideoPlugin::VideoGallery < Folder
 
   def self.type_name
     _('Video Gallery')
