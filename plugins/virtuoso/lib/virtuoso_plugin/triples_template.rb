@@ -25,10 +25,9 @@ class VirtuosoPlugin::TriplesTemplate < Article
   end
 
   def template_content
-    result = plugin.virtuoso_client.query(query)
-    result.map do |r|
-      template.gsub(/%\{.*\}/) {|s| r["#{s.delete('%|{|}')}"]}
-    end.join
+    results = plugin.virtuoso_client.query(query)
+    liquid_template = Liquid::Template.parse("{% for row in results %}#{template}{% endfor %}")
+    liquid_template.render('results' => results)
   end
 
 end
