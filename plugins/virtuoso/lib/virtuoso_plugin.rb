@@ -20,4 +20,8 @@ class VirtuosoPlugin < Noosfero::Plugin
     @virtuoso_client ||= RDF::Virtuoso::Repository.new("#{settings.virtuoso_uri}/sparql", :update_uri => "#{settings.virtuoso_uri}/sparql-auth", :username => settings.virtuoso_username, :password => settings.virtuoso_password, :auth_method => 'digest', :timeout => 30)
   end
 
+  def stylesheet?
+    true
+  end
+
 end

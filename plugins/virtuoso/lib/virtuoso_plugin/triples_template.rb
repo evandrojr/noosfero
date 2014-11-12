@@ -25,9 +25,14 @@ class VirtuosoPlugin::TriplesTemplate < Article
   end
 
   def template_content
-    results = plugin.virtuoso_client.query(query)
-    liquid_template = Liquid::Template.parse("{% for row in results %}#{template}{% endfor %}")
-    liquid_template.render('results' => results)
+    begin
+      results = plugin.virtuoso_client.query(query)
+      liquid_template = Liquid::Template.parse("{% for row in results %}#{template}{% endfor %}")
+      liquid_template.render('results' => results)
+    rescue => ex
+      logger.info ex.to_s
+      "Failed to process the template"
+    end
   end
 
 end
