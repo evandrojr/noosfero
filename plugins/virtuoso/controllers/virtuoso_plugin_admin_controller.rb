@@ -8,7 +8,7 @@ class VirtuosoPluginAdminController < AdminController
 
     if request.post?
       @settings.save!
-      session[:notice] = 'Settings succefully saved.'
+      session[:notice] = 'Settings successfully saved.'
       redirect_to :action => 'index'
     end
   end
