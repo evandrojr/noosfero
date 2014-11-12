@@ -1,0 +1,35 @@
+<h1><%= _('Virtuoso settings')%></h1>
+
+<%= form_for(:settings) do |f| %>
+
+  <strong>
+    <%= labelled_form_field _('Virtuoso URL:'), f.text_field(:virtuoso_uri) %>
+    <%= labelled_form_field _('Virtuoso Username:'), f.text_field(:virtuoso_username) %>
+    <%= labelled_form_field _('Virtuoso Password:'), f.password_field(:virtuoso_password) %>
+    <%= labelled_form_field _('DSpace URL:'), f.text_field(:dspace_uri) %>
+  </strong>
+
+  <% button_bar do %>
+    <%= submit_button(:save, _('Save'), :cancel => {:controller => 'plugins', :action => 'index'}) %>
+  <% end %>
+
+<% end %>
+
+<hr/>
+<div class="harvest">
+  <% if @settings.last_harvest %>
+  <div class="date">
+    <span class="label"><strong><%= _('Last execution:') %></strong></span>
+    <span class="value"><%= time_ago_as_sentence @settings.last_harvest %></span>
+  </div>
+<% end %>
+  <br/>
+  <div class="actions">
+    <% if @harvest_running %>
+      <%= _('Running...') %>
+    <% else %>
+      <%= button :next, _('Force harvest'), :action => :force_harvest %>
+      <%= button :next, _('Force harvest from start'), :action => :force_harvest, :from_start => true %>
+    <% end %>
+  </div>
+</div>

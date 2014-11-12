@@ -1,0 +1,4 @@
+gem 'rdf'
+gem 'rdf-virtuoso'
+gem 'oai'
+gem 'liquid'
