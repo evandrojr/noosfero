@@ -23,7 +23,6 @@
     <span class="value"><%= time_ago_as_sentence @settings.last_harvest %></span>
   </div>
 <% end %>
-  <br/>
   <div class="actions">
     <% if @harvest_running %>
       <%= _('Running...') %>
@@ -31,5 +30,13 @@
       <%= button :next, _('Force harvest'), :action => :force_harvest %>
       <%= button :next, _('Force harvest from start'), :action => :force_harvest, :from_start => true %>
     <% end %>
+  </div>
+</div>
+
+<hr />
+
+<div class="triple-management">
+  <div class="actions">
+    <%= button :edit, _('Triple management'), :action => :triple_management %>
   </div>
 </div>
