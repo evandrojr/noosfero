@@ -24,4 +24,8 @@ class VirtuosoPlugin < Noosfero::Plugin
     ['edit-server-list']
   end  
 
+  def stylesheet?
+    true
+  end
+
 end

@@ -1,0 +1,63 @@
+<h1><%= _('Virtuoso settings : Triples Management')%></h1>
+
+<%= form_tag('/admin/plugin/virtuoso/triple_management', :method => 'post') do %>
+
+  <%= labelled_form_field(_('Default Graph IRI:'), text_field_tag(:graph_uri, @graph_uri, :style => 'width: 100%' ) ) %>
+
+  <%= labelled_form_field(_('Query SPARQL:'), text_area_tag(:query, @query, { :rows => 7, :style => 'width: 99%' } )) %>
+
+  <% button_bar do %>
+    <%= submit_button(:search, _('Search')) %>
+  <% end %>
+
+<% end %>
+
+<style>
+.triple + .triple {
+  border-top: 1px solid #CCC;
+  margin-top: 20px;
+  padding-top: 15px;
+}
+</style>
+
+<% unless @triples.empty? %>
+
+  <hr />
+
+  <%= form_tag('/admin/plugin/virtuoso/triple_update', :method => 'post') do %>
+
+    <%= hidden_field_tag(:graph_uri, @graph_uri) %>
+
+    <% @triples.each { |triple| %>
+
+    <div class="triple">
+
+      <div class="triple-subject" style="margin: 3px 0 3px 0;">
+        <label class="formlabel"><%= _('Subject:') %></label>
+        <%= hidden_field_tag('triples[][from[subject]]', triple[:s].to_s) %>
+        <%= text_field_tag('triples[][to[subject]]', triple[:s].to_s, :style => 'width: 99%;') %>
+      </div>
+
+      <div class="triple-predicate" style="margin: 3px 0 3px 0;">
+        <label class="formlabel"><%= _('Predicate:') %></label>
+        <%= hidden_field_tag('triples[][from[predicate]]', triple[:p].to_s) %>
+        <%= text_field_tag('triples[][to[predicate]]', triple[:p].to_s, :style => 'width: 99%;') %>
+      </div>
+
+      <div class="triple-object" style="margin: 3px 0 3px 0;">
+        <label class="formlabel"><%= _('Object:') %></label>
+        <%= hidden_field_tag('triples[][from[object]]', triple[:o].to_s) %>
+        <%= text_field_tag('triples[][to[object]]', triple[:o].to_s, :style => 'width: 99%;') %>
+      </div>
+
+    </div>
+
+    <% } %>
+
+    <% button_bar do %>
+      <%= submit_button(:save, _('Save')) %>
+    <% end %>
+
+  <% end %>
+
+<% end %>
