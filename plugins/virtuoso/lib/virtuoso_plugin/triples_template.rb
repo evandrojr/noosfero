@@ -8,8 +8,18 @@ class VirtuosoPlugin::TriplesTemplate < Article
     _('Triples template')
   end
 
+  def self.initial_template
+    '
+      {% for row in results %}
+        <div>
+          {{row}}
+        </div>
+      {% endfor %}
+    '
+  end
+
   settings_items :query, :type => :string
-  settings_items :template, :type => :string
+  settings_items :template, :type => :string, :default => initial_template
   settings_items :stylesheet, :type => :string
 
   attr_accessible :query, :template, :stylesheet
@@ -28,7 +38,7 @@ class VirtuosoPlugin::TriplesTemplate < Article
   def template_content
     begin
       results = plugin.virtuoso_client.query(query)
-      liquid_template = Liquid::Template.parse("{% for row in results %}#{template}{% endfor %}")
+      liquid_template = Liquid::Template.parse(template)
       page = liquid_template.render('results' => results)
       transform_html(page)
     rescue => ex
