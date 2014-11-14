@@ -1,3 +1,5 @@
+<%= javascript_include_tag '/plugins/virtuoso/edit-server-list' %>
+
 <h1><%= _('Virtuoso settings')%></h1>
 
 <%= form_for(:settings) do |f| %>
@@ -23,7 +25,6 @@
     <span class="value"><%= time_ago_as_sentence @settings.last_harvest %></span>
   </div>
 <% end %>
-  <br/>
   <div class="actions">
     <% if @harvest_running %>
       <%= _('Running...') %>
@@ -31,5 +32,14 @@
       <%= button :next, _('Force harvest'), :action => :force_harvest %>
       <%= button :next, _('Force harvest from start'), :action => :force_harvest, :from_start => true %>
     <% end %>
+  </div>
+</div>
+
+<hr />
+
+<div class="triple-management">
+  <div class="actions">
+    <%= button :edit, _('Triple management'), :action => :triple_management %>
+    <%= button :edit, _('Custom Queries'), :action => :index, :controller => 'virtuoso_plugin_custom_queries' %>
   </div>
 </div>

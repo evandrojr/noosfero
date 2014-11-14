@@ -1,0 +1,11 @@
+<% extend TinymceHelper %>
+
+<%= tinymce_js %>
+
+<script>
+  function tinymce_macros_setup(editor) {}
+
+  jQuery(document).ready(function($) {
+    <%= tinymce_init_js(:valid_children => "+body[style]") %>
+  });
+</script>

@@ -14,7 +14,7 @@ class TriplesTemplateTest < ActiveSupport::TestCase
     article.plugin.virtuoso_client.expects(:query).returns([{'var' => 'Hello '}, {'var' => 'World'}])
     article.template = "{{row.var}}"
 
-    assert_equal 'Hello World', article.template_content
+    assert_match /Hello World/, article.template_content
   end
 
   should 'display error message when failed to execute the query' do
@@ -24,6 +24,18 @@ class TriplesTemplateTest < ActiveSupport::TestCase
     article.template = "{{row.var}}"
 
     assert_equal "Failed to process the template", article.template_content
+  end
+
+  should 'transform css into inline stylesheet' do
+    article.stubs(:plugin).returns(mock)
+    article.plugin.expects(:virtuoso_client).at_least_once.returns(mock)
+    article.plugin.virtuoso_client.expects(:query).returns([{'var' => 'Hello '}, {'var' => 'World'}])
+    article.template = "<p>{{row.var}}</p>"
+    article.stylesheet = "p {color: red}"
+
+    content = article.template_content
+    assert_match /<p style="color:red">Hello <\/p>/, content
+    assert_match /<p style="color:red">World<\/p>/, content
   end
 
 end

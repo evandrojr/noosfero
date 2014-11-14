@@ -1,0 +1,54 @@
+<div id="virtuoso-triples-management">
+  <h1><%= _('Virtuoso settings &raquo; Triples Management')%></h1>
+
+  <%= form_tag('/admin/plugin/virtuoso/triple_management', :method => 'post') do %>
+    <%= labelled_form_field(_('Default Graph IRI:'), text_field_tag(:graph_uri, @graph_uri) ) %>
+    <%= labelled_form_field(_('Query SPARQL:'), text_area_tag(:query, @query, :rows => 7)) %>
+    <% button_bar do %>
+      <%= submit_button(:search, _('Search')) %>
+    <% end %>
+  <% end %>
+
+  <% unless @triples.empty? %>
+
+  <%= form_tag('/admin/plugin/virtuoso/triple_update', :method => 'post') do %>
+    <%= hidden_field_tag(:graph_uri, @graph_uri) %>
+
+    <ul id="triples-list">
+
+    <% triple_counter = 1 %>
+
+    <% @triples.each { |triple| %>
+
+      <li>
+        <ul class="triple">
+          <li>
+            <%= hidden_field_tag("triples[triple#{triple_counter}[from][subject]]", triple[:s].to_s) %>
+            <%= labelled_form_field(_('Subject:'), text_field_tag("triples[triple#{triple_counter}[to][subject]]", triple[:s].to_s) ) %>
+          </li>
+          <li>
+            <%= hidden_field_tag("triples[triple#{triple_counter}[from][predicate]]", triple[:p].to_s) %>
+            <%= labelled_form_field(_('Predicate:'), text_field_tag("triples[triple#{triple_counter}[to][predicate]]", triple[:p].to_s) ) %>
+          </li>
+          <li>
+            <%= hidden_field_tag("triples[triple#{triple_counter}[from][object]]", triple[:o].to_s) %>
+            <%= labelled_form_field(_('Object:'), text_field_tag("triples[triple#{triple_counter}[to][object]]", triple[:o].to_s) ) %>
+          </li>
+        </ul>
+      </li>
+
+      <% triple_counter += 1 %>
+
+    <% } %>
+
+    </ul>
+
+    <% button_bar do %>
+      <%= submit_button(:save, _('Save')) %>
+    <% end %>
+
+  <% end %>
+
+  <% end %>
+
+</div>
