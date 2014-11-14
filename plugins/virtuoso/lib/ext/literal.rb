@@ -1,7 +1,9 @@
 class RDF::Literal
 
+  include ActionView::Helpers::SanitizeHelper
+
   def to_liquid
-    value
+    strip_tags(value)
   end
 
 end

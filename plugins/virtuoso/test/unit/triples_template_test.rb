@@ -38,4 +38,13 @@ class TriplesTemplateTest < ActiveSupport::TestCase
     assert_match /<p style="color:red">World<\/p>/, content
   end
 
+  should 'do not allow js injection' do
+    article.stubs(:plugin).returns(mock)
+    article.plugin.expects(:virtuoso_client).at_least_once.returns(mock)
+    article.plugin.virtuoso_client.expects(:query).returns([{'var' => RDF::Literal.new('<script>alert("hello");</script>')}])
+    article.template = "{% for row in results %}{{row.var}}{% endfor %}"
+
+    assert_no_match /<script>/, article.template_content
+  end
+
 end
