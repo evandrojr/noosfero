@@ -1,5 +1,7 @@
 class VirtuosoPlugin < Noosfero::Plugin
 
+  @virtuosoServers
+  
   def self.plugin_name
     "Virtuoso integration"
   end

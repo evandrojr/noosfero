@@ -1,8 +1,14 @@
 class VirtuosoPluginAdminController < AdminController
 
   def index
-    settings = params[:settings]
+    settings = params[:settings] 
     settings ||= {}
+    
+#    raise settings.inspect.to_yaml
+    
+#    --- ! '{"virtuoso_uri"=>"http://hom.virtuoso.participa.br", "virtuoso_username"=>"dba",
+#  "virtuoso_password"=>"dasas", "dspace_uri"=>"http://hom.dspace.participa.br"}#'
+    
     @settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin, settings)
     @harvest_running = VirtuosoPlugin::DspaceHarvest.new(environment).find_job.present?
 

@@ -8,14 +8,47 @@
     <%= labelled_form_field _('Virtuoso URL:'), f.text_field(:virtuoso_uri) %>
     <%= labelled_form_field _('Virtuoso Username:'), f.text_field(:virtuoso_username) %>
     <%= labelled_form_field _('Virtuoso Password:'), f.password_field(:virtuoso_password) %>
-    <%= labelled_form_field _('DSpace URL:'), f.text_field(:dspace_uri) %>
+    <%#= labelled_form_field _('DSpace URL:'), f.text_field(:dspace_uri) %>
   </strong>
+
+
+<!-- Iníco bloco link original -->
+<%  raise @settings[:settings].to_yaml %>
+
+<strong><%= _('Dspace Servers') %></strong>
+<div id='edit-server-list-block'>
+  <ul class='link-list-header'>
+    <li class='link-list-name'><%= _('DSpace URL') %></li>
+  </ul>
+  <ul id="dropable-server-list">
+    <% for dspace_uri in @settings[:dspace_servers] do %> 
+      <%= render :partial => 'server_list_item', :locals => {:dspace_uri => dspace_uri} %>
+    <% end %>
+  </ul>
+
+  <div id="new-template">
+    <% template_server = {'icon' => 'ok'} %>
+    <%= render :partial => 'server_list_item', :locals => {:server => {} } %>
+  </div>
+</div>
+
+<%= link_to_function(_('New Dspace Server'), 'add_new_server();', :class => 'button icon-add with-text') %>
+
+
+<!-- FIm bloco link original -->
+
+
 
   <% button_bar do %>
     <%= submit_button(:save, _('Save'), :cancel => {:controller => 'plugins', :action => 'index'}) %>
   <% end %>
 
 <% end %>
+
+
+
+
+
 
 <hr/>
 <div class="harvest">
