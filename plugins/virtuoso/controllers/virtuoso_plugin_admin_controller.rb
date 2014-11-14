@@ -43,10 +43,8 @@ class VirtuosoPluginAdminController < AdminController
 
     triples_management = VirtuosoPlugin::TriplesManagement.new(environment)
 
-    triples.each { |triple|
-      from_triple = triple[:from]
-      to_triple = triple[:to]
-      triples_management.update_triple(graph_uri, from_triple, to_triple)
+    triples.each { |triple_key, triple_content|
+      triples_management.update_triple(graph_uri, triple_content[:from], triple_content[:to])
     }
 
     session[:notice] = _('Triple(s) succesfully updated.')
