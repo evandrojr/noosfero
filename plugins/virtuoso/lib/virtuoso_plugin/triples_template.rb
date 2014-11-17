@@ -8,10 +8,21 @@ class VirtuosoPlugin::TriplesTemplate < Article
     _('Triples template')
   end
 
-  settings_items :query, :type => :string
-  settings_items :template, :type => :string
+  def self.initial_template
+    '
+      {% for row in results %}
+        <div>
+          {{row}}
+        </div>
+      {% endfor %}
+    '
+  end
 
-  attr_accessible :query, :template
+  settings_items :query, :type => :string
+  settings_items :template, :type => :string, :default => initial_template
+  settings_items :stylesheet, :type => :string
+
+  attr_accessible :query, :template, :stylesheet
 
   def to_html(options = {})
     article = self
@@ -27,12 +38,21 @@ class VirtuosoPlugin::TriplesTemplate < Article
   def template_content
     begin
       results = plugin.virtuoso_client.query(query)
-      liquid_template = Liquid::Template.parse("{% for row in results %}#{template}{% endfor %}")
-      liquid_template.render('results' => results)
+      liquid_template = Liquid::Template.parse(template)
+      page = liquid_template.render('results' => results)
+      transform_html(page)
     rescue => ex
       logger.info ex.to_s
       "Failed to process the template"
     end
+  end
+
+  protected
+
+  def transform_html(html)
+    document = Roadie::Document.new(html)
+    document.add_css(stylesheet) if stylesheet.present?
+    document.transform
   end
 
 end

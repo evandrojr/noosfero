@@ -6,6 +6,7 @@ class CreateCustomQueries < ActiveRecord::Migration
       t.string :name
       t.text :query
       t.text :template
+      t.text :stylesheet
       t.boolean :enabled, :default => true
       t.timestamps
     end

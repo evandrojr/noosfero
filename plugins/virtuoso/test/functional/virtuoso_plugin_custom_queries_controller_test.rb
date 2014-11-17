@@ -2,7 +2,7 @@ require 'test_helper'
 
 class VirtuosoPluginCustomQueriesControllerTest < ActionController::TestCase
   setup do
-    @custom_query = VirtuosoPlugin::CustomQuery.create!(:name => 'name', :query => 'query', :template => 'template', :environment => Environment.default)
+    @custom_query = VirtuosoPlugin::CustomQuery.create!(:name => 'name', :query => 'query', :template => 'template', :stylesheet => 'stylesheet', :environment => Environment.default)
     login_as(create_admin_user(Environment.default))
   end
 
@@ -19,7 +19,7 @@ class VirtuosoPluginCustomQueriesControllerTest < ActionController::TestCase
 
   should "create custom_query" do
     assert_difference('VirtuosoPlugin::CustomQuery.count') do
-      post :create, custom_query: { name: @custom_query.name, enabled: @custom_query.enabled, query: @custom_query.query, template: @custom_query.template }
+      post :create, custom_query: { name: @custom_query.name, enabled: @custom_query.enabled, query: @custom_query.query, template: @custom_query.template, stylesheet: @custom_query.stylesheet }
     end
 
     assert_redirected_to :action => :index
@@ -31,7 +31,7 @@ class VirtuosoPluginCustomQueriesControllerTest < ActionController::TestCase
   end
 
   should "update custom_query" do
-    put :update, id: @custom_query, custom_query: { name: @custom_query.name, enabled: @custom_query.enabled, query: @custom_query.query, template: @custom_query.template }
+    put :update, id: @custom_query, custom_query: { name: @custom_query.name, enabled: @custom_query.enabled, query: @custom_query.query, template: @custom_query.template, stylesheet: @custom_query.stylesheet }
     assert_redirected_to :action => :index
   end
 

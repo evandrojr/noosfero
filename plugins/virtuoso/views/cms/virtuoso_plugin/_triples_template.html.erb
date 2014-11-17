@@ -1,7 +1,7 @@
 <div class="virtuoso-triples-template">
   <%= required_fields_message %>
 
-  <%= render :file => 'shared/tiny_mce' %>
+  <%= render :partial => 'cms/virtuoso_plugin/tinymce_template_editor' %>
 
   <%= required labelled_form_field(_('Title'), text_field(:article, 'name', :size => '64', :maxlength => 150)) %>
 
@@ -17,6 +17,13 @@
     <span class="reference" style="float: right;"><a href="https://github.com/Shopify/liquid/wiki/Liquid-for-Designers"><%= _('Template reference') %></a></span>
     <span class="input">
       <%= text_area(:article, :template, :style => 'width: 98%; height: 200px;', :class => 'mceEditor') %>
+    </span>
+  </div>
+
+  <div class="stylesheet">
+    <span class="label"><%= _('Stylesheet') %></span>
+    <span>
+      <%= text_area(:article, :stylesheet, :style => 'width: 98%; height: 100px;') %>
     </span>
   </div>
 
