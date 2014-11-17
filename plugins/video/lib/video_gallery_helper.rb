@@ -1,5 +1,5 @@
 module VideoGalleryHelper
-  
+
   def list_videos(configure={})
       configure[:recursive] ||= false
       configure[:list_type] ||= :folder
@@ -13,6 +13,6 @@ module VideoGalleryHelper
       else
         content_tag('em', _('(empty folder)'))
       end
-  end    
-  
+  end
+
 end

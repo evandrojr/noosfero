@@ -13,10 +13,10 @@ class CommunityHubPlugin < Noosfero::Plugin
   end
 
   def content_types
+    return [] if !context.kind_of?(CmsController)
     if context.respond_to?(:params) && context.params
       types = []
-      parent_id = context.params[:parent_id]
-      types << CommunityHubPlugin::Hub if context.profile.community? && !parent_id
+      types << CommunityHubPlugin::Hub if context.profile.community?
       types
     else
        [CommunityHubPlugin::Hub]

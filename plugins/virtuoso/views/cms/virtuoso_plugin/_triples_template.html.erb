@@ -1,0 +1,33 @@
+<div class="virtuoso-triples-template">
+  <%= required_fields_message %>
+
+  <%= render :partial => 'cms/virtuoso_plugin/tinymce_template_editor' %>
+
+  <%= required labelled_form_field(_('Title'), text_field(:article, 'name', :size => '64', :maxlength => 150)) %>
+
+  <div class="custom-query">
+    <span class="label"><%= _('Custom Query/Template selection: ') %></span>
+    <%= select_tag :select_custom_query, options_from_collection_for_select(environment.virtuoso_plugin_custom_queries, :id, :name) %>
+    <%= button :clone, _('Copy'), '#', :id => 'copy_custom_query' %>
+  </div>
+
+  <%= labelled_form_field(_('SPARQL Query'), text_area(:article, :query, :style => 'width: 98%; height: 120px;')) %>
+  <div class="template">
+    <span class="label"><%= _('Template') %></span>
+    <span class="reference" style="float: right;"><a href="https://github.com/Shopify/liquid/wiki/Liquid-for-Designers"><%= _('Template reference') %></a></span>
+    <span class="input">
+      <%= text_area(:article, :template, :style => 'width: 98%; height: 200px;', :class => 'mceEditor') %>
+    </span>
+  </div>
+
+  <div class="stylesheet">
+    <span class="label"><%= _('Stylesheet') %></span>
+    <span>
+      <%= text_area(:article, :stylesheet, :style => 'width: 98%; height: 100px;') %>
+    </span>
+  </div>
+
+  <%= render :partial => 'shared/lead_and_body', :locals => {:tiny_mce => true} %>
+  <%= render :partial => 'general_fields' %>
+</div>
+<%= javascript_include_tag '/plugins/virtuoso/custom_query.js' %>

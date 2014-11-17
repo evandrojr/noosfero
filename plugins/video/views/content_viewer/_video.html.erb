@@ -1,33 +1,33 @@
 <div align="center">
 <%if @page.video_provider=='youtube' %>
-  <link type="text/css" rel="stylesheet" href="https://vjs.zencdn.net/4.5.1/video-js.css" />
-  <video id="embedded_video" src="" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" 
+  <link type="text/css" rel="stylesheet" href="/plugins/video/css/video-js-4.5.1.css" />
+  <video id="embedded_video" src="" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto"
     width="<%= @page.fitted_width %>" height="<%= @page.fitted_height %>"
     data-setup='<%=CGI::escapeHTML("{ \"techOrder\": [\"youtube\"], \"src\": \"#{@page.video_url}\" }") %>'>
     <%= @page.no_browser_support_message %>
   </video>
-  <script src="https://vjs.zencdn.net/4.5.1/video.js"></script>
-  <script src="/plugins/video/javascripts/videojs/vjs.youtube.js"></script>  
+  <script src="/plugins/video/javascripts/videojs/video-4.5.1.js"></script>
+  <script src="/plugins/video/javascripts/videojs/vjs.youtube.js"></script>
  <% elsif  @page.video_provider=='vimeo' %>
-  <link type="text/css" rel="stylesheet" href="https://vjs.zencdn.net/4.5.1/video-js.css" />
-  <video id="embedded_video" src="" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" 
-    width="<%= @page.fitted_width %>" height="<%= @page.fitted_height %>"  
-    data-setup='<%=CGI::escapeHTML("{ \"techOrder\": [\"video\"], \"src\": \"#{@page.video_url}\", \"loop\": true, \"autoplay\": false  }") %>'>
+  <link type="text/css" rel="stylesheet" href="/plugins/video/css/video-js-4.5.1.css" />
+  <video id="embedded_video" src="" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto"
+    width="<%= @page.fitted_width %>" height="<%= @page.fitted_height %>"
+    data-setup='<%=CGI::escapeHTML("{ \"techOrder\": [\"vimeo\"], \"src\": \"#{@page.video_url}\", \"loop\": true, \"autoplay\": false }") %>'>
     <%= @page.no_browser_support_message %>
   </video>
-  <script src="https://vjs.zencdn.net/4.5.1/video.js"></script>
+  <script src="/plugins/video/javascripts/videojs/video-4.5.1.js"></script>
   <script src="/plugins/video/javascripts/videojs/vjs.vimeo.js"></script>
 <% elsif  @page.video_provider=='file' %>
-  <link href="https://vjs.zencdn.net/4.8/video-js.css" rel="stylesheet">
-  <script src="https://vjs.zencdn.net/4.8/video.js"></script>  
+  <link href="/plugins/video/css/video-js-4.8.5.css" rel="stylesheet">
+  <script src="/plugins/video/javascripts/videojs/video-4.8.5.js"></script>
   <video id="embedded_video" class="video-js vjs-default-skin vjs-big-play-centered"
-    height="353" width="499"           
-    controls preload="auto" 
-    data-setup='{"example_option":true}'>
+    height="353" width="499"
+    controls preload="auto"
+    data-setup='<%=CGI::escapeHTML("{ \"example_option\":true}") %>'>
    <source src="<%= @page.video_url %>" type='<%= @page.video_format %>' />
    <%= @page.no_browser_support_message %>
-  </video>  
-<% end %>  
+  </video>
+<% end %>
 <br style="clear:both" />
 </div>
 <% _("Description:") %>

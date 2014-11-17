@@ -3,7 +3,7 @@
   display: inline-block;
   width: 95px;
   height: 85px;
-  margin: 1em; 
+  margin: 1em;
   border: solid #F0F0F0 1px;
   vertical-align: top;
   text-align: center;
@@ -17,7 +17,7 @@
 }
 
 .video-duration{
-  position: absolute;  
+  position: absolute;
   bottom: 0px;
   background-color: black;
   font-size: 1em;

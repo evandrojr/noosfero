@@ -17,14 +17,14 @@ class VideoPlugin < Noosfero::Plugin
       VideoBlock => {}
   }
   end
-  
+
   def stylesheet?
     true
   end
-  
+
   def content_types
     [VideoPlugin::VideoGallery, VideoPlugin::Video]
-  end  
+  end
 
   def content_remove_new(content)
     if content.kind_of?(VideoPlugin::VideoGallery) or content.kind_of?(VideoPlugin::Video)
@@ -36,8 +36,8 @@ class VideoPlugin < Noosfero::Plugin
     if content.kind_of?(VideoPlugin::VideoGallery) or content.kind_of?(VideoPlugin::Video)
       true
     end
-  end  
-  
+  end
+
   def article_extra_toolbar_buttons(content)
     if content.kind_of?(VideoPlugin::VideoGallery)
       proc do
@@ -47,8 +47,8 @@ class VideoPlugin < Noosfero::Plugin
           :href=>url_for(:action => 'new', :type=>'Video', :controller=>'cms', :parent_id => content.id),
           :title=>_("New Video")
         })
-      end        
+      end
     end
   end
-  
+
 end

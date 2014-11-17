@@ -13,7 +13,7 @@ gem 'ruby-feedparser',          '~> 0.7'
 gem 'daemons',                  '~> 1.1.5'
 gem 'thin',                     '~> 1.3.1'
 gem 'hpricot',                  '~> 0.8.6'
-gem 'nokogiri',                 '~> 1.5.5'
+gem 'nokogiri',                 '~> 1.6.0'
 gem 'rake', :require => false
 gem 'grape',					'~> 0.2.1'
 gem 'rest-client',              '~> 1.6.7'
@@ -33,6 +33,7 @@ group :production do
 end
 
 group :test do
+  gem 'test-unit',                  '~> 1.2.3'
   gem 'rspec',                  '~> 2.10.0'
   gem 'rspec-rails',            '~> 2.10.1'
   gem 'mocha',                  '~> 1.1.0', :require => false
@@ -46,8 +47,9 @@ group :cucumber do
   gem 'selenium-webdriver',     '~> 2.39.0'
 end
 
-# include plugin gemfiles
-Dir.glob(File.join('config', 'plugins', '*')).each do |plugin|
-  plugin_gemfile = File.join(plugin, 'Gemfile')
-  eval File.read(plugin_gemfile) if File.exists?(plugin_gemfile)
+# include gemfiles from enabled plugins
+# plugins in baseplugins/ are not included on purpose. They should not have any
+# dependencies.
+Dir.glob('config/plugins/*/Gemfile').each do |gemfile|
+  eval File.read(gemfile)
 end

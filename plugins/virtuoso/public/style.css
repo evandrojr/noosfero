@@ -1,0 +1,27 @@
+.virtuoso-triples-template .template {
+  margin: 10px 0;
+}
+
+#virtuoso-triples-management input[type="text"] {
+  width: 100%
+}
+
+#virtuoso-triples-management textarea {
+  width: 99%;
+}
+
+#virtuoso-triples-management ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+#virtuoso-triples-management #triples-list {
+  border-top: 1px solid #CCC;
+  padding-top: 15px;
+}
+
+#triples-list > li + li {
+  border-top: 1px solid #CCC;
+  margin-top: 20px;
+  padding-top: 15px;
+}

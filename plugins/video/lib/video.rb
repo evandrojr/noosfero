@@ -47,11 +47,11 @@ class Video < Article
   def fitted_width
     499
   end
-  
+
   def fitted_height
     ((fitted_width * self.video_height) / self.video_width).to_i
   end
-  
+
   def thumbnail_fitted_width
     80
   end
@@ -59,17 +59,17 @@ class Video < Article
   def thumbnail_fitted_height
     ((thumbnail_fitted_width * self.video_thumbnail_height) / self.video_thumbnail_width).to_i
   end
-  
+
   def no_browser_support_message
-    '<p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>'    
+    '<p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>'
   end
-  
+
   private
-  
+
   YOUTUBE_ID_FORMAT = '\w-'
-  
+
   def detect_video
-    if is_youtube? 
+    if is_youtube?
       self.video_provider = 'youtube'
       self.video_id = extract_youtube_id
       url = "http://www.youtube.com/oembed?url=http%3A//www.youtube.com/watch?v%3D#{self.video_id}&format=json"
@@ -78,7 +78,7 @@ class Video < Article
       vid = JSON.parse(buffer)
       self.video_thumbnail_url = vid['thumbnail_url']
       self.video_width = vid['width']
-      self.video_height = vid['height'] 
+      self.video_height = vid['height']
       self.video_thumbnail_width = vid['thumbnail_width']
       self.video_thumbnail_height = vid['thumbnail_height']
       url = "http://gdata.youtube.com/feeds/api/videos/#{self.video_id}?alt=json";
@@ -86,7 +86,7 @@ class Video < Article
       buffer = resp.body
       vid = JSON.parse(buffer)
       self.video_duration = vid['entry']['media$group']['media$content'][0]['duration']
-    elsif is_vimeo? 
+    elsif is_vimeo?
       self.video_provider = 'vimeo'
       self.video_id = extract_vimeo_id
       url = "http://vimeo.com/api/v2/video/#{self.video_id}.json"
@@ -97,7 +97,7 @@ class Video < Article
       #raise vid.to_yaml
       self.video_thumbnail_url = vid['thumbnail_large']
       self.video_width = vid['width']
-      self.video_height = vid['height'] 
+      self.video_height = vid['height']
       self.video_thumbnail_width = 640
       self.video_thumbnail_height = 360
     elsif true
@@ -105,19 +105,19 @@ class Video < Article
       self.video_provider = 'file'
     end
   end
-  
+
   def detect_format
    video_type = 'video/unknown'
-   if /.mp4/i =~ self.video_url or /.mov/i =~ self.video_url 
+   if /.mp4/i =~ self.video_url or /.mov/i =~ self.video_url
     video_type='video/mp4'
    elsif /.webm/i =~ self.video_url
     video_type='video/webm'
-   elsif /.og[vg]/i =~ self.video_url  
+   elsif /.og[vg]/i =~ self.video_url
     video_type='video/ogg'
    end
    video_type
   end
-  
+
   def is_youtube?
     video_url.match(/.*(youtube.com.*v=[#{YOUTUBE_ID_FORMAT}]+|youtu.be\/[#{YOUTUBE_ID_FORMAT}]+).*/) ? true : false
   end
@@ -129,7 +129,7 @@ class Video < Article
   def is_video_file?
     video_url.match(/\.(mp4|ogg|ogv|webm)/) ? true : false
   end
-  
+
   def extract_youtube_id
     return nil unless is_youtube?
     youtube_match = video_url.match("v=([#{YOUTUBE_ID_FORMAT}]*)")
@@ -143,25 +143,3 @@ class Video < Article
     vimeo_match[1] unless vimeo_match.nil?
   end
 end
-
-#To be used for the duration
-#function formatSecondsAsTime(secs) {
-#    var hr = Math.floor(secs / 3600);
-#    var min = Math.floor((secs - (hr * 3600)) / 60);
-#    var sec = Math.floor(secs - (hr * 3600) - (min * 60));
-#
-#    if (hr < 10) {
-#        hr = "0" + hr;
-#    }
-#    if (min < 10) {
-#        min = "0" + min;
-#    }
-#    if (sec < 10) {
-#        sec = "0" + sec;
-#    }
-#    if (hr) {
-#        hr = "00";
-#    }
-#
-#    return hr + ':' + min + ':' + sec;
-#}
