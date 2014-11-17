@@ -6,8 +6,10 @@
 
   <strong>
     <%= labelled_form_field _('Virtuoso URL:'), f.text_field(:virtuoso_uri) %>
-    <%= labelled_form_field _('Virtuoso Username:'), f.text_field(:virtuoso_username) %>
-    <%= labelled_form_field _('Virtuoso Password:'), f.password_field(:virtuoso_password) %>
+    <%= labelled_form_field _('Virtuoso Admin Username:'), f.text_field(:virtuoso_username) %>
+    <%= labelled_form_field _('Virtuoso Admin Password:'), f.password_field(:virtuoso_password) %>
+    <%= labelled_form_field _('Virtuoso Read-Only Username:'), f.text_field(:virtuoso_readonly_username) %>
+    <%= labelled_form_field _('Virtuoso Read-Only Password:'), f.password_field(:virtuoso_readonly_password) %>
     <%= labelled_form_field _('DSpace URL:'), f.text_field(:dspace_uri) %>
   </strong>
 
