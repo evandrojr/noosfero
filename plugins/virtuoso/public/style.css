@@ -25,3 +25,7 @@
   margin-top: 20px;
   padding-top: 15px;
 }
+
+#virtuoso-triples-management #triples-list .triple-actions {
+  text-align: right;
+}

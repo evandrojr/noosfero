@@ -20,7 +20,7 @@ class VirtuosoPluginAdminController < AdminController
     redirect_to :action => :index
   end
 
-  def triple_management
+  def triples_management
     triples_management = VirtuosoPlugin::TriplesManagement.new(environment)
     @triples = []
     if request.post?
@@ -43,6 +43,38 @@ class VirtuosoPluginAdminController < AdminController
 
     session[:notice] = _('Triple(s) succesfully updated.')
     redirect_to :action => :triple_management
+  end
+
+  def add_triple
+    if request.post?
+
+      triple = VirtuosoPlugin::Triple.new
+      triple.graph = params[:triple][:graph]
+      triple.subject = params[:triple][:subject]
+      triple.predicate = params[:triple][:predicate]
+      triple.object = params[:triple][:object]
+
+      triples_management = VirtuosoPlugin::TriplesManagement.new(environment)
+      triples_management.add_triple(triple)
+
+      @triples = []
+
+      session[:notice] = _('Triple succesfully added.')
+      render :action => :triple_management
+    end
+  end
+
+  def remove_triple
+    triple = VirtuosoPlugin::Triple.new
+    triple.graph = params[:triple][:graph]
+    triple.subject = params[:triple][:subject]
+    triple.predicate = params[:triple][:predicate]
+    triple.object = params[:triple][:object]
+
+    triples_management = VirtuosoPlugin::TriplesManagement.new(environment)
+    triples_management.remove_triple(triple)
+
+    render json: { :ok => true, :message => _('Triple succesfully removed.') }
   end
 
 end

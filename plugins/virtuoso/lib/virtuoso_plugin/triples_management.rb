@@ -29,6 +29,16 @@ class VirtuosoPlugin::TriplesManagement
     plugin.virtuoso_client.query(query)
   end
 
+  def add_triple(triple)
+    query = "WITH <#{triple.graph}> INSERT { <#{triple.subject}> <#{triple.predicate}> #{triple.object} }"
+    plugin.virtuoso_client.query(query)
+  end
+
+  def remove_triple(triple)
+    query = "WITH <#{triple.graph}> DELETE { <#{triple.subject}> <#{triple.predicate}> #{triple.object} }"
+    plugin.virtuoso_client.query(query)
+  end
+
   protected
 
   def format_triple_term(term)
