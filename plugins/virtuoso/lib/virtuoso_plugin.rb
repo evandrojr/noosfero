@@ -17,15 +17,25 @@ class VirtuosoPlugin < Noosfero::Plugin
   end
 
   def virtuoso_client
-    @virtuoso_client ||= RDF::Virtuoso::Repository.new("#{settings.virtuoso_uri}/sparql", :update_uri => "#{settings.virtuoso_uri}/sparql-auth", :username => settings.virtuoso_username, :password => settings.virtuoso_password, :auth_method => 'digest', :timeout => 30)
+    @virtuoso_client ||= virtuoso_client_builder(settings.virtuoso_uri, settings.virtuoso_username, settings.virtuoso_password)
   end
-  
+
+  def virtuoso_readonly_client
+    @virtuoso_readonly_client ||= virtuoso_client_builder(settings.virtuoso_uri, settings.virtuoso_readonly_username, settings.virtuoso_readonly_password)
+  end
+
   def js_files
     ['edit-server-list']
-  end  
+  end
 
   def stylesheet?
     true
+  end
+
+  protected
+
+  def virtuoso_client_builder(uri, username, password)
+    RDF::Virtuoso::Repository.new("#{uri}/sparql", :update_uri => "#{uri}/sparql-auth", :username => username, :password => password, :auth_method => 'digest', :timeout => 30)
   end
 
 end
