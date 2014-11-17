@@ -37,7 +37,7 @@ class VirtuosoPlugin::TriplesTemplate < Article
 
   def template_content
     begin
-      results = plugin.virtuoso_client.query(query)
+      results = plugin.virtuoso_readonly_client.query(query)
       liquid_template = Liquid::Template.parse(template)
       page = liquid_template.render('results' => results)
       transform_html(page)
