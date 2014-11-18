@@ -6,11 +6,13 @@
 <%= form_for(:settings) do |f| %>
   <strong>
     <%= labelled_form_field _('Virtuoso URL:'), f.text_field(:virtuoso_uri) %>
-    <%= labelled_form_field _('Virtuoso Username:'), f.text_field(:virtuoso_username) %>
-    <%= labelled_form_field _('Virtuoso Password:'), f.password_field(:virtuoso_password) %>
+    <%= labelled_form_field _('Virtuoso Admin Username:'), f.text_field(:virtuoso_username) %>
+    <%= labelled_form_field _('Virtuoso Admin Password:'), f.password_field(:virtuoso_password) %>
+    <%= labelled_form_field _('Virtuoso Read-Only Username:'), f.text_field(:virtuoso_readonly_username) %>
+    <%= labelled_form_field _('Virtuoso Read-Only Password:'), f.password_field(:virtuoso_readonly_password) %>
+    <%= labelled_form_field _('DSpace URL:'), f.text_field(:dspace_uri) %>
   </strong>
-  <BR>
-  
+  <BR> 
 <div class="dspace-servers-config-box" >
   
   <strong><%= _('Dspace Servers\' URL:') %></strong>
@@ -49,7 +51,7 @@
 <hr />
 <div class="triple-management">
   <div class="actions">
-    <%= button :edit, _('Triple management'), :action => :triple_management %>
+    <%= button :edit, _('Triples management'), :action => :triples_management %>
     <%= button :edit, _('Custom Queries'), :action => :index, :controller => 'virtuoso_plugin_custom_queries' %>
   </div>
 </div>

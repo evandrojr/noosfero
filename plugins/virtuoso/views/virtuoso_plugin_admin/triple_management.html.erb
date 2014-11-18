@@ -1,17 +1,18 @@
 <div id="virtuoso-triples-management">
   <h1><%= _('Virtuoso settings &raquo; Triples Management')%></h1>
 
-  <%= form_tag('/admin/plugin/virtuoso/triple_management', :method => 'post') do %>
-    <%= labelled_form_field(_('Default Graph IRI:'), text_field_tag(:graph_uri, @graph_uri) ) %>
+  <%= form_tag('/admin/plugin/virtuoso/triples_management', :method => 'post') do %>
+    <%= labelled_form_field(_('Graph URI:'), text_field_tag(:graph_uri, @graph_uri) ) %>
     <%= labelled_form_field(_('Query SPARQL:'), text_area_tag(:query, @query, :rows => 7)) %>
     <% button_bar do %>
-      <%= submit_button(:search, _('Search')) %>
+      <%= submit_button(:search, _('Search triples')) %>
+      <%= button :add, _('Add triple'), :action => :add_triple %>
     <% end %>
   <% end %>
 
   <% unless @triples.empty? %>
 
-  <%= form_tag('/admin/plugin/virtuoso/triple_update', :method => 'post') do %>
+  <%= form_tag('/admin/plugin/virtuoso/triple_update', :method => 'post', :id => 'form-triples-edit') do %>
     <%= hidden_field_tag(:graph_uri, @graph_uri) %>
 
     <ul id="triples-list">
@@ -20,7 +21,7 @@
 
     <% @triples.each { |triple| %>
 
-      <li>
+      <li id="triple-<%=triple_counter%>">
         <ul class="triple">
           <li>
             <%= hidden_field_tag("triples[triple#{triple_counter}[from][subject]]", triple[:s].to_s) %>
@@ -33,6 +34,9 @@
           <li>
             <%= hidden_field_tag("triples[triple#{triple_counter}[from][object]]", triple[:o].to_s) %>
             <%= labelled_form_field(_('Object:'), text_field_tag("triples[triple#{triple_counter}[to][object]]", triple[:o].to_s) ) %>
+          </li>
+          <li class="triple-actions">
+            <%= button :remove, _('Remove triple'), {}, :href => '#', :onclick => "remove_triple(#{triple_counter}); return false;" %>
           </li>
         </ul>
       </li>
@@ -52,3 +56,5 @@
   <% end %>
 
 </div>
+
+<%= javascript_include_tag '/plugins/virtuoso/triples_management.js' %>
