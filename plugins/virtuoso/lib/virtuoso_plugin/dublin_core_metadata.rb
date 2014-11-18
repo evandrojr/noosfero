@@ -2,19 +2,27 @@ class VirtuosoPlugin::DublinCoreMetadata
 
   include OAI::XPath
 
-  attr_accessor :date, :title, :creator, :subject, :description, :date, :type, :identifier, :language, :rights, :format
+  FIELDS = ['title', 'creator', 'subject', 'description', 'date',
+            'type', 'identifier', 'language', 'rights', 'format']
 
   def initialize(element)
-    @title = xpath(element, './/dc:title')
-    @creator = xpath(element, './/dc:creator')
-    @subject = xpath_all(element, './/dc:subject').map(&:text)
-    @description = xpath(element, './/dc:description')
-    @date = xpath(element, './/dc:date')
-    @type = xpath(element, './/dc:type')
-    @identifier = xpath(element, './/dc:identifier')
-    @language = xpath(element, './/dc:language')
-    @rights = xpath_all(element, './/dc:rights').map(&:text)
-    @format = xpath(element, './/dc:format')
+    @element = element
+    FIELDS.each do |field|
+      self.class.send(:attr_accessor, field)
+      self.send("#{field}=", extract_field("dc:#{field}"))
+    end
+  end
+
+  def extract_field(name)
+    value = xpath_all(@element, ".//#{name}")
+    case value.size
+    when 0
+      nil
+    when 1
+      value.first.text
+    else
+      value.map(&:text)
+    end
   end
 
 end

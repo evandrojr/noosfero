@@ -24,12 +24,14 @@ class VirtuosoPlugin < Noosfero::Plugin
     @virtuoso_readonly_client ||= virtuoso_client_builder(settings.virtuoso_uri, settings.virtuoso_readonly_username, settings.virtuoso_readonly_password)
   end
 
-  def js_files
-    ['edit-server-list']
-  end
-
   def stylesheet?
     true
+  end
+
+  def self.ontology_mapping_default_setting
+    VirtuosoPlugin::DublinCoreMetadata::FIELDS.map do |field|
+      {:source => "dc:#{field}", :target => "http://purl.org/dc/elements/1.1/#{field}"}
+    end
   end
 
   protected

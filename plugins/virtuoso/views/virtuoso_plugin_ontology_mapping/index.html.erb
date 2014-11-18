@@ -1,0 +1,22 @@
+<h1><%= _('Ontology Mapping') %></h1>
+
+<%= form_for :ontology_mapping do |f| %>
+<table id="ontology-table">
+  <tr>
+    <th width="30%"><%= _('Source') %></th>
+    <th width="70%"><%= _('Target') %></th>
+    <th></th>
+  </tr>
+  <%= render :partial => 'ontology_mapping_item', :collection => @ontology_mapping %>
+</table>
+<div class="actions">
+  <%= button :new, _('New'), '#', :id => 'new-ontology-button' %>
+  <%= submit_button :save, _('Save') %>
+</div>
+<% end %>
+
+<table id="ontology-item-template" style="display: none">
+  <%= render :partial => 'ontology_mapping_item', :collection => [{:source => '', :target => ''}] %>
+</table>
+
+<%= javascript_include_tag '/plugins/virtuoso/ontology_mapping.js' %>

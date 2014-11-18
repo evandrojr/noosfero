@@ -21,6 +21,7 @@ class VirtuosoPlugin::TriplesTemplate < Article
   settings_items :query, :type => :string
   settings_items :template, :type => :string, :default => initial_template
   settings_items :stylesheet, :type => :string
+  settings_items :per_page, :type => :integer, :default => 50
 
   attr_accessible :query, :template, :stylesheet
 
@@ -35,12 +36,12 @@ class VirtuosoPlugin::TriplesTemplate < Article
     @plugin ||= VirtuosoPlugin.new(self)
   end
 
-  def template_content
+  def template_content(page=1)
     begin
-      results = plugin.virtuoso_readonly_client.query(query)
+      results = plugin.virtuoso_readonly_client.query(query).paginate({:per_page => per_page, :page => page})
       liquid_template = Liquid::Template.parse(template)
-      page = liquid_template.render('results' => results)
-      transform_html(page)
+      rendered_template = liquid_template.render('results' => results)
+      transform_html(rendered_template)
     rescue => ex
       logger.info ex.to_s
       "Failed to process the template"

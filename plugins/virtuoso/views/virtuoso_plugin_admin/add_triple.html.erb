@@ -1,0 +1,29 @@
+<div id="virtuoso-triples-management-add-triple">
+
+  <h3><%= _('Add Triple')%></h3>
+
+  <%= form_tag do %>
+
+    <ul>
+      <li>
+        <%= labelled_form_field(_('Graph:'), text_field_tag('triple[graph]', '') ) %>
+      </li>
+      <li>
+        <%= labelled_form_field(_('Subject:'), text_field_tag('triple[subject]', '') ) %>
+      </li>
+      <li>
+        <%= labelled_form_field(_('Predicate:'), text_field_tag('triple[predicate]', '') ) %>
+      </li>
+      <li>
+        <%= labelled_form_field(_('Object:'), text_field_tag('triple[object]', '') ) %>
+      </li>
+    </ul>
+
+    <% button_bar do %>
+      <%= button :add, _('Add'), {}, :href => '#', :onclick => "add_triple(); return false;" %>
+      <%= colorbox_close_button(_('Close')) %>
+    <% end %>
+
+  <% end %>
+
+</div>

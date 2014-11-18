@@ -2,7 +2,8 @@
   margin: 10px 0;
 }
 
-#virtuoso-triples-management input[type="text"] {
+#virtuoso-triples-management input[type="text"],
+#virtuoso-triples-management-add-triple input[type="text"] {
   width: 100%
 }
 
@@ -10,7 +11,8 @@
   width: 99%;
 }
 
-#virtuoso-triples-management ul {
+#virtuoso-triples-management ul,
+#virtuoso-triples-management-add-triple ul {
   list-style-type: none;
   padding: 0;
 }
@@ -24,4 +26,13 @@
   border-top: 1px solid #CCC;
   margin-top: 20px;
   padding-top: 15px;
+}
+
+#virtuoso-triples-management #triples-list .triple-actions {
+  text-align: right;
+}
+
+#virtuoso-triples-management-add-triple {
+  width: 500px;
+  border: 1px solid white;
 }
