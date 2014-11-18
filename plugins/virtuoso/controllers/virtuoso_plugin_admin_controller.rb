@@ -1,14 +1,12 @@
 class VirtuosoPluginAdminController < AdminController
 
-  #validates :dspace_servers, presence: true
-  
   def index
-    settings = params[:settings] 
+    settings = params[:settings]
     settings ||= {}
     @settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin, settings)
     @harvest_running = VirtuosoPlugin::DspaceHarvest.new(environment).find_job.present?
     if request.post?
-      settings[:dspace_servers].delete_if do | server | 
+      settings[:dspace_servers].delete_if do | server |
         server[:dspace_uri].empty?
       end
       @settings.save!
@@ -60,10 +58,7 @@ class VirtuosoPluginAdminController < AdminController
       triples_management = VirtuosoPlugin::TriplesManagement.new(environment)
       triples_management.add_triple(triple)
 
-      @triples = []
-
-      session[:notice] = _('Triple succesfully added.')
-      render :action => :triple_management
+      render json: { :ok => true, :message => _('Triple succesfully added.') }
     end
   end
 

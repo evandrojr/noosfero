@@ -21,7 +21,7 @@ class VirtuosoPlugin::DublinCoreMetadata
     when 1
       value.first.text
     else
-      value.map { |v| v.respond_to?(:text) ? v.text : v}
+      value.map(&:text)
     end
   end
 

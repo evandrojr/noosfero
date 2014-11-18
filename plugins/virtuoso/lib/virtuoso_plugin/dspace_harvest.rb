@@ -1,9 +1,7 @@
 #inspired by https://github.com/code4lib/ruby-oai/blob/master/lib/oai/harvester/harvest.rb
 class VirtuosoPlugin::DspaceHarvest
 
-  DC_CONVERSION = [:title, :creator, :subject, :description, :date, :type, :identifier, :language, :rights, :format]
-
-  def initialize(environment, dspace_uri = "")
+  def initialize(environment, dspace_uri = nil)
     @environment = environment
     @dspace_uri = dspace_uri
   end
@@ -22,12 +20,13 @@ class VirtuosoPlugin::DspaceHarvest
 
   def triplify(record)
     metadata = VirtuosoPlugin::DublinCoreMetadata.new(record.metadata)
-    puts "triplify #{record.header.identifier}"
+    subject_identifier = extract_identifier(record)
+    puts "triplify #{subject_identifier}"
 
     settings.ontology_mapping.each do |mapping|
       values = [metadata.extract_field(mapping[:source])].flatten.compact
       values.each do |value|
-        query = RDF::Virtuoso::Query.insert_data([RDF::URI.new(metadata.identifier), RDF::URI.new(mapping[:target]), value]).graph(RDF::URI.new(@dspace_uri))
+        query = RDF::Virtuoso::Query.insert_data([RDF::URI.new(subject_identifier), RDF::URI.new(mapping[:target]), value]).graph(RDF::URI.new(@dspace_uri))
         plugin.virtuoso_client.insert(query)
       end
     end
@@ -68,21 +67,28 @@ class VirtuosoPlugin::DspaceHarvest
         settings.last_harvest = nil
         settings.save!
       end
-      job = VirtuosoPlugin::DspaceHarvest::Job.new(@environment.id)
+      job = VirtuosoPlugin::DspaceHarvest::Job.new(@environment.id, @dspace_uri)
       Delayed::Job.enqueue(job)
     end
   end
 
   def find_job
-    Delayed::Job.where(:handler => "--- !ruby/struct:VirtuosoPlugin::DspaceHarvest::Job\nenvironment_id: #{@environment.id}\n")
+    Delayed::Job.where(:handler => "--- !ruby/struct:VirtuosoPlugin::DspaceHarvest::Job\nenvironment_id: #{@environment.id}\ndspace_uri: #{@dspace_uri}\n")
   end
 
-  class Job < Struct.new(:environment_id)
+  class Job < Struct.new(:environment_id, :dspace_uri)
     def perform
       environment = Environment.find(environment_id)
-      harvest = VirtuosoPlugin::DspaceHarvest.new(environment)
+      harvest = VirtuosoPlugin::DspaceHarvest.new(environment, dspace_uri)
       harvest.run
     end
+  end
+
+  protected
+
+  def extract_identifier(record)
+    parsed_identifier = /oai:(.+):(\d+\/\d+)/.match(record.header.identifier)
+    "#{@dspace_uri}/handle/#{parsed_identifier[2]}"
   end
 
 end

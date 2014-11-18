@@ -6,7 +6,7 @@
     <%= labelled_form_field(_('Query SPARQL:'), text_area_tag(:query, @query, :rows => 7)) %>
     <% button_bar do %>
       <%= submit_button(:search, _('Search triples')) %>
-      <%= button :add, _('Add triple'), :action => :add_triple %>
+      <%= colorbox_button('add', _('Add a triple'), { :action => 'add_triple' }) %>
     <% end %>
   <% end %>
 
