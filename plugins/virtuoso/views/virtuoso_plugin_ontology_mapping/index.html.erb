@@ -12,6 +12,7 @@
 <div class="actions">
   <%= button :new, _('New'), '#', :id => 'new-ontology-button' %>
   <%= submit_button :save, _('Save') %>
+  <%= button 'cancel', _('Cancel'), :controller => 'virtuoso_plugin_admin', :action => 'index' %>
 </div>
 <% end %>
 
