@@ -22,12 +22,13 @@ class VirtuosoPlugin::DspaceHarvest
 
   def triplify(record)
     metadata = VirtuosoPlugin::DublinCoreMetadata.new(record.metadata)
-    puts "triplify #{record.header.identifier}"
+    subject_identifier = extract_identifier(record)
+    puts "triplify #{subject_identifier}"
 
     settings.ontology_mapping.each do |mapping|
       values = [metadata.extract_field(mapping[:source])].flatten.compact
       values.each do |value|
-        query = RDF::Virtuoso::Query.insert_data([RDF::URI.new(metadata.identifier), RDF::URI.new(mapping[:target]), value]).graph(RDF::URI.new(@dspace_uri))
+        query = RDF::Virtuoso::Query.insert_data([RDF::URI.new(subject_identifier), RDF::URI.new(mapping[:target]), value]).graph(RDF::URI.new(@dspace_uri))
         plugin.virtuoso_client.insert(query)
       end
     end
@@ -83,6 +84,13 @@ class VirtuosoPlugin::DspaceHarvest
       harvest = VirtuosoPlugin::DspaceHarvest.new(environment)
       harvest.run
     end
+  end
+
+  protected
+
+  def extract_identifier(record)
+    parsed_identifier = /oai:(.+):(\d+\/\d+)/.match(record.header.identifier)
+    "#{@dspace_uri}/handle/#{parsed_identifier[2]}"
   end
 
 end
