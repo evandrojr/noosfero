@@ -24,10 +24,10 @@ class VirtuosoPlugin::DspaceHarvest
     metadata = VirtuosoPlugin::DublinCoreMetadata.new(record.metadata)
     puts "triplify #{record.header.identifier}"
 
-    DC_CONVERSION.each do |c|
-      values = [metadata.send(c)].flatten.compact
+    settings.ontology_mapping.each do |mapping|
+      values = [metadata.extract_field(mapping['source'])].flatten.compact
       values.each do |value|
-        query = RDF::Virtuoso::Query.insert_data([RDF::URI.new(metadata.identifier), RDF::URI.new("http://purl.org/dc/elements/1.1/#{c}"), value]).graph(RDF::URI.new(@dspace_uri))
+        query = RDF::Virtuoso::Query.insert_data([RDF::URI.new(metadata.identifier), RDF::URI.new(mapping['target']), value]).graph(RDF::URI.new(@dspace_uri))
         plugin.virtuoso_client.insert(query)
       end
     end
@@ -53,16 +53,15 @@ class VirtuosoPlugin::DspaceHarvest
     settings.save!
     puts "ending harvest #{harvest_time}"
   end
-    
+
   def self.harvest_all(environment, from_start)
     settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin)
     settings.dspace_servers.each do |k, v|
       harvest = VirtuosoPlugin::DspaceHarvest.new(environment, k[:dspace_uri])
       harvest.start(from_start)
-      harvest.run
-    end    
-  end  
-  
+    end
+  end
+
   def start(from_start = false)
     if find_job.empty?
       if from_start
