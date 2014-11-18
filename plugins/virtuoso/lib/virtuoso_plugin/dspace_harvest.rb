@@ -1,9 +1,7 @@
 #inspired by https://github.com/code4lib/ruby-oai/blob/master/lib/oai/harvester/harvest.rb
 class VirtuosoPlugin::DspaceHarvest
 
-  DC_CONVERSION = [:title, :creator, :subject, :description, :date, :type, :identifier, :language, :rights, :format]
- 
-  def initialize(environment, dspace_uri = "")
+  def initialize(environment, dspace_uri = nil)
     @environment = environment
     @dspace_uri = dspace_uri
   end
@@ -69,19 +67,19 @@ class VirtuosoPlugin::DspaceHarvest
         settings.last_harvest = nil
         settings.save!
       end
-      job = VirtuosoPlugin::DspaceHarvest::Job.new(@environment.id)
+      job = VirtuosoPlugin::DspaceHarvest::Job.new(@environment.id, @dspace_uri)
       Delayed::Job.enqueue(job)
     end
   end
 
   def find_job
-    Delayed::Job.where(:handler => "--- !ruby/struct:VirtuosoPlugin::DspaceHarvest::Job\nenvironment_id: #{@environment.id}\n")
+    Delayed::Job.where(:handler => "--- !ruby/struct:VirtuosoPlugin::DspaceHarvest::Job\nenvironment_id: #{@environment.id}\ndspace_uri: #{@dspace_uri}\n")
   end
 
-  class Job < Struct.new(:environment_id)
+  class Job < Struct.new(:environment_id, :dspace_uri)
     def perform
       environment = Environment.find(environment_id)
-      harvest = VirtuosoPlugin::DspaceHarvest.new(environment)
+      harvest = VirtuosoPlugin::DspaceHarvest.new(environment, dspace_uri)
       harvest.run
     end
   end
