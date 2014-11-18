@@ -2,7 +2,7 @@
 class VirtuosoPlugin::DspaceHarvest
 
   DC_CONVERSION = [:title, :creator, :subject, :description, :date, :type, :identifier, :language, :rights, :format]
- 
+
   def initialize(environment, dspace_uri = "")
     @environment = environment
     @dspace_uri = dspace_uri
