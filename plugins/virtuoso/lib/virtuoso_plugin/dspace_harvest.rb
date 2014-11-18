@@ -25,9 +25,9 @@ class VirtuosoPlugin::DspaceHarvest
     puts "triplify #{record.header.identifier}"
 
     settings.ontology_mapping.each do |mapping|
-      values = [metadata.extract_field(mapping['source'])].flatten.compact
+      values = [metadata.extract_field(mapping[:source])].flatten.compact
       values.each do |value|
-        query = RDF::Virtuoso::Query.insert_data([RDF::URI.new(metadata.identifier), RDF::URI.new(mapping['target']), value]).graph(RDF::URI.new(@dspace_uri))
+        query = RDF::Virtuoso::Query.insert_data([RDF::URI.new(metadata.identifier), RDF::URI.new(mapping[:target]), value]).graph(RDF::URI.new(@dspace_uri))
         plugin.virtuoso_client.insert(query)
       end
     end
