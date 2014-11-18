@@ -1,5 +1,7 @@
 class VirtuosoPlugin < Noosfero::Plugin
 
+  @virtuosoServers
+  
   def self.plugin_name
     "Virtuoso integration"
   end
@@ -22,10 +24,6 @@ class VirtuosoPlugin < Noosfero::Plugin
 
   def virtuoso_readonly_client
     @virtuoso_readonly_client ||= virtuoso_client_builder(settings.virtuoso_uri, settings.virtuoso_readonly_username, settings.virtuoso_readonly_password)
-  end
-
-  def js_files
-    ['edit-server-list']
   end
 
   def stylesheet?

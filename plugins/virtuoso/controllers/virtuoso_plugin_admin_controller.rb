@@ -1,12 +1,16 @@
 class VirtuosoPluginAdminController < AdminController
 
+  #validates :dspace_servers, presence: true
+  
   def index
-    settings = params[:settings]
+    settings = params[:settings] 
     settings ||= {}
     @settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin, settings)
     @harvest_running = VirtuosoPlugin::DspaceHarvest.new(environment).find_job.present?
-
     if request.post?
+      settings[:dspace_servers].delete_if do | server | 
+        server[:dspace_uri].empty?
+      end
       @settings.save!
       session[:notice] = 'Settings successfully saved.'
       redirect_to :action => 'index'
@@ -14,8 +18,7 @@ class VirtuosoPluginAdminController < AdminController
   end
 
   def force_harvest
-    harvest = VirtuosoPlugin::DspaceHarvest.new(environment)
-    harvest.start(params[:from_start])
+    VirtuosoPlugin::DspaceHarvest.harvest_all(environment, params[:from_start])
     session[:notice] = _('Harvest started')
     redirect_to :action => :index
   end
