@@ -57,10 +57,7 @@ class VirtuosoPluginAdminController < AdminController
       triples_management = VirtuosoPlugin::TriplesManagement.new(environment)
       triples_management.add_triple(triple)
 
-      @triples = []
-
-      session[:notice] = _('Triple succesfully added.')
-      render :action => :triple_management
+      render json: { :ok => true, :message => _('Triple succesfully added.') }
     end
   end
 
