@@ -1,43 +1,35 @@
 <%= javascript_include_tag '/plugins/virtuoso/edit-server-list' %>
+<link rel="stylesheet" type="text/css" href="/plugins/virtuoso/virtuoso_plugin_admin.css">
 
 <h1><%= _('Virtuoso settings') %></h1>
 
 <%= form_for(:settings) do |f| %>
-
   <strong>
     <%= labelled_form_field _('Virtuoso URL:'), f.text_field(:virtuoso_uri) %>
     <%= labelled_form_field _('Virtuoso Username:'), f.text_field(:virtuoso_username) %>
     <%= labelled_form_field _('Virtuoso Password:'), f.password_field(:virtuoso_password) %>
   </strong>
-
-<strong><%= _('Dspace Servers') %></strong>
-<div id='edit-server-list-block'>
-  <ul class='link-list-header'>
-    <li class='link-list-name'><%= _('DSpace URL') %></li>
-  </ul>
-  <ul id="dropable-server-list">
-    <%= render :partial => 'server_list_item', :collection=>@settings.dspace_servers  %>
-  </ul>
-  <div id="new-template">
-    <% template_server = {'icon' => 'ok'} %>
-    <%= render :partial => 'server_list_item', :locals => {:dspace_uri => "http://" } %>
+  <BR>
+  
+<div class="dspace-servers-config-box" >
+  
+  <strong><%= _('Dspace Servers\' URL:') %></strong>
+  <div id='edit-server-list-block'>
+    <div id="dropable-server-list">
+      <%= render :partial => 'server_list_item', :collection=>@settings.dspace_servers  %>
+    </div>
+    <div id="dspace-new-template">
+      <div >  
+        <%= render :partial => 'server_list_item', :locals => {:dspace_uri => "http://"} %>
+      </div>  
   </div>
-</div>
-
-<%= link_to_function(_('New Dspace Server'), 'add_new_server();', :class => 'button icon-add with-text') %>
-
+    <%= link_to_function(_('New Dspace Server'), 'add_new_server();', :class => 'button icon-add with-text') %>
+  </div>
+</div>  
   <% button_bar do %>
-    <%= submit_button(:save, _('Save'), :cancel => {:controller => 'plugins', :action => 'index'}) %>
+      <%= submit_button(:save, _('Save'), :cancel => {:controller => 'plugins', :action => 'index'}) %>
+    <% end %>
   <% end %>
-
-<% end %>
-
-
-
-
-
-
-<hr/>
 <div class="harvest">
   <% if @settings.last_harvest %>
   <div class="date">
@@ -54,9 +46,7 @@
     <% end %>
   </div>
 </div>
-
 <hr />
-
 <div class="triple-management">
   <div class="actions">
     <%= button :edit, _('Triple management'), :action => :triple_management %>

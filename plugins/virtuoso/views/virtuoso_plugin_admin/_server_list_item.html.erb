@@ -1,11 +1,7 @@
-<li>
-  <ul class="link-list-row">
-    <li>
-      <% value = server_list_item[:dspace_uri] if server_list_item %>
-      <%= text_field_tag 'settings[dspace_servers][][dspace_uri]', value, { :class => 'link-name', :maxlength => 40 } %>
-    </li>
-    <li>
-      <%= button_without_text(:delete, _('Delete'), "#" , :class=>"delete-server-list-row") %>
-    </li>
-  </ul>
-</li>
+<div>
+  <% value = server_list_item[:dspace_uri] if server_list_item %>
+  <%= text_field_tag 'settings[dspace_servers][][dspace_uri]', value, { :class => 'link-name', :maxlength => 60 } %>
+  <%= button_without_text(:delete, _('Delete'), "#" , :class=>"delete-server-list-row") %>
+  <BR><BR>  
+</div>
+ 
