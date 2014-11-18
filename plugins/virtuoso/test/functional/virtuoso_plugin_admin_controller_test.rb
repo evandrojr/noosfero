@@ -10,16 +10,38 @@ class VirtuosoPluginAdminControllerTest < ActionController::TestCase
 
   attr_reader :environment
 
+  
+
+{:virtuoso_uri=>"http://virtuoso.noosfero.com",
+ :virtuoso_username=>"username", :virtuoso_password=>"password",
+ :virtuoso_readonly_username=>"dba",
+ :virtuoso_readonly_password=>"dba",
+ :dspace_servers=>[ 
+                    {"dspace_uri"=>"http://dspace.noosfero.com"},
+                    {"dspace_uri"=>"http://dspace.noosfero.com"},
+                    {"dspace_uri"=>"http://dspace.noosfero.com"}
+                  ]
+}
+  
   should 'save virtuoso plugin settings' do
-    post :index, :settings => {'virtuoso_uri' => 'http://virtuoso.noosfero.com',
-                               'virtuoso_username' => 'username',
-                               'virtuoso_password' => 'password',
-                               'dspace_uri' => 'http://dspace.noosfero.com'}
+    post :index, :settings =>
+          {:virtuoso_uri=>"http://virtuoso.noosfero.com",
+           :virtuoso_username=>"username", :virtuoso_password=>"password",
+           :virtuoso_readonly_username=>"password",
+           :virtuoso_readonly_password=>"password",
+           :dspace_servers=>[ 
+                              {"dspace_uri"=>"http://dspace1.noosfero.com"},
+                              {"dspace_uri"=>"http://dspace2.noosfero.com"},
+                              {"dspace_uri"=>"http://dspace3.noosfero.com"}
+                            ]
+          }
     @settings = Noosfero::Plugin::Settings.new(environment.reload, VirtuosoPlugin)
     assert_equal 'http://virtuoso.noosfero.com', @settings.settings[:virtuoso_uri]
     assert_equal 'username', @settings.settings[:virtuoso_username]
     assert_equal 'password', @settings.settings[:virtuoso_password]
-    assert_equal 'http://dspace.noosfero.com', @settings.settings[:dspace_uri]
+    assert_equal 'http://dspace1.noosfero.com', @settings.settings[:dspace_servers][0][:dspace_uri]
+    assert_equal 'http://dspace2.noosfero.com', @settings.settings[:dspace_servers][1][:dspace_uri]
+    assert_equal 'http://dspace3.noosfero.com', @settings.settings[:dspace_servers][2][:dspace_uri]    
     assert_redirected_to :action => 'index'
   end
 
