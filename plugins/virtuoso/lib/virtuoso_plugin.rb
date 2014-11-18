@@ -1,7 +1,5 @@
 class VirtuosoPlugin < Noosfero::Plugin
 
-  @virtuosoServers
-  
   def self.plugin_name
     "Virtuoso integration"
   end
@@ -28,6 +26,12 @@ class VirtuosoPlugin < Noosfero::Plugin
 
   def stylesheet?
     true
+  end
+
+  def self.ontology_mapping_default_setting
+    VirtuosoPlugin::DublinCoreMetadata::FIELDS.map do |field|
+      {:source => "dc:#{field}", :target => "http://purl.org/dc/elements/1.1/#{field}"}
+    end
   end
 
   protected
