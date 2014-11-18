@@ -13,24 +13,21 @@ function send_ajax(source_url) {
         }
       });
     },
-
     minLength: 3
   });
 }
 
 function new_server_action(){
   send_ajax(jQuery("#page_url").val());
-
   jQuery(".delete-server-list-row").click(function(){
-    jQuery(this).parent().parent().remove();
+    jQuery(this).parent().remove();
     return false;
   });
-
   jQuery(document).scrollTop(jQuery('#dropable-server-list').scrollTop());
 }
 
 function add_new_server() {
-  var new_server = jQuery('#edit-server-list-block #new-template>li').clone();
+  var new_server = jQuery('#edit-server-list-block #dspace-new-template > div').clone();
   new_server.show();
   jQuery('#dropable-server-list').append(new_server);
   new_server_action();
@@ -39,8 +36,8 @@ function add_new_server() {
 jQuery(document).ready(function(){
   new_server_action();
 
-  jQuery("#dropable-server-list").sortable({
-    revert: true,
-    axis: "y"
-  });
+//  jQuery("#dropable-server-list").sortable({
+//    revert: true,
+//    axis: "y"
+//  });
 });

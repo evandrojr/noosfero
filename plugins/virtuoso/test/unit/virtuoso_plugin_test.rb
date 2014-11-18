@@ -29,4 +29,8 @@ class VirtuosoPluginTest < ActiveSupport::TestCase
     plugin.virtuoso_readonly_client
   end
 
+  should 'has a default value for ontology mapping setting' do
+    assert plugin.settings.ontology_mapping
+  end
+
 end
