@@ -1,14 +1,12 @@
 class VirtuosoPluginAdminController < AdminController
 
-  #validates :dspace_servers, presence: true
-  
   def index
-    settings = params[:settings] 
+    settings = params[:settings]
     settings ||= {}
     @settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin, settings)
     @harvest_running = VirtuosoPlugin::DspaceHarvest.new(environment).find_job.present?
     if request.post?
-      settings[:dspace_servers].delete_if do | server | 
+      settings[:dspace_servers].delete_if do | server |
         server[:dspace_uri].empty?
       end
       @settings.save!
