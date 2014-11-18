@@ -34,18 +34,25 @@ class VirtuosoPluginAdminController < AdminController
     render :action => 'triple_management'
   end
 
-  def triple_update
-    graph_uri = params[:graph_uri]
-    triples = params[:triples]
+  def update_triple
+    if request.post?
+      from_triple = VirtuosoPlugin::Triple.new
+      from_triple.graph = params[:from_triple][:graph]
+      from_triple.subject = params[:from_triple][:subject]
+      from_triple.predicate = params[:from_triple][:predicate]
+      from_triple.object = params[:from_triple][:object]
 
-    triples_management = VirtuosoPlugin::TriplesManagement.new(environment)
+      to_triple = VirtuosoPlugin::Triple.new
+      to_triple.graph = params[:to_triple][:graph]
+      to_triple.subject = params[:to_triple][:subject]
+      to_triple.predicate = params[:to_triple][:predicate]
+      to_triple.object = params[:to_triple][:object]
 
-    triples.each { |triple_key, triple_content|
-      triples_management.update_triple(graph_uri, triple_content[:from], triple_content[:to])
-    }
+      triples_management = VirtuosoPlugin::TriplesManagement.new(environment)
+      triples_management.update_triple(from_triple, to_triple)
 
-    session[:notice] = _('Triple(s) succesfully updated.')
-    redirect_to :action => :triple_management
+      render json: { :ok => true, :message => _('Triple succesfully updated.') }
+    end
   end
 
   def add_triple
@@ -65,16 +72,18 @@ class VirtuosoPluginAdminController < AdminController
   end
 
   def remove_triple
-    triple = VirtuosoPlugin::Triple.new
-    triple.graph = params[:triple][:graph]
-    triple.subject = params[:triple][:subject]
-    triple.predicate = params[:triple][:predicate]
-    triple.object = params[:triple][:object]
+    if request.post?
+      triple = VirtuosoPlugin::Triple.new
+      triple.graph = params[:triple][:graph]
+      triple.subject = params[:triple][:subject]
+      triple.predicate = params[:triple][:predicate]
+      triple.object = params[:triple][:object]
 
-    triples_management = VirtuosoPlugin::TriplesManagement.new(environment)
-    triples_management.remove_triple(triple)
+      triples_management = VirtuosoPlugin::TriplesManagement.new(environment)
+      triples_management.remove_triple(triple)
 
-    render json: { :ok => true, :message => _('Triple succesfully removed.') }
+      render json: { :ok => true, :message => _('Triple succesfully removed.') }
+    end
   end
 
 end
