@@ -9,20 +9,7 @@ class VirtuosoPluginAdminControllerTest < ActionController::TestCase
   end
 
   attr_reader :environment
-
-  
-
-{:virtuoso_uri=>"http://virtuoso.noosfero.com",
- :virtuoso_username=>"username", :virtuoso_password=>"password",
- :virtuoso_readonly_username=>"dba",
- :virtuoso_readonly_password=>"dba",
- :dspace_servers=>[ 
-                    {"dspace_uri"=>"http://dspace.noosfero.com"},
-                    {"dspace_uri"=>"http://dspace.noosfero.com"},
-                    {"dspace_uri"=>"http://dspace.noosfero.com"}
-                  ]
-}
-  
+ 
   should 'save virtuoso plugin settings' do
     post :index, :settings =>
           {:virtuoso_uri=>"http://virtuoso.noosfero.com",
