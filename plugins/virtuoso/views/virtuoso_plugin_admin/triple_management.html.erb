@@ -36,6 +36,7 @@
             <%= labelled_form_field(_('Object:'), text_field_tag("triples[triple#{triple_counter}[to][object]]", triple[:o].to_s) ) %>
           </li>
           <li class="triple-actions">
+            <%= button :save, _('Update triple'), {}, :href => '#', :onclick => "update_triple(#{triple_counter}); return false;" %>
             <%= button :remove, _('Remove triple'), {}, :href => '#', :onclick => "remove_triple(#{triple_counter}); return false;" %>
           </li>
         </ul>
@@ -46,10 +47,6 @@
     <% } %>
 
     </ul>
-
-    <% button_bar do %>
-      <%= submit_button(:save, _('Save')) %>
-    <% end %>
 
   <% end %>
 

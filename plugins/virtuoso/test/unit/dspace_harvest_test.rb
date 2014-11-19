@@ -7,6 +7,20 @@ class DspaceHarvestTest < ActiveSupport::TestCase
   end
 
   attr_reader :environment
+  
+  def mock_settings
+    { :virtuoso_uri=>"http://virtuoso.noosfero.com",
+      :virtuoso_username=>"username",
+      :virtuoso_password=>"password",
+      :virtuoso_readonly_username=>"readonly_username",
+      :virtuoso_readonly_password=>"readonly_password",
+      :dspace_servers=>[
+        {"dspace_uri"=>"http://dspace1.noosfero.com"},
+        {"dspace_uri"=>"http://dspace2.noosfero.com"},
+        {"dspace_uri"=>"http://dspace3.noosfero.com"}
+      ]
+    }
+  end  
 
   should 'create delayed job when start' do
     harvest = VirtuosoPlugin::DspaceHarvest.new(environment)
@@ -21,5 +35,29 @@ class DspaceHarvestTest < ActiveSupport::TestCase
       5.times { harvest.start }
     end
   end
+  
+  should 'harvest all dspaces from start' do
+    VirtuosoPlugin::DspaceHarvest.harvest_all(environment, true)
+  end
+  
+  should 'try to harvest all dspaces from start without any setting' do
+    VirtuosoPlugin::DspaceHarvest.harvest_all(environment, true)
+  end
+  
+  should 'try to harvest all dspaces from start with mock configuration' do
+    @settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin, mock_settings)
+    @settings.save!
+    VirtuosoPlugin::DspaceHarvest.harvest_all(environment, true)
+  end
+   
+  should 'try to harvest all dspaces without any setting' do
+    VirtuosoPlugin::DspaceHarvest.harvest_all(environment, false)
+  end
+  
+  should 'try to harvest all dspaces with mock configuration' do
+    @settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin, mock_settings)
+    @settings.save!
+    VirtuosoPlugin::DspaceHarvest.harvest_all(environment, false)
+  end  
 
 end
