@@ -36,3 +36,7 @@
   width: 500px;
   border: 1px solid white;
 }
+
+.virtuoso-manage-custom-queries textarea {
+  width: 90%;
+}
