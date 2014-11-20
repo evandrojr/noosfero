@@ -1,5 +1,7 @@
 require File.dirname(__FILE__) + '/../../test_helper'
 
+module CommunityHubPlugin; class Hub < Article; end; end
+
 class StepTest < ActiveSupport::TestCase
 
   def setup
@@ -235,8 +237,14 @@ class StepTest < ActiveSupport::TestCase
   end
 
   should 'return enabled tools for a step' do
-    assert_includes CommunityTrackPlugin::Step.enabled_tools, TinyMceArticle
-    assert_includes CommunityTrackPlugin::Step.enabled_tools, Forum
+    assert_includes @step.enabled_tools, TinyMceArticle
+    assert_includes @step.enabled_tools, Forum
+  end
+
+  should 'return hub as an enabled tool if the plugin is enabled' do
+    @step.environment.expects(:plugin_enabled?).with(anything).returns(false).at_least_once
+    @step.environment.expects(:plugin_enabled?).with('CommunityHubPlugin').returns(true)
+    assert_includes @step.enabled_tools, CommunityHubPlugin::Hub
   end
 
   should 'return class for selected tool' do
