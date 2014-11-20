@@ -28,7 +28,7 @@ class VirtuosoPlugin::TriplesTemplate < Article
   def to_html(options = {})
     article = self
     proc do
-      render :file => 'content_viewer/triples_template', :locals => {:article => article}
+      render :file => 'content_viewer/triples_template', :locals => {:article => article, :page => params[:npage]}
     end
   end
 
@@ -36,11 +36,17 @@ class VirtuosoPlugin::TriplesTemplate < Article
     @plugin ||= VirtuosoPlugin.new(self)
   end
 
+  attr_reader :results
+
   def template_content(page=1)
     begin
-      results = plugin.virtuoso_readonly_client.query(query).paginate({:per_page => per_page, :page => page})
+      @results ||= plugin.virtuoso_readonly_client.query(query).paginate({:per_page => per_page, :page => page})
       liquid_template = Liquid::Template.parse(template)
-      rendered_template = liquid_template.render('results' => results)
+      rendered_template = liquid_template.render('results' => results,
+                                                 'total_pages' => results.total_pages,
+                                                 'current_page' => results.current_page,
+                                                 'per_page' => results.per_page,
+                                                 'total_entries' => results.total_entries)
       transform_html(rendered_template)
     rescue => ex
       logger.info ex.to_s
