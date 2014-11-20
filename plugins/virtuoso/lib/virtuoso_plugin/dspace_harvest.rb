@@ -55,12 +55,12 @@ class VirtuosoPlugin::DspaceHarvest
 
   def self.harvest_all(environment, from_start)
     settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin)
-    if defined?(settings.dspace_servers)
-      settings.dspace_servers.each do |k, v| 
+    if settings.dspace_servers.present?
+      settings.dspace_servers.each do |k, v|
         harvest = VirtuosoPlugin::DspaceHarvest.new(environment, k[:dspace_uri])
         harvest.start(from_start)
       end
-    end  
+    end
   end
 
   def start(from_start = false)
