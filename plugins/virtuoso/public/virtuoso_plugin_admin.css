@@ -6,3 +6,7 @@
 #dspace-new-template{
   display: none;
 }
+
+.virtuoso-manage-custom-queries textarea {
+  width: 90%;
+}
