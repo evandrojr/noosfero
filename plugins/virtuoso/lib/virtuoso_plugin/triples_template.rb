@@ -42,11 +42,12 @@ class VirtuosoPlugin::TriplesTemplate < Article
     begin
       @results ||= plugin.virtuoso_readonly_client.query(query).paginate({:per_page => per_page, :page => page})
       liquid_template = Liquid::Template.parse(template)
-      rendered_template = liquid_template.render('results' => results,
-                                                 'total_pages' => results.total_pages,
-                                                 'current_page' => results.current_page,
-                                                 'per_page' => results.per_page,
-                                                 'total_entries' => results.total_entries)
+      rendered_template = liquid_template.render('results'       => results,
+                                                 'total_pages'   => results.total_pages,
+                                                 'current_page'  => results.current_page,
+                                                 'per_page'      => results.per_page,
+                                                 'total_entries' => results.total_entries,
+                                                 'page_offset'   => (results.current_page-1)*results.per_page)
       transform_html(rendered_template)
     rescue => ex
       logger.info ex.to_s
