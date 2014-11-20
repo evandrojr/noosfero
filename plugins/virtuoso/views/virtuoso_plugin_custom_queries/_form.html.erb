@@ -1,3 +1,6 @@
+<link rel="stylesheet" type="text/css" href="/plugins/virtuoso/virtuoso_plugin_admin.css">
+
+<div class="virtuoso-manage-custom-queries">
 <%= form_for(:custom_query, :url => {:action => @custom_query.persisted? ? :update : :create, :id => @custom_query.id}) do |f| %>
   <% if @custom_query.errors.any? %>
     <div id="error_explanation">
@@ -35,3 +38,4 @@
     <%= f.submit %>
   </div>
 <% end %>
+</div>
