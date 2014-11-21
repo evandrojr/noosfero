@@ -45,34 +45,42 @@ class VirtuosoPlugin::NoosferoHarvest
   include Rails.application.routes.url_helpers
 
   def triplify_comments(article)
+    total = article.comments.count
+    count = 0
     article.comments.each do |comment|
       subject_identifier = url_for(comment.url)
-      puts "triplify #{subject_identifier} comment"
+      puts "triplify #{subject_identifier} comment (#{count+=1}/#{total})"
       triplify_mappings(COMMENT_MAPPING, subject_identifier, article, comment)
     end
   end
 
   def triplify_articles(profile)
+    total = profile.articles.count
+    count = 0
     profile.articles.public.each do |article|
       subject_identifier = url_for(article.url)
-      puts "triplify #{subject_identifier} article"
+      puts "triplify #{subject_identifier} article (#{count+=1}/#{total})"
       triplify_mappings(ARTICLE_MAPPING, subject_identifier, profile, article)
       triplify_comments(article)
     end
   end
 
   def triplify_friendship(person)
+    total = person.friends.count
+    count = 0
     person.friends.each do |friend|
       subject_identifier = url_for(person.url)
-      puts "triplify #{subject_identifier} friendship"
+      puts "triplify #{subject_identifier} friendship (#{count+=1}/#{total})"
       triplify_mappings(FRIENDSHIP_MAPPING, subject_identifier, person, friend)
     end
   end
 
   def triplify_profiles
+    total = environment.profiles.count
+    count = 0
     environment.profiles.each do |profile|
       subject_identifier = url_for(profile.url)
-      puts "triplify #{subject_identifier} profile"
+      puts "triplify #{subject_identifier} profile (#{count+=1}/#{total})"
       triplify_mappings(PROFILE_MAPPING, subject_identifier, environment, profile)
       triplify_articles(profile) if profile.public?
       triplify_friendship(profile) if profile.person?
