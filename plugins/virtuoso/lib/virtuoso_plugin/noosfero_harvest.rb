@@ -48,7 +48,7 @@ class VirtuosoPlugin::NoosferoHarvest
   def triplify_comments(article)
     total = article.comments.count
     count = 0
-    article.comments.each do |comment|
+    article.comments.find_each do |comment|
       begin
         subject_identifier = url_for(comment.url)
         puts "triplify #{subject_identifier} comment (#{count+=1}/#{total})"
@@ -91,7 +91,7 @@ class VirtuosoPlugin::NoosferoHarvest
   def triplify_profiles
     total = environment.profiles.count
     count = 0
-    environment.profiles.each do |profile|
+    environment.profiles.find_each do |profile|
       begin
         subject_identifier = url_for(profile.url)
         puts "triplify #{subject_identifier} profile (#{count+=1}/#{total})"
