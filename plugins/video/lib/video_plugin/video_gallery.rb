@@ -36,7 +36,7 @@ class VideoPlugin::VideoGallery < Folder
   def to_html(options = {})
     video_gallery = self
     proc do
-      render :partial => 'content_viewer/video_gallery', :locals => {:video_gallery => video_gallery}
+      render :partial => 'content_viewer/video_plugin/video_gallery', :locals => {:video_gallery => video_gallery}
     end
   end
 

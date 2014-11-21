@@ -40,7 +40,7 @@ class VideoPlugin::Video < Article
   def to_html(options={})
     article = self
     proc do
-      render :partial => 'content_viewer/video', :locals => {:article => article}
+      render :partial => 'content_viewer/video_plugin/video', :locals => {:article => article}
     end
   end
 
