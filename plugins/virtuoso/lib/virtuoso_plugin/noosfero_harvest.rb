@@ -1,7 +1,7 @@
 class VirtuosoPlugin::NoosferoHarvest
 
   COMMON_MAPPING = {
-    :type => {:predicate => "http://purl.org/dc/terms/type", :value => lambda {|s, t| t.class.name}},
+    :type => {:predicate => ["http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://purl.org/dc/terms/type"], :value => lambda {|s, t| t.class.name}},
     :created_at => {:predicate => "http://purl.org/dc/terms/created"},
     :updated_at => {:predicate => "http://purl.org/dc/terms/modified"},
   }
@@ -10,19 +10,32 @@ class VirtuosoPlugin::NoosferoHarvest
     :title => {:predicate => "http://purl.org/dc/terms/title"},
     :abstract => {:predicate => "http://purl.org/dc/terms/abstract"},
     :body => {:predicate => "http://purl.org/dc/terms/description"},
+    :participation => {:predicate => "http://purl.org/socialparticipation/ops#performsParticipation", :value => lambda {|s,t| url_for(t.url)}, :subject => lambda {|s,t| url_for(s.url)} },
     :part_of => {:predicate => "http://purl.org/dc/terms/isPartOf", :value => lambda {|s, t| url_for(s.url)} },
     :published_at => {:predicate => "http://purl.org/dc/terms/issued"},
     :author => {:predicate => "http://purl.org/dc/terms/creator", :value => lambda {|s, t| url_for(t.author_url) if t.author_url} },
   }
   PROFILE_MAPPING = {
-    :name => {:predicate => "http://purl.org/dc/terms/title"},
+    :name => {:predicate => "http://xmlns.com/foaf/0.1/name"},
+    :contributor => {:predicate => "http://purl.org/dc/terms/contributor", :value => lambda {|s, t| url_for(s.top_url)} },
     :public? => {:predicate => "http://purl.org/socialparticipation/opa#publicProfile"},
+    :visible => {:predicate => "http://purl.org/socialparticipation/opa#visibleProfile"},
+    :lat => {:predicate => "http://www.w3.org/2003/01/geo/wgs84_pos#lat"},
+    :lng => {:predicate => "http://www.w3.org/2003/01/geo/wgs84_pos#lng"},
+    :type_community => {:predicate => "http://xmlns.com/foaf/0.1/Group", :condition => lambda {|s,t| t.community?} },
+    :type_organization => {:predicate => "http://xmlns.com/foaf/0.1/Organization", :condition => lambda {|s,t| !t.person? && !t.community?} },
+  }
+  PERSON_MAPPING = {
+    :type_participant => {:predicate => "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", :value => "http://purl.org/socialparticipation/ops#Participant"},
+    :type_person => {:predicate => "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", :value => "http://xmlns.com/foaf/0.1/Person"},
+    :email => {:predicate => "http://xmlns.com/foaf/0.1/mbox", :condition => lambda {|s,t| t.public? } }
   }
   COMMENT_MAPPING = {
     :title => {:predicate => "http://purl.org/dc/terms/title"},
-    :body => {:predicate => "http://purl.org/dc/terms/description"},
+    :body => {:predicate => "http://schema.org/text"},
     :part_of => {:predicate => "http://purl.org/dc/terms/isPartOf", :value => lambda {|s, t| url_for(s.url)} },
     :author => {:predicate => "http://purl.org/dc/terms/creator", :value => lambda {|s, t| url_for(t.author_url) if t.author_url} },
+    :participation => {:predicate => "http://purl.org/socialparticipation/ops#performsParticipation", :value => lambda {|s,t| url_for(t.url)}, :subject => lambda {|s,t| url_for(s.profile.url)} },
   }
   FRIENDSHIP_MAPPING = {
     :knows => {:predicate => "http://xmlns.com/foaf/0.1/knows", :value => lambda {|s, t| url_for(t.url)} },
@@ -97,7 +110,10 @@ class VirtuosoPlugin::NoosferoHarvest
         puts "triplify #{subject_identifier} profile (#{count+=1}/#{total})"
         triplify_mappings(PROFILE_MAPPING, subject_identifier, environment, profile)
         triplify_articles(profile) if profile.public?
-        triplify_friendship(profile) if profile.person?
+        if profile.person?
+          triplify_friendship(profile)
+          triplify_mappings(PERSON_MAPPING, subject_identifier, environment, profile, false)
+        end
       rescue => ex
         puts "FAILED: #{ex}"
       end
@@ -110,16 +126,23 @@ class VirtuosoPlugin::NoosferoHarvest
 
   protected
 
-  def triplify_mappings(mapping, subject_identifier, source, target)
-    COMMON_MAPPING.merge(mapping).each do |k, v|
+  def triplify_mappings(mapping, subject_identifier, source, target, include_common = true)
+    target_mapping = include_common ? COMMON_MAPPING.merge(mapping) : mapping
+    target_mapping.each do |k, v|
       next unless v
+      next if v[:condition] && v[:condition].call(source, target)
+
+      subject_identifier = v[:subject].call(source, target) if v[:subject]
+
       value = nil
       if v[:value]
         value = v[:value].kind_of?(Proc) ? v[:value].call(source, target) : v[:value]
       elsif target.respond_to?(k)
         value = target.send(k)
       end
-      insert_triple(RDF::URI.new(subject_identifier), RDF::URI.new(v[:predicate]), value) if value.present?
+      [v[:predicate]].flatten.compact.each do |predicate|
+        insert_triple(RDF::URI.new(subject_identifier), RDF::URI.new(predicate), value) if value.present?
+      end
     end
   end
 
@@ -130,6 +153,10 @@ class VirtuosoPlugin::NoosferoHarvest
       value = RDF::Literal::DateTime.new(value)
     elsif !!value == value
       value = RDF::Literal::Boolean.new(value)
+    elsif value.kind_of?(Float)
+      value = RDF::Literal::Double.new(value)
+    else
+      value
     end
   end
 
