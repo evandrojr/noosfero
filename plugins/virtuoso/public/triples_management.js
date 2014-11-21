@@ -20,17 +20,14 @@ function update_triple(triple_id) {
     url: '/admin/plugin/virtuoso/update_triple',
     data: formData,
     dataType: 'json',
-    success: function(data, status, ajax){
+    success: function(data, status, ajax) {
       if ( !data.ok ) {
-        display_notice(data.error.message);
+        display_notice(data.message);
       }
       else {
         display_notice(data.message);
         jQuery("input#triples_triple" + triple_id + "_from_object").val(jQuery("input#triples_triple" + triple_id + "_to_object").val());
       }
-    },
-    error: function(ajax, status, errorThrown) {
-      alert('Send request - HTTP '+status+': '+errorThrown);
     }
   });
 
@@ -50,18 +47,9 @@ function add_triple() {
     url: '/admin/plugin/virtuoso/add_triple',
     data: formData,
     dataType: 'json',
-    success: function(data, status, ajax){
-      if ( !data.ok ) {
-        display_notice(data.error.message);
-        jQuery.colorbox.close();
-      }
-      else {
-        display_notice(data.message);
-        jQuery.colorbox.close();
-      }
-    },
-    error: function(ajax, status, errorThrown) {
-      alert('Send request - HTTP '+status+': '+errorThrown);
+    success: function(data, status, ajax) {
+      display_notice(data.message);
+      jQuery.colorbox.close();
     }
   });
 
@@ -84,7 +72,7 @@ function remove_triple(triple_id) {
     dataType: 'json',
     success: function(data, status, ajax){
       if ( !data.ok ) {
-        display_notice(data.error.message);
+        display_notice(data.message);
       }
       else {
         display_notice(data.message);
@@ -97,9 +85,6 @@ function remove_triple(triple_id) {
           }
         });
       }
-    },
-    error: function(ajax, status, errorThrown) {
-      alert('Send request - HTTP '+status+': '+errorThrown);
     }
   });
 

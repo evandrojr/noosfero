@@ -23,6 +23,8 @@ class DspaceHarvestTest < ActiveSupport::TestCase
   end
 
   should 'create delayed job when start' do
+    @settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin, mock_settings)
+    @settings.save!
     harvest = VirtuosoPlugin::DspaceHarvest.new(environment, "http://dspace1.noosfero.com")
     assert !harvest.find_job.present?
     harvest.start
@@ -30,14 +32,12 @@ class DspaceHarvestTest < ActiveSupport::TestCase
   end
 
   should 'not duplicate harvest job' do
+    @settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin, mock_settings)
+    @settings.save!
     harvest = VirtuosoPlugin::DspaceHarvest.new(environment, "http://dspace1.noosfero.com")
     assert_difference "harvest.find_job.count", 1 do
       5.times { harvest.start }
     end
-  end
-
-  should 'harvest all dspaces from start' do
-    VirtuosoPlugin::DspaceHarvest.harvest_all(environment, true)
   end
 
   should 'try to harvest all dspaces from start without any setting' do

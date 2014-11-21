@@ -47,15 +47,16 @@ class VirtuosoPluginAdminController < AdminController
       to_triple.object = params[:to_triple][:object]
 
       triples_management = VirtuosoPlugin::TriplesManagement.new(environment)
-      triples_management.update_triple(from_triple, to_triple)
 
-      render json: { :ok => true, :message => _('Triple succesfully updated.') }
+      triple_updated = triples_management.update_triple(from_triple, to_triple)
+      message = triple_updated ? _('Triple succesfully updated.') : _('Triple not updated.')
+
+      render json: { :ok => triple_updated, :message => message }
     end
   end
 
   def add_triple
     if request.post?
-
       triple = VirtuosoPlugin::Triple.new
       triple.graph = params[:triple][:graph]
       triple.subject = params[:triple][:subject]
@@ -63,9 +64,11 @@ class VirtuosoPluginAdminController < AdminController
       triple.object = params[:triple][:object]
 
       triples_management = VirtuosoPlugin::TriplesManagement.new(environment)
-      triples_management.add_triple(triple)
 
-      render json: { :ok => true, :message => _('Triple succesfully added.') }
+      triple_added = triples_management.add_triple(triple)
+      message = triple_added ? _('Triple succesfully added.') : _('Triple not added.')
+
+      render json: { :ok => triple_added, :message => message }
     end
   end
 
@@ -78,9 +81,11 @@ class VirtuosoPluginAdminController < AdminController
       triple.object = params[:triple][:object]
 
       triples_management = VirtuosoPlugin::TriplesManagement.new(environment)
-      triples_management.remove_triple(triple)
 
-      render json: { :ok => true, :message => _('Triple succesfully removed.') }
+      triple_deleted = triples_management.remove_triple(triple)
+      message = triple_deleted ? _('Triple succesfully removed.') : _('Triple not removed.')
+
+      render json: { :ok => triple_deleted, :message => message }
     end
   end
 
