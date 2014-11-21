@@ -43,14 +43,19 @@ class VirtuosoPlugin::NoosferoHarvest
   delegate :settings, :to => :plugin
 
   include Rails.application.routes.url_helpers
+  include ActionView::Helpers::SanitizeHelper
 
   def triplify_comments(article)
     total = article.comments.count
     count = 0
     article.comments.each do |comment|
-      subject_identifier = url_for(comment.url)
-      puts "triplify #{subject_identifier} comment (#{count+=1}/#{total})"
-      triplify_mappings(COMMENT_MAPPING, subject_identifier, article, comment)
+      begin
+        subject_identifier = url_for(comment.url)
+        puts "triplify #{subject_identifier} comment (#{count+=1}/#{total})"
+        triplify_mappings(COMMENT_MAPPING, subject_identifier, article, comment)
+      rescue => ex
+        puts "FAILED: #{ex}"
+      end
     end
   end
 
@@ -58,10 +63,14 @@ class VirtuosoPlugin::NoosferoHarvest
     total = profile.articles.count
     count = 0
     profile.articles.public.each do |article|
-      subject_identifier = url_for(article.url)
-      puts "triplify #{subject_identifier} article (#{count+=1}/#{total})"
-      triplify_mappings(ARTICLE_MAPPING, subject_identifier, profile, article)
-      triplify_comments(article)
+      begin
+        subject_identifier = url_for(article.url)
+        puts "triplify #{subject_identifier} article (#{count+=1}/#{total})"
+        triplify_mappings(ARTICLE_MAPPING, subject_identifier, profile, article)
+        triplify_comments(article)
+      rescue => ex
+        puts "FAILED: #{ex}"
+      end
     end
   end
 
@@ -69,9 +78,13 @@ class VirtuosoPlugin::NoosferoHarvest
     total = person.friends.count
     count = 0
     person.friends.each do |friend|
-      subject_identifier = url_for(person.url)
-      puts "triplify #{subject_identifier} friendship (#{count+=1}/#{total})"
-      triplify_mappings(FRIENDSHIP_MAPPING, subject_identifier, person, friend)
+      begin
+        subject_identifier = url_for(person.url)
+        puts "triplify #{subject_identifier} friendship (#{count+=1}/#{total})"
+        triplify_mappings(FRIENDSHIP_MAPPING, subject_identifier, person, friend)
+      rescue => ex
+        puts "FAILED: #{ex}"
+      end
     end
   end
 
@@ -79,11 +92,15 @@ class VirtuosoPlugin::NoosferoHarvest
     total = environment.profiles.count
     count = 0
     environment.profiles.each do |profile|
-      subject_identifier = url_for(profile.url)
-      puts "triplify #{subject_identifier} profile (#{count+=1}/#{total})"
-      triplify_mappings(PROFILE_MAPPING, subject_identifier, environment, profile)
-      triplify_articles(profile) if profile.public?
-      triplify_friendship(profile) if profile.person?
+      begin
+        subject_identifier = url_for(profile.url)
+        puts "triplify #{subject_identifier} profile (#{count+=1}/#{total})"
+        triplify_mappings(PROFILE_MAPPING, subject_identifier, environment, profile)
+        triplify_articles(profile) if profile.public?
+        triplify_friendship(profile) if profile.person?
+      rescue => ex
+        puts "FAILED: #{ex}"
+      end
     end
   end
 
@@ -106,12 +123,20 @@ class VirtuosoPlugin::NoosferoHarvest
     end
   end
 
-  def insert_triple(subject, predicate, value)
-    value = RDF::URI.new(value) if value.kind_of?(String) && /https?:\/\//.match(value)
-    value = RDF::Literal::DateTime.new(value) if value.kind_of?(ActiveSupport::TimeWithZone)
-    value = RDF::Literal::Boolean.new(value) if !!value == value
+  def process_value(value)
+    if value.kind_of?(String)
+      value = /https?:\/\//.match(value) ? RDF::URI.new(value) : strip_tags(value)
+    elsif value.kind_of?(ActiveSupport::TimeWithZone)
+      value = RDF::Literal::DateTime.new(value)
+    elsif !!value == value
+      value = RDF::Literal::Boolean.new(value)
+    end
+  end
 
-    query = RDF::Virtuoso::Query.insert_data([RDF::URI.new(subject), RDF::URI.new(predicate), value]).graph(RDF::URI.new(@graph))
+  def insert_triple(subject, predicate, value)
+    query = RDF::Virtuoso::Query.insert_data([RDF::URI.new(subject),
+                                              RDF::URI.new(predicate),
+                                              process_value(value)]).graph(RDF::URI.new(@graph))
     plugin.virtuoso_client.insert(query)
   end
 
