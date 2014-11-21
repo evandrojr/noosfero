@@ -8,7 +8,6 @@ class VirtuosoPluginAdminControllerTest < ActionController::TestCase
     @environment = Environment.default
     @profile = create_user('profile').person
     login_as(@profile.identifier)
-    post :index, :settings => mock_settings
   end
 
   def mock_settings
@@ -26,6 +25,7 @@ class VirtuosoPluginAdminControllerTest < ActionController::TestCase
   end
 
   should 'save virtuoso plugin settings' do
+    post :index, :settings => mock_settings
     @settings = Noosfero::Plugin::Settings.new(environment.reload, VirtuosoPlugin)
     assert_equal 'http://virtuoso.noosfero.com', @settings.settings[:virtuoso_uri]
     assert_equal 'username', @settings.settings[:virtuoso_username]
@@ -38,28 +38,33 @@ class VirtuosoPluginAdminControllerTest < ActionController::TestCase
     assert_redirected_to :action => 'index'
   end
 
-  
   should 'redirect to index after save' do
     post :index, :settings => mock_settings
     assert_redirected_to :action => 'index'
   end
 
   should 'create delayed job to start harvest on force action' do
-    harvest = VirtuosoPlugin::DspaceHarvest.new(environment)
+    post :index, :settings => mock_settings
+    harvest = VirtuosoPlugin::DspaceHarvest.new(environment, "http://dspace1.noosfero.com")
     assert !harvest.find_job.present?
     get :force_harvest
     assert harvest.find_job.present?
   end
 
   should 'force harvest from start' do
+    post :index, :settings => mock_settings
     get :force_harvest, :from_start => true
-    harvest = VirtuosoPlugin::DspaceHarvest.new(environment)
+    harvest = VirtuosoPlugin::DspaceHarvest.new(environment, "http://dspace2.noosfero.com")
     assert harvest.find_job.present?
     assert_equal nil, harvest.settings.last_harvest
   end
-
-  should 'force harvest_all from start' do
-    get :force_harvest, :from_start => true
+ 
+  should 'not create delayed job to start harvest on force action without settings' do
+    post :index, :settings => mock_settings
+    harvest = VirtuosoPlugin::DspaceHarvest.new(environment, "http://dspace8.noosfero.com")
+    assert !harvest.find_job.present?, "testing if no job is running"
+    get :force_harvest
+    assert !harvest.find_job.present?, "testing if no job is running again" 
   end
-  
+ 
 end

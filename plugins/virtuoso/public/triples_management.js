@@ -1,3 +1,29 @@
+function is_valid_url(url) {
+  var pattern =/^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
+  return pattern.test(url);
+}
+
+function validate_search_form() {
+  graph_uri = jQuery("input#graph_uri");
+  query = jQuery("textarea#query");
+
+  if ( !is_valid_url(graph_uri.val())) {
+    alert( TRIPLES_MANAGEMENT_GRAPH_URI_REQUIRED_MESSAGE );
+    graph_uri.focus();
+    return false;
+  }
+
+  pattern = /.*select\s.*/i
+  if (!pattern.test(query.val())) {
+    alert( TRIPLES_MANAGEMENT_QUERY_REQUIRED_MESSAGE );
+    query.focus();
+    return false;
+  }
+
+  jQuery("#form-triples-search").submit();
+
+}
+
 function update_triple(triple_id) {
   graph = jQuery("input#graph_uri").val();
 
@@ -20,17 +46,14 @@ function update_triple(triple_id) {
     url: '/admin/plugin/virtuoso/update_triple',
     data: formData,
     dataType: 'json',
-    success: function(data, status, ajax){
+    success: function(data, status, ajax) {
       if ( !data.ok ) {
-        display_notice(data.error.message);
+        display_notice(data.message);
       }
       else {
         display_notice(data.message);
         jQuery("input#triples_triple" + triple_id + "_from_object").val(jQuery("input#triples_triple" + triple_id + "_to_object").val());
       }
-    },
-    error: function(ajax, status, errorThrown) {
-      alert('Send request - HTTP '+status+': '+errorThrown);
     }
   });
 
@@ -50,18 +73,9 @@ function add_triple() {
     url: '/admin/plugin/virtuoso/add_triple',
     data: formData,
     dataType: 'json',
-    success: function(data, status, ajax){
-      if ( !data.ok ) {
-        display_notice(data.error.message);
-        jQuery.colorbox.close();
-      }
-      else {
-        display_notice(data.message);
-        jQuery.colorbox.close();
-      }
-    },
-    error: function(ajax, status, errorThrown) {
-      alert('Send request - HTTP '+status+': '+errorThrown);
+    success: function(data, status, ajax) {
+      display_notice(data.message);
+      jQuery.colorbox.close();
     }
   });
 
@@ -84,7 +98,7 @@ function remove_triple(triple_id) {
     dataType: 'json',
     success: function(data, status, ajax){
       if ( !data.ok ) {
-        display_notice(data.error.message);
+        display_notice(data.message);
       }
       else {
         display_notice(data.message);
@@ -97,9 +111,6 @@ function remove_triple(triple_id) {
           }
         });
       }
-    },
-    error: function(ajax, status, errorThrown) {
-      alert('Send request - HTTP '+status+': '+errorThrown);
     }
   });
 
