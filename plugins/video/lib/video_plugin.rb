@@ -1,7 +1,3 @@
-require_dependency File.dirname(__FILE__) + '/video_block'
-require_dependency File.dirname(__FILE__) + '/video'
-require_dependency File.dirname(__FILE__) + '/video_gallery'
-
 class VideoPlugin < Noosfero::Plugin
 
   def self.plugin_name
@@ -14,7 +10,7 @@ class VideoPlugin < Noosfero::Plugin
 
   def self.extra_blocks
   {
-      VideoBlock => {}
+      VideoPlugin::VideoBlock => {}
   }
   end
 
@@ -44,7 +40,7 @@ class VideoPlugin < Noosfero::Plugin
         content_tag('a', _("New Video"),
         { :id=>"new-video-btn",
           :class=>"button with-text icon-new",
-          :href=>url_for(:action => 'new', :type=>'Video', :controller=>'cms', :parent_id => content.id),
+          :href=>url_for(:action => 'new', :type=>'VideoPlugin::Video', :controller=>'cms', :parent_id => content.id),
           :title=>_("New Video")
         })
       end

@@ -2,7 +2,7 @@ require 'noosfero/translatable_content'
 require 'application_helper'
 require 'net/http'
 
-class Video < Article
+class VideoPlugin::Video < Article
 
   settings_items :video_url,    :type => :string, :default => 'http://'
   settings_items :video_width,  :type => :integer, :default => 499
@@ -40,7 +40,7 @@ class Video < Article
   def to_html(options={})
     article = self
     proc do
-      render :partial => 'content_viewer/video', :locals => {:article => article}
+      render :partial => 'content_viewer/video_plugin/video', :locals => {:article => article}
     end
   end
 
