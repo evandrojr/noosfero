@@ -148,15 +148,9 @@ class VirtuosoPlugin::NoosferoHarvest
 
   def process_value(value)
     if value.kind_of?(String)
-      value = /https?:\/\//.match(value) ? RDF::URI.new(value) : strip_tags(value)
-    elsif value.kind_of?(ActiveSupport::TimeWithZone)
-      value = RDF::Literal::DateTime.new(value)
-    elsif !!value == value
-      value = RDF::Literal::Boolean.new(value)
-    elsif value.kind_of?(Float)
-      value = RDF::Literal::Double.new(value)
+      value = /^https?:\/\//.match(value) ? RDF::URI.new(value) : RDF::Literal.new(strip_tags(value).delete("\n|\r"))
     else
-      value
+      value = RDF::Literal.new(value)
     end
   end
 
