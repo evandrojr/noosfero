@@ -148,7 +148,7 @@ class VirtuosoPlugin::NoosferoHarvest
 
   def process_value(value)
     if value.kind_of?(String)
-      value = /^https?:\/\//.match(value) ? RDF::URI.new(value) : RDF::Literal.new(strip_tags(value))
+      value = /^https?:\/\//.match(value) ? RDF::URI.new(value) : RDF::Literal.new(strip_tags(value).delete("\n|\r"))
     else
       value = RDF::Literal.new(value)
     end
