@@ -4,7 +4,12 @@ class VirtuosoPluginAdminController < AdminController
     settings = params[:settings]
     settings ||= {}
     @settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin, settings)
-    @harvest_running = VirtuosoPlugin::DspaceHarvest.new(environment).find_job.present?
+    @harvest_running = {}
+    if @settings.dspace_servers.present?
+      @settings.dspace_servers.each do |i|
+        @harvest_running[i['dspace_uri']] = VirtuosoPlugin::DspaceHarvest.new(environment, i).find_job(i['dspace_uri']).present?
+      end
+    end
     if request.post?
       settings[:dspace_servers].delete_if do | server |
         server[:dspace_uri].empty?

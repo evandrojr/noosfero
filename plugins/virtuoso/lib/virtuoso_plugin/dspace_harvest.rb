@@ -1,12 +1,24 @@
 #inspired by https://github.com/code4lib/ruby-oai/blob/master/lib/oai/harvester/harvest.rb
 class VirtuosoPlugin::DspaceHarvest
 
-  def initialize(environment, dspace_uri = nil)
+  attr_reader  :environment, :dspace_settings
+
+  def initialize(environment, dspace_settings = nil)
     @environment = environment
-    @dspace_uri = dspace_uri
+    @dspace_settings = dspace_settings
   end
 
-  attr_reader :environment
+  def dspace_uri
+    unless dspace_settings.nil?
+      dspace_settings["dspace_uri"] if dspace_settings.has_key?("dspace_uri")
+    end
+  end
+
+  def last_harvest
+    unless dspace_settings.nil?
+      dspace_settings["last_harvest"] if dspace_settings.has_key?("last_harvest")
+    end
+  end
 
   def plugin
     @plugin ||= VirtuosoPlugin.new(self)
@@ -15,7 +27,7 @@ class VirtuosoPlugin::DspaceHarvest
   delegate :settings, :to => :plugin
 
   def dspace_client
-    @dspace_client ||= OAI::Client.new("#{@dspace_uri}/oai/request")
+    @dspace_client ||= OAI::Client.new("#{dspace_uri}/oai/request")
   end
 
   def triplify(record)
@@ -26,7 +38,7 @@ class VirtuosoPlugin::DspaceHarvest
     settings.ontology_mapping.each do |mapping|
       values = [metadata.extract_field(mapping[:source])].flatten.compact
       values.each do |value|
-        query = RDF::Virtuoso::Query.insert_data([RDF::URI.new(subject_identifier), RDF::URI.new(mapping[:target]), value]).graph(RDF::URI.new(@dspace_uri))
+        query = RDF::Virtuoso::Query.insert_data([RDF::URI.new(subject_identifier), RDF::URI.new(mapping[:target]), value]).graph(RDF::URI.new(dspace_uri))
         plugin.virtuoso_client.insert(query)
       end
     end
@@ -34,8 +46,8 @@ class VirtuosoPlugin::DspaceHarvest
 
   def run
     harvest_time = Time.now.utc
-    params = settings.last_harvest ? {:from => settings.last_harvest.utc} : {}
-    puts "starting harvest #{params} #{@dspace_uri} #{settings.virtuoso_uri}"
+    params = last_harvest ? {:from => last_harvest.utc} : {}
+    puts "starting harvest #{params} #{dspace_uri} #{settings.virtuoso_uri}"
     begin
       records = dspace_client.list_records(params)
       records.each do |record|
@@ -48,16 +60,26 @@ class VirtuosoPlugin::DspaceHarvest
         raise ex
       end
     end
-    settings.last_harvest = harvest_time
-    settings.save!
     puts "ending harvest #{harvest_time}"
+  end
+
+  def save_harvest_time_settings(harvest_time)
+    dspace_settings = {"dspace_uri" => dspace_uri, "last_harvest" => last_harvest}
+    settings.dspace_servers.each do |s|
+      if s["dspace_uri"] == dspace_uri
+        settings.dspace_servers.delete(dspace_settings)
+      end
+    end
+    @dspace_settings = {"dspace_uri" => dspace_uri, "last_harvest" => harvest_time}
+    settings.dspace_servers << @dspace_settings
+    settings.save!
   end
 
   def self.harvest_all(environment, from_start)
     settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin)
     if settings.dspace_servers.present?
-      settings.dspace_servers.each do |k, v|
-        harvest = VirtuosoPlugin::DspaceHarvest.new(environment, k[:dspace_uri])
+      settings.dspace_servers.each do |i|
+        harvest = VirtuosoPlugin::DspaceHarvest.new(environment, i)
         harvest.start(from_start)
       end
     end
@@ -66,22 +88,22 @@ class VirtuosoPlugin::DspaceHarvest
   def start(from_start = false)
     if find_job.empty?
       if from_start
-        settings.last_harvest = nil
-        settings.save!
+        save_harvest_time_settings(nil)
       end
-      job = VirtuosoPlugin::DspaceHarvest::Job.new(@environment.id, @dspace_uri)
+      job = VirtuosoPlugin::DspaceHarvest::Job.new(@environment.id, dspace_uri)
       Delayed::Job.enqueue(job)
     end
   end
 
-  def find_job
-    Delayed::Job.where(:handler => "--- !ruby/struct:VirtuosoPlugin::DspaceHarvest::Job\nenvironment_id: #{@environment.id}\ndspace_uri: #{@dspace_uri}\n")
+  def find_job(_dspace_uri=nil)
+    _dspace_uri ||= dspace_uri
+    Delayed::Job.where(:handler => "--- !ruby/struct:VirtuosoPlugin::DspaceHarvest::Job\nenvironment_id: #{@environment.id}\ndspace_uri: #{_dspace_uri}\n")
   end
 
   class Job < Struct.new(:environment_id, :dspace_uri)
     def perform
-      environment = Environment.find(environment_id)
-      harvest = VirtuosoPlugin::DspaceHarvest.new(environment, dspace_uri)
+      environment = Environment.find(environment_id, dspace_uri)
+      harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri" => dspace_uri, "last_harvest" => last_harvest})
       harvest.run
     end
   end
@@ -90,7 +112,7 @@ class VirtuosoPlugin::DspaceHarvest
 
   def extract_identifier(record)
     parsed_identifier = /oai:(.+):(\d+\/\d+)/.match(record.header.identifier)
-    "#{@dspace_uri}/handle/#{parsed_identifier[2]}"
+    "#{dspace_uri}/handle/#{parsed_identifier[2]}"
   end
 
 end

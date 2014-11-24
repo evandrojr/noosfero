@@ -15,17 +15,39 @@ class DspaceHarvestTest < ActiveSupport::TestCase
       :virtuoso_readonly_username=>"readonly_username",
       :virtuoso_readonly_password=>"readonly_password",
       :dspace_servers=>[
-        {"dspace_uri"=>"http://dspace1.noosfero.com"},
+        {"dspace_uri"=>"http://dspace1.noosfero.com","last_harvest" => 5 },
         {"dspace_uri"=>"http://dspace2.noosfero.com"},
-        {"dspace_uri"=>"http://dspace3.noosfero.com"}
+        {"dspace_uri"=>"http://dspace3.noosfero.com", "last_harvest" => 0},
+        {"dspace_uri"=>"http://dspace4.noosfero.com", "last_harvest" => nil},
+        {"dspace_uri"=>"http://dspace5.noosfero.com", "last_harvest" => 9},
       ]
     }
+  end
+
+  should 'initialize with dspace_uri' do
+    harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri"=>"http://dspace1.noosfero.com"})
+    assert harvest.dspace_uri, "http://dspace1.noosfero.com"
+  end
+
+  should 'initialize with dspace_uri and last_harvest' do
+    harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri"=>"http://dspace9.noosfero.com", "last_harvest" => 5})
+    assert harvest.dspace_uri, "http://dspace9.noosfero.com"
+    assert harvest.last_harvest, 5
+  end
+
+  should 'save_harvest_time_settings' do
+    @settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin, mock_settings)
+    harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri"=>"http://dspace5.noosfero.com", "last_harvest" => 9})
+    assert harvest.last_harvest, 9
+    harvest.save_harvest_time_settings(10)
+    @settings = Noosfero::Plugin::Settings.new(environment.reload, VirtuosoPlugin)
+    assert harvest.last_harvest, 10
   end
 
   should 'create delayed job when start' do
     @settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin, mock_settings)
     @settings.save!
-    harvest = VirtuosoPlugin::DspaceHarvest.new(environment, "http://dspace1.noosfero.com")
+    harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri"=>"http://dspace1.noosfero.com", "last_harvest" => 5})
     assert !harvest.find_job.present?
     harvest.start
     assert harvest.find_job.present?
@@ -34,7 +56,7 @@ class DspaceHarvestTest < ActiveSupport::TestCase
   should 'not duplicate harvest job' do
     @settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin, mock_settings)
     @settings.save!
-    harvest = VirtuosoPlugin::DspaceHarvest.new(environment, "http://dspace1.noosfero.com")
+    harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri"=>"http://dspace1.noosfero.com", "last_harvest" => 5})
     assert_difference "harvest.find_job.count", 1 do
       5.times { harvest.start }
     end

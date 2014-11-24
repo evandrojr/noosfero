@@ -11,35 +11,29 @@
     <%= labelled_form_field _('Virtuoso Read-Only Username:'), f.text_field(:virtuoso_readonly_username, :size=> 60) %>
     <%= labelled_form_field _('Virtuoso Read-Only Password:'), f.password_field(:virtuoso_readonly_password, :size=> 60) %>
   </strong>
-  <BR> 
+  <BR>
 <div class="dspace-servers-config-box" >
-  
+
   <strong><%= _('Dspace Servers\' URL:') %></strong>
   <div id='edit-server-list-block'>
     <div id="dropable-server-list">
       <%= render :partial => 'server_list_item', :collection=>@settings.dspace_servers  %>
     </div>
     <div id="dspace-new-template">
-      <div >  
+      <div >
         <%= render :partial => 'server_list_item', :locals => {:dspace_uri => "http://"} %>
-      </div>  
+      </div>
   </div>
     <%= link_to_function(_('New Dspace Server'), 'add_new_server();', :class => 'button icon-add with-text') %>
   </div>
-</div>  
+</div>
   <% button_bar do %>
       <%= submit_button(:save, _('Save'), :cancel => {:controller => 'plugins', :action => 'index'}) %>
     <% end %>
   <% end %>
 <div class="harvest">
-  <% if @settings.last_harvest %>
-  <div class="date">
-    <span class="label"><strong><%= _('Last execution:') %></strong></span>
-    <span class="value"><%= time_ago_as_sentence @settings.last_harvest %></span>
-  </div>
-<% end %>
   <div class="actions">
-    <% if @harvest_running %>
+    <% if @harvest_running.has_value?(true) %>
       <%= _('Running...') %>
     <% else %>
       <%= button :next, _('Force harvest'), :action => :force_harvest %>
