@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require File.dirname(__FILE__) + '/../test_helper.rb'
 
 class DspaceHarvestTest < ActiveSupport::TestCase
 
@@ -81,24 +81,24 @@ class DspaceHarvestTest < ActiveSupport::TestCase
     settings.save!
     VirtuosoPlugin::DspaceHarvest.harvest_all(environment, false)
   end
-  
-  should 'update last_harvest after harvert from start' do
+ 
+  should 'update last_harvest after harvert' do
     settings =
-    { :virtuoso_uri=>"http://virtuoso.set_at_etc_hosts",
-      :virtuoso_username=>"dba",
-      :virtuoso_password=>"dba",
-      :virtuoso_readonly_username=>"dba",
-      :virtuoso_readonly_password=>"dba",
+    { :virtuoso_uri=>"http://virtuoso",
+      :virtuoso_username=>"username",
+      :virtuoso_password=>"password",
+      :virtuoso_readonly_username=>"username",
+      :virtuoso_readonly_password=>"password",
       :dspace_servers=>[
-          {"dspace_uri"=>"http://dspace.set_at_etc_hosts","last_harvest" =>  Time.now.utc }
+          {"dspace_uri"=>"http://dspace","last_harvest" =>  Time.now.utc }
         ]
-    }    
+    }   
     @settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin, settings)
-    harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri"=>"http://virtuoso.set_at_etc_hosts" })
-    puts "last_harvest before #{harvest.last_harvest}"    
-    harvest.run
-    puts "last_harvest after #{harvest.last_harvest}"
-    asser
+    harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri"=>"http://virtuoso" })
+    dspace_client = mock
+    harvest.expects(:dspace_client).returns(dspace_client)
+    dspace_client.expects(:list_records).returns([])   
+    assert_not_equal harvest.last_harvest, nil
   end
 
 end
