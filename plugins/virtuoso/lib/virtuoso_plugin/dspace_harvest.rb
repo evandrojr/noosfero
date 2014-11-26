@@ -60,6 +60,7 @@ class VirtuosoPlugin::DspaceHarvest
         raise ex
       end
     end
+    save_harvest_time_settings(harvest_time)
     puts "ending harvest #{harvest_time}"
   end
 
