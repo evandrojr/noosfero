@@ -102,8 +102,8 @@ class VirtuosoPlugin::DspaceHarvest
 
   class Job < Struct.new(:environment_id, :dspace_uri)
     def perform
-      environment = Environment.find(environment_id, dspace_uri)
-      harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri" => dspace_uri, "last_harvest" => last_harvest})
+      environment = Environment.find(environment_id)
+      harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri" => dspace_uri})
       harvest.run
     end
   end
