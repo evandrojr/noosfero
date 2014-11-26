@@ -97,7 +97,8 @@ class DspaceHarvestTest < ActiveSupport::TestCase
     harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri"=>"http://virtuoso" })
     dspace_client = mock
     harvest.expects(:dspace_client).returns(dspace_client)
-    dspace_client.expects(:list_records).returns([])   
+    dspace_client.expects(:list_records).returns([])
+    harvest.run
     assert_not_equal harvest.last_harvest, nil
   end
 
