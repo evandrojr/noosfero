@@ -8,3 +8,6 @@
 .oauth-provider-authorize #oauth-permissions {
   color: rgb(92, 92, 92);
 }
+.oauth-provider .actions {
+  margin-top: 10px;
+}
