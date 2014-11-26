@@ -65,10 +65,9 @@ class VirtuosoPlugin::DspaceHarvest
   end
 
   def save_harvest_time_settings(harvest_time)
-    dspace_settings = {"dspace_uri" => dspace_uri, "last_harvest" => last_harvest}
     settings.dspace_servers.each do |s|
       if s["dspace_uri"] == dspace_uri
-        settings.dspace_servers.delete(dspace_settings)
+        settings.dspace_servers.delete(s)
       end
     end
     @dspace_settings = {"dspace_uri" => dspace_uri, "last_harvest" => harvest_time}

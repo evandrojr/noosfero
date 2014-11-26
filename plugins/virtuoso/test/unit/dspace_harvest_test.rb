@@ -40,8 +40,12 @@ class DspaceHarvestTest < ActiveSupport::TestCase
     harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri"=>"http://dspace5.noosfero.com", "last_harvest" => 9})
     assert harvest.last_harvest, 9
     harvest.save_harvest_time_settings(10)
-    Noosfero::Plugin::Settings.new(environment.reload, VirtuosoPlugin)
     assert harvest.last_harvest, 10
+    settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin)
+    dspace_server = settings.dspace_servers[4]
+    settings = Noosfero::Plugin::Settings.new(environment.reload, VirtuosoPlugin)
+    dspace_server = settings.dspace_servers[4]
+    assert_equal 10, dspace_server["last_harvest"]
   end
 
   should 'create delayed job when start' do
@@ -81,8 +85,9 @@ class DspaceHarvestTest < ActiveSupport::TestCase
     settings.save!
     VirtuosoPlugin::DspaceHarvest.harvest_all(environment, false)
   end
- 
+
   should 'update last_harvest after harvert' do
+    time = Time.now.utc
     settings =
     { :virtuoso_uri=>"http://virtuoso",
       :virtuoso_username=>"username",
@@ -90,16 +95,36 @@ class DspaceHarvestTest < ActiveSupport::TestCase
       :virtuoso_readonly_username=>"username",
       :virtuoso_readonly_password=>"password",
       :dspace_servers=>[
-          {"dspace_uri"=>"http://dspace","last_harvest" =>  Time.now.utc }
+          {"dspace_uri"=>"http://dspace","last_harvest" =>  time }
         ]
-    }   
+    }
     @settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin, settings)
-    harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri"=>"http://virtuoso" })
+    harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri"=>"http://dspace" })
     dspace_client = mock
     harvest.expects(:dspace_client).returns(dspace_client)
     dspace_client.expects(:list_records).returns([])
     harvest.run
     assert_not_equal harvest.last_harvest, nil
+    Noosfero::Plugin::Settings.new(environment.reload, VirtuosoPlugin)
+    assert_not_equal harvest.last_harvest, nil
+    assert_not_equal harvest.last_harvest, Time.now.utc
   end
 
+  should 'list records' do
+    settings =
+    { :virtuoso_uri=>"http://hom.virtuoso.participa.br",
+      :virtuoso_username=>"dba",
+      :virtuoso_password=>"dba",
+      :virtuoso_readonly_username=>"dba",
+      :virtuoso_readonly_password=>"dba",
+      :dspace_servers=>[
+          {"dspace_uri"=>"http://hom.dspace.participa.br"}
+        ]
+    }
+    settings = Noosfero::Plugin::Settings.new(environment, VirtuosoPlugin, settings)
+    harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri"=>"http://hom.dspace.participa.br"})
+    params = harvest.last_harvest ? {:from => harvest.last_harvest.utc} : {}
+    records = harvest.dspace_client.list_records(params)
+    assert_not_equal records.count, 0
+  end
 end
