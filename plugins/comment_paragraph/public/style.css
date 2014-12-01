@@ -34,6 +34,11 @@ div.article-comments-list-more{
 
 .comment_paragraph{
   padding: 0px;
+  position: relative;
+  left: -20px;
+  width: 450px;
+  font-weight: bold;
+  text-align: justify;
 }
 
 .triangle-right {
@@ -223,15 +228,6 @@ div[class^='comment-paragraph-loading-'] {
   justify-content: space-around;
 
 }
-
-.comment_paragraph{
-  position: relative;
-  left: -20px;
-  width: 450px;
-  font-weight: bold;
-  text-align: justify;
-}
-
 .comment-paragraph-comments{
   background: lightblue;
   padding: 5px;
