@@ -9,6 +9,11 @@ class ApplicationController < ActionController::Base
   before_filter :allow_cross_domain_access
   before_filter :login_required, :if => :private_environment?
   before_filter :verify_members_whitelist, :if => [:private_environment?, :user]
+  before_filter :log_user
+
+  def log_user
+    Rails.logger.info "Logged in: #{user.identifier}" if user
+  end
 
   def verify_members_whitelist
     render_access_denied unless user.is_admin? || environment.in_whitelist?(user)
