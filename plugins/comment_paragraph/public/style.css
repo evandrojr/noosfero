@@ -81,8 +81,6 @@ div.article-comments-list-more{
 .side-comment .comment_title{display: none;}
 .side-comment label[for="comment_title"] {display: none;}
 
-
-
 div[class^='comments_list_toggle_paragraph_'] {
  border-style: solid;
  border-width: 1px;
@@ -93,9 +91,10 @@ div[class^='comments_list_toggle_paragraph_'] {
 }
 
 div[class^='comment-paragraph-loading-'] {
- background-color: whitesmoke;
+ position: relative;
+ left: 470px;
+ background-color: pink;
  z-index: 99;
- right: -230px;
 }
 
 #content .side-comment .comment-balloon div[class^='comment-wrapper-']{
@@ -145,9 +144,6 @@ div[class^='comment-paragraph-loading-'] {
 #article .side-comment .comment-replies .article-comment{background: white; border: 0px; border-top: 1px solid #ddd;}
 
 .comment-replies .comment-from-owner.comment-content {background: none;}
-
-
-
 
 .side-comment .comment-balloon-content {
   margin: 0;
@@ -210,4 +206,40 @@ div[class^='comment-paragraph-loading-'] {
 
 .side-comment .comment-count {
   bg-color: #b3b2d4;
+}
+
+.comment-paragraph-rowset{
+  padding: 0;
+  margin: 0;
+  list-style: none;
+
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+
+  -webkit-flex-flow: row wrap;
+  justify-content: space-around;
+
+}
+
+.comment_paragraph{
+  position: relative;
+  left: -20px;
+  width: 450px;
+  font-weight: bold;
+  text-align: justify;
+}
+
+.comment-paragraph-comments{
+  background: lightblue;
+  padding: 5px;
+  width: 150px;
+  margin-top: 10px;
+  line-height: 30px;
+  color: white;
+  font-weight: bold;
+  font-size: 1em;
+  text-align: center;
 }
