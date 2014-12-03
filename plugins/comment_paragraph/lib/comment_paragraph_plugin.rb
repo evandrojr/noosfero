@@ -19,7 +19,8 @@ class CommentParagraphPlugin < Noosfero::Plugin
       arr = []
       arr << hidden_field_tag('comment[id]', comment.id)
       arr << hidden_field_tag('comment[paragraph_id]', paragraph_id) if paragraph_id
-      arr << hidden_field_tag('comment[comment_paragraph_selected_area]', comment.comment_paragraph_selected_area) if comment.comment_paragraph_selected_area
+      arr << hidden_field_tag('comment[comment_paragraph_selected_area]', comment.comment_paragraph_selected_area) unless comment.comment_paragraph_selected_area.blank?
+      arr << hidden_field_tag('comment[comment_paragraph_selected_content]', comment.comment_paragraph_selected_content) unless comment.comment_paragraph_selected_content.blank?
       arr
     }
   end

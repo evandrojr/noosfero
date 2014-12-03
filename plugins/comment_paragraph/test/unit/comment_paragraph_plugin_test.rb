@@ -1,4 +1,5 @@
 require File.dirname(__FILE__) + '/../test_helper'
+include ActionView::Helpers::FormTagHelper
 
 class CommentParagraphPluginTest < ActiveSupport::TestCase
 
@@ -23,6 +24,15 @@ class CommentParagraphPluginTest < ActiveSupport::TestCase
 
   should 'have stylesheet' do
     assert plugin.stylesheet?
+  end
+
+  should 'not add comment_paragraph_selected_area if comment_paragraph_selected_area is blank' do
+    comment = Comment.new
+    comment.comment_paragraph_selected_area = ""
+    comment.paragraph_id = 2
+    cpp = CommentParagraphPlugin.new
+    prok = cpp.comment_form_extra_contents({:comment=>comment, :paragraph_id=>4})
+    assert_nil /comment_paragraph_selected_area/.match(prok.call.inspect)
   end
 
 end

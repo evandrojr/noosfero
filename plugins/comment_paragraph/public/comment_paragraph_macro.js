@@ -40,6 +40,12 @@ jQuery(document).ready(function($) {
     return false;
   });
 
+  //Clears all old selected_area and selected_content after submit comment
+  $('[name|=commit]').click(function(){
+      $('.selected_area').val("");
+      $('.selected_content').val("");
+  });
+
   $('#cancel-comment').die();
   $(document.body).on("click", '#cancel-comment', function(){
     $("div.side-comment").hide();
@@ -51,7 +57,7 @@ jQuery(document).ready(function($) {
       div.addClass('opened');
     }
   }
-  
+
   rangy.init();
   cssApplier = rangy.createCssClassApplier("commented-area", {normalize: false});
   //Add marked text bubble
@@ -164,9 +170,9 @@ jQuery(document).ready(function($) {
     } catch(e) {
       return;
     }
+    form = $('#page-comment-form-' + paragraphId).find('form');
 
     //Register the area the has been selected at input.selected_area
-    form = $('#page-comment-form-' + paragraphId).find('form');
     if (form.find('input.selected_area').length === 0){
       $('<input>').attr({
         class: 'selected_area',
@@ -177,8 +183,20 @@ jQuery(document).ready(function($) {
     }else{
       form.find('input.selected_area').val(selected_area)
     }
+    //Register the content being selected at input.comment_paragraph_selected_content
+    var selected_content = getSelectionText();
+    if(selected_content.length > 0)
+    if (form.find('input.selected_content').length === 0){
+      $('<input>').attr({
+        class: 'selected_content',
+        type: 'hidden',
+        name: 'comment[comment_paragraph_selected_content]',
+        value: selected_content
+      }).appendTo(form)
+    }else{
+      form.find('input.selected_content').val(selected_content)
+    }
     rootElement.focus();
-
   });
 
   function processAnchor(){
