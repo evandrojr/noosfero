@@ -230,7 +230,7 @@ class Block < ActiveRecord::Base
     duplicated_block.created_at = nil
     duplicated_block.updated_at = nil
     duplicated_block.save!
-    duplicated_block.insert_at(self.position + 1)
+    duplicated_block.insert_at((self.position || 0) + 1)
     duplicated_block
   end
 
