@@ -359,11 +359,11 @@ class AccountController < ApplicationController
   end
 
   def get_signup_start_time
-    Rails.cache.read params[:signup_time_key]
+    Rails.cache.read params[:signup_time_key] if params[:signup_time_key].present?
   end
 
   def clear_signup_start_time
-    Rails.cache.delete params[:signup_time_key] if params[:signup_time_key]
+    Rails.cache.delete params[:signup_time_key] if params[:signup_time_key].present?
   end
 
   def may_be_a_bot

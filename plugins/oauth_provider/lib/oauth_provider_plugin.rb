@@ -8,6 +8,10 @@ class OauthProviderPlugin < Noosfero::Plugin
     _("Oauth Provider.")
   end
 
+  def stylesheet?
+    true
+  end
+
   Doorkeeper.configure do
     orm :active_record
 
@@ -36,7 +40,8 @@ class OauthProviderPlugin < Noosfero::Plugin
         use_doorkeeper do
           controllers ({
             :applications => 'oauth_provider_applications',
-            :authorized_applications => 'oauth_provider_authorized_applications'
+            :authorized_applications => 'oauth_provider_authorized_applications',
+            :authorizations => 'oauth_provider_authorizations'
           })
         end
       end

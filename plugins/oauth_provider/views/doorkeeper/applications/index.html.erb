@@ -1,3 +1,4 @@
+<div class="oauth-provider">
 <div class="page-header">
   <h3><%= link_to _('Oauh Provider'), '/admin/plugin/oauth_provider' %></h3>
 </div>
@@ -24,3 +25,7 @@
   <% end %>
   </tbody>
 </table>
+<div class="actions">
+  <%= button(:back, _('Go back'), {:controller => 'oauth_provider_plugin_admin', :action => 'index'}) %>
+</div>
+</div>
