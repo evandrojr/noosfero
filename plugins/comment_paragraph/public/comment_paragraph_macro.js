@@ -71,9 +71,20 @@ jQuery(document).ready(function($) {
     var paragraphId = $(this).data('paragraph');
     hideAllCommentsExcept(paragraphId);
     hideAllSelectedAreasExcept(paragraphId);
-    $('#comment-bubble').hide();
+    $('.article-body').toggleClass('comment-paragraph-slide-left');
     $('#side_comment_' + paragraphId).toggle();
-    $('#side_comment_' + paragraphId).find().toggle();
+    
+    
+//    if($('.comment-paragraph-slide-left').size()==0){
+//      $('.article-body').addClass('comment-paragraph-slide-left');
+//      $('#side_comment_' + paragraphId).show();
+//      $('#side_comment_' + paragraphId).find().show();
+//    }else{
+//      $('.article-body').removeClass('comment-paragraph-slide-left');
+//      $('.side-comment').hide();
+//      $('.side-comment').find().hide();
+//    }
+    $('#comment-bubble').hide();
     //Loads the comments
     var url = $('#link_to_ajax_comments_' + paragraphId).data('url');
     $.ajax({
@@ -88,6 +99,9 @@ jQuery(document).ready(function($) {
 
   $('#comment-bubble').click(function(event){
     $(this).hide();
+    if($('.comment-paragraph-slide-left').size()==0){
+      $('.article-body').addClass('comment-paragraph-slide-left');
+    }
     $("#comment-bubble").css({top: 0, left: 0, position:'absolute'});
     var url = $("#comment-bubble").data('url');
     var paragraphId = $("#comment-bubble").data("paragraphId");
@@ -107,7 +121,7 @@ jQuery(document).ready(function($) {
       paragraph = $(this).data('paragraph');
       if(paragraph != clickedParagraph){
         $(this).hide();
-        $(this).find().hide();
+        //$(this).find().hide();
       }
     });
   }
@@ -145,6 +159,11 @@ jQuery(document).ready(function($) {
   $('.comment_paragraph').mouseup(function(event) {
 
     $('#comment-bubble').hide();
+    if($('.comment-paragraph-slide-left').size() > 0){
+      $('.article-body').removeClass('comment-paragraph-slide-left');
+      $('.side-comment').hide();
+      //$('.side-comment').find().hide();
+    }
 
     //Don't do anything if there is no selected text
     if (getSelectionText().length == 0) {

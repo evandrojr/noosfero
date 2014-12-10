@@ -7,7 +7,7 @@ div.article-comments-list-more{
 }
 
 .popBox_comment_paragraph {
-  position: absolute;
+/*  position: absolute;*/
   z-index: 2;
   background: #cccccc;
   width: 60px;
@@ -34,9 +34,6 @@ div.article-comments-list-more{
 
 .comment_paragraph{
   padding: 0px;
-  position: relative;
-  left: -20px;
-  width: 450px;
   font-weight: bold;
   text-align: justify;
 }
@@ -96,8 +93,6 @@ div[class^='comments_list_toggle_paragraph_'] {
 }
 
 div[class^='comment-paragraph-loading-'] {
- position: relative;
- left: 470px;
  z-index: 99;
 }
 
@@ -212,6 +207,7 @@ div[class^='comment-paragraph-loading-'] {
   bg-color: #b3b2d4;
 }
 
+/*
 .comment-paragraph-rowset{
   padding: 0;
   margin: 0;
@@ -225,8 +221,8 @@ div[class^='comment-paragraph-loading-'] {
 
   -webkit-flex-flow: row wrap;
   justify-content: space-around;
+}*/
 
-}
 .comment-paragraph-comments{
   background: lightblue;
   padding: 5px;
@@ -235,4 +231,19 @@ div[class^='comment-paragraph-loading-'] {
   color: white;
   font-weight: bold;
   text-align: center;
+}
+
+.single-border{
+  border-style:  solid;
+  border-width: 2px;
+}
+
+.comment-paragraph-group-comments{
+  position: absolute;
+}
+
+.comment-paragraph-slide-left{
+  position: relative;
+  width: 80%;
+  transition: 0.6s;
 }
