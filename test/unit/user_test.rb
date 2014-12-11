@@ -190,6 +190,12 @@ class UserTest < ActiveSupport::TestCase
     assert_equal '098f6bcd4621d373cade4e832627b4f6', user.crypted_password
   end
 
+
+  def test_should_support_salted_md5_passwords
+    user = new_user(:login => 'lalala', :email => 'lalala@example.com', :password => 'test', :password_confirmation => 'test', :password_type => 'salted_md5', :salt => 'test')
+    assert_equal '05a671c66aefea124cc08b76ea6d30bb', user.crypted_password
+  end
+
   def test_should_support_crypt_passwords
     user = new_user(:login => 'lalala', :email => 'lalala@example.com', :password => 'test', :password_confirmation => 'test', :password_type => 'crypt', :salt => 'test')
     assert_equal 'teH0wLIpW0gyQ', user.crypted_password
@@ -349,7 +355,7 @@ class UserTest < ActiveSupport::TestCase
     assert_equal expected_hash['since_year'], person.user.data_hash['since_year']
 
     # Avatar stuff
-    assert_match 'http://www.gravatar.com/avatar/a0517761d5125820c28d87860bc7c02e', person.user.data_hash['avatar']
+    assert_match '/www.gravatar.com/avatar/a0517761d5125820c28d87860bc7c02e', person.user.data_hash['avatar']
     assert_match 'only_path=false', person.user.data_hash['avatar']
     assert_match 'd=', person.user.data_hash['avatar']
     assert_match 'size=20', person.user.data_hash['avatar']
