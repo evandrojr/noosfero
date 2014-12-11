@@ -71,19 +71,15 @@ jQuery(document).ready(function($) {
     var paragraphId = $(this).data('paragraph');
     hideAllCommentsExcept(paragraphId);
     hideAllSelectedAreasExcept(paragraphId);
-    $('.article-body').toggleClass('comment-paragraph-slide-left');
-    $('#side_comment_' + paragraphId).toggle();
-    
-    
-//    if($('.comment-paragraph-slide-left').size()==0){
-//      $('.article-body').addClass('comment-paragraph-slide-left');
-//      $('#side_comment_' + paragraphId).show();
-//      $('#side_comment_' + paragraphId).find().show();
-//    }else{
-//      $('.article-body').removeClass('comment-paragraph-slide-left');
-//      $('.side-comment').hide();
-//      $('.side-comment').find().hide();
-//    }
+    if($('.comment-paragraph-slide-left').size()==0){
+      $('.article-body').addClass('comment-paragraph-slide-left');
+      $('#side_comment_' + paragraphId).show();
+      $('#side_comment_' + paragraphId).find().show();
+    }else{
+      $('.article-body').removeClass('comment-paragraph-slide-left');
+      $('.side-comment').hide();
+      $('.side-comment').find().hide();
+    }
     $('#comment-bubble').hide();
     //Loads the comments
     var url = $('#link_to_ajax_comments_' + paragraphId).data('url');

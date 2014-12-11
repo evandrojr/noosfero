@@ -89,7 +89,7 @@ div[class^='comments_list_toggle_paragraph_'] {
  border-color: #ccc;
  padding: 5px;
  background-color: whitesmoke;
- width: 270px;
+ width: 300px;
 }
 
 div[class^='comment-paragraph-loading-'] {
@@ -162,6 +162,8 @@ div[class^='comment-paragraph-loading-'] {
   padding: 0;
   width: 100%;
   text-align: left;
+  overflow:  visible;
+  line-break: loose;
 }
 .side-comment .comment-text p {
   margin: 0;
@@ -183,7 +185,7 @@ div[class^='comment-paragraph-loading-'] {
   padding-left: 25px;
 }
 #article .side-comment .comment-picture {
-  width: 75%;
+  width: 100%;
   height: auto;
 }
 #article .side-comment .article-comment .comment-details > h4 {
