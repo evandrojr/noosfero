@@ -1,6 +1,7 @@
 var comment_paragraph_anchor;
 var lastSelectedArea = [];
 var original_paragraphs = [];
+var originalArticleHeight = 0
 
 function setPlusIfZeroComments($){
   $('.comment-count').each(function(){
@@ -14,6 +15,8 @@ jQuery(document).ready(function($) {
   //Quit if does not detect a comment for that plugin
   if($('.comment_paragraph').size() < 1)
     return;
+
+  originalArticleHeight = $('.article-body').height();
 
   all_paragraphs = $('.comment_paragraph');
   all_paragraphs.each( function(paragraph) {
@@ -40,6 +43,12 @@ jQuery(document).ready(function($) {
     return false;
   });
 
+  //Clears all old selected_area and selected_content after submit comment
+  $('[name|=commit]').click(function(){
+      $('.selected_area').val("");
+      $('.selected_content').val("");
+  });
+
   $('#cancel-comment').die();
   $(document.body).on("click", '#cancel-comment', function(){
     $("div.side-comment").hide();
@@ -51,7 +60,7 @@ jQuery(document).ready(function($) {
       div.addClass('opened');
     }
   }
-  
+
   rangy.init();
   cssApplier = rangy.createCssClassApplier("commented-area", {normalize: false});
   //Add marked text bubble
@@ -60,14 +69,27 @@ jQuery(document).ready(function($) {
           <div align="center"  class="triangle-right" >Comentar</div>\
       </a>');
 
+  function resizeArticle(paragraphId){
+    var commentHeigh = $('#side_comment_' + paragraphId).height();
+    if(commentHeigh > 0){
+      $('.article-body').height(originalArticleHeight + commentHeigh + 50);
+    }else{
+       $('.article-body').height(originalArticleHeight);
+    }
+  }
 
   $('.side-comments-counter').click(function(){
     var paragraphId = $(this).data('paragraph');
     hideAllCommentsExcept(paragraphId);
     hideAllSelectedAreasExcept(paragraphId);
+    if($('.comment-paragraph-slide-left').size()==0){
+      $('.article-body').addClass('comment-paragraph-slide-left');
+      $('#side_comment_' + paragraphId).show();
+    }else{
+      $('.article-body').removeClass('comment-paragraph-slide-left');
+      $('.side-comment').hide();
+    }
     $('#comment-bubble').hide();
-    $('#side_comment_' + paragraphId).toggle();
-    $('#side_comment_' + paragraphId).find().toggle();
     //Loads the comments
     var url = $('#link_to_ajax_comments_' + paragraphId).data('url');
     $.ajax({
@@ -76,12 +98,16 @@ jQuery(document).ready(function($) {
     }).done(function() {
       var button = $('#page-comment-form-' + paragraphId + ' a').get(0);
       button.click();
+      resizeArticle(paragraphId);
     });
   });
 
 
   $('#comment-bubble').click(function(event){
     $(this).hide();
+    if($('.comment-paragraph-slide-left').size()==0){
+      $('.article-body').addClass('comment-paragraph-slide-left');
+    }
     $("#comment-bubble").css({top: 0, left: 0, position:'absolute'});
     var url = $("#comment-bubble").data('url');
     var paragraphId = $("#comment-bubble").data("paragraphId");
@@ -93,6 +119,7 @@ jQuery(document).ready(function($) {
     }).done(function() {
       var button = $('#page-comment-form-' + paragraphId + ' a').get(0);
       button.click();
+      resizeArticle(paragraphId);
     });
   });
 
@@ -101,7 +128,7 @@ jQuery(document).ready(function($) {
       paragraph = $(this).data('paragraph');
       if(paragraph != clickedParagraph){
         $(this).hide();
-        $(this).find().hide();
+        //$(this).find().hide();
       }
     });
   }
@@ -139,6 +166,11 @@ jQuery(document).ready(function($) {
   $('.comment_paragraph').mouseup(function(event) {
 
     $('#comment-bubble').hide();
+    if($('.comment-paragraph-slide-left').size() > 0){
+      $('.article-body').removeClass('comment-paragraph-slide-left');
+      $('.side-comment').hide();
+      //$('.side-comment').find().hide();
+    }
 
     //Don't do anything if there is no selected text
     if (getSelectionText().length == 0) {
@@ -164,9 +196,9 @@ jQuery(document).ready(function($) {
     } catch(e) {
       return;
     }
+    form = $('#page-comment-form-' + paragraphId).find('form');
 
     //Register the area the has been selected at input.selected_area
-    form = $('#page-comment-form-' + paragraphId).find('form');
     if (form.find('input.selected_area').length === 0){
       $('<input>').attr({
         class: 'selected_area',
@@ -177,8 +209,20 @@ jQuery(document).ready(function($) {
     }else{
       form.find('input.selected_area').val(selected_area)
     }
+    //Register the content being selected at input.comment_paragraph_selected_content
+    var selected_content = getSelectionText();
+    if(selected_content.length > 0)
+    if (form.find('input.selected_content').length === 0){
+      $('<input>').attr({
+        class: 'selected_content',
+        type: 'hidden',
+        name: 'comment[comment_paragraph_selected_content]',
+        value: selected_content
+      }).appendTo(form)
+    }else{
+      form.find('input.selected_content').val(selected_content)
+    }
     rootElement.focus();
-
   });
 
   function processAnchor(){
