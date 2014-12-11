@@ -242,6 +242,8 @@ div[class^='comment-paragraph-loading-'] {
 
 .comment-paragraph-group-comments{
   position: absolute;
+  background-color: white;
+  z-index: 9999;
 }
 
 .comment-paragraph-slide-left{
