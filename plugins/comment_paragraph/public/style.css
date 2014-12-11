@@ -163,7 +163,7 @@ div[class^='comment-paragraph-loading-'] {
   width: 100%;
   text-align: left;
   overflow:  visible;
-  line-break: loose;
+  word-break: break-all
 }
 .side-comment .comment-text p {
   margin: 0;
@@ -236,7 +236,7 @@ div[class^='comment-paragraph-loading-'] {
 }
 
 .single-border{
-  border-style:  solid;
+  border-style: solid;
   border-width: 2px;
 }
 
