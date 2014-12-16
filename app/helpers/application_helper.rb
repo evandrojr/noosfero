@@ -304,7 +304,7 @@ module ApplicationHelper
   def partial_for_class(klass, prefix=nil, suffix=nil)
     raise ArgumentError, 'No partial for object. Is there a partial for any class in the inheritance hierarchy?' if klass.nil?
     name = klass.name.underscore
-    controller.view_paths.reverse_each do |view_path|
+    controller.view_paths.each do |view_path|
       partial = partial_for_class_in_view_path(klass, view_path, prefix, suffix)
       return partial if partial
     end
@@ -482,7 +482,12 @@ module ApplicationHelper
             '/images/icons-app/enterprise-'+ size.to_s() +'.png'
           end
         else
-          '/images/icons-app/person-'+ size.to_s() +'.png'
+          pixels = Image.attachment_options[:thumbnails][size].split('x').first
+          gravatar_profile_image_url(
+            profile.email,
+            :size => pixels,
+            :d => gravatar_default
+          )
         end
       filename = default_or_themed_icon(icon)
     end
@@ -602,7 +607,7 @@ module ApplicationHelper
   end
 
   def gravatar_default
-    (respond_to?(:theme_option) && theme_option.present? && theme_option['gravatar']) || NOOSFERO_CONF['gravatar']
+    (respond_to?(:theme_option) && theme_option.present? && theme_option['gravatar']) || NOOSFERO_CONF['gravatar'] || 'mm'
   end
 
   attr_reader :environment
@@ -902,13 +907,15 @@ module ApplicationHelper
   end
 
   def page_title
-    (@page ? @page.title + ' - ' : '') +
-    (@topic ? @topic.title + ' - ' : '') +
-    (@section ? @section.title + ' - ' : '') +
-    (@toc ? _('Online Manual') + ' - ' : '') +
-    (controller.controller_name == 'chat' ? _('Chat') + ' - ' : '') +
-    (profile ? profile.short_name : environment.name) +
-    (@category ? " - #{@category.full_name}" : '')
+    CGI.escapeHTML(
+      (@page ? @page.title + ' - ' : '') +
+      (@topic ? @topic.title + ' - ' : '') +
+      (@section ? @section.title + ' - ' : '') +
+      (@toc ? _('Online Manual') + ' - ' : '') +
+      (controller.controller_name == 'chat' ? _('Chat') + ' - ' : '') +
+      (profile ? profile.short_name : environment.name) +
+      (@category ? " - #{@category.full_name}" : '')
+    )
   end
 
   # DEPRECATED. Do not use this.
@@ -1280,11 +1287,13 @@ module ApplicationHelper
   end
 
   def delete_article_message(article)
-    if article.folder?
-      _("Are you sure that you want to remove the folder \"#{article.name}\"? Note that all the items inside it will also be removed!")
-    else
-      _("Are you sure that you want to remove the item \"#{article.name}\"?")
-    end
+    CGI.escapeHTML(
+      if article.folder?
+        _("Are you sure that you want to remove the folder \"%s\"? Note that all the items inside it will also be removed!") % article.name
+      else
+        _("Are you sure that you want to remove the item \"%s\"?") % article.name
+      end
+    )
   end
 
   def expirable_link_to(expired, content, url, options = {})
@@ -1372,7 +1381,7 @@ module ApplicationHelper
       #     are old things that do not support it we are keeping this hot spot.
       html = @plugins.pipeline(:parse_content, html, source).first
     end
-    html
+    html && html.html_safe
   end
 
   def convert_macro(html, source)

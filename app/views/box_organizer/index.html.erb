@@ -8,12 +8,12 @@
 <% end %>
 
 <% n_blocks_in_line = 0 %>
-<% last_block = @blocks.last %>
+<% last_block = @available_blocks.last %>
 
 <div id="block-types-container">
   <div id="block-types">
 
-    <% @blocks.each do |block| %>
+    <% @available_blocks.each do |block| %>
 
     <% if n_blocks_in_line == 0 %>
     <div class="block-types-group">

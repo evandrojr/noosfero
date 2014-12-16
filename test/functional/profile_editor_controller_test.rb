@@ -230,16 +230,20 @@ class ProfileEditorControllerTest < ActionController::TestCase
 
   should 'back when update community info fail' do
     org = fast_create(Community)
-    Community.any_instance.stubs(:update_attributes).returns(false)
+    Community.any_instance.expects(:update_attributes!).raises(ActiveRecord::RecordInvalid)
     post :edit, :profile => org.identifier
+
     assert_template 'edit'
+    assert_response :success
   end
 
   should 'back when update enterprise info fail' do
     org = fast_create(Enterprise)
-    Enterprise.any_instance.stubs(:update_attributes).returns(false)
+
+    Enterprise.any_instance.expects(:update_attributes!).raises(ActiveRecord::RecordInvalid)
     post :edit, :profile => org.identifier
     assert_template 'edit'
+    assert_response :success
   end
 
   should 'show edit profile button' do
@@ -865,7 +869,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
 
   should 'not be able to destroy enterprise if is a regular member' do
     enterprise = fast_create(Enterprise)
-    enterprise.add_member(fast_create(Person)) # first member is admin by default
+    enterprise.add_member(create_user.person) # first member is admin by default
 
     person = create_user('foo').person
     enterprise.add_member(person)

@@ -157,13 +157,16 @@ class Article < ActiveRecord::Base
     self.profile
   end
 
-  def self.human_attribute_name(attrib, options = {})
+  def self.human_attribute_name_with_customization(attrib, options={})
     case attrib.to_sym
     when :name
       _('Title')
     else
-      _(self.superclass.human_attribute_name(attrib))
+      _(self.human_attribute_name_without_customization(attrib))
     end
+  end
+  class << self
+    alias_method_chain :human_attribute_name, :customization
   end
 
   def css_class_list
@@ -280,13 +283,6 @@ class Article < ActiveRecord::Base
     else
       body || ''
     end
-  end
-
-  def reported_version(options = {})
-    article = self
-    search_path = Rails.root.join('app', 'views', 'shared', 'reported_versions')
-    partial_path = File.join('shared', 'reported_versions', partial_for_class_in_view_path(article.class, search_path))
-    lambda { render_to_string(:partial => partial_path, :locals => {:article => article}) }
   end
 
   # returns the data of the article. Must be overriden in each subclass to

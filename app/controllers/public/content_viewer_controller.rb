@@ -126,7 +126,7 @@ class ContentViewerController < ApplicationController
     elsif !@page.display_to?(user)
       if !profile.public?
         private_profile_partial_parameters
-        render :template => 'profile/_private_profile', :status => 403
+        render :template => 'profile/_private_profile', :status => 403, :formats => [:html]
         allowed = false
       else #if !profile.visible?
         render_access_denied
@@ -215,8 +215,6 @@ class ContentViewerController < ApplicationController
   def process_page_posts(params)
     if @page.has_posts?
       posts = get_posts(params[:year], params[:month])
-
-      posts = posts.includes(:parent, {:profile => [:domains, :environment]}, :author)
 
       #FIXME Need to run this before the pagination because this version of
       #      will_paginate returns a will_paginate collection instead of a

@@ -116,7 +116,7 @@ class Block < ActiveRecord::Base
   # Must be redefined in subclasses to match the description of each block
   # type.
   def self.description
-    _('nothing')
+    ('dummy')
   end
 
   # returns a short description of the block, used when the user sees a list of
@@ -205,7 +205,7 @@ class Block < ActiveRecord::Base
 
   # Override in your subclasses.
   # Define which events and context should cause the block cache to expire
-  # Possible events are: :article, :profile, :friendship, :category
+  # Possible events are: :article, :profile, :friendship, :category, :role_assignment
   # Possible contexts are: :profile, :environment
   def self.expire_on
     {
@@ -254,7 +254,7 @@ class Block < ActiveRecord::Base
 
   def self.icon_path
     basename = self.name.split('::').last.underscore
-    File.join('blocks', basename, 'icon.png') 
+    File.join('blocks', basename, 'icon.png')
   end
 
   def self.default_icon_path
@@ -263,6 +263,11 @@ class Block < ActiveRecord::Base
 
   def self.default_preview_path
     "block_preview.png"
+  end
+
+  def copy_from(block)
+    self.settings = block.settings
+    self.position = block.position
   end
 
 end
