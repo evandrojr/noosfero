@@ -215,8 +215,11 @@ module BoxesHelper
       buttons << icon_button(:clone, _('Clone'), { :action => 'clone_block', :id => block.id }, { :method => 'post' })
     end
 
-    if block.respond_to?(:help)
-      buttons << thickbox_inline_popup_icon(:help, _('Help on this block'), {}, "help-on-box-#{block.id}") << content_tag('div', content_tag('h2', _('Help')) + content_tag('div', block.help, :style => 'margin-bottom: 1em;') + thickbox_close_button(_('Close')), :style => 'display: none;', :id => "help-on-box-#{block.id}")
+    unless block.kind_of?(MainBlock)
+      buttons << link_to(content_tag('span', _('Help on this block')),
+                      {:action => 'show_block_type_info', :type => block.class.name},
+                      :class => "button icon-button icon-help colorbox",
+                      :title => _('Help on this block'))
     end
 
     if block.embedable?
