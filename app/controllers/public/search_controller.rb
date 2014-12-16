@@ -45,14 +45,15 @@ class SearchController < PublicController
     @order = []
     @names = {}
     limit = MULTIPLE_SEARCH_LIMIT
-    [
-      [ :people, _('People'), :recent_people ],
-      [ :enterprises, _('Enterprises'), :recent_enterprises ],
-      [ :products, _('Products'), :recent_products ],
-      [ :events, _('Upcoming events'), :upcoming_events ],
-      [ :communities, _('Communities'), :recent_communities ],
-      [ :articles, _('Contents'), :recent_articles ]
-    ].each do |asset, name, filter|
+    items = []
+    items << [ :people, _('People'), :recent_people ] if environment.disabled?('disable_asset_people')
+    items << [ :enterprises, _('Enterprises'), :recent_enterprises ] if environment.disabled?('disable_asset_enterprises')
+    items << [ :products, _('Products'), :recent_products ] if environment.disabled?('disable_asset_products')
+    items << [ :events, _('Upcoming events'), :upcoming_events ] if environment.disabled?('disable_asset_events')
+    items << [ :communities, _('Communities'), :recent_communities ] if environment.disabled?('disable_asset_communities')
+    items << [ :articles, _('Contents'), :recent_articles ] if environment.disabled?('disable_asset_articles')
+
+    items.each do |asset, name, filter|
       @order << asset
       @searches[asset]= {:results => @category.send(filter, limit)}
       raise "No total_entries for: #{asset}" unless @searches[asset][:results].respond_to?(:total_entries)
