@@ -129,7 +129,7 @@ class Block < ActiveRecord::Base
   end
 
   def self.pretty_name
-    self.name.gsub('Block','')
+    self.name.split('::').last.gsub('Block','')
   end
 
   # Returns the content to be used for this block.
