@@ -1,0 +1,5 @@
+to = "box-#{@target_box.id}"
+
+page.replace_html(to, display_updated_box(@target_box))
+
+page.visual_effect(:highlight, to)

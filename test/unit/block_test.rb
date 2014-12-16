@@ -7,6 +7,10 @@ class BlockTest < ActiveSupport::TestCase
     assert_kind_of String, Block.description
   end
   
+  should 'describe shotly itself' do
+    assert_kind_of String, Block.short_description
+  end
+  
   should 'access owner through box' do
     user = create_user('testinguser').person
 
@@ -282,6 +286,35 @@ class BlockTest < ActiveSupport::TestCase
     person = fast_create(Person)
     block = Block.new
     assert_equal block.cache_key('en'), block.cache_key('en', person)
+  end
+
+  should 'pretty_name method defined' do
+    assert Block.respond_to?(:pretty_name)
+  end
+
+  should 'previews_path return the apth to preview images' do
+    class NewBlock < Block; end
+    assert_equal 'blocks/new_block/previews', NewBlock.preview_path
+  end
+
+  should 'return the icon block path' do
+    class NewBlock < Block; end
+    assert_equal 'blocks/new_block/icon.png', NewBlock.icon_path
+  end
+
+  should 'return the icon block path for blocks inside modules' do
+    module SomeModule class NewBlock < Block; end; end
+    assert_equal 'blocks/new_block/icon.png', SomeModule::NewBlock.icon_path
+  end
+
+  should 'return the default icon for blocks without icon' do
+    class NewBlock < Block; end
+    assert_equal 'icon_block.png', NewBlock.default_icon_path
+  end
+
+  should 'return the default preview path for blocks without preview images' do
+    class NewBlock < Block; end
+    assert_equal 'block_preview.png', NewBlock.default_preview_path
   end
 
 end

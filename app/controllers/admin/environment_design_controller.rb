@@ -13,4 +13,8 @@ class EnvironmentDesignController < BoxOrganizerController
     @available_blocks += plugins.dispatch(:extra_blocks, :type => Environment)
   end
 
+  def index
+    available_blocks
+  end
+
 end

@@ -1,0 +1,21 @@
+<div id="block-info-container">
+
+  <div id="block-info-header">
+    <%= display_icon(@block) %>
+    <h1><%= @block.pretty_name %></h1>
+    <p><%= @block.short_description %></p>
+  </div>
+
+  <div id="block-info-images">
+    <div style="white-space: nowrap;">
+      <%= display_previews(@block) %>
+    </div>
+  </div>
+
+  <div id="block-info-description">
+    <h2><%= _('Description') %></h2>
+    <p><%= @block.description %></p>
+    <p><%= @block.new.help if @block.method_defined?(:help) %></p>
+  </div>
+
+</div>

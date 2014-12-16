@@ -114,9 +114,22 @@ class Block < ActiveRecord::Base
   # blocks to choose one to include in the design.
   #
   # Must be redefined in subclasses to match the description of each block
-  # type. 
+  # type.
   def self.description
-    '(dummy)'
+    ('dummy')
+  end
+
+  # returns a short description of the block, used when the user sees a list of
+  # blocks to choose one to include in the design.
+  #
+  # Must be redefined in subclasses to match the short description of each block
+  # type.
+  def self.short_description
+    self.pretty_name
+  end
+
+  def self.pretty_name
+    self.name.split('::').last.gsub('Block','')
   end
 
   # Returns the content to be used for this block.
@@ -232,6 +245,24 @@ class Block < ActiveRecord::Base
     duplicated_block.save!
     duplicated_block.insert_at((self.position || 0) + 1)
     duplicated_block
+  end
+
+  def self.preview_path
+    base_name = self.name.split('::').last.underscore
+    File.join('blocks', base_name,'previews')
+  end
+
+  def self.icon_path
+    basename = self.name.split('::').last.underscore
+    File.join('blocks', basename, 'icon.png')
+  end
+
+  def self.default_icon_path
+    'icon_block.png'
+  end
+
+  def self.default_preview_path
+    "block_preview.png"
   end
 
   def copy_from(block)
