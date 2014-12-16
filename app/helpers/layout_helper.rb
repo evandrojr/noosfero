@@ -28,6 +28,7 @@ module LayoutHelper
       'lightbox',
       'colorbox',
       'inputosaurus',
+      'chat',
       'block_store',
       pngfix_stylesheet_path,
     ] + tokeninput_stylesheets
