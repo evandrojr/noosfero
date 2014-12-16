@@ -41,7 +41,7 @@ module BoxOrganizerHelper
 
     content_tag(:ul,
       images_path.map do |preview|
-	content_tag(:li, image_tag(preview, height: '240', width: '384', alt: ''))
+	content_tag(:li, image_tag(preview, height: '240', alt: ''))
       end.join("\n")
     )
   end
