@@ -216,15 +216,15 @@ class ProfileDesignControllerTest < ActionController::TestCase
     get :index, :profile => 'designtestuser'
     assert_response :success
 
-    assert @controller.instance_variable_get('@blocks').include?(CustomBlock1)
-    assert @controller.instance_variable_get('@blocks').include?(CustomBlock2)
-    assert @controller.instance_variable_get('@blocks').include?(CustomBlock3)
-    assert @controller.instance_variable_get('@blocks').include?(CustomBlock4)
-    assert @controller.instance_variable_get('@blocks').include?(CustomBlock5)
-    assert @controller.instance_variable_get('@blocks').include?(CustomBlock6)
-    assert @controller.instance_variable_get('@blocks').include?(CustomBlock7)
-    assert @controller.instance_variable_get('@blocks').include?(CustomBlock8)
-    assert @controller.instance_variable_get('@blocks').include?(CustomBlock9)
+    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock1)
+    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock2)
+    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock3)
+    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock4)
+    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock5)
+    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock6)
+    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock7)
+    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock8)
+    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock9)
   end
 
   should 'a block plugin cannot be listed for unspecified types' do
@@ -256,14 +256,14 @@ class ProfileDesignControllerTest < ActionController::TestCase
     get :index, :profile => 'designtestuser'
     assert_response :success
 
-    assert @controller.instance_variable_get('@blocks').include?(CustomBlock1)
-    assert !@controller.instance_variable_get('@blocks').include?(CustomBlock2)
-    assert !@controller.instance_variable_get('@blocks').include?(CustomBlock3)
-    assert !@controller.instance_variable_get('@blocks').include?(CustomBlock4)
-    assert @controller.instance_variable_get('@blocks').include?(CustomBlock5)
-    assert !@controller.instance_variable_get('@blocks').include?(CustomBlock6)
-    assert !@controller.instance_variable_get('@blocks').include?(CustomBlock7)
-    assert !@controller.instance_variable_get('@blocks').include?(CustomBlock8)
+    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock1)
+    assert !@controller.instance_variable_get('@available_blocks').include?(CustomBlock2)
+    assert !@controller.instance_variable_get('@available_blocks').include?(CustomBlock3)
+    assert !@controller.instance_variable_get('@available_blocks').include?(CustomBlock4)
+    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock5)
+    assert !@controller.instance_variable_get('@available_blocks').include?(CustomBlock6)
+    assert !@controller.instance_variable_get('@available_blocks').include?(CustomBlock7)
+    assert !@controller.instance_variable_get('@available_blocks').include?(CustomBlock8)
   end
 
   should 'not edit main block with never option' do
