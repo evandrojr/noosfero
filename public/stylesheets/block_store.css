@@ -1,3 +1,7 @@
+#content .block-type {
+  padding: 0;
+}
+
 #block-types {
   height: 100px;
 }
