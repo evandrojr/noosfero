@@ -124,7 +124,7 @@ class Noosfero::Plugin
     def available_plugin_names
       available_plugins.map { |f| File.basename(f).camelize }
     end
-
+ 
     def all
       @all ||= available_plugins.map{ |dir| (File.basename(dir) + "_plugin").camelize }
     end
@@ -166,6 +166,13 @@ class Noosfero::Plugin
     def api_mount_points
     end
   end
+    
+    
+  #FIXME make this test
+  def has_block?(block)
+    self.class.extra_blocks.keys.include?(block)
+  end
+ 
 
   def expanded_template(file_path, locals = {})
     views_path = Rails.root.join('plugins', "#{self.class.public_name}", 'views')

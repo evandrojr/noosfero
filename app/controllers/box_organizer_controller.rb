@@ -5,10 +5,7 @@ class BoxOrganizerController < ApplicationController
   def index
   end
 
-  def move_block
-    @block = boxes_holder.blocks.find(params[:id].gsub(/^block-/, ''))
-
-    @source_box = @block.box
+  def add_or_move_block
 
     target_position = nil
 
@@ -23,9 +20,20 @@ class BoxOrganizerController < ApplicationController
       @target_box = boxes_holder.boxes.find($1)
     end
 
-    if (@source_box != @target_box)
-      @block.remove_from_list
+    type = params[:id].gsub(/^block-/,'')
+
+    if available_blocks.map(&:name).include?(type)
+      @block = type.constantize.new
       @block.box = @target_box
+      @block.position = target_position
+    else
+      @block = boxes_holder.blocks.find(params[:id].gsub(/^block-/, ''))
+      @source_box = @block.box
+
+      if (@source_box != @target_box)
+        @block.remove_from_list
+        @block.box = @target_box
+      end
     end
 
     if target_position.nil?
@@ -41,9 +49,12 @@ class BoxOrganizerController < ApplicationController
 
     @target_box.reload
 
-    unless request.xhr?
-      redirect_to :action => 'index'
+    if available_blocks.map(&:name).include?(type)
+      render :action => 'add_block'
+    else
+      render :action => 'move_block'
     end
+
   end
 
   def move_block_down
@@ -58,20 +69,17 @@ class BoxOrganizerController < ApplicationController
     redirect_to :action => 'index'
   end
 
-  def add_block
+  def show_block_type_info
     type = params[:type]
     if ! type.blank?
       if available_blocks.map(&:name).include?(type)
-        boxes_holder.boxes.find(params[:box_id]).blocks << type.constantize.new
-        redirect_to :action => 'index'
+        @block = type.constantize
       else
-        raise ArgumentError.new("Type %s is not allowed. Go away." % type)
+       raise ArgumentError.new("Type %s is not allowed. Go away." % type)
       end
+      render :action => 'show_block_type_info', :layout => false
     else
-      @center_block_types = filtered_available_blocks((Box.acceptable_center_blocks & available_blocks) + plugins.dispatch(:extra_blocks, :type => boxes_holder.class, :position => 1))
-      @side_block_types = filtered_available_blocks((Box.acceptable_side_blocks & available_blocks) + plugins.dispatch(:extra_blocks, :type => boxes_holder.class, :position => [2,3]))
-      @boxes = boxes_holder.boxes.with_position
-      render :action => 'add_block', :layout => false
+      redirect_to :action => 'index'
     end
   end
 
@@ -84,9 +92,9 @@ class BoxOrganizerController < ApplicationController
     if request.xhr? and params[:query]
       search = params[:query]
       path_list = if boxes_holder.is_a?(Environment) && boxes_holder.enabled?('use_portal_community') && boxes_holder.portal_community
-        boxes_holder.portal_community.articles.find(:all, :conditions=>"articles.name ILIKE '%#{search}%' or articles.path ILIKE '%#{search}%'", :limit=>20).map { |content| "/{portal}/"+content.path }
+        boxes_holder.portal_community.articles.find(:all, :conditions=>"name ILIKE '%#{search}%' or path ILIKE '%#{search}%'", :limit=>20).map { |content| "/{portal}/"+content.path }
       elsif boxes_holder.is_a?(Profile)
-        boxes_holder.articles.find(:all, :conditions=>"articles.name ILIKE '%#{search}%' or articles.path ILIKE '%#{search}%'", :limit=>20).map { |content| "/{profile}/"+content.path }
+        boxes_holder.articles.find(:all, :conditions=>"name ILIKE '%#{search}%' or path ILIKE '%#{search}%'", :limit=>20).map { |content| "/{profile}/"+content.path }
       else
         []
       end

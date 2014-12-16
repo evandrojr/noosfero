@@ -2,7 +2,6 @@ module LayoutHelper
 
   def body_classes
     # Identify the current controller and action for the CSS:
-    (logged_in? ? " logged-in" : "") +
     " controller-#{controller.controller_name}" +
     " action-#{controller.controller_name}-#{controller.action_name}" +
     " template-#{@layout_template || if profile.blank? then 'default' else profile.layout_template end}" +
@@ -29,7 +28,7 @@ module LayoutHelper
       'lightbox',
       'colorbox',
       'inputosaurus',
-      'chat',
+      'block_store',
       pngfix_stylesheet_path,
     ] + tokeninput_stylesheets
     plugins_stylesheets = @plugins.select(&:stylesheet?).map { |plugin| plugin.class.public_path('style.css') }
