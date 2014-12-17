@@ -2,14 +2,15 @@
   position: relative;
   display: inline-block;
   width: 95px;
-  height: 85px;
+  height: 115px;
   margin: 1em;
   border: solid #F0F0F0 1px;
   vertical-align: top;
-  text-align: center;
+  text-align: left;
   overflow: hidden;
   padding-top: 7px;
   margin-botton: 10px;
+  text-overflow: ellipsis;
 }
 
 .video-gallery-top-box{
@@ -22,4 +23,16 @@
   background-color: black;
   font-size: 1em;
   text-color: white;
+}
+
+.video-title{
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.video-author{
+  display: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

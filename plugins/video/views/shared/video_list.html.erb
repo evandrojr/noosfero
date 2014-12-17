@@ -1,6 +1,5 @@
 <div>
   <% contents.each do |content| %>
-    <%#=  py content %>
     <% if content.display_to?(user) %>
       <div class="video-gallery-thumbnail">
         <div class="video-gallery-top-box">
@@ -9,7 +8,10 @@
           <% end  %>
         </div>
         <div class="video-gallery-botton-box">
-          <font size="1em"><%= content.title %></font>
+            <div class="video-author">
+              <%= _("by")  %> <%= content.author_name %> <%= _("updated at") %>  <%= time_ago_as_sentence(content.updated_at)  %>
+            </div>
+            <div class="video-title"><%= content.title %></div>
         </div>
       </div>
     <% end %>
