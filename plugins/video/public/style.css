@@ -36,3 +36,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.video-gallery-thumbnail:hover div{
+  display: inline-block;  
+}
