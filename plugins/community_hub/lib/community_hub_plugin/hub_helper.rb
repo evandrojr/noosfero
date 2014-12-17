@@ -1,11 +1,11 @@
 module CommunityHubPlugin::HubHelper
 
   def mediator?(hub)
-    logged_in? && (hub.author.id == user.id || hub.mediators.include?(user.id)) ? true : false
+    logged_in? && (user && hub.allow_edit?(user) || hub.mediators.include?(user.id))
   end
 
-  def promoted?(hub, user_id)
-    logged_in? && (hub.author.id == user_id || hub.mediators.include?(user_id)) ? true : false
+  def promoted?(hub, person)
+    logged_in? && (hub.allow_edit?(person) || hub.mediators.include?(person.id))
   end
 
   def pinned_message?(hub, message_id)

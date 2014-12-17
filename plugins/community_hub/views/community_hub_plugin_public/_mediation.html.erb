@@ -24,7 +24,7 @@
         <% if mediation.source != 'twitter' && mediation.source != 'facebook' %>
 
         <li class="promote">
-          <% if !promoted?(hub, mediation.created_by.id) %>
+          <% if !promoted?(hub, mediation.created_by) %>
           <a id="<%= mediation.id %>" href="#" onclick="promote_user(<%= mediation.id %>,<%= mediation.created_by.id %>); return false;">
             <img class="not-promoted" src="/plugins/community_hub/icons/hub-not-promote-icon.png" title="<%= _("User not promoted") %>" />
           </a>
