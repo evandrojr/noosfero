@@ -72,18 +72,23 @@ class Block < ActiveRecord::Base
   end
 
   def display_home_page_only(context)
-    if context[:article]
-      return context[:article] == owner.home_page
+    return context[:article] == owner.home_page if context[:article]
+
+    if owner.kind_of?(Profile)
+      return owner.home_page.nil? && context[:request_path] == "/profile/#{owner.identifier}"
     else
       return context[:request_path] == '/'
     end
   end
 
   def display_except_home_page(context)
-    if context[:article]
-      return context[:article] != owner.home_page
+    return context[:article] != owner.home_page if context[:article]
+
+    if owner.kind_of?(Profile)
+      return (!owner.home_page.nil? && context[:request_path] != "/#{owner.identifier}") ||
+               (owner.home_page.nil? && context[:request_path] != "/profile/#{owner.identifier}")
     else
-      return context[:request_path] != '/' + (owner.kind_of?(Profile) ? owner.identifier : '')
+      return context[:request_path] != '/'
     end
   end
 
