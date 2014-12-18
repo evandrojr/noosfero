@@ -79,6 +79,16 @@ class BlockTest < ActiveSupport::TestCase
     assert_equal false, block.visible?(:article => Article.new)
   end
 
+  should 'be able to be displayed only in the default profile homepage when home page is nil' do
+    profile = build(Profile, :identifier => 'testinguser')
+    profile.home_page = nil
+    block = build(Block, :display => 'home_page_only')
+    block.stubs(:owner).returns(profile)
+
+    assert_equal true, block.visible?(:request_path => '/profile/testinguser')
+    assert_equal false, block.visible?(:article => Article.new)
+  end
+
   should 'be able to be displayed only in the homepage (index) of the environment' do
     block = build(Block, :display => 'home_page_only')
 
@@ -99,10 +109,21 @@ class BlockTest < ActiveSupport::TestCase
 
   should 'be able to be displayed everywhere except on profile index' do
     profile = build(Profile, :identifier => 'testinguser')
+    home_page = Article.new
+    profile.home_page = home_page
     block = build(Block, :display => 'except_home_page')
     block.stubs(:owner).returns(profile)
 
     assert_equal false, block.visible?(:article => nil, :request_path => '/testinguser')
+    assert_equal true, block.visible?(:article => nil)
+  end
+
+  should 'be able to be displayed everywhere except on default profile index' do
+    profile = build(Profile, :identifier => 'testinguser')
+    block = build(Block, :display => 'except_home_page')
+    block.stubs(:owner).returns(profile)
+
+    assert_equal false, block.visible?(:article => nil, :request_path => '/profile/testinguser')
     assert_equal true, block.visible?(:article => nil)
   end
 
