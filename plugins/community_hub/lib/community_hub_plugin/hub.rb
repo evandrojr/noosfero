@@ -58,6 +58,6 @@ class CommunityHubPlugin::Hub < Folder
   end
 
   def mediator?(user)
-    self.author.id == user.id || self.mediators.include?(user.id) ? true : false
+    self.allow_edit?(user) || self.mediators.include?(user.id)
   end
 end
