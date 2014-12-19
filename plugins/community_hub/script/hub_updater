@@ -4,9 +4,11 @@ require 'daemons'
 require 'optparse'
 
 NOOSFERO_ROOT = File.expand_path(File.dirname(__FILE__) + '/../../../')
-require NOOSFERO_ROOT + '/config/environment'
 
 Daemons.run_proc('hub') do
+  Dir.chdir NOOSFERO_ROOT
+  require './config/environment'
+
   unless ENV['PROXY'].blank?
     ENV['NO_PROXY'] ||= 'localhost'
     require 'proxifier/env'
