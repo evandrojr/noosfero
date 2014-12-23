@@ -78,6 +78,13 @@ div.article-comments-list-more{
   border-radius: 10px;
 }
 
+.side-comment .comment-header {
+  position: absolute;
+  width: 150px;
+  right: 0;
+  top: 0;
+}
+
 .side-comment .comment-created-at{display: none;}
 .side-comment #comment_title{display: none;}
 .side-comment .comment_title{display: none;}
