@@ -167,10 +167,9 @@ div[class^='comment-paragraph-loading-'] {
 }
 .side-comment .comment-text {
   padding: 0;
-  width: 100%;
-  text-align: left;
+  width: 98%;
+  text-align: justify;
   overflow:  visible;
-  word-break: break-all
 }
 .side-comment .comment-text p {
   margin: 0;
