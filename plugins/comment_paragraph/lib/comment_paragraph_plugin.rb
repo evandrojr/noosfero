@@ -40,48 +40,47 @@ class CommentParagraphPlugin < Noosfero::Plugin
     true
   end
 
-  def cms_controller_filters
-    block = proc do
-      if params['commit'] == 'Save'
+#  def cms_controller_filters
+#    block = proc do
+#      if params['commit'] == 'Save'
+#
+#        settings = Noosfero::Plugin::Settings.new(environment, CommentParagraphPlugin, params[:settings])
+#
+#        extend CommentParagraphPlugin::CommentParagraphHelper
+#        if !@article.id.blank? && self.auto_marking_enabled?(settings, @article.class.name)
+#
+#          parsed_paragraphs = []
+#          paragraph_id = 0
+#
+#          doc = Hpricot(@article.body)
+#          paragraphs = doc.search("/*").each do |paragraph|
+#
+#            if paragraph.to_html =~ /^<div(.*)paragraph_comment(.*)$/ || paragraph.to_html =~ /^<p>\W<\/p>$/
+#              parsed_paragraphs << paragraph.to_html
+#            else
+#              if paragraph.to_html =~ /^(<div|<table|<p|<ul).*/
+#                parsed_paragraphs << CommentParagraphPlugin.parse_paragraph(paragraph.to_html, paragraph_id)
+#              else
+#                parsed_paragraphs << paragraph.to_html
+#              end
+#            end
+#
+#            paragraph_id += 1
+#
+#          end
+#
+#          @article.body = parsed_paragraphs.join()
+#          @article.save
+#
+#        end
+#      end
+#    end
+#
+#    { :type => 'after_filter',
+#      :method_name => 'new',
+#      :block => block }
+#  end
 
-        settings = Noosfero::Plugin::Settings.new(environment, CommentParagraphPlugin, params[:settings])
-
-        extend CommentParagraphPlugin::CommentParagraphHelper
-        if !@article.id.blank? && self.auto_marking_enabled?(settings, @article.class.name)
-
-          parsed_paragraphs = []
-          paragraph_id = 0
-
-          doc = Hpricot(@article.body)
-          paragraphs = doc.search("/*").each do |paragraph|
-
-            if paragraph.to_html =~ /^<div(.*)paragraph_comment(.*)$/ || paragraph.to_html =~ /^<p>\W<\/p>$/
-              parsed_paragraphs << paragraph.to_html
-            else
-              if paragraph.to_html =~ /^(<div|<table|<p|<ul).*/
-                parsed_paragraphs << CommentParagraphPlugin.parse_paragraph(paragraph.to_html, paragraph_id)
-              else
-                parsed_paragraphs << paragraph.to_html
-              end
-            end
-
-            paragraph_id += 1
-
-          end
-
-          @article.body = parsed_paragraphs.join()
-          @article.save
-
-        end
-      end
-    end
-
-    { :type => 'after_filter',
-      :method_name => 'new',
-      :block => block }
-  end
-
-  private
 
   def self.parse_paragraph( paragraph_content, paragraph_id )
       "<div class='macro article_comments paragraph_comment' " +
