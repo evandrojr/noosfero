@@ -47,7 +47,7 @@
 //  jQuery('#article_body_ifr').contents().find('body').children('p,table,img').each(function( index ) {
 //    text=jQuery(this).prop('outerHTML'); 
 //    if(text!="" && text!=" " && text!="<br>"){
-//      paragraphsTxt+='<div class="macro article_comments paragraph_comment" data-macro="comment_paragraph_plugin/allow_comment" data-macro-paragraph_id="' + index + '">' + text + '</div><br>'
+//      paragraphsTxt+='<div class="macro article_comments paragraph_comment" data-macro="comment_paragraph_plugin/allow_comment" data-macro-paragraph_uuid="' + index + '">' + text + '</div><br>'
 //    }
 //  });
 //  tinyMCE.activeEditor.setContent(paragraphsTxt); 

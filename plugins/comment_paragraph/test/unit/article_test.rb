@@ -11,14 +11,14 @@ class ArticleTest < ActiveSupport::TestCase
   attr_reader :article
 
   should 'return paragraph comments from article' do
-    comment1 = fast_create(Comment, :paragraph_id => 1, :source_id => article.id)
-    comment2 = fast_create(Comment, :paragraph_id => nil, :source_id => article.id)
+    comment1 = fast_create(Comment, :paragraph_uuid => 1, :source_id => article.id)
+    comment2 = fast_create(Comment, :paragraph_uuid => nil, :source_id => article.id)
     assert_equal [comment1], article.paragraph_comments
   end
 
   should 'allow save if comment paragraph macro is not removed for paragraph with comments' do
-    article.body = "<div class=\"macro\" data-macro-paragraph_id=0></div>"
-    comment1 = fast_create(Comment, :paragraph_id => 0, :source_id => article.id)
+    article.body = "<div class=\"macro\" data-macro-paragraph_uuid=0></div>"
+    comment1 = fast_create(Comment, :paragraph_uuid => 0, :source_id => article.id)
     assert article.save
   end
 

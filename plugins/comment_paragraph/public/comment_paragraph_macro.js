@@ -20,9 +20,9 @@ jQuery(document).ready(function($) {
 
   all_paragraphs = $('.comment_paragraph');
   all_paragraphs.each( function(paragraph) {
-    var paragraph_id = $( all_paragraphs.get(paragraph) ).attr('data-paragraph');
+    var paragraph_uuid = $( all_paragraphs.get(paragraph) ).attr('data-paragraph');
     var paragraph_content = all_paragraphs.get(paragraph).innerHTML;
-    original_paragraphs.push( { id: paragraph_id, content: paragraph_content } );
+    original_paragraphs.push( { id: paragraph_uuid, content: paragraph_content } );
   });
 
   $(document).keyup(function(e) {
@@ -248,8 +248,8 @@ jQuery(document).ready(function($) {
 
   $(document).on('mouseenter', 'li.article-comment', function() {
     var selected_area = $(this).find('input.paragraph_comment_area').val();
-    var paragraph_id =  $(this).find('input.paragraph_id').val();
-    var rootElement = $('#comment_paragraph_' + paragraph_id).get(0);
+    var paragraph_uuid =  $(this).find('input.paragraph_uuid').val();
+    var rootElement = $('#comment_paragraph_' + paragraph_uuid).get(0);
 
     if(selected_area != ""){
       rangy.deserializeSelection(selected_area, rootElement);
@@ -258,11 +258,11 @@ jQuery(document).ready(function($) {
   });
 
   $(document).on('mouseleave', 'li.article-comment', function() {
-    var paragraph_id = $(this).find('input.paragraph_id').val();
-    var rootElement = $('#comment_paragraph_'+ paragraph_id).get(0);
+    var paragraph_uuid = $(this).find('input.paragraph_uuid').val();
+    var rootElement = $('#comment_paragraph_'+ paragraph_uuid).get(0);
 
     original_paragraphs.each( function(paragraph) {
-      if (paragraph.id == paragraph_id) {
+      if (paragraph.id == paragraph_uuid) {
         rootElement.innerHTML = paragraph.content;
       }
     });

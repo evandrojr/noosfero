@@ -20,17 +20,17 @@ class CommentParagraphPluginPublicControllerTest < ActionController::TestCase
   attr_reader :profile
 
 
-  should 'be able to return paragraph_id for a comment' do
-    comment = fast_create(Comment, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'lalala', :paragraph_id => 0)
+  should 'be able to return paragraph_uuid for a comment' do
+    comment = fast_create(Comment, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'lalala', :paragraph_uuid => 0)
     cid = comment.id
     xhr :get, :comment_paragraph, :id => cid
-    assert_match /\{\"paragraph_id\":0\}/, @response.body
+    assert_match /\{\"paragraph_uuid\":0\}/, @response.body
   end
 
-  should 'return paragraph_id=null for a global comment' do
+  should 'return paragraph_uuid=null for a global comment' do
     comment = fast_create(Comment, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'lalala' )
     xhr :get, :comment_paragraph, :id => comment.id
-    assert_match /\{\"paragraph_id\":null\}/, @response.body
+    assert_match /\{\"paragraph_uuid\":null\}/, @response.body
   end
 
 

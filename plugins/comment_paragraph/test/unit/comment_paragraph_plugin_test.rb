@@ -29,9 +29,9 @@ class CommentParagraphPluginTest < ActiveSupport::TestCase
   should 'not add comment_paragraph_selected_area if comment_paragraph_selected_area is blank' do
     comment = Comment.new
     comment.comment_paragraph_selected_area = ""
-    comment.paragraph_id = 2
+    comment.paragraph_uuid = 2
     cpp = CommentParagraphPlugin.new
-    prok = cpp.comment_form_extra_contents({:comment=>comment, :paragraph_id=>4})
+    prok = cpp.comment_form_extra_contents({:comment=>comment, :paragraph_uuid=>4})
     assert_nil /comment_paragraph_selected_area/.match(prok.call.inspect)
   end
 

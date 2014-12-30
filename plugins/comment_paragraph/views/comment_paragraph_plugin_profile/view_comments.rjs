@@ -1,2 +1,2 @@
-page.replace_html "comments_list_paragraph_#{@paragraph_id}", :partial => 'comment/comment.html.erb', :collection => @comments
-page.replace_html "comment-count-#{@paragraph_id}", @comments_count
+page.replace_html "comments_list_paragraph_#{@paragraph_uuid}", :partial => 'comment/comment.html.erb', :collection => @comments
+page.replace_html "comment-count-#{@paragraph_uuid}", @comments_count

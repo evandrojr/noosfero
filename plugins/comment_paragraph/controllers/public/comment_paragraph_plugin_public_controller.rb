@@ -3,7 +3,7 @@ class CommentParagraphPluginPublicController < PublicController
 
   def comment_paragraph
     @comment = Comment.find(params[:id])
-    render :json => { :paragraph_id => @comment.paragraph_id }
+    render :json => { :paragraph_uuid => @comment.paragraph_uuid }
   end
 
 end
