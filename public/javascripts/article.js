@@ -167,18 +167,38 @@ jQuery(function($) {
   });
 
   function show_hide_token_input() {
-    if($("#article_published_false").attr('checked'))
+    if($("#article_visibility_mode_0").attr('checked'))
       $("#text-input-search-exception-users").parent("div").css('display', 'block');
     else
       $("#text-input-search-exception-users").parent("div").css('display', 'none');
   }
 
+  function show_hide_visibility_modes() {
+    if ($("#article_published_false").attr('checked'))
+      $("#article_visibility_mode_1").parent("div").parent("div").css("display", "block");
+    else
+     $("#article_visibility_mode_1").parent("div").parent("div").css("display", "none");
+  }
+
   if( $("#token-input-search-article-privacy-exceptions").length == 1 ) {
+    show_hide_visibility_modes();
     show_hide_token_input();
 
+    $("#article_published_true").click(function() {
+      show_hide_visibility_modes();
+    });
+
+    $("#article_published_false").click(function() {
+      show_hide_visibility_modes();
+    });
+
     //Hide / Show the text area
-    $("#article_published_false").click(show_hide_token_input);
-    $("#article_published_true").click(show_hide_token_input);
+    $("#article_visibility_mode_0").click(function() {
+      show_hide_token_input();
+    });
+    $("#article_visibility_mode_1").click(function() {
+      show_hide_token_input();
+    });
   }
 
 });
