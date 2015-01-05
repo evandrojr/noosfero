@@ -24,14 +24,12 @@ class CommunityTrackPlugin::TrackListBlock < Block
   def tracks(page=1, per_page=limit)
     tracks = all_tracks
     tracks = case order
-             when 'hits'
-               tracks.order('hits DESC')
              when 'newer'
                tracks.order('created_at DESC')
              when 'random'
                tracks.order('random()')
              else
-               tracks
+               tracks.order('hits DESC')
              end
     tracks.paginate(:per_page => per_page, :page => page)
   end
