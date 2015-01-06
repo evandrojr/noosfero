@@ -2,7 +2,7 @@ require 'hpricot'
 
 class Article < ActiveRecord::Base
 
-  attr_accessible :name, :body, :abstract, :profile, :tag_list, :parent, :allow_members_to_edit, :translation_of_id, :language, :license_id, :parent_id, :display_posts_in_current_language, :category_ids, :posts_per_page, :moderate_comments, :accept_comments, :feed, :published, :source, :highlighted, :notify_comments, :display_hits, :slug, :external_feed_builder, :display_versions, :external_link, :image_builder, :published_at
+  attr_accessible :name, :body, :abstract, :profile, :tag_list, :parent, :allow_members_to_edit, :translation_of_id, :language, :license_id, :parent_id, :display_posts_in_current_language, :category_ids, :posts_per_page, :moderate_comments, :accept_comments, :feed, :published, :source, :highlighted, :notify_comments, :display_hits, :slug, :external_feed_builder, :display_versions, :external_link, :image_builder, :published_at, :visibility_mode
 
   acts_as_having_image
 
@@ -498,7 +498,7 @@ class Article < ActiveRecord::Base
   def display_unpublished_article_to?(user)
     user == author || allow_view_private_content?(user) || user == profile ||
     user.is_admin?(profile.environment) || user.is_admin?(profile) ||
-    article_privacy_exceptions.include?(user)
+    article_privacy_exceptions.include?(user) || (visibility_mode == 1 && user.is_member_of?(profile))
   end
 
   def display_to?(user = nil)
@@ -655,6 +655,8 @@ class Article < ActiveRecord::Base
   def display_versions?
     can_display_versions? && display_versions
   end
+
+  settings_items :visibility_mode, :type => :integer, :default => 0
 
   def get_version(version_number = nil)
     version_number ? versions.find(:first, :order => 'version', :offset => version_number - 1) : versions.earliest
