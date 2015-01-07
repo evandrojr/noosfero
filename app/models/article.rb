@@ -730,7 +730,12 @@ class Article < ActiveRecord::Base
   def body_images_paths
     require 'uri'
     Hpricot(self.body.to_s).search('img[@src]').collect do |i|
-      (self.profile && self.profile.environment) ? URI.join(self.profile.environment.top_url, URI.escape(i.attributes['src'])).to_s : i.attributes['src']
+      begin
+        (self.profile && self.profile.environment) ? URI.join(self.profile.environment.top_url, URI.escape(i.attributes['src'], '[|]')).to_s : i.attributes['src']
+      rescue
+        # some uris are invalid but still visible on modern browsers (e.g.: uri with square brackets)
+        i.attributes['src']
+      end
     end
   end
 
