@@ -81,8 +81,7 @@ module ArticleHelper
   end
 
   def visibility_mode_options(article, tokenized_children)
-    content_tag('div',
-
+    (article.profile.community? ? content_tag('div',
     content_tag('div',
       radio_button(:article, :visibility_mode, 1) +
         content_tag('label', _('For all community members'), :for => 'article_visibility_mode_1', :id => "label_private")) +
@@ -94,7 +93,7 @@ module ArticleHelper
         content_tag('label', _('Fill in the search field to add the exception users to see this content'), :id => "text-input-search-exception-users") +
         token_input_field_tag(:q, 'search-article-privacy-exceptions', {:action => 'search_article_privacy_exceptions'},
           {:focus => false, :hint_text => _('Type in a search term for a user'), :pre_populate => tokenized_children})) :
-          ''), :style => 'padding-left: 15px;')
+          ''), :style => 'padding-left: 15px;') : '' )
   end
 
   def prepare_to_token_input(array)
