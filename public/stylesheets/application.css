@@ -6163,6 +6163,12 @@ li.profile-activity-item.upload_image .activity-gallery-images-count-1 img {
   content: '';
 }
 
+#signup-form #signup-email input#user_email,
+#profile-data input#profile_data_email,
+#forgot-password-form input#value {
+  text-transform: lowercase;
+}
+
 .action-account-signup #wrap-1 div.fieldWithErrors {
   background: transparent;
 }
