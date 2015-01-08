@@ -58,17 +58,28 @@ class PersonNotifier
       Person.find(person_id).notifier.notify
     end
 
+    def failure(job)
+      begin
+        person = Person.find(person_id)
+        person.notifier.dispatch_notification_mail
+      rescue
+        Rails.logger.error "PersonNotifier::NotifyJob: Cannot recover from failure"
+      end
+    end
+
   end
 
   class Mailer < ActionMailer::Base
 
-    add_template_helper(PersonNotifierHelper)
+    add_template_helper(ApplicationHelper)
 
     def session
       {:theme => nil}
     end
 
     def content_summary(person, notifications)
+      ActionMailer::Base.asset_host = person.environment.top_url if person.environment
+
       @current_theme = 'default'
       @profile = person
       @recipient = @profile.nickname || @profile.name
