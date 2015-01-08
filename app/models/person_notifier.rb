@@ -67,13 +67,15 @@ class PersonNotifier
 
   class Mailer < ActionMailer::Base
 
-    add_template_helper(PersonNotifierHelper)
+    add_template_helper(ApplicationHelper)
 
     def session
       {:theme => nil}
     end
 
     def content_summary(person, notifications)
+      ActionMailer::Base.asset_host = person.environment.top_url if person.environment
+
       @current_theme = 'default'
       @profile = person
       @recipient = @profile.nickname || @profile.name
