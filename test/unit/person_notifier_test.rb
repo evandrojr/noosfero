@@ -225,6 +225,18 @@ class PersonNotifierTest < ActiveSupport::TestCase
     assert !jobs.select {|j| !j.failed? && j.last_error.nil? }.empty?
   end
 
+  should 'do not raise errors in NotifyJob failure to avoid loop' do
+    Delayed::Worker.max_attempts = 1
+    Delayed::Job.enqueue(PersonNotifier::NotifyJob.new(@member.id))
+
+    PersonNotifier.any_instance.stubs(:notify).raises('error')
+    PersonNotifier.any_instance.stubs(:dispatch_notification_mail).raises('error')
+
+    process_delayed_job_queue
+    jobs = PersonNotifier::NotifyJob.find(@member.id)
+    assert jobs.select {|j| !j.failed? && j.last_error.nil? }.empty?
+  end
+
   private
 
   def notify
