@@ -19,7 +19,7 @@
 
   <% cache_timeout("pairwise-result-#{pairwise_content.id}", 1.hours) do %>
   <div class="pairwise_content">
-<%= pairwise_spinner(pairwise_content) %>
+    <%= pairwise_spinner(pairwise_content) %>
 
     <div class="total_votes">
       <span class="label"><%= _('Total votes:') %></span>
@@ -46,6 +46,8 @@
       </tbody>
     </table>
   </div>
+  <% end %>
+
   <% if @page.allow_edit?(user) %>
     <div class="embeded_code">
       <span class="embeded_code_link"><a href="javascript:;"><%= _("Show/Hide Embeded Code") %></a></span>
@@ -54,8 +56,6 @@
       </div>
     </div>
   <% end %>
-  <%#= link_to _('Vote'), @page.url, :class=>"button with-text icon-edit" %>
-<% end %>
 <% end %>
 
 </div>
