@@ -3,9 +3,9 @@
   <div style="display: table; background-color: white; margin: 26px 0;">
     <div style="padding: 25px 20px 20px 20px;text-align: left;">
       <%= link_to @url, :style => "text-decoration: none;" do %>
-        <span style="font-weight:bold;font-size: 30px;margin: 0;color: white;background-color: #AAAAAA;padding: 5px;"><%= @environment %></span>
+        <span style="font-weight:bold;font-size: 28px;margin: 0;color: white;background-color: #AAAAAA;padding: 5px;"><%= @environment %></span>
       <% end %>
-      <span style="font-weight:bold;color: #333;font-size:20px;margin-left: 8px;"><%= _("%s's network activity") % @profile.name %></h3>
+      <span style="font-weight:bold;color: #333;font-size:19px;margin-left: 8px;"><%= _("%s's network activity") % @profile.name %></h3>
     </div>
     <div style="margin: 0 20px 20px 20px;border-top:2px solid #e2e2e2;">
     <% @notifications.each do |activity| %>
