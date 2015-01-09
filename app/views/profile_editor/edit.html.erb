@@ -32,10 +32,9 @@
       <%= labelled_radio_button _('Private &mdash; show my contents only to friends'), 'profile_data[public_profile]', false, !@profile.public_profile? %>
     </div>
   <% else %>
-    <div>
-       <%= labelled_check_box _('Hidden &mdash; show content of this group only to administrators'), 'profile_data[visible]', false, !@profile.visible %>
+    <div style="border-bottom: 1px solid #e0e0e0; padding-bottom: 7px; margin-bottom: 7px;">
+       <%= labelled_check_box _('Hidden &mdash; this group will be visible only by members'), 'profile_data[visible]', false, !@profile.visible %>
     </div>
-    <br />
     <div>
       <%= labelled_radio_button _('Public &mdash; show content of this group to all internet users'), 'profile_data[public_profile]', true, @profile.public_profile? %>
     </div>
