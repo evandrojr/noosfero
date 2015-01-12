@@ -243,7 +243,7 @@ class PersonNotifierTest < ActiveSupport::TestCase
     notify
     sent = ActionMailer::Base.deliveries.last
     assert_match /src="\/\/www.gravatar.com\/avatar.*"/, sent.body.to_s
-    assert_match /src="\/\/localhost\/images\/icons-app\/community-icon.png.*"/, sent.body.to_s
+    assert_match /src="http:\/\/localhost\/images\/icons-app\/community-icon.png.*"/, sent.body.to_s
   end
 
   should 'list tasks in notification mail' do
