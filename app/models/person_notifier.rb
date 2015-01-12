@@ -85,7 +85,7 @@ class PersonNotifier
     def content_summary(person, notifications, tasks)
       if person.environment
         ActionMailer::Base.asset_host = person.environment.top_url
-        ActionMailer::Base.default_url_options[:host] = person.environment.top_url.gsub(/^(https?:)?/, '')
+        ActionMailer::Base.default_url_options[:host] = person.environment.default_hostname
       end
 
       @current_theme = 'default'
