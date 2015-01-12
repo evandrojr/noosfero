@@ -246,6 +246,14 @@ class PersonNotifierTest < ActiveSupport::TestCase
     assert_match /src="http:\/\/colivre.net\/images\/icons-app\/community-icon.png.*"/, sent.body.to_s
   end
 
+  should 'list tasks in notification mail' do
+    task = @member.tasks.create!
+    process_delayed_job_queue
+    notify
+    sent = ActionMailer::Base.deliveries.last
+    assert_match /href=".*\/myprofile\/member\/tasks"/, sent.body.to_s
+  end
+
   private
 
   def notify
