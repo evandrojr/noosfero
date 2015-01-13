@@ -99,7 +99,7 @@ class PersonNotifier
         content_type: "text/html",
         from: "#{@profile.environment.name} <#{@profile.environment.noreply_email}>",
         to: @profile.email,
-        subject: _("[%s] Network Activity") % [@profile.environment.name]
+        subject: _("[%s] Notifications") % [@profile.environment.name]
       )
     end
   end
