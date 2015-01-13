@@ -87,3 +87,4 @@ msgid "Hidden &mdash; this group will be visible only by members"# msgstr "Ocult
 msgid "%s's Notifications"# msgstr "Notificações de %s"
 msgid "Network Activity"# msgstr "Atividade da Rede"
 msgid "Tasks"# msgstr "Tarefas"
+msgid "[%s] Notifications"# msgstr "[%s] Notificações"
