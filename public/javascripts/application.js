@@ -518,6 +518,21 @@ function new_qualifier_row(selector, select_qualifiers, delete_button) {
   jQuery(selector).append("<tr><td>" + select_qualifiers + "</td><td id='certifier-area-" + index + "'><select></select>" + delete_button + "</td></tr>");
 }
 
+function userDataCallback(data) {
+  noosfero.user_data = data;
+  if (data.login) {
+    jQuery('head').append('<meta content="authenticity_token" name="csrf-param" />');
+    jQuery('head').append('<meta content="'+jQuery.cookie("_noosfero_.XSRF-TOKEN")+'" name="csrf-token" />');
+  }
+  if (data.notice) {
+    display_notice(data.notice);
+    // clear notice so that it is not display again in the case this function is called again.
+    data.notice = null;
+  }
+  // Bind this event to do more actions with the user data (for example, inside plugins)
+  jQuery(window).trigger("userDataLoaded", data);
+};
+
 // controls the display of the login/logout stuff
 jQuery(function($) {
   $.ajaxSetup({
@@ -528,18 +543,9 @@ jQuery(function($) {
   });
 
   var user_data = noosfero_root() + '/account/user_data';
-  $.getJSON(user_data, function userDataCallBack(data) {
-    if (data.login) {
-      $('head').append('<meta content="authenticity_token" name="csrf-param" />');
-      $('head').append('<meta content="'+$.cookie("_noosfero_.XSRF-TOKEN")+'" name="csrf-token" />');
-    }
-    if (data.notice) {
-      display_notice(data.notice);
-    }
-    // Bind this event to do more actions with the user data (for example, inside plugins)
-    $(window).trigger("userDataLoaded", data);
-  });
+  $.getJSON(user_data, userDataCallback)
 
+  $.ajaxSetup({ cache: false });
 });
 
 // controls the display of contact list
@@ -582,12 +588,9 @@ function display_notice(message) {
 }
 
 function open_chat_window(self_link, anchor) {
-   if(anchor) {
-      jQuery('#chat').show('fast');
-      jQuery("#chat" ).trigger('opengroup', anchor);
-   } else {
-      jQuery('#chat').toggle('fast');
-   }
+   anchor = anchor || '#';
+   var noosfero_chat_window = window.open(noosfero_root() + '/chat' + anchor,'noosfero_chat','width=900,height=500');
+   noosfero_chat_window.focus();
    return false;
 }
 
@@ -1050,7 +1053,7 @@ jQuery(document).ready(function(){
 function apply_zoom_to_images(zoom_text) {
   jQuery(function($) {
     $(window).load( function() {
-      $('#article .article-body img:not(.disable-zoom)').each( function(index) {
+      $('#article .article-body img').each( function(index) {
         var original = original_image_dimensions($(this).attr('src'));
         if ($(this).width() < original['width'] || $(this).height() < original['height']) {
           $(this).wrap('<div class="zoomable-image" />');
@@ -1067,43 +1070,5 @@ function apply_zoom_to_images(zoom_text) {
       });
       $('.zoomify-image').fancybox();
     });
-  });
-}
-
-function getQueryParams(qs) {
-  qs = qs.split("+").join(" ");
-  var params = {},
-      tokens,
-      re = /[?&]?([^=]+)=([^&]*)/g;
-  while (tokens = re.exec(qs)) {
-      params[decodeURIComponent(tokens[1])]
-          = decodeURIComponent(tokens[2]);
-  }
-  return params;
-}
-
-var fullwidth=false;
-function toggle_fullwidth(itemId){
-  if(fullwidth){
-    jQuery(itemId).removeClass("fullwidth");
-    jQuery("#fullscreen-btn").show()
-    jQuery("#exit-fullscreen-btn").hide()
-    fullwidth = false;
-  }
-  else{
-    jQuery(itemId).addClass("fullwidth");
-    jQuery("#exit-fullscreen-btn").show()
-    jQuery("#fullscreen-btn").hide()
-    fullwidth = true;
-  }
-  jQuery(window).trigger("toggleFullwidth", fullwidth);
-}
-
-function fullscreenPageLoad(itemId){
-  jQuery(document).ready(function(){
-    var $_GET = getQueryParams(document.location.search);
-    if ($_GET['fullscreen']==1){
-      toggle_fullwidth(itemId);
-    }
   });
 }
