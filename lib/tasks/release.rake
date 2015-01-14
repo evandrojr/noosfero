@@ -83,7 +83,7 @@ EOF
     begin
       File.open("AUTHORS.md", 'w') do |output|
         output.puts AUTHORS_HEADER
-        output.puts `git log --pretty=format:'%aN <%aE>' | sort | uniq`
+        output.puts `git log --no-merges --pretty=format:'%aN <%aE>' | sort | uniq`
         output.puts AUTHORS_FOOTER
       end
       commit_changes(['AUTHORS.md'], 'Updating authors file') if !pendencies_on_authors[:ok]
@@ -137,7 +137,17 @@ EOF
         new_version += '~rc1'
       end
     else
-      new_version.sub!(/~rc[0-9]+/, '')
+      if new_version =~ /~rc\d+/
+        new_version.sub!(/~rc[0-9]+/, '')
+      else
+        components = new_version.split('.').map(&:to_i)
+        if components.size < 3
+          components << 1
+        else
+          components[-1] += 1
+        end
+        new_version = components.join('.')
+      end
     end
 
     puts "Current version: #{$version}"

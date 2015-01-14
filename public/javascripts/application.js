@@ -518,6 +518,21 @@ function new_qualifier_row(selector, select_qualifiers, delete_button) {
   jQuery(selector).append("<tr><td>" + select_qualifiers + "</td><td id='certifier-area-" + index + "'><select></select>" + delete_button + "</td></tr>");
 }
 
+function userDataCallback(data) {
+  noosfero.user_data = data;
+  if (data.login) {
+    jQuery('head').append('<meta content="authenticity_token" name="csrf-param" />');
+    jQuery('head').append('<meta content="'+jQuery.cookie("_noosfero_.XSRF-TOKEN")+'" name="csrf-token" />');
+  }
+  if (data.notice) {
+    display_notice(data.notice);
+    // clear notice so that it is not display again in the case this function is called again.
+    data.notice = null;
+  }
+  // Bind this event to do more actions with the user data (for example, inside plugins)
+  jQuery(window).trigger("userDataLoaded", data);
+};
+
 // controls the display of the login/logout stuff
 jQuery(function($) {
   $.ajaxSetup({
@@ -528,18 +543,9 @@ jQuery(function($) {
   });
 
   var user_data = noosfero_root() + '/account/user_data';
-  $.getJSON(user_data, function userDataCallBack(data) {
-    if (data.login) {
-      $('head').append('<meta content="authenticity_token" name="csrf-param" />');
-      $('head').append('<meta content="'+$.cookie("_noosfero_.XSRF-TOKEN")+'" name="csrf-token" />');
-    }
-    if (data.notice) {
-      display_notice(data.notice);
-    }
-    // Bind this event to do more actions with the user data (for example, inside plugins)
-    $(window).trigger("userDataLoaded", data);
-  });
+  $.getJSON(user_data, userDataCallback)
 
+  $.ajaxSetup({ cache: false });
 });
 
 // controls the display of contact list
@@ -582,13 +588,13 @@ function display_notice(message) {
 }
 
 function open_chat_window(self_link, anchor) {
-   if(anchor) {
-      jQuery('#chat').show('fast');
-      jQuery("#chat" ).trigger('opengroup', anchor);
-   } else {
-      jQuery('#chat').toggle('fast');
-   }
-   return false;
+  if(anchor) {
+    jQuery('#chat').show('fast');
+    jQuery("#chat" ).trigger('opengroup', anchor);
+  } else {
+    jQuery('#chat').toggle('fast');
+  }
+  return false;
 }
 
 jQuery(function($) {
@@ -772,7 +778,7 @@ function original_image_dimensions(src) {
 
 function gravatarCommentFailback(img) {
   var link = img.parentNode;
-  link.href = "http://www.gravatar.com";
+  link.href = "//www.gravatar.com";
   img.src = img.getAttribute("data-gravatar");
 }
 

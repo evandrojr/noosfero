@@ -97,7 +97,7 @@ class Profile < ActiveRecord::Base
   end
 
   def members_by_name
-    members.order(:name)
+    members.order('profiles.name')
   end
 
   class << self
@@ -108,8 +108,8 @@ class Profile < ActiveRecord::Base
     alias_method_chain :count, :distinct
   end
 
-  def members_by_role(role)
-    Person.members_of(self).all(:conditions => ['role_assignments.role_id = ?', role.id])
+  def members_by_role(roles)
+    Person.members_of(self).by_role(roles)
   end
 
   acts_as_having_boxes

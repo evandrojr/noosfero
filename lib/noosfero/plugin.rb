@@ -88,18 +88,29 @@ class Noosfero::Plugin
     # This is a generic method that initialize any possible filter defined by a
     # plugin to a specific controller
     def load_plugin_filters(plugin)
-      plugin_methods = plugin.instance_methods.select {|m| m.to_s.end_with?('_filters')}
-      plugin_methods.each do |plugin_method|
-        controller_class = plugin_method.to_s.gsub('_filters', '').camelize.constantize
-        filters = plugin.new.send(plugin_method)
-        filters = [filters] if !filters.kind_of?(Array)
+      Rails.configuration.to_prepare do
+        filters = plugin.new.send 'application_controller_filters' rescue []
+        Noosfero::Plugin.add_controller_filters ApplicationController, plugin, filters
 
-        filters.each do |plugin_filter|
-          filter_method = (plugin.name.underscore.gsub('/','_') + '_' + plugin_filter[:method_name]).to_sym
-          controller_class.send(plugin_filter[:type], filter_method, (plugin_filter[:options] || {}))
-          controller_class.send(:define_method, filter_method) do
-            instance_eval(&plugin_filter[:block]) if environment.plugin_enabled?(plugin)
-          end
+        plugin_methods = plugin.instance_methods.select {|m| m.to_s.end_with?('_filters')}
+        plugin_methods.each do |plugin_method|
+          controller_class = plugin_method.to_s.gsub('_filters', '').camelize.constantize
+
+          filters = plugin.new.send(plugin_method)
+          Noosfero::Plugin.add_controller_filters controller_class, plugin, filters
+        end
+      end
+    end
+
+    def add_controller_filters(controller_class, plugin, filters)
+      unless filters.is_a?(Array)
+        filters = [filters]
+      end
+      filters.each do |plugin_filter|
+        filter_method = (plugin.name.underscore.gsub('/','_') + '_' + plugin_filter[:method_name]).to_sym
+        controller_class.send(plugin_filter[:type], filter_method, (plugin_filter[:options] || {}))
+        controller_class.send(:define_method, filter_method) do
+          instance_exec(&plugin_filter[:block]) if environment.plugin_enabled?(plugin)
         end
       end
     end
@@ -529,6 +540,18 @@ class Noosfero::Plugin
   # returns = [{:field => 'field1', :name => 'field 1 name', :model => 'person'}, {...}]
   def change_password_fields
     nil
+  end
+
+  # -> Perform extra transactions related to profile in profile editor
+  # returns = true in success or raise and exception if it could not update the data
+  def profile_editor_transaction_extras
+    nil
+  end
+
+  # -> Return a list of hashs with the needed information to create optional fields
+  # returns = a list of hashs as {:name => "string", :label => "string", :object_name => :key, :method => :key}
+  def extra_optional_fields
+    []
   end
 
   # -> Adds additional blocks to profiles and environments.
