@@ -588,9 +588,12 @@ function display_notice(message) {
 }
 
 function open_chat_window(self_link, anchor) {
-   anchor = anchor || '#';
-   var noosfero_chat_window = window.open(noosfero_root() + '/chat' + anchor,'noosfero_chat','width=900,height=500');
-   noosfero_chat_window.focus();
+   if(anchor) {
+      jQuery('#chat').show('fast');
+      jQuery("#chat" ).trigger('opengroup', anchor);
+   } else {
+      jQuery('#chat').toggle('fast');
+   }
    return false;
 }
 
