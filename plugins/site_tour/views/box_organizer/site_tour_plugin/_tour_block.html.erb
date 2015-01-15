@@ -1,0 +1,25 @@
+<%= javascript_include_tag '/plugins/site_tour/edit_tour_block.js' %>
+<%= stylesheet_link_tag '/plugins/site_tour/edit_tour_block.css' %>
+
+<%= labelled_form_field check_box(:block, :display_button) + _('Display help button'), '' %>
+
+<strong><%= _('Actions') %></strong>
+<div id='edit-tour-block'>
+  <ul class='list-header'>
+    <li class='list-name'><%= _('Group Name') %></li>
+    <li class='list-selector'><%= _('Selector') %></li>
+    <li class='list-description'><%= _('Description') %></li>
+  </ul>
+  <ul id="droppable-tour-actions">
+    <% for action in @block.actions do %>
+      <%= render :partial => 'box_organizer/site_tour_plugin/tour_block_item', :locals => {:action => action} %>
+    <% end %>
+  </ul>
+
+  <div id="new-template">
+    <% template_action = {} %>
+    <%= render :partial => 'box_organizer/site_tour_plugin/tour_block_item', :locals => {:action => template_action} %>
+  </div>
+</div>
+
+<%= link_to_function(_('New'), 'add_new_action();', :class => 'button icon-add with-text') %>

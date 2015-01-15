@@ -33,4 +33,8 @@ class SiteTourPlugin < Noosfero::Plugin
     end
   end
 
+  def self.extra_blocks
+    { SiteTourPlugin::TourBlock => {} }
+  end
+
 end
