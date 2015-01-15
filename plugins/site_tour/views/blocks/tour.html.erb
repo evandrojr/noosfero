@@ -1,0 +1,17 @@
+<%= block_title(block.title) %>
+
+<% if block.display_button %>
+  <%= button :help, _('Help'), '#', :class => 'tour-button', :onclick => 'siteTourPlugin.force();' %>
+<% end %>
+
+<% edit_mode = controller.send(:boxes_editor?) && controller.send(:uses_design_blocks?) %>
+
+<% unless edit_mode %>
+  <script>
+    jQuery( document ).ready(function( $ ) {
+    <% block.actions.each_with_index do |action, index| %>
+      <%= "siteTourPlugin.add('#{j action[:group_name]}','#{j action[:selector]}', '#{j action[:description]}', #{index + 1});" %>
+    <% end %>
+    });
+  </script>
+<% end %>
