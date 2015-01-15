@@ -1,0 +1,64 @@
+
+#edit-tour-block #droppable-tour-actions {
+  padding-left: 23px;
+  margin-top: -12px;
+}
+
+#edit-tour-block #droppable-tour-actions li {
+  list-style-type: none;
+}
+
+#edit-tour-block .action-row {
+  line-height: 25px;
+  margin-bottom: 5px;
+  padding: 10px 1px 10px 10px;
+  cursor: pointer;
+  width: 97%;
+}
+
+#edit-tour-block .action-row:hover {
+  background: #ddd url(../images/drag-and-drop.png) no-repeat;
+  background-position: 98% 15px;
+}
+
+#edit-tour-block .action-row li {
+  list-style-type: none;
+  display: inline;
+  margin-left: 5px;
+}
+
+#edit-tour-block {
+  width: 620px;
+  position: relative;
+  left: -24px;
+}
+
+#edit-tour-block #new-template {
+  display: none;
+}
+
+#edit-tour-block .list-header {
+  width: 98%;
+  height: 25px;
+  padding: 10px 1px 10px 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+#edit-tour-block .list-header li {
+  list-style-type: none;
+  display: inline;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+}
+
+#edit-tour-block .list-header .list-name {
+  margin-left: 50px;
+}
+#edit-tour-block .list-header .list-selector {
+  margin-left: 63px;
+}
+#edit-tour-block .list-header .list-description {
+  margin-left: 68px;
+}
