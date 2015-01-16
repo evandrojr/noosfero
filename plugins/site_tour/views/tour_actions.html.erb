@@ -1,0 +1,12 @@
+<% js_file = defined?(:js_file) ? js_file : nil %>
+<%= javascript_include_tag(js_file) if js_file.present? %>
+
+<% if actions.present? %>
+<script>
+  jQuery( document ).ready(function( $ ) {
+  <% actions.each_with_index do |action, index| %>
+    <%= "siteTourPlugin.add('#{j action[:group_name]}','#{j action[:selector]}', '#{j action[:description]}', #{index + 1});" %>
+  <% end %>
+  });
+</script>
+<% end %>

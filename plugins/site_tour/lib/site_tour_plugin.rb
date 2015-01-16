@@ -25,16 +25,20 @@ class SiteTourPlugin < Noosfero::Plugin
   def body_ending
     proc do
       tour_file = "/plugins/site_tour/tour/#{language}/tour.js"
-      if File.exists?(Rails.root.join("public#{tour_file}").to_s)
-        javascript_include_tag(tour_file)
-      else
-        ""
-      end
+      js_file = File.exists?(Rails.root.join("public#{tour_file}").to_s) ? tour_file : ""
+      settings = Noosfero::Plugin::Settings.new(environment, SiteTourPlugin)
+      actions = (settings.actions||[]).select {|action| action[:language] == language}
+
+      render(:file => 'tour_actions', :locals => { :actions => actions, :js_file => js_file})
     end
   end
 
   def self.extra_blocks
     { SiteTourPlugin::TourBlock => {} }
+  end
+
+  def self.actions_csv_default_setting
+    'en,tour_plugin,.site-tour-plugin_tour-block .tour-button,"Click to start tour!"'
   end
 
 end
