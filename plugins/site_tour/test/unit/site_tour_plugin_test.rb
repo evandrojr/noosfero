@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class SiteTourPluginTest < ActiveSupport::TestCase
+class SiteTourPluginTest < ActionView::TestCase
 
   def setup
     @plugin = SiteTourPlugin.new
@@ -26,15 +26,16 @@ class SiteTourPluginTest < ActiveSupport::TestCase
     file = '/plugins/site_tour/tour/pt/tour.js'
     expects(:language).returns('pt')
     File.expects(:exists?).with(Rails.root.join("public#{file}").to_s).returns(true)
-    expects(:javascript_include_tag).with(file)
-    instance_exec(&plugin.body_ending)
+    expects(:environment).returns(Environment.default)
+    assert_tag_in_string instance_exec(&plugin.body_ending), :tag => 'script'
   end
 
-  should 'not include javascript file do not exists' do
+  should 'not include javascript file that not exists' do
     file = '/plugins/site_tour/tour/pt/tour.js'
     expects(:language).returns('pt')
     File.expects(:exists?).with(Rails.root.join("public#{file}").to_s).returns(false)
-    assert_equal "", instance_exec(&plugin.body_ending)
+    expects(:environment).returns(Environment.default)
+    assert_no_tag_in_string instance_exec(&plugin.body_ending), :tag => "script"
   end
 
 end
