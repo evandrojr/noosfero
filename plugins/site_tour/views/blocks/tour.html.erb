@@ -7,11 +7,5 @@
 <% edit_mode = controller.send(:boxes_editor?) && controller.send(:uses_design_blocks?) %>
 
 <% unless edit_mode %>
-  <script>
-    jQuery( document ).ready(function( $ ) {
-    <% block.actions.each_with_index do |action, index| %>
-      <%= "siteTourPlugin.add('#{j action[:group_name]}','#{j action[:selector]}', '#{j action[:description]}', #{index + 1});" %>
-    <% end %>
-    });
-  </script>
+  <%= render :file => 'tour_actions', :locals => {:actions => block.actions} %>
 <% end %>
