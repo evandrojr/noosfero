@@ -62,6 +62,6 @@ var siteTourPlugin = (function() {
 
 jQuery( document ).ready(function( $ ) {
   $(window).bind('userDataLoaded', function(event, data) {
-    siteTourPlugin.start(data);
+    siteTourPlugin.start(data, jQuery.deparam.querystring()['siteTourPlugin']==='force');
   });
 });
