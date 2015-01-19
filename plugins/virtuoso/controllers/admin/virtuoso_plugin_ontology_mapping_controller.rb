@@ -1,4 +1,4 @@
-class VirtuosoPluginOntologyMappingController < AdminController
+class VirtuosoPluginOntologyMappingController < PluginAdminController
 
   def index
     @settings = VirtuosoPlugin.new(self).settings

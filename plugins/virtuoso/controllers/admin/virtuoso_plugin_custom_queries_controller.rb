@@ -1,4 +1,4 @@
-class VirtuosoPluginCustomQueriesController < AdminController
+class VirtuosoPluginCustomQueriesController < PluginAdminController
 
   def index
     @custom_queries = environment.virtuoso_plugin_custom_queries.all

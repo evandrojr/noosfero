@@ -1,4 +1,4 @@
-class SerproIntegrationPluginAdminController < AdminController
+class SerproIntegrationPluginAdminController < PluginAdminController
 
   def index
     settings = params[:settings]

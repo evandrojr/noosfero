@@ -1,4 +1,4 @@
-class VirtuosoPluginAdminController < AdminController
+class VirtuosoPluginAdminController < PluginAdminController
 
   def index
     settings = params[:settings]

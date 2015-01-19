@@ -1,4 +1,4 @@
-class OauthProviderPluginAdminController < AdminController
+class OauthProviderPluginAdminController < PluginAdminController
 
   def index
   end
