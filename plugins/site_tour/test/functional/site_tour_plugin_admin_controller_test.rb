@@ -17,6 +17,13 @@ class SiteTourPluginAdminControllerTest < ActionController::TestCase
     assert_equal [{:language => 'en', :group_name => 'tour_plugin', :selector => '.tour-button', :description => 'Click'}], @settings.actions
   end
 
+  should 'parse csv and save group triggers array in plugin settings' do
+    group_triggers_csv = "tour_plugin,.tour-button,mouseenter"
+    post :index, :settings => {"group_triggers_csv" => group_triggers_csv}
+    @settings = Noosfero::Plugin::Settings.new(environment.reload, SiteTourPlugin)
+    assert_equal [{:group_name => 'tour_plugin', :selector => '.tour-button', :event => 'mouseenter'}], @settings.group_triggers
+  end
+
   should 'do not store actions_csv' do
     actions_csv = "en,tour_plugin,.tour-button,Click"
     post :index, :settings => {"actions_csv" => actions_csv}
