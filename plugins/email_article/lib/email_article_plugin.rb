@@ -13,12 +13,12 @@ class EmailArticlePlugin < Noosfero::Plugin
     htmlclass = _("button with-text icon-menu-mail")
     title = _("Email article to all community members")
 
-    proc {
+    proc do 
       if  !profile.blank? and !user.blank? and user.is_admin?(profile) and @page.kind_of?(TextArticle)
         link_to_remote(
             label,
             {
-               :url => { :controller => 'email_article_plugin_myprofile', :action => "send_email", :id => @page, :profile => @page.profile},
+               :url => { :profile => profile.identifier, :controller => 'email_article_plugin_myprofile', :action => "send_email", :id => @page},
                :method => :get,
                :success => "display_notice('" + _("Messages are being sent") + "')",
                :failure => "display_notice('" + _("Error sending emails") + "')",
@@ -28,6 +28,6 @@ class EmailArticlePlugin < Noosfero::Plugin
             :title => title
          )
       end
-    }
+    end
   end
 end
