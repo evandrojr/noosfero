@@ -38,4 +38,36 @@ class SiteTourPluginTest < ActionView::TestCase
     assert_no_tag_in_string instance_exec(&plugin.body_ending), :tag => "script"
   end
 
+  should 'render javascript tag with tooltip actions and group triggers' do
+    expects(:language).returns('en').at_least_once
+
+    settings = Noosfero::Plugin::Settings.new(Environment.default, SiteTourPlugin)
+    settings.actions = [{:language => 'en', :group_name => 'test', :selector => 'body', :description => 'Test'}]
+    settings.group_triggers = [{:group_name => 'test', :selector => 'body', :event => 'click'}]
+    settings.save!
+
+    expects(:environment).returns(Environment.default)
+    body_ending = instance_exec(&plugin.body_ending)
+    assert_match /siteTourPlugin\.add\('test', 'body', 'Test', 1\);/, body_ending
+    assert_match /siteTourPlugin\.addGroupTrigger\('test', 'body', 'click'\);/, body_ending
+  end
+
+  should 'start each tooltip group with the correct step order' do
+    expects(:language).returns('en').at_least_once
+
+    settings = Noosfero::Plugin::Settings.new(Environment.default, SiteTourPlugin)
+    settings.actions = [
+        {:language => 'en', :group_name => 'test_a', :selector => 'body', :description => 'Test A1'},
+        {:language => 'en', :group_name => 'test_a', :selector => 'body', :description => 'Test A2'},
+        {:language => 'en', :group_name => 'test_b', :selector => 'body', :description => 'Test B1'},
+    ]
+    settings.save!
+
+    expects(:environment).returns(Environment.default)
+    body_ending = instance_exec(&plugin.body_ending)
+    assert_match /siteTourPlugin\.add\('test_a', 'body', 'Test A1', 1\);/, body_ending
+    assert_match /siteTourPlugin\.add\('test_a', 'body', 'Test A2', 2\);/, body_ending
+    assert_match /siteTourPlugin\.add\('test_b', 'body', 'Test B1', 1\);/, body_ending
+  end
+
 end
