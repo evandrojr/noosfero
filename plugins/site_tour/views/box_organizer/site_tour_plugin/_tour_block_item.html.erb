@@ -1,5 +1,5 @@
 <li>
-  <ul class="action-row">
+  <ul class="item-row">
     <li>
       <%= text_field_tag 'block[actions][][group_name]', action[:group_name], :class => 'group-name', :maxlength => 20 %>
     </li>
@@ -10,7 +10,7 @@
       <%= text_field_tag 'block[actions][][description]', action[:description], :class => 'description' %>
     </li>
     <li>
-      <%= button_without_text(:delete, _('Delete'), "#" , :class=>"delete-tour-action-row") %>
+      <%= button_without_text(:delete, _('Delete'), "#" , :class=>"delete-tour-block-item") %>
     </li>
   </ul>
 </li>
