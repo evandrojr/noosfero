@@ -9,7 +9,7 @@ var siteTourPlugin = (function() {
   }
 
   function mark(name) {
-    jQuery.cookie("_noosfero_.sitetour." + name, 1);
+    jQuery.cookie("_noosfero_.sitetour." + name, 1, {expires: 365});
     if(userData.login) {
       jQuery.post('/plugin/site_tour/public/mark_action', {action_name: name}, function(data) { });
     }
