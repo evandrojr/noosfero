@@ -4,14 +4,15 @@
 <% if actions.present? %>
 <script>
   jQuery( document ).ready(function( $ ) {
-  <% actions.each_with_index do |action, index| %>
-    <%= "siteTourPlugin.add('#{j action[:group_name]}', '#{j action[:selector]}', '#{j action[:description]}', #{index + 1});" %>
-  <% end %>
+    <% actions.group_by {|h| h[:group_name]}.each do |group, group_actions| %>
+      <% group_actions.each_with_index do |action, index| %>
+        <%= "siteTourPlugin.add('#{j action[:group_name]}', '#{j action[:selector]}', '#{j action[:description]}', #{index + 1});" %>
+      <% end %>
+    <% end %>
 
-  <% (group_triggers||[]).each_with_index do |group, index| %>
-    <%= "siteTourPlugin.addGroupTrigger('#{j group[:group_name]}', '#{j group[:selector]}', '#{j group[:event]}');" %>
-  <% end %>
-
+    <% (group_triggers||[]).each_with_index do |group, index| %>
+      <%= "siteTourPlugin.addGroupTrigger('#{j group[:group_name]}', '#{j group[:selector]}', '#{j group[:event]}');" %>
+    <% end %>
   });
 </script>
 <% end %>
