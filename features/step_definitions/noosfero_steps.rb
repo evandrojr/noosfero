@@ -4,7 +4,8 @@ Given /^the following users?$/ do |table|
     person_data = item.dup
     person_data.delete("login")
     category = Category.find_by_slug person_data.delete("category")
-    user = User.create!(:login => item[:login], :password => '123456', :password_confirmation => '123456', :email => item[:login] + "@example.com", :person_data => person_data)
+    email = item[:email] || item[:login] + "@example.com"
+    user = User.create!(:login => item[:login], :password => '123456', :password_confirmation => '123456', :email => email, :person_data => person_data)
     user.activate
     p = user.person
     p.categories << category if category
@@ -691,11 +692,6 @@ Given /^the cache is turned (on|off)$/ do |state|
   ActionController::Base.perform_caching = (state == 'on')
 end
 
-When /^I make a AJAX request to (.*)$/ do |page|
-  header 'X-Requested-With', 'XMLHttpRequest'
-  visit(path_to(page))
-end
-
 Given /^the environment is configured to (.*) after login$/ do |option|
   redirection = case option
     when 'stay on the same page'
@@ -765,4 +761,12 @@ When /^I confirm the "(.*)" dialog$/ do |confirmation|
   a = page.driver.browser.switch_to.alert
   assert_equal confirmation, a.text
   a.accept
+end
+
+Given /^the field (.*) is public for all users$/ do |field|
+  Person.all.each do |person|
+    person.fields_privacy = Hash.new if person.fields_privacy.nil?
+    person.fields_privacy[field] = "public"
+    person.save!
+  end
 end

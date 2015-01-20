@@ -3,7 +3,7 @@
 # which by default is the one returned by Environment:default.
 class Profile < ActiveRecord::Base
 
-  attr_accessible :name, :identifier, :public_profile, :nickname, :custom_footer, :custom_header, :address, :zip_code, :contact_phone, :image_builder, :description, :closed, :template_id, :environment, :lat, :lng, :is_template, :fields_privacy, :preferred_domain_id, :category_ids, :country, :city, :state, :national_region_code, :email, :contact_email, :redirect_l10n, :notification_time
+  attr_accessible :name, :identifier, :public_profile, :nickname, :custom_footer, :custom_header, :address, :zip_code, :contact_phone, :image_builder, :description, :closed, :template_id, :environment, :lat, :lng, :is_template, :fields_privacy, :preferred_domain_id, :category_ids, :country, :city, :state, :national_region_code, :email, :contact_email, :redirect_l10n, :notification_time, :redirection_after_login
 
   # use for internationalizable human type names in search facets
   # reimplement on subclasses
@@ -97,7 +97,7 @@ class Profile < ActiveRecord::Base
   end
 
   def members_by_name
-    members.order(:name)
+    members.order('profiles.name')
   end
 
   class << self
@@ -108,8 +108,8 @@ class Profile < ActiveRecord::Base
     alias_method_chain :count, :distinct
   end
 
-  def members_by_role(role)
-    Person.members_of(self).all(:conditions => ['role_assignments.role_id = ?', role.id])
+  def members_by_role(roles)
+    Person.members_of(self).by_role(roles)
   end
 
   acts_as_having_boxes
@@ -346,16 +346,17 @@ class Profile < ActiveRecord::Base
   end
 
   def copy_blocks_from(profile)
+    template_boxes = profile.boxes.select{|box| box.position}
     self.boxes.destroy_all
-    profile.boxes.each do |box|
-      new_box = Box.new
+    self.boxes = template_boxes.size.times.map { Box.new }
+
+    template_boxes.each_with_index do |box, i|
+      new_box = self.boxes[i]
       new_box.position = box.position
-      self.boxes << new_box
       box.blocks.each do |block|
         new_block = block.class.new(:title => block[:title])
-        new_block.settings = block.settings
-        new_block.position = block.position
-        self.boxes[-1].blocks << new_block
+        new_block.copy_from(block)
+        new_box.blocks << new_block
       end
     end
   end

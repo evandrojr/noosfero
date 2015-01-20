@@ -31,8 +31,9 @@ class ContentViewerController < ApplicationController
 
     if request.post? && @page.forum?
       process_forum_terms_of_use(user, params[:terms_accepted])
-    elsif is_a_forum_topic?(@page)
-      redirect_to @page.parent.url unless @page.parent.agrees_with_terms?(user)
+    elsif is_a_forum_topic?(@page) && !@page.parent.agrees_with_terms?(user)
+      redirect_to @page.parent.url
+      return
     end
 
     # At this point the page will be showed
@@ -73,7 +74,7 @@ class ContentViewerController < ApplicationController
   end
 
   def versions_diff
-    path = params[:page].join('/')
+    path = params[:page]
     @page = profile.articles.find_by_path(path)
     @v1, @v2 = @page.versions.find_by_version(params[:v1]), @page.versions.find_by_version(params[:v2])
   end
@@ -125,7 +126,7 @@ class ContentViewerController < ApplicationController
     elsif !@page.display_to?(user)
       if !profile.public?
         private_profile_partial_parameters
-        render :template => 'profile/_private_profile', :status => 403
+        render :template => 'profile/_private_profile', :status => 403, :formats => [:html]
         allowed = false
       else #if !profile.visible?
         render_access_denied
