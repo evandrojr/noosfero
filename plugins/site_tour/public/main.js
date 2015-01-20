@@ -1,7 +1,9 @@
 var siteTourPlugin = (function() {
 
   var actions = [];
+  var groupTriggers = [];
   var userData = {};
+  var intro;
 
   function hasMark(name) {
     return jQuery.cookie("_noosfero_.sitetour." + name) ||
@@ -19,7 +21,7 @@ var siteTourPlugin = (function() {
     jQuery('.site-tour-plugin').removeAttr('data-intro data-intro-name data-step');
   }
 
-  function configureIntro(force) {
+  function configureIntro(force, actions) {
     clearAll();
     for(var i=0; i<actions.length; i++) {
       var action = actions[i];
@@ -38,20 +40,43 @@ var siteTourPlugin = (function() {
     }
   }
 
+  function actionsOnload() {
+    var groups = jQuery.map(groupTriggers, function(g) { return g.name; });
+    return jQuery.grep(actions, function(n, i) { return jQuery.inArray(n.name, groups); });
+  }
+
+  function actionsByGroup(group) {
+    return jQuery.grep(actions, function(n, i) { return n.name===group });
+  }
+
+  function forceParam() {
+    return jQuery.deparam.querystring()['siteTourPlugin']==='force';
+  }
+
   return {
     add: function (name, selector, text, step) {
       actions.push({name: name, selector: selector, text: text, step: step});
     },
+    addGroupTrigger: function(name, selector, ev) {
+      groupTriggers.push({name: name, selector: selector, event: ev});
+      plugin = this;
+      var handler = function() {
+        configureIntro(forceParam(), actionsByGroup(name));
+        intro.start();
+        jQuery(document).off(ev, selector, handler);
+      };
+      jQuery(document).on(ev, selector, handler);
+    },
     start: function(data, force) {
-      force = typeof force !== 'undefined' ? force : false;
+      force = typeof force !== 'undefined' ? force : false || forceParam();
       userData = data;
 
-      var intro = introJs();
+      intro = introJs();
       intro.onafterchange(function(targetElement) {
         var name = jQuery(targetElement).attr('data-intro-name');
         mark(name);
       });
-      configureIntro(force);
+      configureIntro(force, actionsOnload());
       intro.start();
     },
     force: function() {
@@ -62,6 +87,6 @@ var siteTourPlugin = (function() {
 
 jQuery( document ).ready(function( $ ) {
   $(window).bind('userDataLoaded', function(event, data) {
-    siteTourPlugin.start(data, jQuery.deparam.querystring()['siteTourPlugin']==='force');
+    siteTourPlugin.start(data);
   });
 });

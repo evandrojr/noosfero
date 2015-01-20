@@ -1,27 +1,30 @@
+#edit-tour-block .list-items {
+  margin-bottom: 25px;
+}
 
-#edit-tour-block #droppable-tour-actions {
-  padding-left: 23px;
+#edit-tour-block .droppable-items {
+  padding-left: 0;
   margin-top: -12px;
 }
 
-#edit-tour-block #droppable-tour-actions li {
+#edit-tour-block .droppable-items li {
   list-style-type: none;
 }
 
-#edit-tour-block .action-row {
+#edit-tour-block .item-row {
   line-height: 25px;
   margin-bottom: 5px;
-  padding: 10px 1px 10px 10px;
+  padding: 0;
   cursor: pointer;
   width: 97%;
 }
 
-#edit-tour-block .action-row:hover {
-  background: #ddd url(../images/drag-and-drop.png) no-repeat;
+#edit-tour-block .item-row:hover {
+  background: #ddd url(/images/drag-and-drop.png) no-repeat;
   background-position: 98% 15px;
 }
 
-#edit-tour-block .action-row li {
+#edit-tour-block .item-row li {
   list-style-type: none;
   display: inline;
   margin-left: 5px;
@@ -30,7 +33,6 @@
 #edit-tour-block {
   width: 620px;
   position: relative;
-  left: -24px;
 }
 
 #edit-tour-block #new-template {
@@ -39,8 +41,7 @@
 
 #edit-tour-block .list-header {
   width: 98%;
-  height: 25px;
-  padding: 10px 1px 10px 10px;
+  padding: 0 1px 10px 10px;
   margin-bottom: 5px;
   cursor: pointer;
 }
@@ -49,16 +50,16 @@
   list-style-type: none;
   display: inline;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 12px;
   text-align: center;
 }
 
 #edit-tour-block .list-header .list-name {
-  margin-left: 50px;
+  margin-left: 20px;
 }
 #edit-tour-block .list-header .list-selector {
   margin-left: 63px;
 }
-#edit-tour-block .list-header .list-description {
+#edit-tour-block .list-header .list-description, #edit-tour-block .list-header .list-event {
   margin-left: 68px;
 }

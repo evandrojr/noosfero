@@ -29,7 +29,7 @@ class SiteTourPlugin < Noosfero::Plugin
       settings = Noosfero::Plugin::Settings.new(environment, SiteTourPlugin)
       actions = (settings.actions||[]).select {|action| action[:language] == language}
 
-      render(:file => 'tour_actions', :locals => { :actions => actions, :js_file => js_file})
+      render(:file => 'tour_actions', :locals => { :actions => actions, :group_triggers => settings.group_triggers, :js_file => js_file})
     end
   end
 
