@@ -76,7 +76,7 @@ var siteTourPlugin = (function() {
         var name = jQuery(targetElement).attr('data-intro-name');
         mark(name);
       });
-      configureIntro(force, actionsOnload);
+      configureIntro(force, actionsOnload());
       intro.start();
     },
     force: function() {
