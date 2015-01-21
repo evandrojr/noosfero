@@ -1,18 +1,14 @@
-<table class="comments">
-  <tr>
-    <td>
-      <div class="comment_paragraph" id="comment_paragraph_<%= paragraph_uuid %>" data-paragraph="<%= paragraph_uuid %>">
-        <%= inner_html %>
-      </div>
-    </td>
-    <td>
-      <div  align="center" class="side-comments-counter" id="side_comments_counter_<%= paragraph_uuid %>"  data-paragraph="<%= paragraph_uuid %>" style="vertical-align: middle; padding-left: 3px; padding-right: 5px;">
-        <span id="comment-count-<%= paragraph_uuid %>" class='comment-count'>
-          <%= count %>
-        </span>
-      </div>
-    </td>
-    <td>
+<div class="comment-paragraph-plugin comments">
+  <div class="comment_paragraph" id="comment_paragraph_<%= paragraph_uuid %>" data-paragraph="<%= paragraph_uuid %>">
+    <%= inner_html %>
+  </div>
+  <div class="side-comments-counter-container">
+    <div class="side-comments-counter" id="side_comments_counter_<%= paragraph_uuid %>"  data-paragraph="<%= paragraph_uuid %>">
+      <span id="comment-count-<%= paragraph_uuid %>" class='comment-count'>
+        <%= count %>
+      </span>
+    </div>
+  </div>
 <div class="comment-paragraph-group-comments">
      <%=
        url = { :profile => profile_identifier, :controller => 'comment_paragraph_plugin_profile', :action => 'view_comments', :paragraph_uuid => paragraph_uuid, :article_id => article_id}
@@ -33,7 +29,9 @@
   <div class="side-comment" id="side_comment_<%= paragraph_uuid %>" data-paragraph="<%= paragraph_uuid %>" style="display:none">
      <div class="comment-paragraph-loading-<%= paragraph_uuid %>">
        <div class="comments_list_toggle_paragraph_<%= paragraph_uuid %>" >
-         <div class="article-comments-list" id="comments_list_paragraph_<%= paragraph_uuid %>"></div>
+         <div class="article-comments-list" id="comments_list_paragraph_<%= paragraph_uuid %>">
+           <div class="loading"></div>
+         </div>
          <div class ="article-comments-list-more" id="comments_list_paragraph_<%= paragraph_uuid %>_more"></div>
          <div id="page-comment-form-<%= paragraph_uuid %>" class='post_comment_box closed'>
            <%= render :partial => 'comment/comment_form', :locals => {:comment => Comment.new, :display_link => true, :cancel_triggers_hide => true, :paragraph_uuid => paragraph_uuid}%>
@@ -42,9 +40,7 @@
      </div>
   </div>
 </div>
-    </td>
-  </tr>
-</table>
+</div>
 
 
 
