@@ -58,6 +58,7 @@ jQuery(document).ready(function($) {
   function hideCommentBox() {
     $("div.side-comment").hide();
     $('.article-body').removeClass('comment-paragraph-slide-left');
+    $('.comments').removeClass('selected');
   }
 
   function showBox(div){
@@ -75,20 +76,12 @@ jQuery(document).ready(function($) {
           <div align="center"  class="triangle-right" >Comentar</div>\
       </a>');
 
-  function resizeArticle(paragraphId){
-    var commentHeigh = $('#side_comment_' + paragraphId).height();
-    if(commentHeigh > 0){
-      $('.article-body').height(originalArticleHeight + commentHeigh + 50);
-    }else{
-       $('.article-body').height(originalArticleHeight);
-    }
-  }
-
   $('.side-comments-counter').click(function(){
     var paragraphId = $(this).data('paragraph');
     hideAllCommentsExcept(paragraphId);
     hideAllSelectedAreasExcept(paragraphId);
     hideCommentBox();
+    $(this).closest('.comments').addClass('selected');
     $('.article-body').addClass('comment-paragraph-slide-left');
     $('#side_comment_' + paragraphId).show();
     $('#comment-bubble').removeClass('visible');
@@ -100,7 +93,6 @@ jQuery(document).ready(function($) {
     }).done(function() {
       var button = $('#page-comment-form-' + paragraphId + ' a').get(0);
       button.click();
-      resizeArticle(paragraphId);
     });
   });
 
@@ -120,7 +112,6 @@ jQuery(document).ready(function($) {
     }).done(function() {
       var button = $('#page-comment-form-' + paragraphId + ' a').get(0);
       button.click();
-      resizeArticle(paragraphId);
     });
   });
 
