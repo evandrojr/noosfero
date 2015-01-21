@@ -72,6 +72,7 @@ var siteTourPlugin = (function() {
       userData = data;
 
       intro = introJs();
+      intro.setOption('tooltipPosition', 'auto');
       intro.onafterchange(function(targetElement) {
         var name = jQuery(targetElement).attr('data-intro-name');
         mark(name);
