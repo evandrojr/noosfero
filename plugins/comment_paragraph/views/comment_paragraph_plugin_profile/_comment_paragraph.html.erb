@@ -1,18 +1,14 @@
-<table class="comments">
-  <tr>
-    <td>
-      <div class="comment_paragraph" id="comment_paragraph_<%= paragraph_id %>" data-paragraph="<%= paragraph_id %>">
-        <%= inner_html %>
-      </div>
-    </td>
-    <td>
-      <div  align="center" class="side-comments-counter" id="side_comments_counter_<%= paragraph_id %>"  data-paragraph="<%= paragraph_id %>" style="vertical-align: middle; padding-left: 3px; padding-right: 5px;">
-        <span id="comment-count-<%= paragraph_id %>" class='comment-count'>
-          <%= count %>
-        </span>
-      </div>
-    </td>
-    <td>
+<div class="comments">
+  <div class="comment_paragraph" id="comment_paragraph_<%= paragraph_id %>" data-paragraph="<%= paragraph_id %>">
+    <%= inner_html %>
+  </div>
+  <div class="side-comments-counter-container">
+    <div class="side-comments-counter" id="side_comments_counter_<%= paragraph_id %>"  data-paragraph="<%= paragraph_id %>">
+      <span id="comment-count-<%= paragraph_id %>" class='comment-count'>
+        <%= count %>
+      </span>
+    </div>
+  </div>
 <div class="comment-paragraph-group-comments">
      <%=
        url = { :profile => profile_identifier, :controller => 'comment_paragraph_plugin_profile', :action => 'view_comments', :paragraph_id => paragraph_id, :article_id => article_id}
@@ -42,9 +38,7 @@
      </div>
   </div>
 </div>
-    </td>
-  </tr>
-</table>
+</div>
 
 
 

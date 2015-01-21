@@ -29,7 +29,7 @@ jQuery(document).ready(function($) {
     // on press ESC key...
     if (e.which == 27) {
       // closing side comment box
-      $("div.side-comment").hide();
+      hideCommentBox();
     }
   });
 
@@ -51,8 +51,14 @@ jQuery(document).ready(function($) {
 
   $('#cancel-comment').die();
   $(document.body).on("click", '#cancel-comment', function(){
-    $("div.side-comment").hide();
+    hideCommentBox();
+    return false;
   });
+
+  function hideCommentBox() {
+    $("div.side-comment").hide();
+    $('.article-body').removeClass('comment-paragraph-slide-left');
+  }
 
   function showBox(div){
     if(div.hasClass('closed')) {
@@ -65,7 +71,7 @@ jQuery(document).ready(function($) {
   cssApplier = rangy.createCssClassApplier("commented-area", {normalize: false});
   //Add marked text bubble
   $("body").append('\
-      <a id="comment-bubble" style="width:90px;text-decoration: none">\
+      <a id="comment-bubble">\
           <div align="center"  class="triangle-right" >Comentar</div>\
       </a>');
 
@@ -82,14 +88,10 @@ jQuery(document).ready(function($) {
     var paragraphId = $(this).data('paragraph');
     hideAllCommentsExcept(paragraphId);
     hideAllSelectedAreasExcept(paragraphId);
-    if($('.comment-paragraph-slide-left').size()==0){
-      $('.article-body').addClass('comment-paragraph-slide-left');
-      $('#side_comment_' + paragraphId).show();
-    }else{
-      $('.article-body').removeClass('comment-paragraph-slide-left');
-      $('.side-comment').hide();
-    }
-    $('#comment-bubble').hide();
+    hideCommentBox();
+    $('.article-body').addClass('comment-paragraph-slide-left');
+    $('#side_comment_' + paragraphId).show();
+    $('#comment-bubble').removeClass('visible');
     //Loads the comments
     var url = $('#link_to_ajax_comments_' + paragraphId).data('url');
     $.ajax({
@@ -108,7 +110,6 @@ jQuery(document).ready(function($) {
     if($('.comment-paragraph-slide-left').size()==0){
       $('.article-body').addClass('comment-paragraph-slide-left');
     }
-    $("#comment-bubble").css({top: 0, left: 0, position:'absolute'});
     var url = $("#comment-bubble").data('url');
     var paragraphId = $("#comment-bubble").data("paragraphId");
     hideAllCommentsExcept(paragraphId);
@@ -142,8 +143,6 @@ jQuery(document).ready(function($) {
     });
   }
 
-  $("#comment-bubble").hide();
-
   function getSelectionText() {
     var text = "";
     if (window.getSelection) {
@@ -157,19 +156,15 @@ jQuery(document).ready(function($) {
   function setCommentBubblePosition(posX, posY) {
     $("#comment-bubble").css({
       top: (posY - 80),
-      left: (posX - 70),
-      position:'absolute'
+      left: (posX - 70)
     });
   }
 
   //highlight area from the paragraph
   $('.comment_paragraph').mouseup(function(event) {
 
-    $('#comment-bubble').hide();
     if($('.comment-paragraph-slide-left').size() > 0){
-      $('.article-body').removeClass('comment-paragraph-slide-left');
-      $('.side-comment').hide();
-      //$('.side-comment').find().hide();
+      hideCommentBox();
     }
 
     //Don't do anything if there is no selected text
@@ -185,7 +180,7 @@ jQuery(document).ready(function($) {
     var url = $('#link_to_ajax_comments_' + paragraphId).data('url');
     $("#comment-bubble").data("url", url);
     $("#comment-bubble").data("paragraphId", paragraphId);
-    $("#comment-bubble").show();
+    $("#comment-bubble").addClass('visible');
 
     var rootElement = $(this).get(0);
 
