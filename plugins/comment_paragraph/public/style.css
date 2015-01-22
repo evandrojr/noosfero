@@ -94,6 +94,8 @@ div.article-comments-list-more{
   width: 150px;
   right: 0;
   top: 0;
+  zoom: 0.8;
+  -moz-transform: scale(0.8);
 }
 
 .side-comment .comment-created-at{display: none;}
@@ -169,7 +171,7 @@ div[class^='comment-paragraph-loading-'] {
   bottom: -9px;
   left: 5px;
   border-style: solid;
-  border-width: 12px 5px 0;
+  border-width: 10px 5px 0;
   border-color: #bdbdbd transparent;
   display: block;
   width: 0;
@@ -195,6 +197,7 @@ div[class^='comment-paragraph-loading-'] {
   overflow-y: auto;
   overflow-x: hidden;
   max-height: 400px;
+  border-bottom: 1px solid rgb(240, 240, 240);
 }
 #article .side-comment .article-comments-list .article-comment {
   margin: 0;
@@ -301,4 +304,19 @@ div[class^='comment-paragraph-loading-'] {
 .article-body {
   width: 100%;
   transition: width 0.3s ease-in-out;
+}
+
+.comment-paragraph-plugin .post_comment_box {
+  text-align: center;
+  padding: 5px 5px 0 5px;
+}
+.comment-paragraph-plugin .comment-details .menu-submenu {
+  right: 21px;
+  top: -1px;
+}
+
+.comment-paragraph-plugin .comment_reply.post_comment_box form {
+  padding-left: 0;
+  padding-right: 10px;
+  margin-left: -36px;
 }
