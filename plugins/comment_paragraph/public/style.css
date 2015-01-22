@@ -9,6 +9,7 @@
   width: 90px;
   text-decoration: none;
   visibility: hidden;
+  cursor: pointer;
 }
 
 div.article-comments-list-more{
@@ -99,21 +100,17 @@ div.article-comments-list-more{
 }
 
 .side-comment .comment-created-at{display: none;}
-.side-comment #comment_title{display: none;}
-.side-comment .comment_title{display: none;}
+.side-comment #comment_title, .side-comment .comment_title{display: none;}
 .side-comment label[for="comment_title"] {display: none;}
 
-div[class^='comments_list_toggle_paragraph_'] {
- border-style: solid;
- border-width: 1px;
- border-color: #e7e7e7;
- padding: 5px;
- background-color: whitesmoke;
- width: 280px;
-}
-
-div[class^='comment-paragraph-loading-'] {
- z-index: 99;
+.side-comment {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #e7e7e7;
+  padding: 5px;
+  background-color: whitesmoke;
+  width: 280px;
+  display: none;
 }
 
 #content .side-comment .comment-balloon div[class^='comment-wrapper-']{
@@ -172,12 +169,12 @@ div[class^='comment-paragraph-loading-'] {
   left: 5px;
   border-style: solid;
   border-width: 10px 5px 0;
-  border-color: #bdbdbd transparent;
+  border-color: #b5b5b5 transparent;
   display: block;
   width: 0;
 }
 
-.comment-count{
+.comment-count-container {
   position: relative;
   top: 3px;
 }
@@ -231,9 +228,6 @@ div[class^='comment-paragraph-loading-'] {
 .side-comment .comment-wrapper-1 {
   margin-left: 36px;
 }
-#article .side-comment .article-comments-list .comment-replies {
-  padding-left: 25px;
-}
 #article .side-comment .comment-picture {
   width: 100%;
   height: auto;
@@ -246,9 +240,6 @@ div[class^='comment-paragraph-loading-'] {
 .side-comment .formlabel[for='comment_body'] {
   display: none;
 }
-.side-comment > div > div {
-  background: #FFFFFF;
-}
 .side-comment .comment_form p {
   display: none;
 }
@@ -257,7 +248,7 @@ div[class^='comment-paragraph-loading-'] {
   padding-bottom: 15px;
 }
 
-.side-comment .comment-count {
+.side-comment .comment-count-container {
   bg-color: #b3b2d4;
 }
 
@@ -265,22 +256,12 @@ div[class^='comment-paragraph-loading-'] {
   height: 50px;
 }
 
-.comment-paragraph-comments{
-  background: lightblue;
-  padding: 5px;
-  width: 150px;
-  margin-top: 10px;
-  color: white;
-  font-weight: bold;
-  text-align: center;
-}
-
 .single-border{
   border-style: solid;
   border-width: 2px;
 }
 
-.comment-paragraph-slide-left .comments {
+.comment-paragraph-plugin .comments {
   position: relative;
   display: table;
 }
@@ -289,7 +270,7 @@ div[class^='comment-paragraph-loading-'] {
   background-color: rgb(236, 236, 236);
 }
 
-.comment-paragraph-group-comments{
+.side-comment {
   position: absolute;
   right: -296px;
   top: 0px;
@@ -297,11 +278,11 @@ div[class^='comment-paragraph-loading-'] {
   z-index: 199;
 }
 
-.article-body.comment-paragraph-slide-left {
+.comment-paragraph-plugin.comment-paragraph-slide-left {
   position: relative;
   width: 80%;
 }
-.article-body {
+.comment-paragraph-plugin {
   width: 100%;
   transition: width 0.3s ease-in-out;
 }
@@ -319,4 +300,45 @@ div[class^='comment-paragraph-loading-'] {
   padding-left: 0;
   padding-right: 10px;
   margin-left: -36px;
+}
+
+.comment-paragraph-plugin .no-comments-yet .comment-count {
+  display: none;
+}
+
+.comment-paragraph-plugin .no-comments-yet:after {
+  content: "+";
+}
+#content .comment-paragraph-plugin .no-comments-yet {
+  font-size: 100%;
+  opacity: 1;
+}
+
+#content .comment-paragraph-plugin .display-comment-form {
+  text-decoration: none;
+  color: gray;
+}
+
+#content .comment-paragraph-plugin .display-comment-form:hover {
+  color: rgb(95, 95, 95);
+}
+
+#content .comment-paragraph-plugin .side-comment .article-comments-list .comment-replies .comment-replies {
+  padding-left: 0;
+}
+#content .comment-paragraph-plugin .side-comment .article-comments-list .comment-replies {
+  padding-left: 25px;
+}
+
+#content .comment-paragraph-plugin #cancel-comment, #content .comment-paragraph-plugin .icon-add {
+  background: none;
+  border: none;
+}
+#content .comment-paragraph-plugin #cancel-comment:hover, #content .comment-paragraph-plugin .icon-add:hover {
+  background: none;
+  color: black;
+  border: none;
+}
+#content .comment-paragraph-plugin .button-bar {
+  margin: 5px 0;
 }

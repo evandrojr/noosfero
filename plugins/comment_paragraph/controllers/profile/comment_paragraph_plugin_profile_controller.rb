@@ -8,6 +8,7 @@ class CommentParagraphPluginProfileController < ProfileController
     @comments = article.comments.without_spam.in_paragraph(@paragraph_uuid)
     @comments_count = @comments.count
     @comments = @comments.without_reply
+    render :partial => 'comment/comment.html.erb', :collection => @comments
   end
 
 end

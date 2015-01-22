@@ -7,39 +7,31 @@ class CommentParagraphPluginProfileController; def rescue_action(e) raise e end;
 class CommentParagraphPluginProfileControllerTest < ActionController::TestCase
 
   def setup
-    @controller = CommentParagraphPluginProfileController.new
-    @request    = ActionController::TestRequest.new
-    @response   = ActionController::TestResponse.new
-
     @profile = create_user('testuser').person
     @article = profile.articles.build(:name => 'test')
     @article.save!
   end
-  attr_reader :article
-  attr_reader :profile
+  attr_reader :article, :profile
 
   should 'be able to show paragraph comments' do
     comment = fast_create(Comment, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'lalala', :paragraph_uuid => 0)
     xhr :get, :view_comments, :profile => @profile.identifier, :article_id => article.id, :paragraph_uuid => 0
-    assert_template 'comment_paragraph_plugin_profile/view_comments'
-    assert_match /comments_list_paragraph_0/, @response.body
-    assert_match /\"comment-count-0\", \"1\"/, @response.body
+    assert_select "#comment-#{comment.id}"
   end
 
   should 'do not show global comments' do
-    fast_create(Comment, :source_id => article, :author_id => profile, :title => 'global comment', :body => 'global', :paragraph_uuid => nil)
-    fast_create(Comment, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'lalala', :paragraph_uuid => 0)
+    global_comment = fast_create(Comment, :source_id => article, :author_id => profile, :title => 'global comment', :body => 'global', :paragraph_uuid => nil)
+    comment = fast_create(Comment, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'lalala', :paragraph_uuid => 0)
     xhr :get, :view_comments, :profile => @profile.identifier, :article_id => article.id, :paragraph_uuid => 0
-    assert_template 'comment_paragraph_plugin_profile/view_comments'
-    assert_match /comments_list_paragraph_0/, @response.body
-    assert_match /\"comment-count-0\", \"1\"/, @response.body
+    assert_select "#comment-#{global_comment.id}", 0
+    assert_select "#comment-#{comment.id}"
   end
 
   should 'be able to show all comments of a paragraph' do
-    comment1 = fast_create(Comment, :created_at => Time.now - 1.days, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'a comment', :paragraph_uuid => 0)
-    comment2 = fast_create(Comment, :created_at => Time.now - 2.days, :source_id => article, :author_id => profile, :title => 'b comment', :body => 'b comment', :paragraph_uuid => 0)
-    comment3 = fast_create(Comment, :created_at => Time.now - 3.days, :source_id => article, :author_id => profile, :title => 'c comment', :body => 'c comment', :paragraph_uuid => 0)
-    comment4 = fast_create(Comment, :created_at => Time.now - 4.days, :source_id => article, :author_id => profile, :title => 'd comment', :body => 'd comment', :paragraph_uuid => 0)
+    fast_create(Comment, :created_at => Time.now - 1.days, :source_id => article, :author_id => profile, :title => 'a comment', :body => 'a comment', :paragraph_uuid => 0)
+    fast_create(Comment, :created_at => Time.now - 2.days, :source_id => article, :author_id => profile, :title => 'b comment', :body => 'b comment', :paragraph_uuid => 0)
+    fast_create(Comment, :created_at => Time.now - 3.days, :source_id => article, :author_id => profile, :title => 'c comment', :body => 'c comment', :paragraph_uuid => 0)
+    fast_create(Comment, :created_at => Time.now - 4.days, :source_id => article, :author_id => profile, :title => 'd comment', :body => 'd comment', :paragraph_uuid => 0)
     xhr :get, :view_comments, :profile => @profile.identifier, :article_id => article.id, :paragraph_uuid => 0
     assert_match /a comment/, @response.body
     assert_match /b comment/, @response.body

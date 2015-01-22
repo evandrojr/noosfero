@@ -22,5 +22,4 @@ class ArticleTest < ActiveSupport::TestCase
     assert article.save
   end
 
-
 end

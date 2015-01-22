@@ -1,39 +1,17 @@
 var comment_paragraph_anchor;
-var lastSelectedArea = [];
-var original_paragraphs = [];
-var originalArticleHeight = 0
-
-function setPlusIfZeroComments($){
-  $('.comment-count').each(function(){
-    var commentCount = $(this).text().trim();
-    if(commentCount=='0')
-      $(this).text("+");
-  });
-}
 
 jQuery(document).ready(function($) {
   //Quit if does not detect a comment for that plugin
   if($('.comment_paragraph').size() < 1)
     return;
 
-  originalArticleHeight = $('.article-body').height();
-
-  all_paragraphs = $('.comment_paragraph');
-  all_paragraphs.each( function(paragraph) {
-    var paragraph_uuid = $( all_paragraphs.get(paragraph) ).attr('data-paragraph');
-    var paragraph_content = all_paragraphs.get(paragraph).innerHTML;
-    original_paragraphs.push( { id: paragraph_uuid, content: paragraph_content } );
-  });
-
   $(document).keyup(function(e) {
     // on press ESC key...
     if (e.which == 27) {
-      // closing side comment box
       hideCommentBox();
     }
   });
 
-  setPlusIfZeroComments($);
   $('.display-comment-form').unbind();
   $('.display-comment-form').click(function(){
     var $button = $(this);
@@ -49,15 +27,16 @@ jQuery(document).ready(function($) {
       $('.selected_content').val("");
   });
 
-  $('#cancel-comment').die();
-  $(document.body).on("click", '#cancel-comment', function(){
-    hideCommentBox();
-    return false;
+  //hide comments when click outside
+  $('body').click(function(event){
+    if ($(event.target).closest('.comment-paragraph-plugin, #comment-bubble').length === 0) {
+      hideCommentBox();
+    }
   });
 
   function hideCommentBox() {
     $("div.side-comment").hide();
-    $('.article-body').removeClass('comment-paragraph-slide-left');
+    $('.comment-paragraph-plugin').removeClass('comment-paragraph-slide-left');
     $('.comments').removeClass('selected');
   }
 
@@ -76,60 +55,40 @@ jQuery(document).ready(function($) {
           <div align="center"  class="triangle-right" >Comentar</div>\
       </a>');
 
-  $('.side-comments-counter').click(function(){
-    var paragraphId = $(this).data('paragraph');
-    hideAllCommentsExcept(paragraphId);
+  $('.comment-paragraph-plugin .side-comments-counter').click(function(){
+    var container = $(this).closest('.comment-paragraph-plugin');
+    var paragraphId = container.data('paragraph');
     hideAllSelectedAreasExcept(paragraphId);
     hideCommentBox();
-    $(this).closest('.comments').addClass('selected');
-    $('.article-body').addClass('comment-paragraph-slide-left');
-    $('#side_comment_' + paragraphId).show();
+    container.addClass('comment-paragraph-slide-left selected');
+    container.find('.side-comment').show();
     $('#comment-bubble').removeClass('visible');
     //Loads the comments
-    var url = $('#link_to_ajax_comments_' + paragraphId).data('url');
-    $.ajax({
-      dataType: "script",
-      url: url
-    }).done(function() {
-      var button = $('#page-comment-form-' + paragraphId + ' a').get(0);
-      button.click();
+    var url = container.find('.side-comment').data('comment_paragraph_url');
+    $.ajax(url).done(function(data) {
+      container.find('.article-comments-list').html(data);
+      if(container.find('.article-comment').length==0) {
+        container.find('.post_comment_box a.display-comment-form').click();
+      } else {
+        container.find('.post_comment_box').removeClass('opened');
+        container.find('.post_comment_box').addClass('closed');
+        container.find('.display-comment-form').show();
+      }
     });
   });
 
 
   $('#comment-bubble').click(function(event){
-    $(this).hide();
-    if($('.comment-paragraph-slide-left').size()==0){
-      $('.article-body').addClass('comment-paragraph-slide-left');
-    }
-    var url = $("#comment-bubble").data('url');
-    var paragraphId = $("#comment-bubble").data("paragraphId");
-    hideAllCommentsExcept(paragraphId);
-    $('#side_comment_' + paragraphId).show();
-    $.ajax({
-      dataType: "script",
-      url: url
-    }).done(function() {
-      var button = $('#page-comment-form-' + paragraphId + ' a').get(0);
-      button.click();
-    });
+    var paragraph = $("#comment-bubble").data("paragraph");
+    $('#comment-paragraph-plugin_' + paragraph).find('.side-comments-counter').click();
   });
-
-  function hideAllCommentsExcept(clickedParagraph){
-    $(".side-comment").each(function(){
-      paragraph = $(this).data('paragraph');
-      if(paragraph != clickedParagraph){
-        $(this).hide();
-        //$(this).find().hide();
-      }
-    });
-  }
 
   function hideAllSelectedAreasExcept(clickedParagraph){
     $(".comment_paragraph").each(function(){
-      paragraph = $(this).data('paragraph');
+      paragraph = $(this).closest('.comment-paragraph-plugin').data('paragraph');
       if(paragraph != clickedParagraph){
         $(this).find(".commented-area").contents().unwrap();
+        $(this).html($(this).html()); //XXX: workaround to prevent creation of text nodes
       }
     });
   }
@@ -154,23 +113,20 @@ jQuery(document).ready(function($) {
   //highlight area from the paragraph
   $('.comment_paragraph').mouseup(function(event) {
 
-    if($('.comment-paragraph-slide-left').size() > 0){
-      hideCommentBox();
-    }
+    hideCommentBox();
 
     //Don't do anything if there is no selected text
     if (getSelectionText().length == 0) {
       return;
     }
 
-    var paragraphId = $(this).data('paragraph');
+    var container = $(this).closest('.comment-paragraph-plugin');
+    var paragraphId = container.data('paragraph');
 
     setCommentBubblePosition( event.pageX, event.pageY );
 
     //Prepare to open the div
-    var url = $('#link_to_ajax_comments_' + paragraphId).data('url');
-    $("#comment-bubble").data("url", url);
-    $("#comment-bubble").data("paragraphId", paragraphId);
+    $("#comment-bubble").data("paragraph", paragraphId);
     $("#comment-bubble").addClass('visible');
 
     var rootElement = $(this).get(0);
@@ -182,9 +138,9 @@ jQuery(document).ready(function($) {
     } catch(e) {
       return;
     }
-    form = $('#page-comment-form-' + paragraphId).find('form');
+    form = container.find('.post_comment_box').find('form');
 
-    //Register the area the has been selected at input.selected_area
+    //Register the area that has been selected at input.selected_area
     if (form.find('input.selected_area').length === 0){
       $('<input>').attr({
         class: 'selected_area',
@@ -216,16 +172,15 @@ jQuery(document).ready(function($) {
     if(anchor.length==0) return;
     var val = anchor.split('-'); //anchor format = #comment-\d+
     if(val.length!=2 || val[0]!='#comment') return;
-    if($('div[data-macro=comment_paragraph_plugin\\/allow_comment]').length==0) return; //comment_paragraph_plugin/allow_comment div must exists
+    if($('.comment-paragraph-plugin').length==0) return;
     var comment_id = val[1];
     if(!/^\d+$/.test(comment_id)) return; //test for integer
     comment_paragraph_anchor = anchor;
+
     var url = '/plugin/comment_paragraph/public/comment_paragraph/'+comment_id;
-    $.ajax({
-      dataType: "script",
-      url: url
-    }).done(function() {
-      var button = $('#page-comment-form-' + comment_id + ' a').get(0)
+    $.ajax(url).done(function(data) {
+      var button = $('#comment-paragraph-plugin_' + data.paragraph_uuid + ' .side-comments-counter').click();
+      $('body').animate({scrollTop: parseInt(button.offset().top)}, 500);
       button.click();
     });
   }
@@ -234,8 +189,8 @@ jQuery(document).ready(function($) {
 
   $(document).on('mouseenter', 'li.article-comment', function() {
     var selected_area = $(this).find('input.paragraph_comment_area').val();
-    var paragraph_uuid =  $(this).find('input.paragraph_uuid').val();
-    var rootElement = $('#comment_paragraph_' + paragraph_uuid).get(0);
+    var container = $(this).closest('.comment-paragraph-plugin');
+    var rootElement = container.find('.comment_paragraph')[0];
 
     if(selected_area != ""){
       rangy.deserializeSelection(selected_area, rootElement);
@@ -244,30 +199,6 @@ jQuery(document).ready(function($) {
   });
 
   $(document).on('mouseleave', 'li.article-comment', function() {
-    var paragraph_uuid = $(this).find('input.paragraph_uuid').val();
-    var rootElement = $('#comment_paragraph_'+ paragraph_uuid).get(0);
-
-    original_paragraphs.each( function(paragraph) {
-      if (paragraph.id == paragraph_uuid) {
-        rootElement.innerHTML = paragraph.content;
-      }
-    });
+    hideAllSelectedAreasExcept();
   });
-
-  function toggleParagraph(paragraph) {
-    var div = $('div.comments_list_toggle_paragraph_'+paragraph);
-    var visible = div.is(':visible');
-    if(!visible)
-      $('div.comment-paragraph-loading-' + paragraph).addClass('comment-button-loading');
-    div.toggle('fast');
-    return visible;
-  }
-
-  function loadCompleted(paragraph) {
-    $('div.comment-paragraph-loading-'+paragraph).removeClass('comment-button-loading')
-    if(comment_paragraph_anchor) {
-      $.scrollTo($(comment_paragraph_anchor));
-      comment_paragraph_anchor = null;
-    }
-  }
 });
