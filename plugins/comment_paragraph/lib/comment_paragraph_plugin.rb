@@ -40,6 +40,10 @@ class CommentParagraphPlugin < Noosfero::Plugin
     true
   end
 
+  def self.activation_mode_default_setting
+    'auto'
+  end
+
 end
 
 require_dependency 'comment_paragraph_plugin/macros/allow_comment'

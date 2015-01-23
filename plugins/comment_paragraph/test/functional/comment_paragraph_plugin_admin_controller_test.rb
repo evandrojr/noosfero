@@ -14,25 +14,25 @@ class CommentParagraphPluginAdminControllerTest < ActionController::TestCase
     @environment.save!
     @plugin_settings = Noosfero::Plugin::Settings.new(@environment, CommentParagraphPlugin)
   end
+  attr_reader :plugin_settings, :environment
 
   should 'access index action' do
     get :index
-    assert_template 'index'
     assert_response :success
   end
 
   should 'update comment paragraph plugin settings' do
-    assert_nil @plugin_settings.get_setting(:auto_marking_article_types)
-    post :index, :settings => { :auto_marking_article_types => ['TinyMceArticle'] }
-    @environment.reload
-    assert_not_nil @plugin_settings.get_setting(:auto_marking_article_types)
+    assert_not_equal 'manual', plugin_settings.get_setting(:activation_mode)
+    post :index, :settings => { :activation_mode => 'manual' }
+    environment.reload
+    assert_equal 'manual', plugin_settings.get_setting(:activation_mode)
   end
 
   should 'get article types previously selected' do
-    post :index, :settings => { :auto_marking_article_types => ['TinyMceArticle', 'TextileArticle'] }
+    plugin_settings.activation_mode = 'manual'
+    plugin_settings.save!
     get :index
-    assert_tag :input, :attributes => { :value => 'TinyMceArticle' }
-    assert_tag :input, :attributes => { :value => 'TextileArticle' }
+    assert_tag :input, :attributes => { :value => 'manual', :checked => 'checked' }
   end
 
 end
