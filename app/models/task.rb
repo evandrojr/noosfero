@@ -141,7 +141,7 @@ class Task < ActiveRecord::Base
   end
 
   def reject_details
-    false
+    true
   end
 
   def icon
