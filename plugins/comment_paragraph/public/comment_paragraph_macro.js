@@ -208,6 +208,7 @@ jQuery(document).ready(function($) {
   processAnchor();
 
   $(document).on('mouseenter', 'li.article-comment', function() {
+    hideAllSelectedAreasExcept(null, '.commented-area-selected');
     var selected_area = $(this).find('input.paragraph_comment_area').val();
     var container = $(this).closest('.comment-paragraph-plugin');
     var rootElement = container.find('.comment_paragraph')[0];
@@ -220,5 +221,14 @@ jQuery(document).ready(function($) {
 
   $(document).on('mouseleave', 'li.article-comment', function() {
     hideAllSelectedAreasExcept();
+
+    var container = $(this).closest('.comment-paragraph-plugin');
+    var selected_area = container.find('input.selected_area').val();
+    var rootElement = container.find('.comment_paragraph')[0];
+    if(selected_area != ""){
+      rangy.deserializeSelection(selected_area, rootElement);
+      cssApplierSelected.toggleSelection();
+    }
+    clearSelection();
   });
 });

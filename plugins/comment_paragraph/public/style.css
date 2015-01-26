@@ -43,12 +43,12 @@ div.article-comments-list-more{
 }
 
 .comment_paragraph ::selection {
-  background: lightseagreen; /* WebKit/Blink Browsers */
+  background-color: lightseagreen; /* WebKit/Blink Browsers */
   color: white;
 }
 
 .comment_paragraph ::-moz-selection {
-  background: lightseagreen; /* Gecko Browsers */
+  background-color: lightseagreen; /* Gecko Browsers */
   color: white;
 }
 
