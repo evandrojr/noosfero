@@ -54,15 +54,15 @@ div.article-comments-list-more{
   padding:15px;
   margin:1em 0 3em;
   color:#fff;
-  background:#075698; /* default background for browsers without gradient support */
+  background:#717171; /* default background for browsers without gradient support */
   /* css3 */
-  background:-webkit-gradient(linear, 0 0, 0 100%, from(#ababab), to(#424242));
-  background:-moz-linear-gradient(#ABABAB, #424242);
-  background:-o-linear-gradient(#ABABAB, #424242);
-  background: linear-gradient(#ABABAB, #424242);
-  -webkit-border-radius:10px;
-  -moz-border-radius:10px;
-  border-radius:10px;
+  background:-webkit-gradient(linear, 0 0, 0 100%, from(#717171), to(#1F1F1F));
+  background:-moz-linear-gradient(#717171, #1F1F1F);
+  background:-o-linear-gradient(#717171, #1F1F1F);
+  background: linear-gradient(#717171, #1F1F1F);
+  -webkit-border-radius:8px;
+  -moz-border-radius:8px;
+  border-radius:8px;
   font-weight: bold;
 }
 
@@ -73,7 +73,7 @@ div.article-comments-list-more{
   left: 50px;
   border-width: 20px 0 0 20px;
   border-style: solid;
-  border-color: #424242 transparent;
+  border-color: #1F1F1F transparent;
   display: block;
   width: 0;
 }

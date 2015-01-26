@@ -1,5 +1,3 @@
-var comment_paragraph_anchor;
-
 jQuery(document).ready(function($) {
   //Quit if does not detect a comment for that plugin
   if($('.comment_paragraph').size() < 1)
@@ -31,6 +29,8 @@ jQuery(document).ready(function($) {
   $('body').click(function(event){
     if ($(event.target).closest('.comment-paragraph-plugin, #comment-bubble').length === 0) {
       hideCommentBox();
+      $('#comment-bubble').removeClass('visible');
+      hideAllSelectedAreasExcept();
     }
   });
 
@@ -60,14 +60,14 @@ jQuery(document).ready(function($) {
     var paragraphId = container.data('paragraph');
     hideAllSelectedAreasExcept(paragraphId);
     hideCommentBox();
+    $('#comment-bubble').removeClass('visible');
     container.addClass('comment-paragraph-slide-left selected');
     container.find('.side-comment').show();
-    $('#comment-bubble').removeClass('visible');
     //Loads the comments
     var url = container.find('.side-comment').data('comment_paragraph_url');
     $.ajax(url).done(function(data) {
       container.find('.article-comments-list').html(data);
-      if(container.find('.article-comment').length==0) {
+      if(container.find('.article-comment').length==0 || container.find('.selected_area').length) {
         container.find('.post_comment_box a.display-comment-form').click();
       } else {
         container.find('.post_comment_box').removeClass('opened');
@@ -75,6 +75,13 @@ jQuery(document).ready(function($) {
         container.find('.display-comment-form').show();
       }
     });
+
+    //set a one time handler to prevent multiple selections
+    var fn = function() {
+      hideAllSelectedAreasExcept();
+      $('.comment-paragraph-plugin').off('mousedown', '.comment_paragraph', fn);
+    }
+    $('.comment-paragraph-plugin').on('mousedown', '.comment_paragraph', fn);
   });
 
 
@@ -153,7 +160,6 @@ jQuery(document).ready(function($) {
     }
     //Register the content being selected at input.comment_paragraph_selected_content
     var selected_content = getSelectionText();
-    if(selected_content.length > 0)
     if (form.find('input.selected_content').length === 0){
       $('<input>').attr({
         class: 'selected_content',
@@ -165,6 +171,7 @@ jQuery(document).ready(function($) {
       form.find('input.selected_content').val(selected_content)
     }
     rootElement.focus();
+    cssApplier.toggleSelection();
   });
 
   function processAnchor(){
@@ -175,7 +182,6 @@ jQuery(document).ready(function($) {
     if($('.comment-paragraph-plugin').length==0) return;
     var comment_id = val[1];
     if(!/^\d+$/.test(comment_id)) return; //test for integer
-    comment_paragraph_anchor = anchor;
 
     var url = '/plugin/comment_paragraph/public/comment_paragraph/'+comment_id;
     $.ajax(url).done(function(data) {
