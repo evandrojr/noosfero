@@ -75,13 +75,6 @@ jQuery(document).ready(function($) {
         container.find('.display-comment-form').show();
       }
     });
-
-    //set a one time handler to prevent multiple selections
-    var fn = function() {
-      hideAllSelectedAreasExcept();
-      $('.comment-paragraph-plugin').off('mousedown', '.comment_paragraph', fn);
-    }
-    $('.comment-paragraph-plugin').on('mousedown', '.comment_paragraph', fn);
   });
 
 
@@ -172,6 +165,12 @@ jQuery(document).ready(function($) {
     }
     rootElement.focus();
     cssApplier.toggleSelection();
+    //set a one time handler to prevent multiple selections
+    var fn = function() {
+      hideAllSelectedAreasExcept();
+      $('.comment-paragraph-plugin').off('mousedown', '.comment_paragraph', fn);
+    }
+    $('.comment-paragraph-plugin').on('mousedown', '.comment_paragraph', fn);
   });
 
   function processAnchor(){
