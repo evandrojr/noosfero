@@ -28,7 +28,7 @@ class CommentParagraphPlugin < Noosfero::Plugin
   def comment_extra_contents(args)
     comment = args[:comment]
     proc {
-      render :file => 'comment/comment_extra', :locals => {:comment => comment}
+      render :file => 'comment_paragraph_plugin_profile/comment_extra', :locals => {:comment => comment}
     }
   end
 
