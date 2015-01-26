@@ -32,16 +32,24 @@ div.article-comments-list-more{
   font-weight: bold;
 }
 
-.commented-area {
+.comment-paragraph-plugin .commented-area {
   background-color: lightseagreen;
+  color: white;
+}
+
+.comment-paragraph-plugin .commented-area-selected {
+  background-color: rgb(255, 86, 86);
+  color: white;
 }
 
 .comment_paragraph ::selection {
   background: lightseagreen; /* WebKit/Blink Browsers */
+  color: white;
 }
 
 .comment_paragraph ::-moz-selection {
   background: lightseagreen; /* Gecko Browsers */
+  color: white;
 }
 
 .comment_paragraph{
