@@ -181,7 +181,6 @@ jQuery(function($) {
   }
 
   if( $("#token-input-search-article-privacy-exceptions").length == 1 ) {
-    show_hide_visibility_modes();
     show_hide_token_input();
 
     $("#article_published_true").click(function() {
