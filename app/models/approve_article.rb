@@ -77,10 +77,6 @@ class ApproveArticle < Task
     true
   end
 
-  def reject_details
-    true
-  end
-
   def default_decision
     if article
       'skip'

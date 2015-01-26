@@ -23,10 +23,6 @@ class BscPlugin::AssociateEnterprise < Task
     {:type => :defined_image, :src => src, :name => bsc.name}
   end
 
-  def reject_details
-    true
-  end
-
   def perform
     bsc.enterprises << enterprise
   end
