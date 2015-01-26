@@ -49,6 +49,8 @@ jQuery(document).ready(function($) {
 
   rangy.init();
   cssApplier = rangy.createCssClassApplier("commented-area", {normalize: false});
+  cssApplierSelected = rangy.createCssClassApplier("commented-area-selected", {normalize: false});
+
   //Add marked text bubble
   $("body").append('\
       <a id="comment-bubble">\
@@ -83,11 +85,14 @@ jQuery(document).ready(function($) {
     $('#comment-paragraph-plugin_' + paragraph).find('.side-comments-counter').click();
   });
 
-  function hideAllSelectedAreasExcept(clickedParagraph){
+  function hideAllSelectedAreasExcept(clickedParagraph, areaClass) {
+    if(!areaClass) {
+      areaClass = '.commented-area';
+    }
     $(".comment_paragraph").each(function(){
       paragraph = $(this).closest('.comment-paragraph-plugin').data('paragraph');
       if(paragraph != clickedParagraph){
-        $(this).find(".commented-area").contents().unwrap();
+        $(this).find(areaClass).contents().unwrap();
         $(this).html($(this).html()); //XXX: workaround to prevent creation of text nodes
       }
     });
@@ -101,6 +106,14 @@ jQuery(document).ready(function($) {
         text = document.selection.createRange().text;
     }
     return text;
+  }
+
+  function clearSelection() {
+    if ( document.selection ) {
+      document.selection.empty();
+    } else if ( window.getSelection ) {
+      window.getSelection().removeAllRanges();
+    }
   }
 
   function setCommentBubblePosition(posX, posY) {
@@ -164,10 +177,12 @@ jQuery(document).ready(function($) {
       form.find('input.selected_content').val(selected_content)
     }
     rootElement.focus();
-    cssApplier.toggleSelection();
+    cssApplierSelected.toggleSelection();
+    clearSelection();
+
     //set a one time handler to prevent multiple selections
     var fn = function() {
-      hideAllSelectedAreasExcept();
+      hideAllSelectedAreasExcept(null, '.commented-area-selected');
       $('.comment-paragraph-plugin').off('mousedown', '.comment_paragraph', fn);
     }
     $('.comment-paragraph-plugin').on('mousedown', '.comment_paragraph', fn);
@@ -193,6 +208,7 @@ jQuery(document).ready(function($) {
   processAnchor();
 
   $(document).on('mouseenter', 'li.article-comment', function() {
+    hideAllSelectedAreasExcept(null, '.commented-area-selected');
     var selected_area = $(this).find('input.paragraph_comment_area').val();
     var container = $(this).closest('.comment-paragraph-plugin');
     var rootElement = container.find('.comment_paragraph')[0];
@@ -205,5 +221,14 @@ jQuery(document).ready(function($) {
 
   $(document).on('mouseleave', 'li.article-comment', function() {
     hideAllSelectedAreasExcept();
+
+    var container = $(this).closest('.comment-paragraph-plugin');
+    var selected_area = container.find('input.selected_area').val();
+    var rootElement = container.find('.comment_paragraph')[0];
+    if(selected_area != ""){
+      rangy.deserializeSelection(selected_area, rootElement);
+      cssApplierSelected.toggleSelection();
+    }
+    clearSelection();
   });
 });
