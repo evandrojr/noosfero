@@ -2,6 +2,7 @@ module LayoutHelper
 
   def body_classes
     # Identify the current controller and action for the CSS:
+    (logged_in? ? " logged-in" : "") +
     " controller-#{controller.controller_name}" +
     " action-#{controller.controller_name}-#{controller.action_name}" +
     " template-#{@layout_template || if profile.blank? then 'default' else profile.layout_template end}" +
@@ -17,6 +18,8 @@ module LayoutHelper
     unless plugins_javascripts.empty?
       output += javascript_include_tag plugins_javascripts, :cache => "cache/plugins-#{Digest::MD5.hexdigest plugins_javascripts.to_s}"
     end
+    output += theme_javascript_ng.to_s
+
     output
   end
 
@@ -82,6 +85,10 @@ module LayoutHelper
 
   def theme_stylesheet_path
     theme_path + '/style.css'
+  end
+
+  def layout_template
+    if profile then profile.layout_template else environment.layout_template end
   end
 
   def addthis_javascript
