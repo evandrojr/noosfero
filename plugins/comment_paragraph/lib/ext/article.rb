@@ -55,8 +55,7 @@ class Article
   def comment_paragraph_plugin_parse_paragraph(paragraph_content, paragraph_uuid)
     "<div class='macro article_comments paragraph_comment' " +
       "data-macro='comment_paragraph_plugin/allow_comment' " +
-      "data-macro-paragraph_uuid='#{paragraph_uuid}'>#{paragraph_content}</div>\r\n" +
-      "<p>&nbsp;</p>"
+      "data-macro-paragraph_uuid='#{paragraph_uuid}'>#{paragraph_content}</div>\r\n"
   end
 
 end

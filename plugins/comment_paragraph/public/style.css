@@ -1,3 +1,15 @@
+#content #article-toolbar .icon-toggle_comment_paragraph {
+  position: relative;
+  top: -71px;
+  border: 0;
+  background-color: transparent;
+  padding-left: 0;
+  color: gray;
+}
+#content #article-toolbar .icon-toggle_comment_paragraph:hover {
+  color: black;
+}
+
 #comment-bubble.visible {
   visibility: visible;
 }

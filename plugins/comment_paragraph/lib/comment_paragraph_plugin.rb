@@ -44,6 +44,13 @@ class CommentParagraphPlugin < Noosfero::Plugin
     'manual'
   end
 
+  def article_header_extra_contents(article)
+    return unless article.comment_paragraph_plugin_enabled?
+    proc do
+      button :toggle_comment_paragraph, article.comment_paragraph_plugin_activated? ? _('Deactivate Comment Paragraph') : _('Activate Comment Paragraph'), :controller => 'comment_paragraph_plugin_myprofile', :action => 'toggle_activation', :id => article.id if article.allow_edit?(user)
+    end
+  end
+
 end
 
 require_dependency 'comment_paragraph_plugin/macros/allow_comment'
