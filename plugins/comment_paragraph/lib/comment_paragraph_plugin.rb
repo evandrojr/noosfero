@@ -41,7 +41,7 @@ class CommentParagraphPlugin < Noosfero::Plugin
   end
 
   def self.activation_mode_default_setting
-    'auto'
+    'manual'
   end
 
 end

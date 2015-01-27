@@ -12,7 +12,7 @@ class CommentParagraphPlugin::AllowComment < Noosfero::Plugin::Macro
     count = article.paragraph_comments.without_spam.in_paragraph(paragraph_uuid).count
 
     proc {
-      if controller.kind_of?(ContentViewerController)
+      if controller.kind_of?(ContentViewerController) && article.comment_paragraph_plugin_activated?
         render :partial => 'comment_paragraph_plugin_profile/comment_paragraph',
                :locals => {:paragraph_uuid => paragraph_uuid, :article_id => article.id, :inner_html => inner_html, :count => count, :profile_identifier => article.profile.identifier }
       else

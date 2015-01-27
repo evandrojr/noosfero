@@ -6,25 +6,26 @@ class Article
 
   before_save :comment_paragraph_plugin_parse_html
 
+  before_create :comment_paragraph_plugin_set_initial_value
+
   settings_items :comment_paragraph_plugin_activate, :type => :boolean, :default => false
 
   def comment_paragraph_plugin_enabled?
     environment.plugin_enabled?(CommentParagraphPlugin) && self.kind_of?(TextArticle)
   end
 
-  protected
-
-  def comment_paragraph_plugin_activate?
-      comment_paragraph_plugin_enabled? && comment_paragraph_plugin_settings.activation_mode == 'auto'
+  def comment_paragraph_plugin_activated?
+    comment_paragraph_plugin_activate && comment_paragraph_plugin_enabled?
   end
 
-  def comment_paragraph_plugin_parse_html
-    comment_paragraph_plugin_activate = comment_paragraph_plugin_activate?
-    return unless comment_paragraph_plugin_activate
+  protected
 
-    if body && body_changed?
+  def comment_paragraph_plugin_parse_html
+    return unless comment_paragraph_plugin_activated?
+
+    if body && (body_changed? || setting_changed?(:comment_paragraph_plugin_activate))
       parsed_paragraphs = []
-      updated = body_change[1]
+      updated = body_changed? ? body_change[1] : body
       doc = Hpricot(updated)
       doc.search("/*").each do |paragraph|
         if paragraph.to_html =~ /^<div(.*)paragraph_comment(.*)$/ || paragraph.to_html =~ /^<p>\W<\/p>$/
@@ -39,6 +40,12 @@ class Article
       end
       self.body = parsed_paragraphs.join()
     end
+  end
+
+  def comment_paragraph_plugin_set_initial_value
+    self.comment_paragraph_plugin_activate = comment_paragraph_plugin_enabled? &&
+      comment_paragraph_plugin_settings.activation_mode == 'auto'
+    true
   end
 
   def comment_paragraph_plugin_settings

@@ -9,8 +9,7 @@ class CommentParagraphPluginPublicControllerTest < ActionController::TestCase
 
   def setup
     @profile = create_user('testuser').person
-    @article = profile.articles.build(:name => 'test')
-    @article.save!
+    @article = profile.articles.create!(:name => 'test')
   end
   attr_reader :article, :profile
 

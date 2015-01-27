@@ -10,10 +10,12 @@ end
 class ContentViewerControllerTest < ActionController::TestCase
 
   def setup
-    @profile = fast_create(Community)
-    @page = fast_create(Article, :profile_id => @profile.id, :body => "<div class=\"macro\" data-macro-paragraph_uuid=\"0\" data-macro='comment_paragraph_plugin/allow_comment' ></div>")
     @environment = Environment.default
     @environment.enable_plugin(CommentParagraphPlugin)
+    @profile = fast_create(Community)
+    @page = fast_create(TextArticle, :profile_id => @profile.id, :body => "<p>inner text</p>")
+    @page.comment_paragraph_plugin_activate = true
+    @page.save!
   end
 
   attr_reader :page
