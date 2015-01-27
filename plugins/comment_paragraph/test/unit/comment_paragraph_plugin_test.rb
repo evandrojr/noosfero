@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative '../test_helper'
 include ActionView::Helpers::FormTagHelper
 
 class CommentParagraphPluginTest < ActiveSupport::TestCase

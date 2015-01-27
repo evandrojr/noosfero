@@ -1,5 +1,5 @@
-require File.dirname(__FILE__) + '/../test_helper'
-require File.dirname(__FILE__) + '/../../controllers/profile/comment_paragraph_plugin_profile_controller'
+require_relative '../test_helper'
+require_relative '../../controllers/profile/comment_paragraph_plugin_profile_controller'
 
 # Re-raise errors caught by the controller.
 class CommentParagraphPluginProfileController; def rescue_action(e) raise e end; end
