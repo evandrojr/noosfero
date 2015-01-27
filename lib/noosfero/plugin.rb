@@ -439,6 +439,12 @@ class Noosfero::Plugin
     nil
   end
 
+  # -> Adds adicional fields to a view
+  # returns = proc block that creates html code
+  def upload_files_extra_fields(article)
+    nil
+  end
+  
   # -> Adds fields to the signup form
   # returns = proc that creates html code
   def signup_extra_contents
@@ -580,6 +586,12 @@ class Noosfero::Plugin
   # returns = a list of hashs as {:name => "string", :label => "string", :object_name => :key, :method => :key}
   def extra_optional_fields
     []
+  end
+
+  # -> Adds css class to <html> tag
+  # returns = ['class1', 'class2']
+  def html_tag_classes
+    nil
   end
 
   # -> Adds additional blocks to profiles and environments.

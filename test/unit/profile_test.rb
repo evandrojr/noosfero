@@ -1,5 +1,5 @@
 # encoding: UTF-8
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative "../test_helper"
 
 class ProfileTest < ActiveSupport::TestCase
   fixtures :profiles, :environments, :users, :roles, :domains
@@ -1954,5 +1954,23 @@ class ProfileTest < ActiveSupport::TestCase
     plugins = Noosfero::Plugin::Manager.new(environment, self)
     p = fast_create(Profile)
     assert p.folder_types.include?('ProfileTest::Folder1')
+  end
+
+  should 'enable profile visibility' do
+    profile = fast_create(Profile)
+
+    assert_equal true, profile.disable
+
+    assert_equal true, profile.enable
+    assert_equal true, profile.visible?
+  end
+
+  should 'disable profile visibility' do
+    profile = fast_create(Profile)
+
+    assert_equal true, profile.enable
+
+    assert_equal true, profile.disable
+    assert_equal false, profile.visible?
   end
 end

@@ -1,7 +1,7 @@
 <div id='edit-track-list-block'>
-  <%= labelled_form_field _('Limit of items'), text_field(:block, :limit, :size => 3) %>
+  <%= labelled_form_field c_('Limit of items'), text_field(:block, :limit, :size => 3) %>
 
-  <%= labelled_form_field _('Order'),
+  <%= labelled_form_field c_('Order'),
     select(:block, :order,
            options_for_select(CommunityTrackPlugin::TrackListBlock.order_options, :selected => @block.order)) %>
 

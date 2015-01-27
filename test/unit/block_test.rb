@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative "../test_helper"
 
 class BlockTest < ActiveSupport::TestCase
 
@@ -83,20 +83,10 @@ class BlockTest < ActiveSupport::TestCase
     assert_equal false, block.visible?(:article => Article.new)
   end
 
-  should 'be able to be displayed only in the default profile homepage when home page is nil' do
-    profile = build(Profile, :identifier => 'testinguser')
-    profile.home_page = nil
-    block = build(Block, :display => 'home_page_only')
-    block.stubs(:owner).returns(profile)
-
-    assert_equal true, block.visible?(:request_path => '/profile/testinguser')
-    assert_equal false, block.visible?(:article => Article.new)
-  end
-
   should 'be able to be displayed only in the homepage (index) of the environment' do
     block = build(Block, :display => 'home_page_only')
 
-    assert_equal true, block.visible?(:article => nil, :request_path => '/')
+    assert_equal true, block.visible?(:article => nil, :request_path => "#{Noosfero.root('/')}")
     assert_equal false, block.visible?(:article => nil)
   end
 
@@ -113,21 +103,10 @@ class BlockTest < ActiveSupport::TestCase
 
   should 'be able to be displayed everywhere except on profile index' do
     profile = build(Profile, :identifier => 'testinguser')
-    home_page = Article.new
-    profile.home_page = home_page
     block = build(Block, :display => 'except_home_page')
     block.stubs(:owner).returns(profile)
 
-    assert_equal false, block.visible?(:article => nil, :request_path => '/testinguser')
-    assert_equal true, block.visible?(:article => nil)
-  end
-
-  should 'be able to be displayed everywhere except on default profile index' do
-    profile = build(Profile, :identifier => 'testinguser')
-    block = build(Block, :display => 'except_home_page')
-    block.stubs(:owner).returns(profile)
-
-    assert_equal false, block.visible?(:article => nil, :request_path => '/profile/testinguser')
+    assert_equal false, block.visible?(:article => nil, :request_path => "#{Noosfero.root('/')}profile/testinguser")
     assert_equal true, block.visible?(:article => nil)
   end
 
@@ -307,6 +286,53 @@ class BlockTest < ActiveSupport::TestCase
     person = fast_create(Person)
     block = Block.new
     assert_equal block.cache_key('en'), block.cache_key('en', person)
+  end
+
+  should 'display block to members of community for display_user = members' do
+    community = fast_create(Community)
+    user = create_user('testinguser')
+    community.add_member(user.person)
+
+    box = fast_create(Box, :owner_id => community.id, :owner_type => 'Community')
+    block = create(Block, :box_id => box.id)
+    block.display_user = 'followers'
+    block.save!
+    assert block.display_to_user?(user.person)
+  end
+
+  should 'do not display block to non members of community for display_user = members' do
+    community = fast_create(Community)
+    user = create_user('testinguser')
+
+    box = fast_create(Box, :owner_id => community.id, :owner_type => 'Community')
+    block = create(Block, :box_id => box.id)
+    block.display_user = 'followers'
+    block.save!
+    assert !block.display_to_user?(user.person)
+  end
+
+  should 'display block to friends of person for display_user = friends' do
+    person = create_user('person_one').person
+    person_friend = create_user('person_friend').person
+
+    person.add_friend(person_friend)
+
+    box = fast_create(Box, :owner_id => person.id, :owner_type => 'Person')
+    block = create(Block, :box_id => box.id)
+    block.display_user = 'followers'
+    block.save!
+    assert block.display_to_user?(person_friend)
+  end
+
+  should 'do not display block to non friends of person for display_user = friends' do
+    person = create_user('person_one').person
+    person_friend = create_user('person_friend').person
+
+    box = fast_create(Box, :owner_id => person.id, :owner_type => 'Person')
+    block = create(Block, :box_id => box.id)
+    block.display_user = 'followers'
+    block.save!
+    assert !block.display_to_user?(person_friend)
   end
 
   should 'pretty_name method defined' do

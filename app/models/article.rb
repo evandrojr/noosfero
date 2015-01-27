@@ -2,7 +2,14 @@ require 'hpricot'
 
 class Article < ActiveRecord::Base
 
-  attr_accessible :name, :body, :abstract, :profile, :tag_list, :parent, :allow_members_to_edit, :translation_of_id, :language, :license_id, :parent_id, :display_posts_in_current_language, :category_ids, :posts_per_page, :moderate_comments, :accept_comments, :feed, :published, :source, :highlighted, :notify_comments, :display_hits, :slug, :external_feed_builder, :display_versions, :external_link, :image_builder, :published_at, :visibility_mode
+  attr_accessible :name, :body, :abstract, :profile, :tag_list, :parent,
+                  :allow_members_to_edit, :translation_of_id, :language,
+                  :license_id, :parent_id, :display_posts_in_current_language,
+                  :category_ids, :posts_per_page, :moderate_comments,
+                  :accept_comments, :feed, :published, :source,
+                  :highlighted, :notify_comments, :display_hits, :slug,
+                  :external_feed_builder, :display_versions, :external_link,
+                  :image_builder, :show_to_followers
 
   acts_as_having_image
 
@@ -58,10 +65,10 @@ class Article < ActiveRecord::Base
   belongs_to :last_changed_by, :class_name => 'Person', :foreign_key => 'last_changed_by_id'
   belongs_to :created_by, :class_name => 'Person', :foreign_key => 'created_by_id'
 
-  has_many :comments, :class_name => 'Comment', :foreign_key => 'source_id', :dependent => :destroy, :order => 'comments.created_at asc', :include => [:author, :children]
+  has_many :comments, :class_name => 'Comment', :foreign_key => 'source_id', :dependent => :destroy, :order => 'created_at asc'
 
   has_many :article_categorizations, :conditions => [ 'articles_categories.virtual = ?', false ]
-  has_many :categories, :through => :article_categorizations, :include => [:environment]
+  has_many :categories, :through => :article_categorizations
 
   has_many :article_categorizations_including_virtual, :class_name => 'ArticleCategorization'
   has_many :categories_including_virtual, :through => :article_categorizations_including_virtual, :source => :category
@@ -348,7 +355,7 @@ class Article < ActiveRecord::Base
   def belongs_to_blog?
     self.parent and self.parent.blog?
   end
-  
+
   def belongs_to_forum?
     self.parent and self.parent.forum?
   end
@@ -460,6 +467,7 @@ class Article < ActiveRecord::Base
       if self.parent && !self.parent.published?
         return false
       end
+
       true
     else
       false
@@ -475,7 +483,7 @@ class Article < ActiveRecord::Base
   end
 
   scope :published, :conditions => ['articles.published = ?', true]
-  scope :folders, lambda {|profile|{:conditions => ['articles.type IN (?)', profile.folder_types], :include => [:parent] }}
+  scope :folders, lambda {|profile|{:conditions => ['articles.type IN (?)', profile.folder_types] }}
   scope :no_folders, lambda {|profile|{:conditions => ['articles.type NOT IN (?)', profile.folder_types]}}
   scope :galleries, :conditions => [ "articles.type IN ('Gallery')" ]
   scope :images, :conditions => { :is_image => true }
@@ -484,21 +492,24 @@ class Article < ActiveRecord::Base
 
   scope :more_popular, :order => 'hits DESC'
   scope :more_comments, :order => "comments_count DESC"
-  scope :more_recent, :order => "articles.created_at DESC"
+  scope :more_recent, :order => "created_at DESC"
 
   def self.display_filter(user, profile)
     return {:conditions => ['articles.published = ?', true]} if !user
     {:conditions => ["  articles.published = ? OR
                         articles.last_changed_by_id = ? OR
                         articles.profile_id = ? OR
-                        ?",
-                        true, user.id, user.id, user.has_permission?(:view_private_content, profile)] }
+                        ? OR  articles.show_to_followers = ? AND ?",
+                        true, user.id, user.id, user.has_permission?(:view_private_content, profile),
+                        true, user.follows?(profile)]}
   end
+
 
   def display_unpublished_article_to?(user)
     user == author || allow_view_private_content?(user) || user == profile ||
     user.is_admin?(profile.environment) || user.is_admin?(profile) ||
-    article_privacy_exceptions.include?(user) || (visibility_mode == 1 && user.is_member_of?(profile))
+    article_privacy_exceptions.include?(user) ||
+    (self.show_to_followers && user.follows?(profile))
   end
 
   def display_to?(user = nil)
@@ -656,8 +667,6 @@ class Article < ActiveRecord::Base
     can_display_versions? && display_versions
   end
 
-  settings_items :visibility_mode, :type => :integer, :default => 0
-
   def get_version(version_number = nil)
     version_number ? versions.find(:first, :order => 'version', :offset => version_number - 1) : versions.earliest
   end
@@ -683,11 +692,6 @@ class Article < ActiveRecord::Base
   def author_id(version_number = nil)
     person = author_by_version(version_number)
     person ? person.id : nil
-  end
-
-  #FIXME make this test
-  def author_custom_image(size = :icon)
-    author ? author.profile_custom_image(size) : nil
   end
 
   def version_license(version_number = nil)
@@ -730,12 +734,7 @@ class Article < ActiveRecord::Base
   def body_images_paths
     require 'uri'
     Hpricot(self.body.to_s).search('img[@src]').collect do |i|
-      begin
-        (self.profile && self.profile.environment) ? URI.join(self.profile.environment.top_url, URI.escape(i.attributes['src'], '[|]')).to_s : i.attributes['src']
-      rescue
-        # some uris are invalid but still visible on modern browsers (e.g.: uri with square brackets)
-        i.attributes['src']
-      end
+      (self.profile && self.profile.environment) ? URI.join(self.profile.environment.top_url, URI.escape(i.attributes['src'])).to_s : i.attributes['src']
     end
   end
 

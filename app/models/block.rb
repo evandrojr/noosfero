@@ -1,6 +1,6 @@
 class Block < ActiveRecord::Base
 
-  attr_accessible :title, :display, :limit, :box_id, :posts_per_page, :visualization_format, :language, :display_user, :box
+  attr_accessible :title, :display, :limit, :box_id, :posts_per_page, :visualization_format, :language, :display_user, :box, :fixed
 
   # to be able to generate HTML
   include ActionView::Helpers::UrlHelper
@@ -64,7 +64,7 @@ class Block < ActiveRecord::Base
   end
 
   def display_to_user?(user)
-    display_user == 'all' || (user.nil? && display_user == 'not_logged') || (user && display_user == 'logged')
+    display_user == 'all' || (user.nil? && display_user == 'not_logged') || (user && display_user == 'logged') || (user && display_user == 'followers' && user.follows?(owner))
   end
 
   def display_always(context)
@@ -72,23 +72,18 @@ class Block < ActiveRecord::Base
   end
 
   def display_home_page_only(context)
-    return context[:article] == owner.home_page if context[:article]
-
-    if owner.kind_of?(Profile)
-      return owner.home_page.nil? && context[:request_path] == "/profile/#{owner.identifier}"
+    if context[:article]
+      return context[:article] == owner.home_page
     else
-      return context[:request_path] == '/'
+      return home_page_path?(context[:request_path])
     end
   end
 
   def display_except_home_page(context)
-    return context[:article] != owner.home_page if context[:article]
-
-    if owner.kind_of?(Profile)
-      return (!owner.home_page.nil? && context[:request_path] != "/#{owner.identifier}") ||
-               (owner.home_page.nil? && context[:request_path] != "/profile/#{owner.identifier}")
+    if context[:article]
+      return context[:article] != owner.home_page
     else
-      return context[:request_path] != '/'
+      return !home_page_path?(context[:request_path])
     end
   end
 
@@ -115,13 +110,16 @@ class Block < ActiveRecord::Base
   # * <tt>'all'</tt>: the block is always displayed
   settings_items :language, :type => :string, :default => 'all'
 
+  # The block can be configured to be fixed. Only can be edited by environment admins
+  settings_items :fixed, :type => :boolean, :default => false
+
   # returns the description of the block, used when the user sees a list of
   # blocks to choose one to include in the design.
   #
   # Must be redefined in subclasses to match the description of each block
   # type.
   def self.description
-    ('dummy')
+    '(dummy)'
   end
 
   # returns a short description of the block, used when the user sees a list of
@@ -142,13 +140,13 @@ class Block < ActiveRecord::Base
   # This method can return several types of objects:
   #
   # * <tt>String</tt>: if the string starts with <tt>http://</tt> or <tt>https://</tt>, then it is assumed to be address of an IFRAME. Otherwise it's is used as regular HTML.
-  # * <tt>Hash</tt>: the hash is used to build an URL that is used as the address for a IFRAME. 
+  # * <tt>Hash</tt>: the hash is used to build an URL that is used as the address for a IFRAME.
   # * <tt>Proc</tt>: the Proc is evaluated in the scope of BoxesHelper. The
   # block can then use <tt>render</tt>, <tt>link_to</tt>, etc.
   #
   # The method can also return <tt>nil</tt>, which means "no content".
   #
-  # See BoxesHelper#extract_block_content for implementation details. 
+  # See BoxesHelper#extract_block_content for implementation details.
   def content(args={})
     "This is block number %d" % self.id
   end
@@ -239,6 +237,7 @@ class Block < ActiveRecord::Base
       'all'            => _('All users'),
       'logged'         => _('Logged'),
       'not_logged'     => _('Not logged'),
+      'followers'      => owner.class != Environment && owner.organization? ? _('Members') : _('Friends')
     }
   end
 
@@ -273,6 +272,28 @@ class Block < ActiveRecord::Base
   def copy_from(block)
     self.settings = block.settings
     self.position = block.position
+  end
+
+  def copy_from(block)
+    self.settings = block.settings
+    self.position = block.position
+  end
+
+  private
+
+  def home_page_path
+    home_page_url = Noosfero.root('/')
+
+    if owner.kind_of?(Profile)
+      home_page_url += "profile/" if owner.home_page.nil?
+      home_page_url += owner.identifier
+    end
+
+    return home_page_url
+  end
+
+  def home_page_path? path
+    return path == home_page_path || path == (home_page_path + '/')
   end
 
 end

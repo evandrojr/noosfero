@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative "../test_helper"
 
 class ArticleTest < ActiveSupport::TestCase
 
@@ -718,19 +718,6 @@ class ArticleTest < ActiveSupport::TestCase
     a = fast_create(Article, :name => 'Test article', :profile_id => profile.id)
     assert_respond_to a, :can_display_hits?
     assert_equal true, a.can_display_hits?
-  end
-
-  should 'have visibility_mode setting with default 0' do
-    a = fast_create(Article, :name => 'Test article', :profile_id => profile.id)
-    assert_respond_to a, :visibility_mode
-    assert_equal 0, a.visibility_mode
-  end
-
-  should 'set visibility_mode setting value to 1' do
-    a = fast_create(Article, :name => 'Test article', :profile_id => profile.id)
-    a.visibility_mode = 1
-    a.save && a.reload
-    assert_equal 1, a.visibility_mode
   end
 
   should 'return a view url when image' do
