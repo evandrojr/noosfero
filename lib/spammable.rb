@@ -12,8 +12,8 @@ module Spammable
     def self.extended (base)
       if base.respond_to?(:scope)
         base.class_eval do
-          scope :without_spam, :conditions => ["#{base.table_name}.spam IS NULL OR #{base.table_name}.spam = ?", false]
-          scope :spam, :conditions => ["#{base.table_name}.spam = ?", true]
+          scope :without_spam, :conditions => ['spam IS NULL OR spam = ?', false]
+          scope :spam, :conditions => ['spam = ?', true]
         end
       end
     end

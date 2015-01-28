@@ -444,7 +444,7 @@ roles] }
   end
 
   def already_reported?(profile)
-    abuse_reports.includes({:abuse_complaint => :reported}).any? { |report| report.abuse_complaint.reported == profile && report.abuse_complaint.opened? }
+    abuse_reports.any? { |report| report.abuse_complaint.reported == profile && report.abuse_complaint.opened? }
   end
 
   def register_report(abuse_report, profile)

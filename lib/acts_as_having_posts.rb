@@ -2,7 +2,7 @@ module ActsAsHavingPosts
 
   module ClassMethods
     def  acts_as_having_posts(options = {})
-      has_many :posts, { :class_name => 'Article', :foreign_key => 'parent_id', :source => :children, :conditions => [ 'articles.type != ?', 'RssFeed' ], :order => 'published_at DESC, id DESC', :include => [:parent, :profile] }.merge(options)
+      has_many :posts, { :class_name => 'Article', :foreign_key => 'parent_id', :source => :children, :conditions => [ 'articles.type != ?', 'RssFeed' ], :order => 'published_at DESC, id DESC' }.merge(options)
 
       attr_accessor :feed_attrs
 

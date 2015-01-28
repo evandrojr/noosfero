@@ -64,7 +64,7 @@
 
   <% unless comment.replies.blank? || comment.spam? %>
   <ul class="comment-replies">
-    <% comment.replies.includes([:children, :author]).each do |reply| %>
+    <% comment.replies.each do |reply| %>
       <%= render :partial => 'comment/comment', :locals => { :comment => reply } %>
     <% end %>
   </ul>

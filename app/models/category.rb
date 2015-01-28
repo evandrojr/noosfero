@@ -16,7 +16,7 @@ class Category < ActiveRecord::Base
 
   # Finds all top level categories for a given environment. 
   scope :top_level_for, lambda { |environment|
-    {:conditions => ['parent_id is null and environment_id = ?', environment.id ], :include => [:children]}
+    {:conditions => ['parent_id is null and environment_id = ?', environment.id ]}
   }
 
   scope :on_level, lambda { |parent| {:conditions => {:parent_id => parent}} }

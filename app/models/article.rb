@@ -258,7 +258,7 @@ class Article < ActiveRecord::Base
   # retrieves all articles belonging to the given +profile+ that are not
   # sub-articles of any other article.
   scope :top_level_for, lambda { |profile|
-    {:conditions => [ 'parent_id is null and profile_id = ?', profile.id ], :include => [:profile]}
+    {:conditions => [ 'parent_id is null and profile_id = ?', profile.id ]}
   }
 
   scope :public,

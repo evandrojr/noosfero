@@ -150,7 +150,7 @@ class ManageProductsControllerTest < ActionController::TestCase
     category2 = fast_create(ProductCategory, :name => 'Category 2', :parent_id => category1.id)
     category3 = fast_create(ProductCategory, :name => 'Category 3', :parent_id => category2.id)
     get :new, :profile => @enterprise.identifier
-    assert_tag :tag => 'select', :attributes => { :id => 'category_id' }, :descendant => { :tag => 'option', :content => category1.name + " &raquo;" }
+    assert_tag :tag => 'select', :attributes => { :id => 'category_id' }, :descendant => { :tag => 'option', :content => category1.name }
   end
 
   should "create new product categorized" do
