@@ -6746,6 +6746,10 @@ li.profile-activity-item.upload_image .activity-gallery-images-count-1 img {
 
 /* AutoComplete*/
 .formfield input.ui-autocomplete-loading { background: url('/images/loading-small.gif') right center no-repeat, url("../images/input-bg.gif") no-repeat left top;  }
+.ui-autocomplete-loading{
+  background: url('/images/loading-small.gif') right center no-repeat
+}
+
 
 .ui-autocomplete-category {
     font-weight: bold;

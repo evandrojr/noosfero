@@ -239,6 +239,8 @@ class Task < ActiveRecord::Base
   scope :opened, :conditions => { :status =>  [Task::Status::ACTIVE, Task::Status::HIDDEN] }
   scope :of, lambda { |type| conditions = type ? "type LIKE '#{type}'" : "1=1"; {:conditions =>  [conditions]} }
   scope :order_by, lambda { |attribute, ord| {:order => "#{attribute} #{ord}"} }
+  #scope :like, lambda { |field, value| {:conditions => ["LOWER(#{field}) LIKE ?", "%#{value}%"]}}
+  scope :like, ->(field,value) { where("LOWER(#{field}) LIKE ?", "%#{value.downcase}%")}
 
   scope :to, lambda { |profile|
     environment_condition = nil
