@@ -65,4 +65,11 @@ class TasksController < MyProfileController
     @ticket = Ticket.find(:first, :conditions => ['(requestor_id = ? or target_id = ?) and id = ?', profile.id, profile.id, params[:id]])
   end
 
+  def search_tasks
+    @filter = params[:filter_type].blank? ? nil : params[:filter_type]
+    result = Task.to(profile).without_spam.pending.of(@filter).like('data',params[:term])
+
+    render :json => result.map { |task| {:label => task.data[:name], :value => task.data[:name]} }
+  end
+
 end
