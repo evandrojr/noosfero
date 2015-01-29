@@ -161,6 +161,7 @@ class Profile < ActiveRecord::Base
   scope :visible, :conditions => { :visible => true }
   scope :disabled, :conditions => { :visible => false }
   scope :public, :conditions => { :visible => true, :public_profile => true }
+  scope :enabled, :conditions => { :enabled => true }
 
   # Subclasses must override this method
   scope :more_popular
@@ -430,7 +431,7 @@ class Profile < ActiveRecord::Base
   end
 
   xss_terminate :only => [ :name, :nickname, :address, :contact_phone, :description ], :on => 'validation'
-  xss_terminate :only => [ :custom_footer, :custom_header ], :with => 'white_list', :on => 'validation'
+  xss_terminate :only => [ :custom_footer, :custom_header ], :with => 'white_list'
 
   include WhiteListFilter
   filter_iframes :custom_header, :custom_footer
