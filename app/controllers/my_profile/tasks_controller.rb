@@ -3,10 +3,10 @@ class TasksController < MyProfileController
   protect 'perform_task', :profile
   
   def index
-    @filter = params[:filter_type].blank? ? nil : params[:filter_type]
+    @filter_type = params[:filter_type] = params[:filter_type].blank? ? nil : params[:filter_type]
     @filter_text = params[:filter_text].blank? ? nil : params[:filter_text]
     @task_types = Task.pending_types_for(profile)
-    @tasks = Task.to(profile).without_spam.pending.of(@filter).like('data',@filter_text).order_by('created_at', 'asc').paginate(:per_page => Task.per_page, :page => params[:page])
+    @tasks = Task.pending_all(profile,params).order_by('created_at', 'asc').paginate(:per_page => Task.per_page, :page => params[:page])
     @failed = params ? params[:failed] : {}
   end
 
@@ -67,8 +67,9 @@ class TasksController < MyProfileController
   end
 
   def search_tasks
-    @filter = params[:filter_type].blank? ? nil : params[:filter_type]
-    result = Task.to(profile).without_spam.pending.of(@filter).like('data',params[:term])
+
+    params[:filter_type] = params[:filter_type].blank? ? nil : params[:filter_type]
+    result = Task.pending_all(profile,params)
 
     render :json => result.map { |task| {:label => task.data[:name], :value => task.data[:name]} }
   end
