@@ -240,6 +240,9 @@ class Task < ActiveRecord::Base
   scope :of, lambda { |type| conditions = type ? "type LIKE '#{type}'" : "1=1"; {:conditions =>  [conditions]} }
   scope :order_by, lambda { |attribute, ord| {:order => "#{attribute} #{ord}"} }
   scope :like, ->(field,value) { where("LOWER(#{field}) LIKE ?", "%#{value.downcase}%") if value}
+  scope :pending_all, ->(profile, params){
+    self.to(profile).without_spam.pending.of(params[:filter_type]).like('data', params[:filter_text])
+  }
 
   scope :to, lambda { |profile|
     environment_condition = nil
@@ -250,6 +253,7 @@ class Task < ActiveRecord::Base
     profile_condition = "(target_type = 'Profile' AND target_id = #{profile.id})"
     { :conditions => [environment_condition, profile_condition].compact.join(' OR ') }
   }
+
 
   def self.pending_types_for(profile)
     Task.to(profile).pending.select('distinct type').map { |t| [t.class.name, t.title] }

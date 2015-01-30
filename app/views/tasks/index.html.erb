@@ -25,16 +25,10 @@
 
     <%= field_set_tag _('Filter'), :class => 'filter_fields' do %>
         <p>
-          <%= labelled_select(_('Type of task')+': ', :filter_type, :first, :last, @filter,  type_collection, {:id => 'filter-type'}) %>
+          <%= labelled_select(_('Type of task')+': ', :filter_type, :first, :last, @filter_type,  type_collection, {:id => 'filter-type'}) %>
         </p>
         <p>
           <%= labelled_text_field(_("Text filter")+': ', :filter_text, nil, {:id => 'filter-text-autocomplete',:value => @filter_text}) %>
-          <script type="text/javascript">
-              jQuery('#filter-text-autocomplete').autocomplete({
-                  source:<%= "'/myprofile/#{profile.identifier}/tasks/search_tasks'" %>+'?filter_type='+jQuery('#filter-type').val(),
-                  minLength:2
-              });
-          </script>
         </p>
         <p>
           <%= submit_button(:search, _('Search')) %>
@@ -42,7 +36,9 @@
     <% end %>
 <% end %>
 <% if @tasks.empty? %>
-  <em><%= _('No pending tasks for %s') % profile.name %></em>
+  <p>
+    <em><%= _('No pending tasks for %s') % profile.name %></em>
+  </p>
 <% else %>
   <%= form_tag :action => 'close' do%>
     <% button_bar do %>
