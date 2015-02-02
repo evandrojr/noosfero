@@ -1313,7 +1313,7 @@ module ApplicationHelper
   end
 
   def template_options(kind, field_name)
-    templates = environment.send(kind).templates.order('name')
+    templates = environment.send(kind).templates
     return '' if templates.count == 0
     if templates.count == 1
       if templates.first.custom_fields == {}
@@ -1327,10 +1327,16 @@ module ApplicationHelper
         content_tag('div', custom_fields)
       end
     else
-      options = options_for_select(templates.collect{ |template| [template.name, template.id]})
-      content_tag('div',
-        content_tag('div', content_tag('label', _('Profile organization'), :class => 'formlabel') + (select_tag 'profile_data[template_id]', options, :onchange => 'show_fields_for_template(this);')),
-        :id => 'template-options')
+	  radios = templates.map do |template|
+        content_tag('li', labelled_radio_button(link_to(template.name, template.url, :target => '_blank'), "#{field_name}[template_id]", template.id, environment.is_default_template?(template)))
+      end.join("\n")
+
+      content_tag('div', content_tag('label', _('Profile organization'), :for => 'template-options', :class => 'formlabel') +
+        content_tag('p', _('Your profile will be created according to the selected template. Click on the options to view them.'), :style => 'margin: 5px 15px;padding: 0px 10px;') +
+        content_tag('ul', radios, :style => 'list-style: none; padding-left: 20px; margin-top: 0.5em;'),
+        :id => 'template-options',
+        :style => 'margin-top: 1em'
+      )
     end
   end
 
