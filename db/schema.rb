@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140827191326) do
+ActiveRecord::Schema.define(:version => 20150122165042) do
 
   create_table "abuse_reports", :force => true do |t|
     t.integer  "reporter_id"
@@ -95,12 +95,15 @@ ActiveRecord::Schema.define(:version => 20140827191326) do
     t.integer  "license_id"
     t.integer  "image_id"
     t.integer  "position"
-    t.integer  "created_by_id"
     t.integer  "spam_comments_count",  :default => 0
     t.integer  "author_id"
+    t.integer  "created_by_id"
   end
 
   add_index "article_versions", ["article_id"], :name => "index_article_versions_on_article_id"
+  add_index "article_versions", ["path", "profile_id"], :name => "index_article_versions_on_path_and_profile_id"
+  add_index "article_versions", ["path"], :name => "index_article_versions_on_path"
+  add_index "article_versions", ["published_at", "id"], :name => "index_article_versions_on_published_at_and_id"
 
   create_table "articles", :force => true do |t|
     t.string   "name"
@@ -143,9 +146,10 @@ ActiveRecord::Schema.define(:version => 20140827191326) do
     t.integer  "license_id"
     t.integer  "image_id"
     t.integer  "position"
-    t.integer  "created_by_id"
     t.integer  "spam_comments_count",  :default => 0
     t.integer  "author_id"
+    t.integer  "created_by_id"
+    t.boolean  "show_to_followers",    :default => false
   end
 
   add_index "articles", ["comments_count"], :name => "index_articles_on_comments_count"
@@ -153,9 +157,15 @@ ActiveRecord::Schema.define(:version => 20140827191326) do
   add_index "articles", ["hits"], :name => "index_articles_on_hits"
   add_index "articles", ["name"], :name => "index_articles_on_name"
   add_index "articles", ["parent_id"], :name => "index_articles_on_parent_id"
+  add_index "articles", ["path", "profile_id"], :name => "index_articles_on_path_and_profile_id"
+  add_index "articles", ["path"], :name => "index_articles_on_path"
   add_index "articles", ["profile_id"], :name => "index_articles_on_profile_id"
+  add_index "articles", ["published_at", "id"], :name => "index_articles_on_published_at_and_id"
   add_index "articles", ["slug"], :name => "index_articles_on_slug"
   add_index "articles", ["translation_of_id"], :name => "index_articles_on_translation_of_id"
+  add_index "articles", ["type", "parent_id"], :name => "index_articles_on_type_and_parent_id"
+  add_index "articles", ["type", "profile_id"], :name => "index_articles_on_type_and_profile_id"
+  add_index "articles", ["type"], :name => "index_articles_on_type"
 
   create_table "articles_categories", :id => false, :force => true do |t|
     t.integer "article_id"
@@ -277,6 +287,11 @@ ActiveRecord::Schema.define(:version => 20140827191326) do
     t.string  "google_maps_key"
   end
 
+  add_index "domains", ["is_default"], :name => "index_domains_on_is_default"
+  add_index "domains", ["name"], :name => "index_domains_on_name"
+  add_index "domains", ["owner_id", "owner_type", "is_default"], :name => "index_domains_on_owner_id_and_owner_type_and_is_default"
+  add_index "domains", ["owner_id", "owner_type"], :name => "index_domains_on_owner_id_and_owner_type"
+
   create_table "environments", :force => true do |t|
     t.string   "name"
     t.string   "contact_email"
@@ -301,7 +316,7 @@ ActiveRecord::Schema.define(:version => 20140827191326) do
   create_table "external_feeds", :force => true do |t|
     t.string   "feed_title"
     t.datetime "fetched_at"
-    t.string   "address"
+    t.text     "address"
     t.integer  "blog_id",                         :null => false
     t.boolean  "enabled",       :default => true, :null => false
     t.boolean  "only_once",     :default => true, :null => false
