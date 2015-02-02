@@ -225,6 +225,15 @@ class PersonNotifierTest < ActiveSupport::TestCase
     assert !jobs.select {|j| !j.failed? && j.last_error.nil? }.empty?
   end
 
+  should 'render image tags for both internal and external src' do
+    @community.add_member(@member)
+    process_delayed_job_queue
+    notify
+    sent = ActionMailer::Base.deliveries.last
+    assert_match /src="\/\/www.gravatar.com\/avatar.*"/, sent.body.to_s
+    assert_match /src="http:\/\/.*\/images\/icons-app\/community-icon.png.*"/, sent.body.to_s
+  end
+
   should 'do not raise errors in NotifyJob failure to avoid loop' do
     Delayed::Worker.max_attempts = 1
     Delayed::Job.enqueue(PersonNotifier::NotifyJob.new(@member.id))
@@ -235,15 +244,6 @@ class PersonNotifierTest < ActiveSupport::TestCase
     process_delayed_job_queue
     jobs = PersonNotifier::NotifyJob.find(@member.id)
     assert jobs.select {|j| !j.failed? && j.last_error.nil? }.empty?
-  end
-
-  should 'render image tags for both internal and external src' do
-    @community.add_member(@member)
-    process_delayed_job_queue
-    notify
-    sent = ActionMailer::Base.deliveries.last
-    assert_match /src="\/\/www.gravatar.com\/avatar.*"/, sent.body.to_s
-    assert_match /src="http:\/\/localhost\/images\/icons-app\/community-icon.png.*"/, sent.body.to_s
   end
 
   should 'list tasks in notification mail' do
