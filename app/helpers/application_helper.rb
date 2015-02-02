@@ -304,7 +304,7 @@ module ApplicationHelper
   def partial_for_class(klass, prefix=nil, suffix=nil)
     raise ArgumentError, 'No partial for object. Is there a partial for any class in the inheritance hierarchy?' if klass.nil?
     name = klass.name.underscore
-    controller.view_paths.reverse_each do |view_path|
+    controller.view_paths.each do |view_path|
       partial = partial_for_class_in_view_path(klass, view_path, prefix, suffix)
       return partial if partial
     end
@@ -433,19 +433,19 @@ module ApplicationHelper
   end
 
   def theme_site_title
-    theme_include('site_title')
+    @theme_site_title ||= theme_include 'site_title'
   end
 
   def theme_header
-    theme_include('header')
+    @theme_header ||= theme_include 'header'
   end
 
   def theme_footer
-    theme_include('footer')
+    @theme_footer ||= theme_include 'footer'
   end
 
   def theme_extra_navigation
-    theme_include('navigation')
+    @theme_extra_navigation ||= theme_include 'navigation'
   end
 
   def is_testing_theme
@@ -482,7 +482,12 @@ module ApplicationHelper
             '/images/icons-app/enterprise-'+ size.to_s() +'.png'
           end
         else
-          '/images/icons-app/person-'+ size.to_s() +'.png'
+          pixels = Image.attachment_options[:thumbnails][size].split('x').first
+          gravatar_profile_image_url(
+            profile.email,
+            :size => pixels,
+            :d => gravatar_default
+          )
         end
       filename = default_or_themed_icon(icon)
     end
@@ -602,7 +607,7 @@ module ApplicationHelper
   end
 
   def gravatar_default
-    (respond_to?(:theme_option) && theme_option.present? && theme_option['gravatar']) || NOOSFERO_CONF['gravatar']
+    (respond_to?(:theme_option) && theme_option.present? && theme_option['gravatar']) || NOOSFERO_CONF['gravatar'] || 'mm'
   end
 
   attr_reader :environment
@@ -669,13 +674,14 @@ module ApplicationHelper
     html.join "\n"
   end
 
+  def theme_javascript_src
+    script = File.join theme_path, 'theme.js'
+    script if File.exists? File.join(Rails.root, 'public', script)
+  end
+
   def theme_javascript_ng
-    script = File.join(theme_path, 'theme.js')
-    if File.exists?(File.join(Rails.root, 'public', script))
-      javascript_include_tag script
-    else
-      nil
-    end
+    script = theme_javascript_src
+    javascript_include_tag script if script
   end
 
   def file_field_or_thumbnail(label, image, i)
@@ -856,8 +862,9 @@ module ApplicationHelper
   end
 
   def base_url
-    environment.top_url
+    environment.top_url(request.scheme)
   end
+  alias :top_url :base_url
 
   def helper_for_article(article)
     article_helper = ActionView::Base.new
@@ -902,13 +909,15 @@ module ApplicationHelper
   end
 
   def page_title
-    (@page ? @page.title + ' - ' : '') +
-    (@topic ? @topic.title + ' - ' : '') +
-    (@section ? @section.title + ' - ' : '') +
-    (@toc ? _('Online Manual') + ' - ' : '') +
-    (controller.controller_name == 'chat' ? _('Chat') + ' - ' : '') +
-    (profile ? profile.short_name : environment.name) +
-    (@category ? " - #{@category.full_name}" : '')
+    CGI.escapeHTML(
+      (@page ? @page.title + ' - ' : '') +
+      (@topic ? @topic.title + ' - ' : '') +
+      (@section ? @section.title + ' - ' : '') +
+      (@toc ? _('Online Manual') + ' - ' : '') +
+      (controller.controller_name == 'chat' ? _('Chat') + ' - ' : '') +
+      (profile ? profile.short_name : environment.name) +
+      (@category ? " - #{@category.full_name}" : '')
+    )
   end
 
   # DEPRECATED. Do not use this.
@@ -937,9 +946,9 @@ module ApplicationHelper
   # from Article model for an ArticleBlock.
   def reference_to_article(text, article, anchor=nil)
     if article.profile.domains.empty?
-      href = "/#{article.url[:profile]}/"
+      href = "#{Noosfero.root}/#{article.url[:profile]}/"
     else
-      href = "http://#{article.profile.domains.first.name}/"
+      href = "http://#{article.profile.domains.first.name}#{Noosfero.root}/"
     end
     href += article.url[:page].join('/')
     href += '#' + anchor if anchor
@@ -1280,11 +1289,13 @@ module ApplicationHelper
   end
 
   def delete_article_message(article)
-    if article.folder?
-      _("Are you sure that you want to remove the folder \"#{article.name}\"? Note that all the items inside it will also be removed!")
-    else
-      _("Are you sure that you want to remove the item \"#{article.name}\"?")
-    end
+    CGI.escapeHTML(
+      if article.folder?
+        _("Are you sure that you want to remove the folder \"%s\"? Note that all the items inside it will also be removed!") % article.name
+      else
+        _("Are you sure that you want to remove the item \"%s\"?") % article.name
+      end
+    )
   end
 
   def expirable_link_to(expired, content, url, options = {})
@@ -1301,7 +1312,7 @@ module ApplicationHelper
   end
 
   def template_options(kind, field_name)
-    templates = environment.send(kind).templates.order('name')
+    templates = environment.send(kind).templates
     return '' if templates.count == 0
     if templates.count == 1
       if templates.first.custom_fields == {}
@@ -1315,10 +1326,16 @@ module ApplicationHelper
         content_tag('div', custom_fields)
       end
     else
-      options = options_for_select(templates.collect{ |template| [template.name, template.id]})
-      content_tag('div',
-        content_tag('div', content_tag('label', _('Profile organization'), :class => 'formlabel') + (select_tag 'profile_data[template_id]', options, :onchange => 'show_fields_for_template(this);')),
-        :id => 'template-options')
+      radios = templates.map do |template|
+        content_tag('li', labelled_radio_button(link_to(template.name, template.url, :target => '_blank'), "#{field_name}[template_id]", template.id, environment.is_default_template?(template)))
+      end.join("\n")
+
+      content_tag('div', content_tag('label', _('Profile organization'), :for => 'template-options', :class => 'formlabel') +
+        content_tag('p', _('Your profile will be created according to the selected template. Click on the options to view them.'), :style => 'margin: 5px 15px;padding: 0px 10px;') +
+        content_tag('ul', radios, :style => 'list-style: none; padding-left: 20px; margin-top: 0.5em;'),
+        :id => 'template-options',
+        :style => 'margin-top: 1em'
+      )
     end
   end
 
@@ -1375,7 +1392,7 @@ module ApplicationHelper
       #     are old things that do not support it we are keeping this hot spot.
       html = @plugins.pipeline(:parse_content, html, source).first
     end
-    html
+    html && html.html_safe
   end
 
   def convert_macro(html, source)

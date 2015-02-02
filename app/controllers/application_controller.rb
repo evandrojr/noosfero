@@ -40,7 +40,7 @@ class ApplicationController < ActionController::Base
 
     theme_layout = theme_option(:layout)
     if theme_layout
-      theme_view_file('layouts/'+theme_layout) || theme_layout
+      (theme_view_file('layouts/'+theme_layout) || theme_layout).to_s
     else
      'application'
     end
@@ -127,6 +127,9 @@ class ApplicationController < ActionController::Base
 
   # TODO: move this logic somewhere else (Domain class?)
   def detect_stuff_by_domain
+    # Sets text domain based on request host for custom internationalization
+    FastGettext.text_domain = Domain.custom_locale(request.host)
+
     @domain = Domain.find_by_name(request.host)
     if @domain.nil?
       @environment = Environment.default
