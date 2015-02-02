@@ -21,7 +21,7 @@ class ProfileEditorController < MyProfileController
       Profile.transaction do
         Image.transaction do
           begin
-            params[:profile_data][:visible] = params[:profile_data][:visible] == '0' unless profile.person?
+            params[:profile_data][:visible] = params[:profile_data][:visible] == '0' if profile.community? && params[:profile_data].present?
             @plugins.dispatch(:profile_editor_transaction_extras)
             @profile_data.update_attributes!(params[:profile_data])
             redirect_to :action => 'index', :profile => profile.identifier
