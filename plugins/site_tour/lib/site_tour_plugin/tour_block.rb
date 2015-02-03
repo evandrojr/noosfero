@@ -8,7 +8,7 @@ class SiteTourPlugin::TourBlock < Block
 
   before_save do |block|
     block.actions.reject! {|i| i[:group_name].blank? && i[:selector].blank? && i[:description].blank?}
-    block.group_triggers.reject! {|i| i[:group_name].blank? && i[:selector].blank? && i[:event].blank?}
+    block.group_triggers.reject! {|i| i[:group_name].blank? && i[:selector].blank?}
   end
 
   def self.description
