@@ -67,7 +67,7 @@ class SiteTourPluginTest < ActionView::TestCase
     body_ending = instance_exec(&plugin.body_ending)
     assert_match /siteTourPlugin\.add\('test_a', 'body', 'Test A1', 1\);/, body_ending
     assert_match /siteTourPlugin\.add\('test_a', 'body', 'Test A2', 2\);/, body_ending
-    assert_match /siteTourPlugin\.add\('test_b', 'body', 'Test B1', 1\);/, body_ending
+    assert_match /siteTourPlugin\.add\('test_b', 'body', 'Test B1', 3\);/, body_ending
   end
 
 end

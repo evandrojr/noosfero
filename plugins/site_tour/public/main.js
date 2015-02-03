@@ -77,6 +77,7 @@ var siteTourPlugin = (function() {
 
       intro = introJs();
       intro.setOption('tooltipPosition', 'auto');
+      intro.setOption('showStepNumbers', 'false');
       intro.setOptions(options);
       intro.onafterchange(function(targetElement) {
         var name = jQuery(targetElement).attr('data-intro-name');
