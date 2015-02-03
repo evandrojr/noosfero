@@ -4,8 +4,7 @@ class SiteTourPluginAdminControllerTest < ActionController::TestCase
 
   def setup
     @environment = Environment.default
-    @profile = create_user('profile').person
-    login_as(@profile.identifier)
+    login_as(create_admin_user(@environment))
   end
 
   attr_reader :environment

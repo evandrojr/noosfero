@@ -1,6 +1,6 @@
 require 'csv'
 
-class SiteTourPluginAdminController < AdminController
+class SiteTourPluginAdminController < PluginAdminController
 
   no_design_blocks
 
