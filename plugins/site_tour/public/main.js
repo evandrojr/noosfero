@@ -4,6 +4,7 @@ var siteTourPlugin = (function() {
   var groupTriggers = [];
   var userData = {};
   var intro;
+  var options = {};
 
   function hasMark(name) {
     return jQuery.cookie("_noosfero_.sitetour." + name) ||
@@ -54,6 +55,9 @@ var siteTourPlugin = (function() {
   }
 
   return {
+    setOption: function(key, value) {
+      options[key] = value;
+    },
     add: function (name, selector, text, step) {
       actions.push({name: name, selector: selector, text: text, step: step});
     },
@@ -73,6 +77,7 @@ var siteTourPlugin = (function() {
 
       intro = introJs();
       intro.setOption('tooltipPosition', 'auto');
+      intro.setOptions(options);
       intro.onafterchange(function(targetElement) {
         var name = jQuery(targetElement).attr('data-intro-name');
         mark(name);
