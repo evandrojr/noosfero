@@ -193,18 +193,6 @@ jQuery(function($) {
     }
   }
 
-  if( $("#token-input-search-article-privacy-exceptions").length == 1 ) {
-    show_hide_privacy_options();
-    show_hide_token_input();
-  }
-
-  $(document).ready(function(){
-    show_hide_privacy_options();
-  });
-
-  //Hide / Show the text area
-  $("#article_published_false").click(show_hide_privacy_options);
-  $("#article_published_true").click(show_hide_privacy_options);
   $(".custom_privacy_option").click(show_hide_token_input);
 
 });
