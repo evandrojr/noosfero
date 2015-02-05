@@ -216,20 +216,6 @@ class SearchControllerTest < ActionController::TestCase
     assert_equal @category, assigns(:category)
   end
 
-  should 'display results for enabled assets' do
-    assets = ['people', 'enterprises', 'products', 'events', 'communities', 'articles']
-    get :category_index, :category_path => [ 'my-category' ]
-    assets.each { |asset| assert_select "div.search-results-#{asset}" }
-  end
-
-  should 'not display results for disabled assets' do
-    assets = ['people', 'enterprises', 'products', 'events', 'communities', 'articles']
-    environment = Environment.default
-    assets.each { |asset| environment.enable("disable_asset_#{asset}") }
-    get :category_index, :category_path => [ 'my-category' ]
-    assets.each { |asset| assert_select "div.search-results-#{asset}", false }
-  end
-
   should 'not list "Search for ..." in category_index' do
     get :category_index, :category_path => [ 'my-category' ]
     assert_no_tag :content => /Search for ".*" in the whole site/
