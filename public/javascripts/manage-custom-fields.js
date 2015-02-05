@@ -73,7 +73,7 @@ function add_new_field() {
 
 function show_fields_for_template(element) {
   jQuery('div#signup-form-custom-fields div.formfieldline').remove();
-  var selected_template = element.options[element.selectedIndex].value;
+  var selected_template = jQuery(element).attr('value');
   jQuery.ajax({
     type: "GET",
     url: "/account/custom_fields_for_template",
@@ -99,3 +99,6 @@ function show_fields_for_template(element) {
   });
 }
 
+jQuery(document).ready(function($) {
+  show_fields_for_template($('#template-options input[type=radio]:checked'));
+});
