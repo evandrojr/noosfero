@@ -6,7 +6,7 @@ module VideoPlugin::VideoGalleryHelper
       if !configure[:contents].blank?
         configure[:contents] = configure[:contents].paginate(
           :order => "updated_at DESC",
-          :per_page => 16,
+          :per_page => 17,
           :page => params[:npage]
         )
         render :file => 'shared/video_list', :locals => configure

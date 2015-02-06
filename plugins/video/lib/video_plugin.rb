@@ -9,9 +9,7 @@ class VideoPlugin < Noosfero::Plugin
   end
 
   def self.extra_blocks
-  {
-      VideoPlugin::VideoBlock => {}
-  }
+      { VideoPlugin::VideoBlock => {}, VideoPlugin::VideoGalleryBlock => {} }
   end
 
   def stylesheet?
