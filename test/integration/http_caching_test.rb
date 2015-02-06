@@ -1,4 +1,4 @@
-require 'test_helper'
+require_relative "../test_helper"
 
 class HttpCachingTest < ActionController::IntegrationTest
 
@@ -9,6 +9,7 @@ class HttpCachingTest < ActionController::IntegrationTest
   test 'home page, default configuration' do
     get '/'
     assert_cache(5.minutes)
+    assert_no_cookies
   end
 
   test 'home page, custom config' do
@@ -89,6 +90,11 @@ class HttpCachingTest < ActionController::IntegrationTest
     get "/the-community/test-page"
     assert_response 403
     assert_no_cache
+  end
+
+  test 'user data, not logged in' do
+    get '/account/user_data', {}, { 'X-Requested-With' => 'XMLHttpRequest'}
+    assert_no_cookies
   end
 
   protected

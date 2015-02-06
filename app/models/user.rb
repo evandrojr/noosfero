@@ -11,6 +11,10 @@ class User < ActiveRecord::Base
   N_('Password confirmation')
   N_('Terms accepted')
 
+  SEARCHABLE_FIELDS = {
+    :email => {:label => _('Email'), :weight => 5},
+  }
+
   def self.[](login)
     self.find_by_login(login)
   end
@@ -201,6 +205,10 @@ class User < ActiveRecord::Base
     Digest::MD5.hexdigest(password)
   end
 
+  add_encryption_method :salted_md5 do |password, salt|
+    Digest::MD5.hexdigest(password+salt)
+  end
+
   add_encryption_method :clear do |password, salt|
     password
   end
@@ -350,6 +358,7 @@ class User < ActiveRecord::Base
     end
 
     def delay_activation_check
+      return if person.is_template?
       Delayed::Job.enqueue(UserActivationJob.new(self.id), {:priority => 0, :run_at => 72.hours.from_now})
     end
 end

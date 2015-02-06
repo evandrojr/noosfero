@@ -82,10 +82,12 @@ class AccountController < ApplicationController
     if @plugins.dispatch(:allow_user_registration).include?(false)
       redirect_back_or_default(:controller => 'home')
       session[:notice] = _("This environment doesn't allow user registration.")
+      return
     end
 
     store_location(request.referer) unless params[:return_to] or session[:return_to]
 
+    # Tranforming to boolean
     @block_bot = !!session[:may_be_a_bot]
     @invitation_code = params[:invitation_code]
     begin
@@ -129,8 +131,8 @@ class AccountController < ApplicationController
             check_join_in_community(@user)
             go_to_signup_initial_page
           else
+            redirect_to :controller => :home, :action => :welcome, :template_id => (@user.person.template && @user.person.template.id)
             session[:notice] = _('Thanks for registering!')
-            @register_pending = true
           end
         end
       end
@@ -193,7 +195,7 @@ class AccountController < ApplicationController
         else
           @change_password.errors[:base] << _('Could not find any user with %s equal to "%s".') % [fields_label, params[:value]]
         end
-      rescue ActiveRecord::RecordInvald
+      rescue ActiveRecord::RecordInvalid
         @change_password.errors[:base] << _('Could not perform password recovery for the user.')
       end
     end
@@ -461,6 +463,8 @@ class AccountController < ApplicationController
         redirect_to user.url
       when 'user_control_panel'
         redirect_to user.admin_url
+      when 'welcome_page'
+        redirect_to :controller => :home, :action => :welcome, :template_id => (user.template && user.template.id)
     else
       redirect_back_or_default(default)
     end

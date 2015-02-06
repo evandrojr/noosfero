@@ -1,17 +1,16 @@
 class Product < ActiveRecord::Base
 
   SEARCHABLE_FIELDS = {
-    :name => 10,
-    :description => 1,
+    :name => {:label => _('Name'), :weight => 10},
+    :description => {:label => _('Description'), :weight => 1},
   }
 
-  SEARCH_FILTERS = %w[
-    more_recent
-  ]
+  SEARCH_FILTERS = {
+    :order => %w[more_recent],
+    :display => %w[full map]
+  }
 
-  SEARCH_DISPLAYS = %w[map full]
-
-  attr_accessible :name, :product_category, :highlighted, :price, :enterprise, :image_builder, :description, :available, :qualifiers, :unit_id, :discount, :inputs
+  attr_accessible :name, :product_category, :highlighted, :price, :enterprise, :image_builder, :description, :available, :qualifiers, :unit_id, :discount, :inputs, :qualifiers_list
 
   def self.default_search_display
     'full'

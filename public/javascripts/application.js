@@ -518,6 +518,25 @@ function new_qualifier_row(selector, select_qualifiers, delete_button) {
   jQuery(selector).append("<tr><td>" + select_qualifiers + "</td><td id='certifier-area-" + index + "'><select></select>" + delete_button + "</td></tr>");
 }
 
+function userDataCallback(data) {
+  noosfero.user_data = data;
+  if (data.login) {
+    // logged in
+    if (data.chat_enabled) {
+      setInterval(function(){ jQuery.getJSON(user_data, chatOnlineUsersDataCallBack)}, 10000);
+    }
+    jQuery('head').append('<meta content="authenticity_token" name="csrf-param" />');
+    jQuery('head').append('<meta content="'+jQuery.cookie("_noosfero_.XSRF-TOKEN")+'" name="csrf-token" />');
+  }
+  if (data.notice) {
+    display_notice(data.notice);
+    // clear notice so that it is not display again in the case this function is called again.
+    data.notice = null;
+  }
+  // Bind this event to do more actions with the user data (for example, inside plugins)
+  jQuery(window).trigger("userDataLoaded", data);
+};
+
 // controls the display of the login/logout stuff
 jQuery(function($) {
   $.ajaxSetup({
@@ -528,21 +547,9 @@ jQuery(function($) {
   });
 
   var user_data = noosfero_root() + '/account/user_data';
-  $.getJSON(user_data, function userDataCallBack(data) {
-    if (data.login) {
-      // logged in
-      if (data.chat_enabled) {
-        setInterval(function(){ $.getJSON(user_data, chatOnlineUsersDataCallBack)}, 10000);
-      }
-      $('head').append('<meta content="authenticity_token" name="csrf-param" />');
-      $('head').append('<meta content="'+$.cookie("_noosfero_.XSRF-TOKEN")+'" name="csrf-token" />');
-    }
-    if (data.notice) {
-      display_notice(data.notice);
-    }
-    // Bind this event to do more actions with the user data (for example, inside plugins)
-    $(window).trigger("userDataLoaded", data);
-  });
+  $.getJSON(user_data, userDataCallback)
+
+  $.ajaxSetup({ cache: false });
 
   function chatOnlineUsersDataCallBack(data) {
     if ($('#chat-online-users').length == 0) {
@@ -799,7 +806,7 @@ function original_image_dimensions(src) {
 
 function gravatarCommentFailback(img) {
   var link = img.parentNode;
-  link.href = "http://www.gravatar.com";
+  link.href = "//www.gravatar.com";
   img.src = img.getAttribute("data-gravatar");
 }
 
@@ -829,9 +836,12 @@ Array.min = function(array) {
 };
 
 function hideAndGetUrl(link) {
+  document.body.style.cursor = 'wait';
   link.hide();
   url = jQuery(link).attr('href');
-  jQuery.get(url);
+  jQuery.get(url, function( data ) {
+    document.body.style.cursor = 'default';
+  });
 }
 
 jQuery(function($){
@@ -1066,12 +1076,50 @@ function showHideTermsOfUse() {
   }
 }
 
+jQuery('.profiles-suggestions .explain-suggestion').live('click', function() {
+  var clicked = jQuery(this);
+  clicked.toggleClass('active');
+  clicked.next('.extra_info').toggle();
+  return false;
+});
+
+jQuery('.suggestions-block .block-subtitle').live('click', function() {
+  var clicked = jQuery(this);
+  clicked.next('.profiles-suggestions').toggle();
+  clicked.nextAll('.more-suggestions').toggle();
+  return false;
+});
+
 jQuery(document).ready(function(){
   showHideTermsOfUse();
 
   jQuery("#article_has_terms_of_use").click(function(){
     showHideTermsOfUse();
   });
+
+  // Suggestions on search inputs
+  (function($) {
+    var suggestions_cache = {};
+    $(".search-input-with-suggestions").autocomplete({
+      minLength: 2,
+      select: function(event, ui){
+        $(this).val(ui.item.value);
+        $(this).closest('form').submit();
+      },
+      source: function(request, response) {
+        var term = request.term.toLowerCase();
+        if (term in suggestions_cache) {
+          response(suggestions_cache[term]);
+          return;
+        }
+        request["asset"] = this.element.data("asset");
+        $.getJSON("/search/suggestions", request, function(data, status, xhr) {
+          suggestions_cache[term] = data;
+          response(data);
+        });
+      }
+    });
+  })(jQuery);
 });
 
 function apply_zoom_to_images(zoom_text) {
