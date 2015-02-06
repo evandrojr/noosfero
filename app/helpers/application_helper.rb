@@ -1338,8 +1338,8 @@ module ApplicationHelper
         content_tag('div', custom_fields)
       end
     else
-	  radios = templates.map do |template|
-        content_tag('li', labelled_radio_button(link_to(template.name, template.url, :target => '_blank'), "#{field_name}[template_id]", template.id, environment.is_default_template?(template)))
+      radios = templates.map do |template|
+        content_tag('li', labelled_radio_button(link_to(template.name, template.url, :target => '_blank'), "#{field_name}[template_id]", template.id, environment.is_default_template?(template), :onchange => 'show_fields_for_template(this);'))
       end.join("\n")
 
       content_tag('div', content_tag('label', _('Profile organization'), :for => 'template-options', :class => 'formlabel') +
