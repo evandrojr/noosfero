@@ -4,7 +4,10 @@ class Enterprise < Organization
 
   attr_accessible :business_name, :address_reference, :district, :tag_list, :organization_website, :historic_and_current_context, :activities_short_description, :products_per_catalog_page
 
-  SEARCH_DISPLAYS += %w[map full]
+  SEARCH_FILTERS = {
+    :order => %w[more_recent more_popular more_active],
+    :display => %w[compact full map]
+  }
 
   def self.type_name
     _('Enterprise')
@@ -59,16 +62,6 @@ class Enterprise < Organization
     super + FIELDS
   end
 
-  validate :presence_of_required_fieds
-
-  def presence_of_required_fieds
-    self.required_fields.each do |field|
-      if self.send(field).blank?
-        self.errors.add_on_blank(field)
-      end
-    end
-  end
-
   def active_fields
     environment ? environment.active_enterprise_fields : []
   end
@@ -107,7 +100,12 @@ class Enterprise < Organization
     self.tasks.where(:type => 'EnterpriseActivation').first
   end
 
-  def enable(owner)
+  def enable(owner = nil)
+    if owner.nil?
+      self.visible = true
+      return self.save
+    end
+
     return if enabled
     # must be set first for the following to work
     self.enabled = true
@@ -169,7 +167,7 @@ class Enterprise < Organization
   end
 
   def default_template
-    environment.enterprise_template
+    environment.enterprise_default_template
   end
 
   def template_with_inactive_enterprise

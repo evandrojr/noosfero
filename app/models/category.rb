@@ -3,19 +3,16 @@ class Category < ActiveRecord::Base
   attr_accessible :name, :parent_id, :display_color, :display_in_menu, :image_builder, :environment, :parent
 
   SEARCHABLE_FIELDS = {
-    :name => 10,
-    :acronym => 5,
-    :abbreviation => 5,
-    :slug => 1,
+    :name => {:label => _('Name'), :weight => 10},
+    :acronym => {:label => _('Acronym'), :weight => 5},
+    :abbreviation => {:label => _('Abbreviation'), :weight => 5},
+    :slug => {:label => _('Slug'), :weight => 1},
   }
 
   validates_exclusion_of :slug, :in => [ 'index' ], :message => N_('{fn} cannot be like that.').fix_i18n
   validates_presence_of :name, :environment_id
   validates_uniqueness_of :slug,:scope => [ :environment_id, :parent_id ], :message => N_('{fn} is already being used by another category.').fix_i18n
   belongs_to :environment
-
-  validates_inclusion_of :display_color, :in => 1..15, :allow_nil => true
-  validates_uniqueness_of :display_color, :scope => :environment_id, :if => (lambda { |cat| ! cat.display_color.nil? }), :message => N_('{fn} was already assigned to another category.').fix_i18n
 
   # Finds all top level categories for a given environment. 
   scope :top_level_for, lambda { |environment|
@@ -41,6 +38,13 @@ class Category < ActiveRecord::Base
   has_many :products, :through => :enterprises
 
   acts_as_having_image
+
+  before_save :normalize_display_color
+
+  def normalize_display_color
+    display_color.gsub!('#', '') if display_color
+    display_color = nil if display_color.blank?
+  end
 
   scope :from_types, lambda { |types|
     types.select{ |t| t.blank? }.empty? ?
@@ -99,6 +103,14 @@ class Category < ActiveRecord::Base
   def is_leaf_displayable_in_menu?
     return false if self.display_in_menu == false
     self.children.find(:all, :conditions => {:display_in_menu => true}).empty?
+  end
+
+  def with_color
+    if display_color.blank?
+      parent.nil? ? nil : parent.with_color
+    else
+      self
+    end
   end
 
 end

@@ -257,7 +257,7 @@ body, th, td, input {
 }
 
 #navigation .menu-submenu-trigger {
-  background: #eee url(/images/down-arrow.png) center center no-repeat;
+  background: #eee url(../../../images/down-arrow.png) center center no-repeat;
   border: 0px;
   height: 8px;
   width: 124px;
@@ -412,6 +412,14 @@ div#notice {
   text-align: left;
   border-bottom: 2px solid #AAA;
 }
+#content .block-subtitle {
+  font-variant: normal;
+  color: #AAA;
+  font-size: 11px;
+  text-align: center;
+  border-bottom: 1px solid #AAA;
+  padding: 2px 0;
+}
 
 /*************************** Login block *****************************/
 
@@ -496,10 +504,7 @@ div#notice {
   display: block;
 }
 
-#content .tags-block .block-footer-content a,
-#content .profile-list-block .block-footer-content a,
-#content .enterprises-block .block-footer-content a,
-#content .communities-block .block-footer-content a {
+.block-footer-content a.view-all {
   position: absolute;
   top: 2px;
   right: 0px;
@@ -507,11 +512,6 @@ div#notice {
   color: #000;
   text-decoration: none;
   padding-right: 15px;
-}
-#content .tags-block .block-footer-content a,
-#content .profile-list-block .block-footer-content a,
-#content .enterprises-block .block-footer-content a,
-#content .communities-block .block-footer-content a {
   background: url(imgs/arrow-right-p.png) 100% 50% no-repeat;
 }
 
@@ -1220,28 +1220,28 @@ hr.pre-posts, hr.sep-posts {
 }
 
 .comment-from-owner .comment-wrapper-1 {
-  background: #fbf7b5 url(/images/comment-owner-bg-N.png) repeat-x;
+  background: #fbf7b5 url(../../../images/comment-owner-bg-N.png) repeat-x;
 }
 .comment-from-owner .comment-wrapper-2 {
-  background: url(/images/comment-owner-bg-S.png)    0% 100% repeat-x;
+  background: url(../../../images/comment-owner-bg-S.png)    0% 100% repeat-x;
 }
 .comment-from-owner .comment-wrapper-3 {
-  background: url(/images/comment-owner-bg-L.png)  100%   0% repeat-y;
+  background: url(../../../images/comment-owner-bg-L.png)  100%   0% repeat-y;
 }
 .comment-from-owner .comment-wrapper-4 {
-  background: url(/images/comment-owner-bg-O.png)    0%   0% repeat-y;
+  background: url(../../../images/comment-owner-bg-O.png)    0%   0% repeat-y;
 }
 .comment-from-owner .comment-wrapper-5 {
-  background: url(/images/comment-owner-bg-SL.png) 100% 100% no-repeat;
+  background: url(../../../images/comment-owner-bg-SL.png) 100% 100% no-repeat;
 }
 .comment-from-owner .comment-wrapper-6 {
-  background: url(/images/comment-owner-bg-SO.png)   0% 100% no-repeat;
+  background: url(../../../images/comment-owner-bg-SO.png)   0% 100% no-repeat;
 }
 .comment-from-owner .comment-wrapper-7 {
-  background: url(/images/comment-owner-bg-NL.png) 100%   0% no-repeat;
+  background: url(../../../images/comment-owner-bg-NL.png) 100%   0% no-repeat;
 }
 .comment-from-owner .comment-wrapper-8 {
-  background: url(/images/comment-owner-bg-NO.png)   0%   0% no-repeat;
+  background: url(../../../images/comment-owner-bg-NO.png)   0%   0% no-repeat;
 }
 
 .comment-created-at {
@@ -1278,12 +1278,12 @@ hr.pre-posts, hr.sep-posts {
 
 /******** controller-friends action-friends-index ********/
 
-.action-friends-index .profile-list li,
+.profile-list li,
 .common-profile-list-block .vcard {
   border: 1px solid transparent;
 }
 
-.action-friends-index .profile-list li:hover,
+.profile-list li:hover,
 .common-profile-list-block .vcard:hover {
   border: 1px solid #CCC;
   -moz-border-radius: 5px;

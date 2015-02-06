@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative "../test_helper"
 
 class CmsHelperTest < ActionView::TestCase
 
@@ -48,41 +48,13 @@ class CmsHelperTest < ActionView::TestCase
     result = link_to_article(file)
   end
 
-  should 'display spread button when profile is a person' do
+  should 'display spread button' do
     plugins.stubs(:dispatch).returns([])
     profile = fast_create(Person)
     article = fast_create(TinyMceArticle, :name => 'My article', :profile_id => profile.id)
-    expects(:link_to).with('Spread this', {:action => 'publish', :id => article.id}, :class => 'button with-text icon-spread', :title => nil)
+    expects(:link_to).with('Spread this', {:action => 'publish', :id => article.id}, :class => 'button with-text icon-spread colorbox', :title => nil)
 
-    result = display_spread_button(profile, article)
-  end
-
-  should 'display spread button when profile is a community and env has portal_community' do
-    plugins.stubs(:dispatch).returns([])
-    env = fast_create(Environment)
-    env.expects(:portal_community).returns(true)
-    profile = fast_create(Community, :environment_id => env.id)
-    expects(:environment).returns(env)
-
-    article = fast_create(TinyMceArticle, :name => 'My article', :profile_id => profile.id)
-
-    expects(:link_to).with('Spread this', {:action => 'publish_on_portal_community', :id => article.id}, :class => 'button with-text icon-spread', :title => nil)
-
-    result = display_spread_button(profile, article)
-  end
-
-  should 'not display spread button when profile is a community and env has not portal_community' do
-    plugins.stubs(:dispatch).returns([])
-    env = fast_create(Environment)
-    env.expects(:portal_community).returns(nil)
-    profile = fast_create(Community, :environment_id => env.id)
-    expects(:environment).returns(env)
-
-    article = fast_create(TinyMceArticle, :name => 'My article', :profile_id => profile.id)
-
-    expects(:link_to).with('Spread this', {:action => 'publish_on_portal_community', :id => article.id}, :class => 'button with-text icon-spread', :title => nil).never
-
-    result = display_spread_button(profile, article)
+    result = display_spread_button(article)
   end
 
   should 'display delete_button to folder' do
@@ -90,7 +62,7 @@ class CmsHelperTest < ActionView::TestCase
     profile = fast_create(Profile)
     name = 'My folder'
     folder = fast_create(Folder, :name => name, :profile_id => profile.id)
-    confirm_message = "Are you sure that you want to remove the folder \"#{name}\"? Note that all the items inside it will also be removed!"
+    confirm_message = CGI.escapeHTML("Are you sure that you want to remove the folder \"#{name}\"? Note that all the items inside it will also be removed!")
     expects(:link_to).with('Delete', {:action => 'destroy', :id => folder.id}, :method => :post, :confirm => confirm_message, :class => 'button with-text icon-delete', :title => nil)
 
     result = display_delete_button(folder)
@@ -101,7 +73,7 @@ class CmsHelperTest < ActionView::TestCase
     profile = fast_create(Profile)
     name = 'My article'
     article = fast_create(TinyMceArticle, :name => name, :profile_id => profile.id)
-    confirm_message = "Are you sure that you want to remove the item \"#{name}\"?"
+    confirm_message = CGI.escapeHTML("Are you sure that you want to remove the item \"#{name}\"?")
     expects(:link_to).with('Delete', {:action => 'destroy', :id => article.id}, :method => :post, :confirm => confirm_message, :class => 'button with-text icon-delete', :title => nil)
 
     result = display_delete_button(article)

@@ -1,5 +1,5 @@
 # encoding: UTF-8
-require File.dirname(__FILE__) + '/../test_helper'
+require_relative "../test_helper"
 
 class PersonTest < ActiveSupport::TestCase
   fixtures :profiles, :users, :environments
@@ -511,6 +511,18 @@ class PersonTest < ActiveSupport::TestCase
     person = build(Person, :environment => e, :formation => 'Agrometeorology')
     assert !person.valid?
     assert ! person.errors[:custom_formation.to_s].present?
+  end
+
+  should 'not require fields if person is a template' do
+    e = Environment.default
+    e.expects(:required_person_fields).returns(['cell_phone']).at_least_once
+    person = build(Person, :environment => e)
+    assert ! person.valid?
+    assert person.errors[:cell_phone.to_s].present?
+
+    person.is_template = true
+    person.valid?
+    assert ! person.errors[:cell_phone.to_s].present?
   end
 
   should 'identify when person is a friend' do
@@ -1118,6 +1130,26 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal [person], Person.members_of(community)
   end
 
+  should 'return unique non-members of a community' do
+    member = fast_create(Person)
+    person = fast_create(Person)
+    community = fast_create(Community)
+    community.add_member(member)
+
+    assert_equal (Person.all - Person.members_of(community)).sort, Person.not_members_of(community).sort
+  end
+
+  should 'return unique non-friends of a person' do
+    friend = fast_create(Person)
+    not_friend = fast_create(Person)
+    person = fast_create(Person)
+    person.add_friend(friend)
+    friend.add_friend(person)
+
+    assert_includes Person.not_friends_of(person), not_friend
+    assert_not_includes Person.not_friends_of(person), friend
+  end
+
   should 'be able to pass array to members_of' do
     person1 = fast_create(Person)
     community = fast_create(Community)
@@ -1128,6 +1160,20 @@ class PersonTest < ActiveSupport::TestCase
 
     assert_includes Person.members_of([community, enterprise]), person1
     assert_includes Person.members_of([community, enterprise]), person2
+  end
+
+  should 'be able to pass array to not_members_of' do
+    person1 = fast_create(Person)
+    community = fast_create(Community)
+    community.add_member(person1)
+    person2 = fast_create(Person)
+    enterprise = fast_create(Enterprise)
+    enterprise.add_member(person2)
+    person3 = fast_create(Person)
+
+    assert_not_includes Person.not_members_of([community, enterprise]), person1
+    assert_not_includes Person.not_members_of([community, enterprise]), person2
+    assert_includes Person.not_members_of([community, enterprise]), person3
   end
 
   should 'find more active people' do
@@ -1198,8 +1244,8 @@ class PersonTest < ActiveSupport::TestCase
 
   should 'return tracked_actions and scraps as activities' do
     ActionTracker::Record.destroy_all
-    person = fast_create(Person)
-    another_person = fast_create(Person)
+    person = create_user.person
+    another_person = create_user.person
 
     UserStampSweeper.any_instance.stubs(:current_user).returns(another_person)
     scrap = create(Scrap, defaults_for_scrap(:sender => another_person, :receiver => person, :content => 'A scrap'))
@@ -1226,6 +1272,23 @@ class PersonTest < ActiveSupport::TestCase
     person_activity = ActionTracker::Record.last
 
     assert_equivalent [person_scrap,person_activity], person.activities.map { |a| a.klass.constantize.find(a.id) }
+  end
+
+  should 'grant every permission over profile for its admin' do
+    admin = create_user('some-user').person
+    profile = fast_create(Profile)
+    profile.add_admin(admin)
+
+    assert admin.has_permission?('anything', profile), 'Admin does not have every permission!'
+  end
+
+  should 'grant every permission over profile for environment admin' do
+    admin = create_user('some-user').person
+    profile = fast_create(Profile)
+    environment = profile.environment
+    environment.add_admin(admin)
+
+    assert admin.has_permission?('anything', profile), 'Environment admin does not have every permission!'
   end
 
   should 'allow plugins to extend person\'s permission access' do
@@ -1458,4 +1521,114 @@ class PersonTest < ActiveSupport::TestCase
       person.reload
     end
   end
+
+  should 'have a list of suggested people to be friend' do
+    person = create_user('person').person
+    suggested_friend = fast_create(Person)
+
+    ProfileSuggestion.create(:person => person, :suggestion => suggested_friend)
+    assert_equal [suggested_friend], person.suggested_people
+  end
+
+  should 'have a list of suggested communities to be member' do
+    person = create_user('person').person
+    suggested_community = fast_create(Community)
+
+    ProfileSuggestion.create(:person => person, :suggestion => suggested_community)
+    assert_equal [suggested_community], person.suggested_communities
+  end
+
+  should 'remove profile suggestion when person is destroyed' do
+    person = create_user('person').person
+    suggested_community = fast_create(Community)
+
+    suggestion = ProfileSuggestion.create(:person => person, :suggestion => suggested_community)
+
+    person.destroy
+    assert_raise ActiveRecord::RecordNotFound do
+      ProfileSuggestion.find suggestion.id
+    end
+  end
+
+  should 'remove profile suggestion when suggested profile is destroyed' do
+    person = create_user('person').person
+    suggested_community = fast_create(Community)
+
+    suggestion = ProfileSuggestion.create(:person => person, :suggestion => suggested_community)
+
+    suggested_community.destroy
+    assert_raise ActiveRecord::RecordNotFound do
+      ProfileSuggestion.find suggestion.id
+    end
+  end
+
+  should 'not suggest disabled suggestion of people' do
+    person = create_user('person').person
+    suggested_person = fast_create(Person)
+    disabled_suggested_person = fast_create(Person)
+
+    enabled_suggestion = ProfileSuggestion.create(:person => person, :suggestion => suggested_person)
+    disabled_suggestion = ProfileSuggestion.create(:person => person, :suggestion => disabled_suggested_person, :enabled => false)
+
+    assert_equal [suggested_person], person.suggested_people
+  end
+
+  should 'not suggest disabled suggestion of communities' do
+    person = create_user('person').person
+    suggested_community = fast_create(Community)
+    disabled_suggested_community = fast_create(Community)
+
+    enabled_suggestion = ProfileSuggestion.create(:person => person, :suggestion => suggested_community)
+    disabled_suggestion = ProfileSuggestion.create(:person => person, :suggestion => disabled_suggested_community, :enabled => false)
+
+    assert_equal [suggested_community], person.suggested_communities
+  end
+
+  should 'disable friend suggestion' do
+    person = create_user('person').person
+    suggested_person = fast_create(Person)
+
+    suggestion = ProfileSuggestion.create(:person => person, :suggestion => suggested_person)
+
+    assert_difference 'person.suggested_people.count', -1 do
+      person.remove_suggestion(suggested_person)
+    end
+  end
+
+  should 'disable community suggestion' do
+    person = create_user('person').person
+    suggested_community = fast_create(Community)
+
+    suggestion = ProfileSuggestion.create(:person => person, :suggestion => suggested_community)
+
+    assert_difference 'person.suggested_communities.count', -1 do
+      person.remove_suggestion(suggested_community)
+    end
+  end
+
+  should 'return url to people suggestions for a person' do
+    environment = create_environment('mycolivre.net')
+    profile = build(Person, :identifier => 'testprofile', :environment_id => create_environment('mycolivre.net').id)
+    assert_equal({ :host => "mycolivre.net", :profile => 'testprofile', :controller => 'friends', :action => 'suggest' }, profile.people_suggestions_url)
+  end
+
+  should 'return url to communities suggestions for a person' do
+    environment = create_environment('mycolivre.net')
+    profile = build(Person, :identifier => 'testprofile', :environment_id => create_environment('mycolivre.net').id)
+    assert_equal({ :host => "mycolivre.net", :profile => 'testprofile', :controller => 'memberships', :action => 'suggest' }, profile.communities_suggestions_url)
+  end
+
+  should 'allow homepage change if user is an environment admin' do
+    person = create_user('person').person
+    person.environment.expects(:enabled?).with('cant_change_homepage').returns(true)
+    person.expects(:is_admin?).returns(true)
+    assert person.can_change_homepage?
+  end
+
+  should 'allow homepage change if environment feature permit it' do
+    person = create_user('person').person
+    person.environment.expects(:enabled?).with('cant_change_homepage').returns(false)
+    assert person.can_change_homepage?
+  end
+
 end

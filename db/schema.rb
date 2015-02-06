@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140808185510) do
+ActiveRecord::Schema.define(:version => 20150122165042) do
 
   create_table "abuse_reports", :force => true do |t|
     t.integer  "reporter_id"
@@ -95,12 +95,15 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
     t.integer  "license_id"
     t.integer  "image_id"
     t.integer  "position"
-    t.integer  "created_by_id"
     t.integer  "spam_comments_count",  :default => 0
     t.integer  "author_id"
+    t.integer  "created_by_id"
   end
 
   add_index "article_versions", ["article_id"], :name => "index_article_versions_on_article_id"
+  add_index "article_versions", ["path", "profile_id"], :name => "index_article_versions_on_path_and_profile_id"
+  add_index "article_versions", ["path"], :name => "index_article_versions_on_path"
+  add_index "article_versions", ["published_at", "id"], :name => "index_article_versions_on_published_at_and_id"
 
   create_table "articles", :force => true do |t|
     t.string   "name"
@@ -143,9 +146,10 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
     t.integer  "license_id"
     t.integer  "image_id"
     t.integer  "position"
-    t.integer  "created_by_id"
     t.integer  "spam_comments_count",  :default => 0
     t.integer  "author_id"
+    t.integer  "created_by_id"
+    t.boolean  "show_to_followers",    :default => false
   end
 
   add_index "articles", ["comments_count"], :name => "index_articles_on_comments_count"
@@ -153,9 +157,15 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
   add_index "articles", ["hits"], :name => "index_articles_on_hits"
   add_index "articles", ["name"], :name => "index_articles_on_name"
   add_index "articles", ["parent_id"], :name => "index_articles_on_parent_id"
+  add_index "articles", ["path", "profile_id"], :name => "index_articles_on_path_and_profile_id"
+  add_index "articles", ["path"], :name => "index_articles_on_path"
   add_index "articles", ["profile_id"], :name => "index_articles_on_profile_id"
+  add_index "articles", ["published_at", "id"], :name => "index_articles_on_published_at_and_id"
   add_index "articles", ["slug"], :name => "index_articles_on_slug"
   add_index "articles", ["translation_of_id"], :name => "index_articles_on_translation_of_id"
+  add_index "articles", ["type", "parent_id"], :name => "index_articles_on_type_and_parent_id"
+  add_index "articles", ["type", "profile_id"], :name => "index_articles_on_type_and_profile_id"
+  add_index "articles", ["type"], :name => "index_articles_on_type"
 
   create_table "articles_categories", :id => false, :force => true do |t|
     t.integer "article_id"
@@ -194,19 +204,19 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
   create_table "categories", :force => true do |t|
     t.string  "name"
     t.string  "slug"
-    t.text    "path",            :default => ""
-    t.integer "display_color"
+    t.text    "path",                         :default => ""
     t.integer "environment_id"
     t.integer "parent_id"
     t.string  "type"
     t.float   "lat"
     t.float   "lng"
-    t.boolean "display_in_menu", :default => false
-    t.integer "children_count",  :default => 0
-    t.boolean "accept_products", :default => true
+    t.boolean "display_in_menu",              :default => false
+    t.integer "children_count",               :default => 0
+    t.boolean "accept_products",              :default => true
     t.integer "image_id"
     t.string  "acronym"
     t.string  "abbreviation"
+    t.string  "display_color",   :limit => 6
   end
 
   create_table "categories_profiles", :id => false, :force => true do |t|
@@ -277,6 +287,11 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
     t.string  "google_maps_key"
   end
 
+  add_index "domains", ["is_default"], :name => "index_domains_on_is_default"
+  add_index "domains", ["name"], :name => "index_domains_on_name"
+  add_index "domains", ["owner_id", "owner_type", "is_default"], :name => "index_domains_on_owner_id_and_owner_type_and_is_default"
+  add_index "domains", ["owner_id", "owner_type"], :name => "index_domains_on_owner_id_and_owner_type"
+
   create_table "environments", :force => true do |t|
     t.string   "name"
     t.string   "contact_email"
@@ -301,7 +316,7 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
   create_table "external_feeds", :force => true do |t|
     t.string   "feed_title"
     t.datetime "fetched_at"
-    t.string   "address"
+    t.text     "address"
     t.integer  "blog_id",                         :null => false
     t.boolean  "enabled",       :default => true, :null => false
     t.boolean  "only_once",     :default => true, :null => false
@@ -450,6 +465,21 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
   add_index "products", ["product_category_id"], :name => "index_products_on_product_category_id"
   add_index "products", ["profile_id"], :name => "index_products_on_profile_id"
 
+  create_table "profile_suggestions", :force => true do |t|
+    t.integer  "person_id"
+    t.integer  "suggestion_id"
+    t.string   "suggestion_type"
+    t.text     "categories"
+    t.boolean  "enabled",         :default => true
+    t.float    "score",           :default => 0.0
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
+  end
+
+  add_index "profile_suggestions", ["person_id"], :name => "index_profile_suggestions_on_person_id"
+  add_index "profile_suggestions", ["score"], :name => "index_profile_suggestions_on_score"
+  add_index "profile_suggestions", ["suggestion_id"], :name => "index_profile_suggestions_on_suggestion_id"
+
   create_table "profiles", :force => true do |t|
     t.string   "name"
     t.string   "type"
@@ -488,6 +518,9 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
     t.integer  "activities_count",                      :default => 0,     :null => false
     t.string   "personal_website"
     t.string   "jabber_id"
+    t.integer  "welcome_page_id"
+    t.boolean  "allow_members_to_invite",               :default => true
+    t.boolean  "invite_friends_only",                   :default => false
   end
 
   add_index "profiles", ["activities_count"], :name => "index_profiles_on_activities_count"
@@ -556,6 +589,31 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
     t.integer  "context_id"
   end
 
+  create_table "search_term_occurrences", :force => true do |t|
+    t.integer  "search_term_id"
+    t.datetime "created_at"
+    t.integer  "total",          :default => 0
+    t.integer  "indexed",        :default => 0
+  end
+
+  add_index "search_term_occurrences", ["created_at"], :name => "index_search_term_occurrences_on_created_at"
+
+  create_table "search_terms", :force => true do |t|
+    t.string  "term"
+    t.integer "context_id"
+    t.string  "context_type"
+    t.string  "asset",            :default => "all"
+    t.float   "score",            :default => 0.0
+    t.float   "relevance_score",  :default => 0.0
+    t.float   "occurrence_score", :default => 0.0
+  end
+
+  add_index "search_terms", ["asset"], :name => "index_search_terms_on_asset"
+  add_index "search_terms", ["occurrence_score"], :name => "index_search_terms_on_occurrence_score"
+  add_index "search_terms", ["relevance_score"], :name => "index_search_terms_on_relevance_score"
+  add_index "search_terms", ["score"], :name => "index_search_terms_on_score"
+  add_index "search_terms", ["term"], :name => "index_search_terms_on_term"
+
   create_table "sessions", :force => true do |t|
     t.string   "session_id", :null => false
     t.text     "data"
@@ -565,6 +623,12 @@ ActiveRecord::Schema.define(:version => 20140808185510) do
 
   add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
+
+  create_table "suggestion_connections", :force => true do |t|
+    t.integer "suggestion_id",   :null => false
+    t.integer "connection_id",   :null => false
+    t.string  "connection_type", :null => false
+  end
 
   create_table "taggings", :force => true do |t|
     t.integer  "tag_id"

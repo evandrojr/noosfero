@@ -1,75 +1,64 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class FriendsBlockTest < ActiveSupport::TestCase
+class FriendsBlockTest < ActionView::TestCase
 
   should 'inherit from Block' do
     assert_kind_of Block, FriendsBlock.new
   end
 
-
   should 'declare its default title' do
+    FriendsBlock.any_instance.expects(:profile_count).returns(0)
     assert_not_equal Block.new.default_title, FriendsBlock.new.default_title
   end
-
 
   should 'describe itself' do
     assert_not_equal Block.description, FriendsBlock.description
   end
-
 
   should 'is editable' do
     block = FriendsBlock.new
     assert block.editable?
   end
 
-
   should 'have field limit' do
     block = FriendsBlock.new
     assert_respond_to block, :limit
   end
-
 
   should 'default value of limit' do
     block = FriendsBlock.new
     assert_equal 6, block.limit
   end
 
-
   should 'have field name' do
     block = FriendsBlock.new
     assert_respond_to block, :name
   end
-
 
   should 'default value of name' do
     block = FriendsBlock.new
     assert_equal "", block.name
   end
 
-
   should 'have field address' do
     block = FriendsBlock.new
     assert_respond_to block, :address
   end
-
 
   should 'default value of address' do
     block = FriendsBlock.new
     assert_equal "", block.address
   end
 
-
   should 'prioritize profiles with image by default' do
-    assert FriendsBlock.new.prioritize_people_with_image
+    assert FriendsBlock.new.prioritize_profiles_with_image
   end
-
 
   should 'accept a limit of people to be displayed' do
     block = FriendsBlock.new
     block.limit = 20
     assert_equal 20, block.limit
   end
-
 
   should 'list friends from person' do
     owner = fast_create(Person)
@@ -91,19 +80,18 @@ class FriendsBlockTest < ActiveSupport::TestCase
     assert_match(/#{friend2.name}/, content)
   end
 
-
   should 'link to "all friends"' do
     person1 = create_user('mytestperson').person
 
     block = FriendsBlock.new
+    block.stubs(:suggestions).returns([])
     block.expects(:owner).returns(person1).at_least_once
 
-    expects(:_).with('View all').returns('View all')
-    expects(:link_to).with('View all', :profile => 'mytestperson', :controller => 'profile', :action => 'friends').returns('link-to-friends')
-
-    assert_equal 'link-to-friends', instance_eval(&block.footer)
+    instance_eval(&block.footer)
+    assert_select 'a.view-all' do |elements|
+      assert_select '[href=/profile/mytestperson/friends]'
+    end
   end
-
 
   should 'count number of owner friends' do
     owner = fast_create(Person)
@@ -120,7 +108,6 @@ class FriendsBlockTest < ActiveSupport::TestCase
     assert_equal 3, block.profile_count
   end
 
-
   should 'count number of public and private friends' do
     owner = fast_create(Person)
     private_p = fast_create(Person, {:public_profile => false})
@@ -135,7 +122,6 @@ class FriendsBlockTest < ActiveSupport::TestCase
     assert_equal 2, block.profile_count
   end
 
-
   should 'not count number of invisible friends' do
     owner = fast_create(Person)
     private_p = fast_create(Person, {:visible => false})
@@ -148,6 +134,17 @@ class FriendsBlockTest < ActiveSupport::TestCase
     block.expects(:owner).returns(owner).at_least_once
 
     assert_equal 1, block.profile_count
+  end
+
+  should 'list owner\'s friends suggestions' do
+    owner = fast_create(Person)
+    suggestion1 = owner.profile_suggestions.create(:suggestion => fast_create(Person))
+    suggestion2 = owner.profile_suggestions.create(:suggestion => fast_create(Person))
+
+    block = FriendsBlock.new
+    block.stubs(:owner).returns(owner)
+
+    assert_equivalent block.suggestions, [suggestion1,suggestion2]
   end
 
   protected

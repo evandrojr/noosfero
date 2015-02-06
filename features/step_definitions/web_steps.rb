@@ -11,8 +11,14 @@ require File.expand_path(File.join(File.dirname(__FILE__), "..", "support", "pat
 
 module WithinHelpers
   def with_scope(locator)
-    locator = locator ? first(locator) : locator
-    locator ? within(locator) { yield } : yield
+    if locator
+      locator = first(locator) || locator
+      within(locator) do
+        yield
+      end
+    else
+      yield
+    end
   end
 end
 World(WithinHelpers)
@@ -93,6 +99,7 @@ When /^(?:|I )choose "([^"]*)"(?: within "([^"]*)")?$/ do |field, selector|
 end
 
 When /^(?:|I )attach the file "([^"]*)" to "([^"]*)"(?: within "([^"]*)")?$/ do |path, field, selector|
+  path = File.expand_path(path).gsub('/', File::ALT_SEPARATOR || File::SEPARATOR)
   with_scope(selector) do
     attach_file(field, path)
   end
@@ -246,7 +253,7 @@ Then /^display "([^\"]*)"$/ do |element|
 end
 
 Then /^there should be a div with class "([^"]*)"$/ do |klass|
-  should have_selector('div', :class => klass)
+  should have_selector("div.#{klass}")
 end
 
 When /^(?:|I )follow exact "([^"]*)"(?: within "([^"]*)")?$/ do |link, selector|

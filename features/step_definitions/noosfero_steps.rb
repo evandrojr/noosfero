@@ -692,11 +692,6 @@ Given /^the cache is turned (on|off)$/ do |state|
   ActionController::Base.perform_caching = (state == 'on')
 end
 
-When /^I make a AJAX request to (.*)$/ do |page|
-  header 'X-Requested-With', 'XMLHttpRequest'
-  visit(path_to(page))
-end
-
 Given /^the environment is configured to (.*) after login$/ do |option|
   redirection = case option
     when 'stay on the same page'
@@ -745,6 +740,8 @@ Given /^the environment is configured to (.*) after signup$/ do |option|
       'user_homepage'
     when 'redirect to profile control panel'
       'user_control_panel'
+    when 'redirect to welcome page'
+      'welcome_page'
   end
   environment = Environment.default
   environment.redirection_after_signup = redirection
@@ -766,4 +763,12 @@ When /^I confirm the "(.*)" dialog$/ do |confirmation|
   a = page.driver.browser.switch_to.alert
   assert_equal confirmation, a.text
   a.accept
+end
+
+Given /^the field (.*) is public for all users$/ do |field|
+  Person.all.each do |person|
+    person.fields_privacy = Hash.new if person.fields_privacy.nil?
+    person.fields_privacy[field] = "public"
+    person.save!
+  end
 end

@@ -1,8 +1,20 @@
 // Place your application-specific JavaScript functions and classes here
 // This file is automatically included by javascript_include_tag :defaults
 
+// scope for noosfero stuff
+noosfero = {
+};
+
 function noosfero_init() {
   // focus_first_field(); it is moving the page view when de form is down.
+}
+
+var __noosfero_root = null;
+function noosfero_root() {
+  if (__noosfero_root == null) {
+    __noosfero_root = jQuery('meta[property="noosfero:root"]').attr("content") || '';
+  }
+  return __noosfero_root;
 }
 
 /* If applicable, find the first field in which the user can type and move the
@@ -167,7 +179,7 @@ function loading_done(element_id) {
    jQuery(element_id).removeClass('small-loading-dark');
 }
 function open_loading(message) {
-   jQuery('body').prepend("<div id='overlay_loading' class='ui-widget-overlay' style='display: none'/><div id='overlay_loading_modal' style='display: none'><p>"+message+"</p><img src='/images/loading-dark.gif'/></div>");
+   jQuery('body').prepend("<div id='overlay_loading' class='ui-widget-overlay' style='display: none'/><div id='overlay_loading_modal' style='display: none'><p>"+message+"</p><img src='" + noosfero_root() + "/images/loading-dark.gif'/></div>");
    jQuery('#overlay_loading').show();
    jQuery('#overlay_loading_modal').center();
    jQuery('#overlay_loading_modal').fadeIn('slow');
@@ -506,6 +518,25 @@ function new_qualifier_row(selector, select_qualifiers, delete_button) {
   jQuery(selector).append("<tr><td>" + select_qualifiers + "</td><td id='certifier-area-" + index + "'><select></select>" + delete_button + "</td></tr>");
 }
 
+function userDataCallback(data) {
+  noosfero.user_data = data;
+  if (data.login) {
+    // logged in
+    if (data.chat_enabled) {
+      setInterval(function(){ jQuery.getJSON(user_data, chatOnlineUsersDataCallBack)}, 10000);
+    }
+    jQuery('head').append('<meta content="authenticity_token" name="csrf-param" />');
+    jQuery('head').append('<meta content="'+jQuery.cookie("_noosfero_.XSRF-TOKEN")+'" name="csrf-token" />');
+  }
+  if (data.notice) {
+    display_notice(data.notice);
+    // clear notice so that it is not display again in the case this function is called again.
+    data.notice = null;
+  }
+  // Bind this event to do more actions with the user data (for example, inside plugins)
+  jQuery(window).trigger("userDataLoaded", data);
+};
+
 // controls the display of the login/logout stuff
 jQuery(function($) {
   $.ajaxSetup({
@@ -515,21 +546,10 @@ jQuery(function($) {
     }
   });
 
-  $.getJSON('/account/user_data', function userDataCallBack(data) {
-    if (data.login) {
-      // logged in
-      if (data.chat_enabled) {
-        setInterval(function(){ $.getJSON('/account/user_data', chatOnlineUsersDataCallBack)}, 10000);
-      }
-      $('head').append('<meta content="authenticity_token" name="csrf-param" />');
-      $('head').append('<meta content="'+$.cookie("_noosfero_.XSRF-TOKEN")+'" name="csrf-token" />');
-    }
-    if (data.notice) {
-      display_notice(data.notice);
-    }
-    // Bind this event to do more actions with the user data (for example, inside plugins)
-    $(window).trigger("userDataLoaded", data);
-  });
+  var user_data = noosfero_root() + '/account/user_data';
+  $.getJSON(user_data, userDataCallback)
+
+  $.ajaxSetup({ cache: false });
 
   function chatOnlineUsersDataCallBack(data) {
     if ($('#chat-online-users').length == 0) {
@@ -600,7 +620,7 @@ function display_notice(message) {
 
 function open_chat_window(self_link, anchor) {
    anchor = anchor || '#';
-   var noosfero_chat_window = window.open('/chat' + anchor,'noosfero_chat','width=900,height=500');
+   var noosfero_chat_window = window.open(noosfero_root() + '/chat' + anchor,'noosfero_chat','width=900,height=500');
    noosfero_chat_window.focus();
    return false;
 }
@@ -786,7 +806,7 @@ function original_image_dimensions(src) {
 
 function gravatarCommentFailback(img) {
   var link = img.parentNode;
-  link.href = "http://www.gravatar.com";
+  link.href = "//www.gravatar.com";
   img.src = img.getAttribute("data-gravatar");
 }
 
@@ -816,9 +836,12 @@ Array.min = function(array) {
 };
 
 function hideAndGetUrl(link) {
+  document.body.style.cursor = 'wait';
   link.hide();
   url = jQuery(link).attr('href');
-  jQuery.get(url);
+  jQuery.get(url, function( data ) {
+    document.body.style.cursor = 'default';
+  });
 }
 
 jQuery(function($){
@@ -1053,12 +1076,50 @@ function showHideTermsOfUse() {
   }
 }
 
+jQuery('.profiles-suggestions .explain-suggestion').live('click', function() {
+  var clicked = jQuery(this);
+  clicked.toggleClass('active');
+  clicked.next('.extra_info').toggle();
+  return false;
+});
+
+jQuery('.suggestions-block .block-subtitle').live('click', function() {
+  var clicked = jQuery(this);
+  clicked.next('.profiles-suggestions').toggle();
+  clicked.nextAll('.more-suggestions').toggle();
+  return false;
+});
+
 jQuery(document).ready(function(){
   showHideTermsOfUse();
 
   jQuery("#article_has_terms_of_use").click(function(){
     showHideTermsOfUse();
   });
+
+  // Suggestions on search inputs
+  (function($) {
+    var suggestions_cache = {};
+    $(".search-input-with-suggestions").autocomplete({
+      minLength: 2,
+      select: function(event, ui){
+        $(this).val(ui.item.value);
+        $(this).closest('form').submit();
+      },
+      source: function(request, response) {
+        var term = request.term.toLowerCase();
+        if (term in suggestions_cache) {
+          response(suggestions_cache[term]);
+          return;
+        }
+        request["asset"] = this.element.data("asset");
+        $.getJSON("/search/suggestions", request, function(data, status, xhr) {
+          suggestions_cache[term] = data;
+          response(data);
+        });
+      }
+    });
+  })(jQuery);
 });
 
 function apply_zoom_to_images(zoom_text) {

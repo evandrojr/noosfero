@@ -15,11 +15,23 @@ class AccountController < ApplicationController
 
   def activate
     @user = User.find_by_activation_code(params[:activation_code]) if params[:activation_code]
-    if @user and @user.activate
-      @message = _("Your account has been activated, now you can log in!")
-      check_redirection
-      session[:join] = params[:join] unless params[:join].blank?
-      render :action => 'login', :userlogin => @user.login
+    if @user
+      unless @user.environment.enabled?('admin_must_approve_new_users') 
+        if @user.activate
+          @message = _("Your account has been activated, now you can log in!")
+          check_redirection
+          session[:join] = params[:join] unless params[:join].blank?
+          render :action => 'login', :userlogin => @user.login
+        end
+      else
+        if @user.create_moderate_task
+          session[:notice] = _('Thanks for registering. The administrators were notified.')
+          @register_pending = true
+          @user.activation_code = nil
+          @user.save!
+          redirect_to :controller => :home
+        end      
+      end
     else
       session[:notice] = _("It looks like you're trying to activate an account. Perhaps have already activated this account?")
       redirect_to :controller => :home
@@ -70,10 +82,12 @@ class AccountController < ApplicationController
     if @plugins.dispatch(:allow_user_registration).include?(false)
       redirect_back_or_default(:controller => 'home')
       session[:notice] = _("This environment doesn't allow user registration.")
+      return
     end
 
     store_location(request.referer) unless params[:return_to] or session[:return_to]
 
+    # Tranforming to boolean
     @block_bot = !!session[:may_be_a_bot]
     @invitation_code = params[:invitation_code]
     begin
@@ -85,6 +99,7 @@ class AccountController < ApplicationController
       @user.return_to = session[:return_to]
       @person = Person.new(params[:profile_data])
       @person.environment = @user.environment
+
       if request.post?
         if may_be_a_bot
           set_signup_start_time_for_now
@@ -103,12 +118,21 @@ class AccountController < ApplicationController
             invitation.update_attributes!({:friend => @user.person})
             invitation.finish
           end
+
+          unless params[:file].nil?
+            image = Image::new :uploaded_data=> params[:file][:image]
+
+            @user.person.image = image
+            @user.person.save
+          end
+
           if @user.activated?
             self.current_user = @user
             check_join_in_community(@user)
             go_to_signup_initial_page
           else
-            @register_pending = true
+            redirect_to :controller => :home, :action => :welcome, :template_id => (@user.person.template && @user.person.template.id)
+            session[:notice] = _('Thanks for registering!')
           end
         end
       end
@@ -171,7 +195,7 @@ class AccountController < ApplicationController
         else
           @change_password.errors[:base] << _('Could not find any user with %s equal to "%s".') % [fields_label, params[:value]]
         end
-      rescue ActiveRecord::RecordInvald
+      rescue ActiveRecord::RecordInvalid
         @change_password.errors[:base] << _('Could not perform password recovery for the user.')
       end
     end
@@ -439,6 +463,8 @@ class AccountController < ApplicationController
         redirect_to user.url
       when 'user_control_panel'
         redirect_to user.admin_url
+      when 'welcome_page'
+        redirect_to :controller => :home, :action => :welcome, :template_id => (user.template && user.template.id)
     else
       redirect_back_or_default(default)
     end
