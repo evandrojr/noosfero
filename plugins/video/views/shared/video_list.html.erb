@@ -6,18 +6,18 @@
   other_videos = contents - first_video_arr %>
   <% if first_video.display_to?(user) %>
     <div class="video-gallery-table-big">
-      <div class="video-gallery-left-column-big">  
+      <div class="video-gallery-left-column-big">
           <%= link_to first_video.view_url do %>
             <img  width="320" height="320" src='<%= first_video.video_thumbnail_url %>' class="disable-zoom"/>
           <% end  %>
-      </div>          
+      </div>
       <div class="video-gallery-right-column-big">
-        <div class="video-title-big"><%= first_video.title %></div>  
+        <div class="video-title-big"><%= first_video.title %></div>
         <div class="video-author-big">
           <%= _("by")  %> <%= first_video.author_name %> <%= _("updated at") %>  <%= time_ago_as_sentence(first_video.updated_at)  %>
         </div>
       </div>
-    </div>    
+    </div>
   <% end  %>
   <% other_videos.each do |content| %>
     <% if content.display_to?(user) %>
