@@ -256,7 +256,16 @@ class Noosfero::Plugin
     nil
   end
 
-  # -> Adds content to catalog item
+  # -> Adds tabs to the products
+  # returns   = { :title => title, :id => id, :content => content }
+  #   title   = name that will be displayed.
+  #   id      = div id.
+  #   content = lambda block that creates html code.
+  def product_tabs product
+    nil
+  end
+
+  # -> Adds content to calalog item
   # returns = lambda block that creates html code
   def catalog_item_extras(item)
     nil
@@ -428,6 +437,12 @@ class Noosfero::Plugin
     nil
   end
 
+  # -> Adds adicional fields to a view
+  # returns = proc block that creates html code
+  def upload_files_extra_fields(article)
+    nil
+  end
+
   # -> Adds fields to the signup form
   # returns = proc that creates html code
   def signup_extra_contents
@@ -545,6 +560,20 @@ class Noosfero::Plugin
   # P.S.: The plugin might add other informations on the return hash for its
   # own use in specific views
   def find_by_contents(asset, scope, query, paginate_options={}, options={})
+    scope = scope.like_search(query, options) unless query.blank?
+    scope = scope.send(options[:filter]) unless options[:filter].blank?
+    {:results => scope.paginate(paginate_options)}
+  end
+
+  # -> Suggests terms based on asset and query
+  # returns = [a, b, c, ...]
+  def find_suggestions(query, context, asset, options={:limit => 5})
+    context.search_terms.
+      where(:asset => asset).
+      where("search_terms.term like ?", "%#{query}%").
+      where('search_terms.score > 0').
+      order('search_terms.score DESC').
+      limit(options[:limit]).map(&:term)
   end
 
   # -> Adds aditional fields for change_password
@@ -563,6 +592,12 @@ class Noosfero::Plugin
   # returns = a list of hashs as {:name => "string", :label => "string", :object_name => :key, :method => :key}
   def extra_optional_fields
     []
+  end
+
+  # -> Adds css class to <html> tag
+  # returns = ['class1', 'class2']
+  def html_tag_classes
+    nil
   end
 
   # -> Adds additional blocks to profiles and environments.

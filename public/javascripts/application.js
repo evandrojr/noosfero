@@ -113,22 +113,24 @@ jQuery.fn.center = function () {
 }
 
 function show_warning(field, message) {
-   new Effect.Highlight(field, {duration:3});
-   $(message).show();
+  jQuery('#'+field).effect('highlight');
+  jQuery('#'+message).show();
 }
 
 function hide_warning(field) {
-   $(field).hide();
+   jQuery('#'+field).hide();
 }
 
 function enable_button(button) {
-   button.enable();
-   button.removeClassName("disabled");
+  button = jQuery(button)
+  button.prop('disabled', false);
+  button.removeClass("disabled");
 }
 
 function disable_button(button) {
-   button.disable();
-   button.addClassName("disabled");
+  button = jQuery(button)
+  button.prop('disabled', true);
+  button.addClass("disabled");
 }
 
 function toggleDisabled(enable, element) {
@@ -162,21 +164,21 @@ function hideOthersIconSelector(current_div) {
 }
 
 function loading(element_id, message) {
-   jQuery(element_id).addClass('loading');
+   jQuery('#'+element_id).addClass('loading');
    if (message) {
-      jQuery(element_id).html(message);
+      jQuery('#'+element_id).html(message);
    }
 }
 function small_loading(element_id, message) {
-   $(element_id).addClassName('small-loading');
+   $('#'+element_id).addClass('small-loading');
    if (message) {
-      $(element_id).update(message);
+      $('#'+element_id).text(message);
    }
 }
 function loading_done(element_id) {
-   jQuery(element_id).removeClass('loading');
-   jQuery(element_id).removeClass('small-loading');
-   jQuery(element_id).removeClass('small-loading-dark');
+   jQuery('#'+element_id).removeClass('loading');
+   jQuery('#'+element_id).removeClass('small-loading');
+   jQuery('#'+element_id).removeClass('small-loading-dark');
 }
 function open_loading(message) {
    jQuery('body').prepend("<div id='overlay_loading' class='ui-widget-overlay' style='display: none'/><div id='overlay_loading_modal' style='display: none'><p>"+message+"</p><img src='" + noosfero_root() + "/images/loading-dark.gif'/></div>");
@@ -836,9 +838,12 @@ Array.min = function(array) {
 };
 
 function hideAndGetUrl(link) {
+  document.body.style.cursor = 'wait';
   link.hide();
   url = jQuery(link).attr('href');
-  jQuery.get(url);
+  jQuery.get(url, function( data ) {
+    document.body.style.cursor = 'default';
+  });
 }
 
 jQuery(function($){
@@ -1073,12 +1078,50 @@ function showHideTermsOfUse() {
   }
 }
 
+jQuery('.profiles-suggestions .explain-suggestion').live('click', function() {
+  var clicked = jQuery(this);
+  clicked.toggleClass('active');
+  clicked.next('.extra_info').toggle();
+  return false;
+});
+
+jQuery('.suggestions-block .block-subtitle').live('click', function() {
+  var clicked = jQuery(this);
+  clicked.next('.profiles-suggestions').toggle();
+  clicked.nextAll('.more-suggestions').toggle();
+  return false;
+});
+
 jQuery(document).ready(function(){
   showHideTermsOfUse();
 
   jQuery("#article_has_terms_of_use").click(function(){
     showHideTermsOfUse();
   });
+
+  // Suggestions on search inputs
+  (function($) {
+    var suggestions_cache = {};
+    $(".search-input-with-suggestions").autocomplete({
+      minLength: 2,
+      select: function(event, ui){
+        $(this).val(ui.item.value);
+        $(this).closest('form').submit();
+      },
+      source: function(request, response) {
+        var term = request.term.toLowerCase();
+        if (term in suggestions_cache) {
+          response(suggestions_cache[term]);
+          return;
+        }
+        request["asset"] = this.element.data("asset");
+        $.getJSON("/search/suggestions", request, function(data, status, xhr) {
+          suggestions_cache[term] = data;
+          response(data);
+        });
+      }
+    });
+  })(jQuery);
 });
 
 function apply_zoom_to_images(zoom_text) {

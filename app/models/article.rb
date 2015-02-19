@@ -2,25 +2,29 @@ require 'hpricot'
 
 class Article < ActiveRecord::Base
 
-  attr_accessible :name, :body, :abstract, :profile, :tag_list, :parent, :allow_members_to_edit, :translation_of_id, :language, :license_id, :parent_id, :display_posts_in_current_language, :category_ids, :posts_per_page, :moderate_comments, :accept_comments, :feed, :published, :source, :highlighted, :notify_comments, :display_hits, :slug, :external_feed_builder, :display_versions, :external_link, :image_builder
+  attr_accessible :name, :body, :abstract, :profile, :tag_list, :parent,
+                  :allow_members_to_edit, :translation_of_id, :language,
+                  :license_id, :parent_id, :display_posts_in_current_language,
+                  :category_ids, :posts_per_page, :moderate_comments,
+                  :accept_comments, :feed, :published, :source,
+                  :highlighted, :notify_comments, :display_hits, :slug,
+                  :external_feed_builder, :display_versions, :external_link,
+                  :image_builder, :show_to_followers
 
   acts_as_having_image
 
   SEARCHABLE_FIELDS = {
-    :name => 10,
-    :abstract => 3,
-    :body => 2,
-    :slug => 1,
-    :filename => 1,
+    :name => {:label => _('Name'), :weight => 10},
+    :abstract => {:label => _('Abstract'), :weight => 3},
+    :body => {:label => _('Content'), :weight => 2},
+    :slug => {:label => _('Slug'), :weight => 1},
+    :filename => {:label => _('Filename'), :weight => 1},
   }
 
-  SEARCH_FILTERS = %w[
-    more_recent
-    more_popular
-    more_comments
-  ]
-
-  SEARCH_DISPLAYS = %w[full]
+  SEARCH_FILTERS = {
+    :order => %w[more_recent more_popular more_comments],
+    :display => %w[full]
+  }
 
   def self.default_search_display
     'full'
@@ -101,6 +105,11 @@ class Article < ActiveRecord::Base
   after_destroy :destroy_activity
   def destroy_activity
     self.activity.destroy if self.activity
+  end
+
+  after_destroy :destroy_link_article
+  def destroy_link_article
+    Article.where(:reference_article_id => self.id, :type => LinkArticle).destroy_all
   end
 
   xss_terminate :only => [ :name ], :on => 'validation', :with => 'white_list'
@@ -333,7 +342,7 @@ class Article < ActiveRecord::Base
   def belongs_to_blog?
     self.parent and self.parent.blog?
   end
-  
+
   def belongs_to_forum?
     self.parent and self.parent.forum?
   end
@@ -379,6 +388,10 @@ class Article < ActiveRecord::Base
 
   def download_headers
     {}
+  end
+
+  def alternate_languages
+    self.translations.map(&:language)
   end
 
   scope :native_translations, :conditions => { :translation_of_id => nil }
@@ -445,6 +458,7 @@ class Article < ActiveRecord::Base
       if self.parent && !self.parent.published?
         return false
       end
+
       true
     else
       false
@@ -464,7 +478,9 @@ class Article < ActiveRecord::Base
   scope :no_folders, lambda {|profile|{:conditions => ['articles.type NOT IN (?)', profile.folder_types]}}
   scope :galleries, :conditions => [ "articles.type IN ('Gallery')" ]
   scope :images, :conditions => { :is_image => true }
+  scope :no_images, :conditions => { :is_image => false }
   scope :text_articles, :conditions => [ 'articles.type IN (?)', text_article_types ]
+  scope :files, :conditions => { :type => 'UploadedFile' }
   scope :with_types, lambda { |types| { :conditions => [ 'articles.type IN (?)', types ] } }
 
   scope :more_popular, :order => 'hits DESC'
@@ -476,14 +492,17 @@ class Article < ActiveRecord::Base
     {:conditions => ["  articles.published = ? OR
                         articles.last_changed_by_id = ? OR
                         articles.profile_id = ? OR
-                        ?",
-                        true, user.id, user.id, user.has_permission?(:view_private_content, profile)] }
+                        ? OR  articles.show_to_followers = ? AND ?",
+                        true, user.id, user.id, user.has_permission?(:view_private_content, profile),
+                        true, user.follows?(profile)]}
   end
+
 
   def display_unpublished_article_to?(user)
     user == author || allow_view_private_content?(user) || user == profile ||
     user.is_admin?(profile.environment) || user.is_admin?(profile) ||
-    article_privacy_exceptions.include?(user)
+    article_privacy_exceptions.include?(user) ||
+    (self.show_to_followers && user.follows?(profile))
   end
 
   def display_to?(user = nil)
@@ -512,7 +531,10 @@ class Article < ActiveRecord::Base
   end
 
   alias :allow_delete?  :allow_post_content?
-  alias :allow_spread?  :allow_post_content?
+
+  def allow_spread?(user = nil)
+    user && public?
+  end
 
   def allow_create?(user)
     allow_post_content?(user) || allow_publish_content?(user)
@@ -749,7 +771,7 @@ class Article < ActiveRecord::Base
     img.nil? ? '' : img.attributes['src']
   end
 
-  delegate :region, :region_id, :environment, :environment_id, :to => :profile, :allow_nil => true
+  delegate :lat, :lng, :region, :region_id, :environment, :environment_id, :to => :profile, :allow_nil => true
 
   def has_macro?
     true

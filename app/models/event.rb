@@ -19,7 +19,7 @@ class Event < Article
     maybe_add_http(self.setting[:link])
   end
 
-  xss_terminate :only => [ :body, :link, :address ], :with => 'white_list', :on => 'validation'
+  xss_terminate :only => [ :name, :body, :link, :address ], :with => 'white_list', :on => 'validation'
 
   def initialize(*args)
     super(*args)
@@ -139,6 +139,10 @@ class Event < Article
     end
 
     result
+  end
+
+  def duration
+    ((self.end_date || self.start_date) - self.start_date).to_i
   end
 
   def lead
