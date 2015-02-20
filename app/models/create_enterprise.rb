@@ -164,10 +164,6 @@ class CreateEnterprise < Task
     {:message => _('%{requestor} wants to create enterprise %{subject}.')}
   end
 
-  def reject_details
-    true
-  end
-
   def task_created_message
     _('Your request for registering enterprise "%{enterprise}" at %{environment} was just received. It will be reviewed by the validator organization of your choice, according to its methods and criteria.
 

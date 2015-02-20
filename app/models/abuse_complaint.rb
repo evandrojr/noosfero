@@ -40,10 +40,6 @@ class AbuseComplaint < Task
     true
   end
 
-  def reject_details
-    true
-  end
-
   def icon
     {:type => :profile_image, :profile => reported, :url => reported.url}
   end
