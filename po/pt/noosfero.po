@@ -934,7 +934,7 @@ msgid ""
 "User \"%{user}\" just requested to register. You have to approve or reject "
 "it through the \"Pending Validations\" section in your control panel.\n"
 msgstr ""
-"O usuário \"%{user}\" requisitou a criação da comunidade %{community}. Você "
+"O usuário \"%{user}\" requisitou o registro no ambiente. Você "
 "tem que aprová-lo ou rejeitá-lo através da seção \"Validações Pendentes\" no "
 "seu painel de controle.\n"
 
