@@ -46,6 +46,7 @@ class SerproIntegrationPlugin::GitlabIntegration
       @client.add_group_member(group.id, user.id, 40)
     rescue Gitlab::Error::Conflict => e
       #already member
+      Rails.logger.info e.to_s
     end
     user
   end
