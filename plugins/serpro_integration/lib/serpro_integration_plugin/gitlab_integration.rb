@@ -10,7 +10,7 @@ class SerproIntegrationPlugin::GitlabIntegration
 
   def create_group(group_name)
     #FIXME find group by name
-    group = @client.groups.select {|group| group.name == group_name}.first
+    group = @client.groups(:search => group_name).select {|group| group.name == group_name}.first
     group ||= @client.create_group(group_name, group_name)
     @group = group
   end
@@ -46,6 +46,7 @@ class SerproIntegrationPlugin::GitlabIntegration
       @client.add_group_member(group.id, user.id, 40)
     rescue Gitlab::Error::Conflict => e
       #already member
+      Rails.logger.info e.to_s
     end
     user
   end
