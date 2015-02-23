@@ -14,6 +14,7 @@ class EmailArticlePluginMyprofileController < MyProfileController
 
   class Sender < ActionMailer::Base
     def content(article)
+      sender = Person.find(article.author_id)
       members = article.profile.members
       emails = []
       members.each{ |m|
@@ -22,7 +23,7 @@ class EmailArticlePluginMyprofileController < MyProfileController
       mail(
         content_type: 'text/html',
         to: emails,
-        from: "#{article.author.user.name} <#{article.author.user.email}>",
+        from: "#{article.author_name} <#{sender.contact_email}>",
         reply_to: article.author.user.email,
         subject: "[Artigo] " + article.title,
         body: set_absolute_path(article.body, article.environment)

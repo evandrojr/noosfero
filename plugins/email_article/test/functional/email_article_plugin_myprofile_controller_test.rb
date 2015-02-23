@@ -14,7 +14,9 @@ class EmailArticlePluginMyprofileControllerTest < ActionController::TestCase
     @user = create_user('testinguser')
     login_as(@user.login)
     @profile.add_admin(@user.person)
-    @article = @profile.articles.create!(:name => 'a test article', :last_changed_by => @user.person)
+    @article = @profile.articles.create!(:name => 'a test article')
+    @article.author = @user.person
+    puts "---->" + @article.author_id.to_yaml
     @article.save
     get :send_email, :profile => @profile.identifier, :id => @article.id
     assert_response :success
@@ -24,16 +26,22 @@ class EmailArticlePluginMyprofileControllerTest < ActionController::TestCase
     @profile = Community.create!(:name => 'Another community', :identifier => 'another-community')
     @user = create_user('user-out-of-the-community')
     login_as(@user.login)
-    @article = @profile.articles.create!(:name => 'a test article', :last_changed_by => @user.person)
+    @article = @profile.articles.create!(:name => 'a test article')
+    @article.author = @user.person
     @article.save
     get :send_email, :profile => @profile.identifier, :id => @article.id
     assert_response 403
   end
 
+  should 'show button at article_toolbar_extra_buttons' do
+    @profile = Community.create!(:name => 'Another community', :identifier => 'another-community')
+    @user = create_user('user-out-of-the-community')
+    login_as(@user.login)
+    @article = @profile.articles.create!(:name => 'a test article')
+    @article.author = @user.person
+    @article.save
+    ep = EmailArticlePlugin.new
+    ep.article_toolbar_extra_buttons.call
+  end
+
 end
-
-
-
-
-
-
