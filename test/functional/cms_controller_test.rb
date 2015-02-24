@@ -638,7 +638,7 @@ class CmsControllerTest < ActionController::TestCase
 
   should 'display OK button on why_categorize popup' do
     get :why_categorize, :profile => profile.identifier
-    assert_tag :tag => 'a', :attributes => { :rel => 'deactivate'} # lightbox close button
+    assert_tag :tag => 'a', :attributes => { :rel => 'deactivate'} # modal close button
   end
 
   should 'display published option' do
@@ -663,8 +663,8 @@ class CmsControllerTest < ActionController::TestCase
   should 'be able to add image with alignment' do
     post :new, :type => 'TinyMceArticle', :profile => profile.identifier, :article => { :name => 'image-alignment', :body => "the text of the article with image <img src='#' align='right'/> right align..." }
     saved = TinyMceArticle.find_by_name('image-alignment')
-    assert_match /<img.*src="#".*\/>/, saved.body
-    assert_match /<img.*align="right".*\/>/, saved.body
+    assert_match /<img.*src="#".*>/, saved.body
+    assert_match /<img.*align="right".*>/, saved.body
   end
 
   should 'be able to add image with alignment when textile' do
@@ -1438,6 +1438,9 @@ class CmsControllerTest < ActionController::TestCase
   end
 
   should 'article language should be selected' do
+    e = Environment.default
+    e.languages = ['ru']
+    e.save
     textile = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'textile', :language => 'ru')
     get :edit, :profile => @profile.identifier, :id => textile.id
     assert_tag :option, :attributes => { :selected => 'selected', :value => 'ru' }, :parent => {
@@ -1445,6 +1448,9 @@ class CmsControllerTest < ActionController::TestCase
   end
 
   should 'list possible languages and include blank option' do
+    e = Environment.default
+    e.languages = ['en', 'pt','fr','hy','de', 'ru', 'es', 'eo', 'it']
+    e.save
     get :new, :profile => @profile.identifier, :type => 'TextileArticle'
     assert_equal Noosfero.locales.invert, assigns(:locales)
     assert_tag :option, :attributes => { :value => '' }, :parent => {

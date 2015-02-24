@@ -101,6 +101,7 @@ ActiveRecord::Schema.define(:version => 20150122165042) do
   end
 
   add_index "article_versions", ["article_id"], :name => "index_article_versions_on_article_id"
+  add_index "article_versions", ["parent_id"], :name => "index_article_versions_on_parent_id"
   add_index "article_versions", ["path", "profile_id"], :name => "index_article_versions_on_path_and_profile_id"
   add_index "article_versions", ["path"], :name => "index_article_versions_on_path"
   add_index "article_versions", ["published_at", "id"], :name => "index_article_versions_on_published_at_and_id"
@@ -217,7 +218,10 @@ ActiveRecord::Schema.define(:version => 20150122165042) do
     t.string  "acronym"
     t.string  "abbreviation"
     t.string  "display_color",   :limit => 6
+    t.text    "ancestry"
   end
+
+  add_index "categories", ["parent_id"], :name => "index_categories_on_parent_id"
 
   create_table "categories_profiles", :id => false, :force => true do |t|
     t.integer "profile_id"
@@ -237,6 +241,14 @@ ActiveRecord::Schema.define(:version => 20150122165042) do
     t.datetime "updated_at"
   end
 
+  create_table "chat_messages", :force => true do |t|
+    t.integer  "to_id"
+    t.integer  "from_id"
+    t.string   "body"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
   create_table "comments", :force => true do |t|
     t.string   "title"
     t.text     "body"
@@ -251,6 +263,8 @@ ActiveRecord::Schema.define(:version => 20150122165042) do
     t.string   "source_type"
     t.string   "user_agent"
     t.string   "referrer"
+    t.text     "setting"
+    t.integer  "paragraph_id"
   end
 
   add_index "comments", ["source_id", "spam"], :name => "index_comments_on_source_id_and_spam"
@@ -356,6 +370,8 @@ ActiveRecord::Schema.define(:version => 20150122165042) do
     t.integer "height"
     t.boolean "thumbnails_processed", :default => false
   end
+
+  add_index "images", ["parent_id"], :name => "index_images_on_parent_id"
 
   create_table "inputs", :force => true do |t|
     t.integer  "product_id",                                    :null => false
@@ -650,6 +666,7 @@ ActiveRecord::Schema.define(:version => 20150122165042) do
   end
 
   add_index "tags", ["name"], :name => "index_tags_on_name", :unique => true
+  add_index "tags", ["parent_id"], :name => "index_tags_on_parent_id"
 
   create_table "tasks", :force => true do |t|
     t.text     "data"
@@ -689,6 +706,8 @@ ActiveRecord::Schema.define(:version => 20150122165042) do
     t.string  "thumbnail"
   end
 
+  add_index "thumbnails", ["parent_id"], :name => "index_thumbnails_on_parent_id"
+
   create_table "units", :force => true do |t|
     t.string  "singular",       :null => false
     t.string  "plural",         :null => false
@@ -699,23 +718,26 @@ ActiveRecord::Schema.define(:version => 20150122165042) do
   create_table "users", :force => true do |t|
     t.string   "login"
     t.string   "email"
-    t.string   "crypted_password",          :limit => 40
-    t.string   "salt",                      :limit => 40
+    t.string   "crypted_password",           :limit => 40
+    t.string   "salt",                       :limit => 40
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "remember_token"
     t.datetime "remember_token_expires_at"
     t.text     "terms_of_use"
-    t.string   "terms_accepted",            :limit => 1
+    t.string   "terms_accepted",             :limit => 1
     t.integer  "environment_id"
     t.string   "password_type"
-    t.boolean  "enable_email",                            :default => false
-    t.string   "last_chat_status",                        :default => ""
-    t.string   "chat_status",                             :default => ""
+    t.boolean  "enable_email",                             :default => false
+    t.string   "last_chat_status",                         :default => ""
+    t.string   "chat_status",                              :default => ""
     t.datetime "chat_status_at"
-    t.string   "activation_code",           :limit => 40
+    t.string   "activation_code",            :limit => 40
     t.datetime "activated_at"
     t.string   "return_to"
+    t.datetime "last_login_at"
+    t.string   "private_token"
+    t.datetime "private_token_generated_at"
   end
 
   create_table "validation_infos", :force => true do |t|
