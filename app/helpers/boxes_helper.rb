@@ -191,7 +191,7 @@ module BoxesHelper
         "before-block-#{block.id}"
       end
     if block.nil? or modifiable?(block)
-      content_tag('div', '&nbsp;', :id => id, :class => 'block-target' ) + drop_receiving_element(id, :url => { :action => 'move_block', :target => id }, :accept => box.acceptable_blocks, :hoverclass => 'block-target-hover')
+      content_tag('div', '&nbsp;', :id => id, :class => 'block-target' ) + drop_receiving_element(id, :url => { :action => 'add_or_move_block', :target => id }, :accept => box.acceptable_blocks, :hoverclass => 'block-target-hover')
     else
       ""
     end
@@ -224,9 +224,9 @@ module BoxesHelper
       # FIXME too much hardcoded stuff
       if holder.layout_template == 'default'
         if block.box.position == 2 # area 2, left side => move to right side
-          buttons << icon_button('right', _('Move to the opposite side'), { :action => 'move_block', :target => 'end-of-box-' + holder.boxes[2].id.to_s, :id => block.id }, :method => 'post' )
+          buttons << icon_button('right', _('Move to the opposite side'), { :action => 'add_or_move_block', :target => 'end-of-box-' + holder.boxes[2].id.to_s, :id => block.id }, :method => 'post' )
         elsif block.box.position == 3 # area 3, right side => move to left side
-          buttons << icon_button('left', _('Move to the opposite side'), { :action => 'move_block', :target => 'end-of-box-' + holder.boxes[1].id.to_s, :id => block.id }, :method => 'post' )
+          buttons << icon_button('left', _('Move to the opposite side'), { :action => 'add_or_move_block', :target => 'end-of-box-' + holder.boxes[1].id.to_s, :id => block.id }, :method => 'post' )
         end
       end
 
