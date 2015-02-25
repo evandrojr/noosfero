@@ -102,7 +102,6 @@ class User < ActiveRecord::Base
   validates_length_of       :email,    :within => 3..100, :if => (lambda {|user| !user.email.blank?})
   validates_uniqueness_of   :login, :email, :case_sensitive => false, :scope => :environment_id
   before_save :encrypt_password
-  before_save :normalize_email, if: proc{ |u| u.email.present? }
   validates_format_of :email, :with => Noosfero::Constants::EMAIL_FORMAT, :if => (lambda {|user| !user.email.blank?})
 
   validates_inclusion_of :terms_accepted, :in => [ '1' ], :if => lambda { |u| ! u.terms_of_use.blank? }, :message => N_('{fn} must be checked in order to signup.').fix_i18n
@@ -349,11 +348,6 @@ class User < ActiveRecord::Base
   end
 
   protected
-
-    def normalize_email
-      self.email = self.email.squish.downcase
-    end
-
     # before filter
     def encrypt_password
       return if password.blank?
