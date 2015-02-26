@@ -102,6 +102,7 @@ class User < ActiveRecord::Base
   validates_length_of       :email,    :within => 3..100, :if => (lambda {|user| !user.email.blank?})
   validates_uniqueness_of   :login, :email, :case_sensitive => false, :scope => :environment_id
   before_save :encrypt_password
+  before_save :normalize_email, if: proc{ |u| u.email.present? }
   validates_format_of :email, :with => Noosfero::Constants::EMAIL_FORMAT, :if => (lambda {|user| !user.email.blank?})
 
   validates_inclusion_of :terms_accepted, :in => [ '1' ], :if => lambda { |u| ! u.terms_of_use.blank? }, :message => N_('{fn} must be checked in order to signup.').fix_i18n
@@ -116,18 +117,6 @@ class User < ActiveRecord::Base
 
   def register_login
     self.update_attribute :last_login_at, Time.now
-  end
-
-  #FIXME make this test
-  def generate_private_token!
-    self.private_token = SecureRandom.hex
-    self.private_token_generated_at = DateTime.now
-    save(:validate => false)
-  end
-
-  #FIXME make this test
-  def private_token_expired?
-    self.generate_private_token! if self.private_token.nil? || (self.private_token_generated_at + 2.weeks < DateTime.now)
   end
 
   # Activates the user in the database.
@@ -347,7 +336,25 @@ class User < ActiveRecord::Base
     @is_password_required = false
   end
 
+  #FIXME make this test
+  def generate_private_token!
+    self.private_token = SecureRandom.hex
+    self.private_token_generated_at = DateTime.now
+    save(:validate => false)
+  end
+
+  #FIXME make this test
+  def private_token_expired?
+    self.generate_private_token! if self.private_token.nil? || (self.private_token_generated_at + 2.weeks < DateTime.now)
+  end
+
+
   protected
+
+    def normalize_email
+      self.email = self.email.squish.downcase
+    end
+
     # before filter
     def encrypt_password
       return if password.blank?
@@ -375,6 +382,6 @@ class User < ActiveRecord::Base
 
     def delay_activation_check
       return if person.is_template?
-      Delayed::Job.enqueue(UserActivationJob.new(self.id), {:priority => 0, :run_at => 72.hours.from_now})
+      Delayed::Job.enqueue(UserActivationJob.new(self.id), {:priority => 0, :run_at => (NOOSFERO_CONF['hours_until_user_activation_check'] || 72).hours.from_now})
     end
 end
