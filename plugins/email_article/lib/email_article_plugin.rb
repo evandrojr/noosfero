@@ -8,16 +8,12 @@ class EmailArticlePlugin < Noosfero::Plugin
     _("A plugin that emails an article to the members of the community")
   end
 
-  def page
-    @page
-  end
-
   def article_toolbar_extra_buttons
     label = _("Send article to members")
     htmlclass = _("button with-text icon-menu-mail")
     title = _("Email article to all community members")
     proc do
-      if  !profile.blank? and !user.blank? and user.is_admin?(profile) and page.kind_of?(TextArticle)
+      if  !profile.blank? and !user.blank? and user.is_admin?(profile) and @page.kind_of?(TextArticle)
         link_to_remote(
             label,
             {

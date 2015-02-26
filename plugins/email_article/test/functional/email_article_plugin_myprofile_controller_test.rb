@@ -46,9 +46,10 @@ class EmailArticlePluginMyprofileControllerTest < ActionController::TestCase
     send_mail_button = @plugin.article_toolbar_extra_buttons
     self.stubs(:profile).returns(@profile)
     self.stubs(:user).returns(@user)
-    self.stubs(:page).returns(@article)
+#    self.stubs(:page).returns(@article)
     @user.stubs(:is_admin?).returns(true)
     self.stubs(:link_to_remote).returns("send mail button")
+#   @plugin.class_eval{@page=2}
     html = self.instance_eval(&send_mail_button)
     assert_equal html, "send mail button"
   end  
