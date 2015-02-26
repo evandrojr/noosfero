@@ -3,7 +3,6 @@ ENV["RAILS_ENV"] = "test"
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'rails/test_help'
 require 'mocha'
-require 'hpricot'
 
 require 'noosfero/test'
 require 'authenticated_test_helper'
@@ -141,9 +140,18 @@ class ActiveSupport::TestCase
   end
 
   # For models that render views (blocks, articles, ...)
-  def render(*args)
-    view_paths = @explicit_view_paths || ActionController::Base.view_paths
-    ActionView::Base.new(view_paths, {}).render(*args)
+  def self.action_view
+    @action_view ||= begin
+      view_paths = ActionController::Base.view_paths
+      action_view = ActionView::Base.new view_paths, {}
+      # for using Noosfero helpers inside render calls
+      action_view.extend ApplicationHelper
+      action_view
+    end
+  end
+
+  def render *args
+    self.class.action_view.render(*args)
   end
 
   private
