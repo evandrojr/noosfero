@@ -16,7 +16,6 @@ class EmailArticlePluginMyprofileControllerTest < ActionController::TestCase
     @profile.add_admin(@user.person)
     @article = @profile.articles.create!(:name => 'a test article')
     @article.author = @user.person
-    puts "---->" + @article.author_id.to_yaml
     @article.save
     get :send_email, :profile => @profile.identifier, :id => @article.id
     assert_response :success
@@ -37,11 +36,21 @@ class EmailArticlePluginMyprofileControllerTest < ActionController::TestCase
     @profile = Community.create!(:name => 'Another community', :identifier => 'another-community')
     @user = create_user('user-out-of-the-community')
     login_as(@user.login)
-    @article = @profile.articles.create!(:name => 'a test article')
+    @article = TextArticle.new
+    @article.name = 'a test article'
+    @article.profile = @profile
     @article.author = @user.person
     @article.save
-    ep = EmailArticlePlugin.new
-    ep.article_toolbar_extra_buttons.call
-  end
-
+    @plugin = EmailArticlePlugin.new
+    @plugin.stubs(:link_to_remote).returns(true)
+    send_mail_button = @plugin.article_toolbar_extra_buttons
+    self.stubs(:profile).returns(@profile)
+    self.stubs(:user).returns(@user)
+    self.stubs(:page).returns(@article)
+    @user.stubs(:is_admin?).returns(true)
+    self.stubs(:link_to_remote).returns("send mail button")
+    html = self.instance_eval(&send_mail_button)
+    assert_equal html, "send mail button"
+  end  
+  
 end
