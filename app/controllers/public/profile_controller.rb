@@ -353,6 +353,7 @@ class ProfileController < PublicController
 
   def send_mail
     @mailing = profile.mailings.build(params[:mailing])
+    ra params[:mailing]
     if request.post?
       @mailing.locale = locale
       @mailing.person = user
