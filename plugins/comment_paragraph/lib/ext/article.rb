@@ -21,12 +21,12 @@ class Article
   def comment_paragraph_plugin_parse_html
     comment_paragraph_plugin_set_initial_value unless persisted?
     return unless comment_paragraph_plugin_activated?
-
     if body && (body_changed? || setting_changed?(:comment_paragraph_plugin_activate))
       parsed_paragraphs = []
       updated = body_changed? ? body_change[1] : body
-      doc = Hpricot(updated)
-      doc.search("/*").each do |paragraph|
+      doc =  Nokogiri::HTML(updated).css('body')
+      
+      doc.children.each do |paragraph|
         if paragraph.to_html =~ /^<div(.*)paragraph_comment(.*)$/ || paragraph.to_html =~ /^<p>\W<\/p>$/
           parsed_paragraphs << paragraph.to_html
         else

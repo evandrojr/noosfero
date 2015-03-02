@@ -32,12 +32,14 @@ class AllowCommentTest < ActiveSupport::TestCase
   end
 
   should 'not parse contents outside content viewer controller' do
+    article = fast_create(TextArticle, :profile_id => profile.id, :body => 'inner')
     content = macro.parse({:paragraph_uuid => comment.paragraph_uuid}, article.body, article)
     controller.expects(:kind_of?).with(ContentViewerController).returns(false)
     assert_equal 'inner', instance_eval(&content)
   end
 
   should 'not parse contents if comment_paragraph is not activated' do
+    article = fast_create(TextArticle, :profile_id => profile.id, :body => 'inner')
     article.expects(:comment_paragraph_plugin_activated?).returns(false)
     content = macro.parse({:paragraph_uuid => comment.paragraph_uuid}, article.body, article)
     controller.expects(:kind_of?).with(ContentViewerController).returns(true)
