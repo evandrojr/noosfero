@@ -6,10 +6,14 @@
     <div class="activation-mode">
       <h4><%= _('Activation Mode') %></h4>
       <div class="auto">
-        <%= f.radio_button(:activation_mode, 'auto') %> <%= _('Auto') %>
+        <%= f.radio_button(:activation_mode, 'auto') %>
+        <span class="name"><strong><%= _('Auto') %></strong></span>
+        <span class="detail"><%= _('(all text articles will be activated by default)') %></span>
       </div>
-      <div>
-        <%= f.radio_button(:activation_mode, 'manual') %> <%= _('Manual') %>
+      <div class="manual">
+        <%= f.radio_button(:activation_mode, 'manual') %>
+        <span class="name"><strong><%= _('Manual') %></strong></span>
+        <span class="detail"><%= _('(click on "Activate Comment Paragraph" )') %></span>
       </div>
     </div>
 

@@ -1,5 +1,5 @@
-require File.dirname(__FILE__) + '/../../../../test/test_helper'
-require File.dirname(__FILE__) + '/../../controllers/comment_paragraph_plugin_admin_controller'
+require_relative '../../../../test/test_helper'
+require_relative '../../controllers/comment_paragraph_plugin_admin_controller'
 
 # Re-raise errors caught by the controller.
 class CommentParagraphPluginAdminController; def rescue_action(e) raise e end; end
@@ -22,10 +22,10 @@ class CommentParagraphPluginAdminControllerTest < ActionController::TestCase
   end
 
   should 'update comment paragraph plugin settings' do
-    assert_not_equal 'manual', plugin_settings.get_setting(:activation_mode)
-    post :index, :settings => { :activation_mode => 'manual' }
+    assert_not_equal 'auto', plugin_settings.get_setting(:activation_mode)
+    post :index, :settings => { :activation_mode => 'auto' }
     environment.reload
-    assert_equal 'manual', plugin_settings.get_setting(:activation_mode)
+    assert_equal 'auto', plugin_settings.get_setting(:activation_mode)
   end
 
   should 'get article types previously selected' do

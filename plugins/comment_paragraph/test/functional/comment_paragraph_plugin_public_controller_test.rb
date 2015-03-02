@@ -1,5 +1,5 @@
-require File.dirname(__FILE__) + '/../test_helper'
-require File.dirname(__FILE__) + '/../../controllers/public/comment_paragraph_plugin_public_controller'
+require_relative '../test_helper'
+require_relative '../../controllers/public/comment_paragraph_plugin_public_controller'
 
 
 # Re-raise errors caught by the controller.
@@ -9,8 +9,7 @@ class CommentParagraphPluginPublicControllerTest < ActionController::TestCase
 
   def setup
     @profile = create_user('testuser').person
-    @article = profile.articles.build(:name => 'test')
-    @article.save!
+    @article = profile.articles.create!(:name => 'test')
   end
   attr_reader :article, :profile
 
