@@ -3,7 +3,7 @@ class Scrap < ActiveRecord::Base
   attr_accessible :content, :sender_id, :receiver_id, :scrap_id
 
   SEARCHABLE_FIELDS = {
-    :content => 1,
+    :content => {:label => _('Content'), :weight => 1},
   }
   validates_presence_of :content
   validates_presence_of :sender_id, :receiver_id
@@ -25,7 +25,7 @@ class Scrap < ActiveRecord::Base
 
   after_create do |scrap|
     scrap.root.update_attribute('updated_at', DateTime.now) unless scrap.root.nil?
-    Scrap::Notifier.notification(scrap).deliver if scrap.send_notification?
+    ScrapNotifier.notification(scrap).deliver if scrap.send_notification?
   end
 
   before_validation :strip_all_html_tags

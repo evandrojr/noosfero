@@ -1,17 +1,17 @@
 class Product < ActiveRecord::Base
 
   SEARCHABLE_FIELDS = {
-    :name => 10,
-    :description => 1,
+    :name => {:label => _('Name'), :weight => 10},
+    :description => {:label => _('Description'), :weight => 1},
   }
 
-  SEARCH_FILTERS = %w[
-    more_recent
-  ]
+  SEARCH_FILTERS = {
+    :order => %w[more_recent],
+    :display => %w[full map]
+  }
 
-  SEARCH_DISPLAYS = %w[map full]
-
-  attr_accessible :name, :product_category, :highlighted, :price, :enterprise, :image_builder, :description, :available, :qualifiers, :unit_id, :discount, :inputs, :qualifiers_list
+  attr_accessible :name, :product_category, :profile, :profile_id, :enterprise,
+    :highlighted, :price, :image_builder, :description, :available, :qualifiers, :unit_id, :discount, :inputs, :qualifiers_list
 
   def self.default_search_display
     'full'
@@ -237,7 +237,7 @@ class Product < ActiveRecord::Base
 
   def percentage_from_solidarity_economy
     se_i = t_i = 0
-    self.inputs(true).each{ |i| t_i += 1; se_i += 1 if i.is_from_solidarity_economy }
+    self.inputs.each{ |i| t_i += 1; se_i += 1 if i.is_from_solidarity_economy }
     t_i = 1 if t_i == 0 # avoid division by 0
     p = case (se_i.to_f/t_i)*100
         when 0 then [0, '']

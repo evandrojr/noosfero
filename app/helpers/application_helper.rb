@@ -8,11 +8,7 @@ module ApplicationHelper
 
   include PermissionNameHelper
 
-  include LightboxHelper
-
-  include ThickboxHelper
-
-  include ColorboxHelper
+  include ModalHelper
 
   include BoxesHelper
 
@@ -45,6 +41,8 @@ module ApplicationHelper
   include TokenHelper
 
   include CatalogHelper
+
+  include PluginsHelper
 
   def locale
     (@page && !@page.language.blank?) ? @page.language : FastGettext.locale
@@ -594,7 +592,7 @@ module ApplicationHelper
     extra_info = extra_info.nil? ? '' : content_tag( 'span', extra_info, :class => 'extra_info' )
     links = links_for_balloon(profile)
     content_tag('div', content_tag(tag,
-                                   (environment.enabled?(:show_balloon_with_profile_links_when_clicked) ? link_to( content_tag( 'span', _('Profile links')), '#', :onclick => "toggleSubmenu(this, '#{profile.short_name}', #{CGI::escapeHTML(links.to_json)}); return false", :class => "menu-submenu-trigger #{trigger_class}", :url => url) : "") +
+                                   (environment.enabled?(:show_balloon_with_profile_links_when_clicked) ? popover_menu(_('Profile links'),profile.short_name,links,{:class => trigger_class, :url => url}) : "") +
     link_to(
       content_tag( 'span', profile_image( profile, size ), :class => 'profile-image' ) +
       content_tag( 'span', h(name), :class => ( profile.class == Person ? 'fn' : 'org' ) ) +
@@ -604,6 +602,14 @@ module ApplicationHelper
       :help => _('Click on this icon to go to the <b>%s</b>\'s home page') % profile.name,
       :title => profile.name ),
       :class => 'vcard'), :class => 'common-profile-list-block')
+  end
+
+  def popover_menu(title,menu_title,links,html_options={})
+    html_options[:class] = "" unless html_options[:class]
+    html_options[:class] << " menu-submenu-trigger"
+    html_options[:onclick] = "toggleSubmenu(this, '#{menu_title}', #{CGI::escapeHTML(links.to_json)}); return false"
+
+    link_to(content_tag(:span, title), '#', html_options)
   end
 
   def gravatar_default
@@ -649,8 +655,8 @@ module ApplicationHelper
       ' onfocus="if(this.value==\''+s+'\'){this.value=\'\'} this.form.className=\'focus-in\'"'+
       ' onblur="if(/^\s*$/.test(this.value)){this.value=\''+s+'\'} this.form.className=\'focus-out\'">'+
       '</form>'
-    else #opt == 'lightbox_link' is default
-      lightbox_link_to '<span class="icon-menu-search"></span>'+ _('Search'), {
+    else
+      modal_link_to '<span class="icon-menu-search"></span>'+ _('Search'), {
                        :controller => 'search',
                        :action => 'popup',
                        :category_path => (@category ? @category.explode_path : nil)},
@@ -720,7 +726,7 @@ module ApplicationHelper
   class NoosferoFormBuilder < ActionView::Helpers::FormBuilder
     extend ActionView::Helpers::TagHelper
 
-    def self.output_field(text, field_html, field_id = nil)
+    def self.output_field(text, field_html, field_id = nil, options = {})
       # try to guess an id if none given
       if field_id.nil?
         field_html =~ /id=['"]([^'"]*)['"]/
@@ -862,8 +868,9 @@ module ApplicationHelper
   end
 
   def base_url
-    environment.top_url
+    environment.top_url(request.scheme)
   end
+  alias :top_url :base_url
 
   def helper_for_article(article)
     article_helper = ActionView::Base.new
@@ -1047,11 +1054,11 @@ module ApplicationHelper
       {s_('contents|Most commented') => {:href => url_for({:controller => 'search', :action => 'contents', :filter => 'more_comments'})}}
     ]
     if logged_in?
-      links.push(_('New content') => colorbox_options({:href => url_for({:controller => 'cms', :action => 'new', :profile => current_user.login, :cms => true})}))
+      links.push(_('New content') => modal_options({:href => url_for({:controller => 'cms', :action => 'new', :profile => current_user.login, :cms => true})}))
     end
 
     link_to(content_tag(:span, _('Contents'), :class => 'icon-menu-articles'), {:controller => "search", :action => 'contents', :category_path => nil}, :id => 'submenu-contents') +
-    link_to(content_tag(:span, _('Contents menu')), '#', :onclick => "toggleSubmenu(this,'',#{CGI::escapeHTML(links.to_json)}); return false", :class => 'menu-submenu-trigger up', :id => 'submenu-contents-trigger')
+    popover_menu(_('Contents menu'),'',links,:class => 'up', :id => 'submenu-contents-trigger')
   end
   alias :browse_contents_menu :search_contents_menu
 
@@ -1067,7 +1074,7 @@ module ApplicationHelper
      end
 
     link_to(content_tag(:span, _('People'), :class => 'icon-menu-people'), {:controller => "search", :action => 'people', :category_path => ''}, :id => 'submenu-people') +
-    link_to(content_tag(:span, _('People menu')), '#', :onclick => "toggleSubmenu(this,'',#{CGI::escapeHTML(links.to_json)}); return false", :class => 'menu-submenu-trigger up', :id => 'submenu-people-trigger')
+    popover_menu(_('People menu'),'',links,:class => 'up', :id => 'submenu-people-trigger')
   end
   alias :browse_people_menu :search_people_menu
 
@@ -1083,7 +1090,7 @@ module ApplicationHelper
      end
 
     link_to(content_tag(:span, _('Communities'), :class => 'icon-menu-community'), {:controller => "search", :action => 'communities'}, :id => 'submenu-communities') +
-    link_to(content_tag(:span, _('Communities menu')), '#', :onclick => "toggleSubmenu(this,'',#{CGI::escapeHTML(links.to_json)}); return false", :class => 'menu-submenu-trigger up', :id => 'submenu-communities-trigger')
+    popover_menu(_('Communities menu'),'',links,:class => 'up', :id => 'submenu-communities-trigger')
   end
   alias :browse_communities_menu :search_communities_menu
 
@@ -1306,8 +1313,19 @@ module ApplicationHelper
     end
   end
 
-  def remove_content_button(action)
-    @plugins.dispatch("content_remove_#{action.to_s}", @page).include?(true)
+  def content_remove_spread(content)
+    !content.public? || content.folder? || (profile == user && user.communities.blank? && !environment.portal_enabled)
+  end
+
+  def remove_content_button(action, content)
+    method_name = "content_remove_#{action.to_s}"
+    plugin_condition = @plugins.dispatch(method_name, content).include?(true)
+    begin
+      core_condition = self.send(method_name, content)
+    rescue NoMethodError
+      core_condition = false
+    end
+    core_condition || plugin_condition
   end
 
   def template_options(kind, field_name)
@@ -1384,16 +1402,16 @@ module ApplicationHelper
   end
 
   def convert_macro(html, source)
-    doc = Hpricot(html)
+    doc = Nokogiri::HTML.fragment html
     #TODO This way is more efficient but do not support macro inside of
     #     macro. You must parse them from the inside-out in order to enable
     #     that.
-    doc.search('.macro').each do |macro|
+    doc.css('.macro').each do |macro|
       macro_name = macro['data-macro']
       result = @plugins.parse_macro(macro_name, macro, source)
       macro.inner_html = result.kind_of?(Proc) ? self.instance_exec(&result) : result
     end
-    doc.html
+    doc.to_html
   end
 
   def default_folder_for_image_upload(profile)
@@ -1408,6 +1426,43 @@ module ApplicationHelper
 
   def display_article_versions(article, version = nil)
     content_tag('ul', article.versions.map {|v| link_to("r#{v.version}", @page.url.merge(:version => v.version))})
+  end
+
+  def search_input_with_suggestions(name, asset, default, options = {})
+    text_field_tag name, default, options.merge({:class => 'search-input-with-suggestions', 'data-asset' => asset})
+  end
+
+  def profile_suggestion_profile_connections(suggestion)
+    profiles = suggestion.profile_connections.first(4).map do |profile|
+      link_to(profile_image(profile, :icon, :title => profile.name), profile.url, :class => 'profile-suggestion-connection-icon')
+    end
+
+    controller_target = suggestion.suggestion_type == 'Person' ? :friends : :memberships
+    profiles << link_to("<big> +#{suggestion.profile_connections.count - 4}</big>", :controller => controller_target, :action => :connections, :id => suggestion.suggestion_id) if suggestion.profile_connections.count > 4
+
+    if profiles.present?
+      content_tag(:div, profiles.join , :class => 'profile-connections')
+    else
+      ''
+    end
+  end
+
+  def profile_suggestion_tag_connections(suggestion)
+    tags = suggestion.tag_connections.first(4).map do |tag|
+      tag.name + ', '
+    end
+    last_tag = tags.pop
+    tags << last_tag.strip.chop if last_tag.present?
+    title = tags.join
+
+    controller_target = suggestion.suggestion_type == 'Person' ? :friends : :memberships
+    tags << ' ' + link_to('...', {:controller => controller_target, :action => :connections, :id => suggestion.suggestion_id}, :class => 'more-tag-connections', :title => _('See all connections')) if suggestion.tag_connections.count > 4
+
+    if tags.present?
+      content_tag(:div, tags.join, :class => 'tag-connections', :title => title)
+    else
+      ''
+    end
   end
 
   def labelled_colorpicker_field(human_name, object_name, method, options = {})

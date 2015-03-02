@@ -28,6 +28,7 @@ class ApplicationController < ActionController::Base
       unless environment.access_control_allow_methods.blank?
         response.headers["Access-Control-Allow-Methods"] = environment.access_control_allow_methods
       end
+      response.headers["Access-Control-Allow-Credentials"] = 'true'
     elsif environment.restrict_to_access_control_origins
       render_access_denied _('Origin not in allowed.')
     end
@@ -59,15 +60,7 @@ class ApplicationController < ActionController::Base
   helper :document
   helper :language
 
-  def self.no_design_blocks
-    @no_design_blocks = true
-  end
-  def self.uses_design_blocks?
-    !@no_design_blocks
-  end
-  def uses_design_blocks?
-    !@no_design_blocks && self.class.uses_design_blocks?
-  end
+  include DesignHelper
 
   # Be sure to include AuthenticationSystem in Application Controller instead
   include AuthenticatedSystem
@@ -183,21 +176,19 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def find_by_contents(asset, scope, query, paginate_options={:page => 1}, options={})
-    plugins.dispatch_first(:find_by_contents, asset, scope, query, paginate_options, options) ||
-    fallback_find_by_contents(asset, scope, query, paginate_options, options)
+  include SearchTermHelper
+
+  def find_by_contents(asset, context, scope, query, paginate_options={:page => 1}, options={})
+    search = plugins.dispatch_first(:find_by_contents, asset, scope, query, paginate_options, options)
+    register_search_term(query, scope.count, search[:results].count, context, asset)
+    search
   end
 
-  private
-
-  def fallback_find_by_contents(asset, scope, query, paginate_options, options)
-    scope = scope.like_search(query) unless query.blank?
-    scope = scope.send(options[:filter]) unless options[:filter].blank?
-    {:results => scope.paginate(paginate_options)}
+  def find_suggestions(query, context, asset, options={})
+    plugins.dispatch_first(:find_suggestions, query, context, asset, options)
   end
 
   def private_environment?
     @environment.enabled?(:restrict_to_members)
   end
-
 end

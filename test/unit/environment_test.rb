@@ -1056,6 +1056,30 @@ class EnvironmentTest < ActiveSupport::TestCase
     assert_equal 4, e.news_amount_by_folder
   end
 
+  should 'have amount of highlighted news' do
+    e = Environment.default
+
+    assert_respond_to e, :highlighted_news_amount
+
+    assert_equal 2, e.highlighted_news_amount
+    e.highlighted_news_amount = 4
+    e.save!
+
+    assert_equal 4, Environment.default.highlighted_news_amount
+  end
+
+  should 'have amount of portal news' do
+    e = Environment.default
+
+    assert_respond_to e, :portal_news_amount
+
+    assert_equal 5, e.portal_news_amount
+    e.portal_news_amount = 2
+    e.save!
+
+    assert_equal 2, Environment.default.portal_news_amount
+  end
+
   should 'list tags with their counts' do
     person = fast_create(Person)
     person.articles.create!(:name => 'article 1', :tag_list => 'first-tag')
@@ -1627,4 +1651,26 @@ class EnvironmentTest < ActiveSupport::TestCase
 
     assert_equal 'Welcome to the environment', environment.signup_welcome_screen_body
   end
+
+  should 'has_license be true if there is one license in enviroment' do
+    e = fast_create(Environment)
+    fast_create(License, :name => 'Some', :environment_id => e.id)
+
+    assert e.has_license?
+  end
+
+  should 'has_license be true if there is many licenses in enviroment' do
+    e = fast_create(Environment)
+    fast_create(License, :name => 'Some', :environment_id => e.id)
+    fast_create(License, :name => 'Another', :environment_id => e.id)
+
+    assert e.has_license?
+  end
+
+  should 'has_license be false if there is no license in enviroment' do
+    e = fast_create(Environment)
+
+    assert !e.has_license?
+  end
+
 end
