@@ -47,7 +47,6 @@ class Invitation < Task
   end
 
   def self.invite(person, contacts_to_invite, message, profile)
-
     contacts_to_invite.each do |contact_to_invite|
       next if contact_to_invite == _("Firstname Lastname <friend@email.com>")
 
@@ -80,23 +79,7 @@ class Invitation < Task
       if profile.person?
         InviteFriend.create(task_args) if user.nil? || !user.person.is_a_friend?(person)
       elsif profile.community?
-
-        if person.is_admin?
-          unless user.person.is_member_of?(profile)
-
-            profile.add_member(user.person)
-
-            #Call after add member callback
-            yield user
-
-          end
-        else
-
-          InviteMember.create(task_args.merge(:community_id => profile.id)) if user.nil? || !user.person.is_member_of?(profile)
-
-          #Call after create invite member task callback
-          yield user,task_args
-        end
+        InviteMember.create(task_args.merge(:community_id => profile.id)) if user.nil? || !user.person.is_member_of?(profile)
       else
         raise NotImplementedError, 'Don\'t know how to invite people to a %s' % profile.class.to_s
       end
