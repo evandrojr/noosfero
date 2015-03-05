@@ -9,7 +9,7 @@
          of a community
     -->
     <% @members.each do |member| %>
-      <%= profile_image_link(member, :portrait, 'li', @profiles_focus.include?(member.user_id) ? {:value =>_('New'), :class => 'new-profile'}:'') %>
+      <%= profile_image_link(member) %>
     <% end %>
   </ul>
 
