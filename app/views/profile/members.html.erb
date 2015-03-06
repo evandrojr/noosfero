@@ -4,6 +4,10 @@
 
 <% cache_timeout(profile.members_cache_key(params), 4.hours) do %>
   <ul class='profile-list'>
+    <!--
+     @todo Highlight visual for invited members
+         of a community
+    -->
     <% @members.each do |member| %>
       <%= profile_image_link(member) %>
     <% end %>

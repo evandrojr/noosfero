@@ -2205,6 +2205,21 @@ a.button.disabled, input.disabled {
 .profile-list .extra_info {
   font-size: 9px;
 }
+
+/* New members of community added
+* by admin of environment feature
+* #issue 227
+*/
+.profile-list .extra_info.new-profile {
+  margin-top: 5px;
+  color: #0A0;
+  font-weight: bold;
+}
+
+span.new-profile img{
+  border-top: solid 2px #0A0;
+  margin-top: -2px;
+}
 /* ==> blocks/recent-documents-block.css <<= */
 
 #content .recent-documents-block {

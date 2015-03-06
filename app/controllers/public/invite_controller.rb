@@ -62,20 +62,36 @@ class InviteController < PublicController
     redirect_to :action => 'invite_friends'
   end
 
+  #Invite or add member without create a task
+  #if logged user is admin of environment
   def invite_registered_friend
-    contacts_to_invite = params['q'].split(',')
-    if !contacts_to_invite.empty? && request.post?
-      Delayed::Job.enqueue InvitationJob.new(user.id, contacts_to_invite, '', profile.id, nil, locale)
-      session[:notice] = _('Your invitations are being sent.')
-      if profile.person?
-        redirect_to :controller => 'profile', :action => 'friends'
-      else
-        redirect_to :controller => 'profile', :action => 'members'
-      end
-    else
+
+    if !params['q'].present? || !request.post?
+
       redirect_to :action => 'invite_friends'
       session[:notice] = _('Please enter a valid profile.')
+
+      return
     end
+
+    contacts_to_invite = params['q'].split(',')
+
+    if user.is_admin? && profile.community?
+
+      Delayed::Job.enqueue AddMembersJob.new contacts_to_invite, profile.id, locale
+
+      session[:notice] = _('This friends was added!')
+    else
+      Delayed::Job.enqueue InvitationJob.new(user.id, contacts_to_invite, '', profile.id, nil, locale)
+      session[:notice] = _('Your invitations are being sent.')
+    end
+
+    if profile.person?
+      redirect_to :controller => 'profile', :action => 'friends'
+    else
+      redirect_to :controller => 'profile', :action => 'members'
+    end
+
   end
 
   def search
