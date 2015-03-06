@@ -1,3 +1,17 @@
+#content #article-toolbar .icon-toggle_comment_paragraph {
+  top: -71px;
+  border: 0;
+  background-color: transparent;
+  color: gray;
+}
+#content #article-toolbar .icon-toggle_comment_paragraph:hover {
+  color: black;
+}
+
+.icon-toggle_comment_paragraph{
+  background-image: url('/plugins/comment_paragraph/images/internet-group-chat.png');
+}
+
 #comment-bubble.visible {
   visibility: visible;
 }

@@ -50,6 +50,8 @@
     <%#*Adds extra buttons to the toolbar%>
     <%= @plugins.dispatch(:article_extra_toolbar_buttons, @page).collect { |content| instance_exec(&content) }.join("") %>
     
+    <%= @plugins.dispatch(:article_toolbar_actions, @page).collect { |content| instance_exec(&content) }.join("")%>
+
     <%= report_abuse(profile, :link, @page) %>
   </div>
   <div id="article-header">

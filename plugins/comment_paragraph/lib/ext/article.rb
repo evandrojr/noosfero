@@ -12,21 +12,21 @@ class Article
     environment.plugin_enabled?(CommentParagraphPlugin) && self.kind_of?(TextArticle)
   end
 
-  protected
-
-  def comment_paragraph_plugin_activate?
-      comment_paragraph_plugin_enabled? && comment_paragraph_plugin_settings.activation_mode == 'auto'
+  def comment_paragraph_plugin_activated?
+    comment_paragraph_plugin_activate && comment_paragraph_plugin_enabled?
   end
 
-  def comment_paragraph_plugin_parse_html
-    comment_paragraph_plugin_activate = comment_paragraph_plugin_activate?
-    return unless comment_paragraph_plugin_activate
+  protected
 
-    if body && body_changed?
+  def comment_paragraph_plugin_parse_html
+    comment_paragraph_plugin_set_initial_value unless persisted?
+    return unless comment_paragraph_plugin_activated?
+    if body && (body_changed? || setting_changed?(:comment_paragraph_plugin_activate))
       parsed_paragraphs = []
-      updated = body_change[1]
-      doc = Hpricot(updated)
-      doc.search("/*").each do |paragraph|
+      updated = body_changed? ? body_change[1] : body
+      doc =  Nokogiri::HTML(updated).css('body')
+      
+      doc.children.each do |paragraph|
         if paragraph.to_html =~ /^<div(.*)paragraph_comment(.*)$/ || paragraph.to_html =~ /^<p>\W<\/p>$/
           parsed_paragraphs << paragraph.to_html
         else
@@ -41,6 +41,11 @@ class Article
     end
   end
 
+  def comment_paragraph_plugin_set_initial_value
+    self.comment_paragraph_plugin_activate = comment_paragraph_plugin_enabled? &&
+      comment_paragraph_plugin_settings.activation_mode == 'auto'
+  end
+
   def comment_paragraph_plugin_settings
     @comment_paragraph_plugin_settings ||= Noosfero::Plugin::Settings.new(environment, CommentParagraphPlugin)
   end
@@ -48,8 +53,7 @@ class Article
   def comment_paragraph_plugin_parse_paragraph(paragraph_content, paragraph_uuid)
     "<div class='macro article_comments paragraph_comment' " +
       "data-macro='comment_paragraph_plugin/allow_comment' " +
-      "data-macro-paragraph_uuid='#{paragraph_uuid}'>#{paragraph_content}</div>\r\n" +
-      "<p>&nbsp;</p>"
+      "data-macro-paragraph_uuid='#{paragraph_uuid}'>#{paragraph_content}</div>\r\n"
   end
 
 end
