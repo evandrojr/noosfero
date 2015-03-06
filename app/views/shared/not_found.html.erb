@@ -11,7 +11,7 @@
       <%= button :home, _('Go to the home page'), '/' %>
        <% if logged_in? %>
           <% parent_id = ((@article && @article.allow_children?) ? @article : nil) %>
-          <%= colorbox_button('new', _('New content'), :controller => 'cms', :action => 'new', :parent_id => parent_id, :cms => true) %>
+          <%= modal_button('new', _('New content'), :controller => 'cms', :action => 'new', :parent_id => parent_id, :cms => true) %>
       <% end %>
     <% end %>
     <form action="/search">

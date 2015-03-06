@@ -3,7 +3,7 @@
 # domains.
 class Environment < ActiveRecord::Base
 
-  attr_accessible :name, :is_default, :signup_welcome_text_subject, :signup_welcome_text_body, :terms_of_use, :message_for_disabled_enterprise, :news_amount_by_folder, :default_language, :languages, :description, :organization_approval_method, :enabled_plugins, :enabled_features, :disabled_blocks, :redirection_after_login, :redirection_after_signup, :contact_email, :theme, :reports_lower_bound, :noreply_email, :signup_welcome_screen_body, :members_whitelist_enabled, :members_whitelist
+  attr_accessible :name, :is_default, :signup_welcome_text_subject, :signup_welcome_text_body, :terms_of_use, :message_for_disabled_enterprise, :news_amount_by_folder, :default_language, :languages, :description, :organization_approval_method, :enabled_plugins, :enabled_features, :redirection_after_login, :redirection_after_signup, :contact_email, :theme, :reports_lower_bound, :noreply_email, :signup_welcome_screen_body, :members_whitelist_enabled, :members_whitelist, :highlighted_news_amount, :portal_news_amount
 
   has_many :users
 
@@ -268,9 +268,12 @@ class Environment < ActiveRecord::Base
   settings_items :description, :type => String, :default => '<div style="text-align: center"><a href="http://noosfero.org/"><img src="/images/noosfero-network.png" alt="Noosfero"/></a></div>'
   settings_items :local_docs, :type => Array, :default => []
   settings_items :news_amount_by_folder, :type => Integer, :default => 4
+  settings_items :highlighted_news_amount, :type => Integer, :default => 2
+  settings_items :portal_news_amount, :type => Integer, :default => 5
   settings_items :help_message_to_add_enterprise, :type => String, :default => ''
   settings_items :tip_message_enterprise_activation_question, :type => String, :default => ''
 
+  settings_items :currency_iso_unit, :type => String, :default => 'USD'
   settings_items :currency_unit, :type => String, :default => '$'
   settings_items :currency_separator, :type => String, :default => '.'
   settings_items :currency_delimiter, :type => String, :default => ','
@@ -291,8 +294,6 @@ class Environment < ActiveRecord::Base
   ] + ('a' .. 'z').map{|i| "#{i}.yimg.com"}
 
   settings_items :enabled_plugins, :type => Array, :default => Noosfero::Plugin.available_plugin_names
-
-  settings_items :disabled_blocks, :type => Array, :default => []
 
   settings_items :search_hints, :type => Hash, :default => {}
 
@@ -357,10 +358,6 @@ class Environment < ActiveRecord::Base
 
   def plugin_enabled?(plugin)
     enabled_plugins.include?(plugin.to_s)
-  end
-
-  def block_disabled?(block)
-    disabled_blocks.include?(block.to_s)
   end
 
   # enables the features identified by <tt>features</tt>, which is expected to

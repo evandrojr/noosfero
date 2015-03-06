@@ -113,22 +113,24 @@ jQuery.fn.center = function () {
 }
 
 function show_warning(field, message) {
-   new Effect.Highlight(field, {duration:3});
-   $(message).show();
+  jQuery('#'+field).effect('highlight');
+  jQuery('#'+message).show();
 }
 
 function hide_warning(field) {
-   $(field).hide();
+   jQuery('#'+field).hide();
 }
 
 function enable_button(button) {
-   button.enable();
-   button.removeClassName("disabled");
+  button = jQuery(button)
+  button.prop('disabled', false);
+  button.removeClass("disabled");
 }
 
 function disable_button(button) {
-   button.disable();
-   button.addClassName("disabled");
+  button = jQuery(button)
+  button.prop('disabled', true);
+  button.addClass("disabled");
 }
 
 function toggleDisabled(enable, element) {
@@ -162,21 +164,21 @@ function hideOthersIconSelector(current_div) {
 }
 
 function loading(element_id, message) {
-   jQuery(element_id).addClass('loading');
+   jQuery('#'+element_id).addClass('loading');
    if (message) {
-      jQuery(element_id).html(message);
+      jQuery('#'+element_id).html(message);
    }
 }
 function small_loading(element_id, message) {
-   $(element_id).addClassName('small-loading');
+   $('#'+element_id).addClass('small-loading');
    if (message) {
-      $(element_id).update(message);
+      $('#'+element_id).text(message);
    }
 }
 function loading_done(element_id) {
-   jQuery(element_id).removeClass('loading');
-   jQuery(element_id).removeClass('small-loading');
-   jQuery(element_id).removeClass('small-loading-dark');
+   jQuery('#'+element_id).removeClass('loading');
+   jQuery('#'+element_id).removeClass('small-loading');
+   jQuery('#'+element_id).removeClass('small-loading-dark');
 }
 function open_loading(message) {
    jQuery('body').prepend("<div id='overlay_loading' class='ui-widget-overlay' style='display: none'/><div id='overlay_loading_modal' style='display: none'><p>"+message+"</p><img src='" + noosfero_root() + "/images/loading-dark.gif'/></div>");
@@ -346,8 +348,7 @@ function toggleSubmenu(trigger, title, link_list) {
 }
 
 function toggleMenu(trigger) {
-  hideAllSubmenus();
-  jQuery(trigger).siblings('.simplemenu-submenu').toggle().toggleClass('opened');
+  jQuery(trigger).siblings('.simplemenu-submenu').toggle();
 }
 
 function hideAllSubmenus() {
@@ -521,6 +522,7 @@ function new_qualifier_row(selector, select_qualifiers, delete_button) {
 function userDataCallback(data) {
   noosfero.user_data = data;
   if (data.login) {
+    // logged in
     jQuery('head').append('<meta content="authenticity_token" name="csrf-param" />');
     jQuery('head').append('<meta content="'+jQuery.cookie("_noosfero_.XSRF-TOKEN")+'" name="csrf-token" />');
   }
@@ -1013,31 +1015,6 @@ log.error = function() {
   window.log.apply(window, jQuery.merge(['error'], arguments));
 }
 
-jQuery(function($) {
-  $('.colorbox').live('click', function() {
-    $.colorbox({
-      href:       $(this).attr('href'),
-      maxWidth:   $(window).width()-50,
-      height:     $(window).height()-50,
-      open:       true,
-      fixed:      true,
-      close:      'Cancel',
-      onComplete: function(bt) {
-        var opt = {}, maxH = $(window).height()-50;
-        if ($('#cboxLoadedContent *:first').height() > maxH) opt.height = maxH;
-        $.colorbox.resize(opt);
-      }
-    });
-    return false;
-  });
-
-  $('.colorbox-close').live('click', function() {
-    $.colorbox.close();
-    return false;
-  });
-
-});
-
 function showHideTermsOfUse() {
   if( jQuery("#article_has_terms_of_use").attr("checked") )
     jQuery("#text_area_terms_of_use").show();
@@ -1117,6 +1094,50 @@ function apply_zoom_to_images(zoom_text) {
   });
 }
 
+function notifyMe(title, options) {
+  // This might be useful in the future
+  //
+  // Let's check if the browser supports notifications
+  // if (!("Notification" in window)) {
+  //   alert("This browser does not support desktop notification");
+  // }
+
+  // Let's check if the user is okay to get some notification
+  var notification = null;
+  if (Notification.permission === "granted") {
+    // If it's okay let's create a notification
+    notification = new Notification(title, options);
+  }
+
+  // Otherwise, we need to ask the user for permission
+  // Note, Chrome does not implement the permission static property
+  // So we have to check for NOT 'denied' instead of 'default'
+  else if (Notification.permission !== 'denied') {
+    Notification.requestPermission(function (permission) {
+      // Whatever the user answers, we make sure we store the information
+      if (!('permission' in Notification)) {
+        Notification.permission = permission;
+      }
+
+      // If the user is okay, let's create a notification
+      if (permission === "granted") {
+	notification = new Notification(title, options);
+      }
+    });
+  }
+  return notification;
+  // At last, if the user already denied any notification, and you
+  // want to be respectful there is no need to bother them any more.
+}
+
+function start_fetching(element){
+  jQuery(element).append('<div class="fetching-overlay">Loading...</div>');
+}
+
+function stop_fetching(element){
+  jQuery('.fetching-overlay', element).remove();
+}
+
 function getQueryParams(qs) {
   qs = qs.split("+").join(" ");
   var params = {},
@@ -1143,6 +1164,7 @@ function toggle_fullwidth(itemId){
     jQuery("#fullscreen-btn").hide()
     fullwidth = true;
   }
+  jQuery(window).trigger("toggleFullwidth", fullwidth);
 }
 
 function fullscreenPageLoad(itemId){
@@ -1153,3 +1175,5 @@ function fullscreenPageLoad(itemId){
     }
   });
 }
+
+window.isHidden = function isHidden() { return (typeof(document.hidden) != 'undefined') ? document.hidden : !document.hasFocus() };
