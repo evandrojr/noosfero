@@ -37,29 +37,32 @@ class CommentParagraphPluginTest < ActiveSupport::TestCase
   end
 
   should 'display button to toggle comment paragraph for users which can edit the article' do
-    article = fast_create(Article)
+    profile = fast_create(Profile)
+    article = fast_create(Article, :profile_id => profile.id)
     article.expects(:comment_paragraph_plugin_enabled?).returns(true)
     article.expects(:allow_edit?).with(user).returns(true)
 
-    content = plugin.article_header_extra_contents(article)
+    content = plugin.article_toolbar_actions(article)
     expects(:button).once
     instance_eval(&content)
   end
 
   should 'not display button to toggle comment paragraph for users which can not edit the article' do
-    article = fast_create(Article)
+    profile = fast_create(Profile)
+    article = fast_create(Article, :profile_id => profile.id)
     article.expects(:comment_paragraph_plugin_enabled?).returns(true)
     article.expects(:allow_edit?).with(user).returns(false)
 
-    content = plugin.article_header_extra_contents(article)
+    content = plugin.article_toolbar_actions(article)
     assert_equal nil, instance_eval(&content)
   end
 
   should 'not display button to toggle comment paragraph if plugin is not enabled' do
-    article = fast_create(Article)
+    profile = fast_create(Profile)
+    article = fast_create(Article, :profile_id => profile.id)
     article.expects(:comment_paragraph_plugin_enabled?).returns(false)
 
-    assert_equal nil, plugin.article_header_extra_contents(article)
+    assert_equal nil, plugin.article_toolbar_actions(article)
   end
 
 end
