@@ -191,7 +191,9 @@ module BoxesHelper
         "before-block-#{block.id}"
       end
     if block.nil? or modifiable?(block)
-      content_tag('div', '&nbsp;', :id => id, :class => 'block-target' ) + drop_receiving_element(id, :url => { :action => 'move_block', :target => id }, :accept => box.acceptable_blocks, :hoverclass => 'block-target-hover')
+      draggable_id = "encodeURIComponent(jQuery(ui.draggable).attr('id'))"
+      draggable_type = "encodeURIComponent(jQuery(ui.draggable).attr('data-block-type'))"
+      content_tag('div', _('Drop Here'), :id => id, :class => 'block-target' ) + drop_receiving_element(id, :url => { :action => 'move_block', :target => id }, :accept => box.acceptable_blocks, :hoverclass => 'block-target-hover', :with => "'type='+"+draggable_type+"+'&id=' + "+draggable_id, :activeClass => 'block-target-active')
     else
       ""
     end
@@ -199,7 +201,20 @@ module BoxesHelper
 
   # makes the given block draggable so it can be moved away.
   def block_handle(block)
-    modifiable?(block) ? draggable_element("block-#{block.id}", :revert => true) : ""
+    modifiable?(block) ? block_draggable("block-#{block.id}") : ""
+  end
+
+  def block_draggable(element_id, options={})
+    draggable_options = {
+      :revert => "'invalid'",
+      :appendTo => "'#block-store-draggables'",
+      :helper => '"clone"',
+      :revertDuration => 200,
+      :scroll => false,
+      :start => "function() {$('#box-organizer').addClass('shadow')}",
+      :stop => "function() {$('#box-organizer').removeClass('shadow')}"
+    }.merge(options)
+    draggable_element(element_id, draggable_options)
   end
 
   def block_edit_buttons(block)
@@ -251,8 +266,8 @@ module BoxesHelper
               content_tag('h2', _('Embed block code')) +
               content_tag('div', _('Below, you''ll see a field containing embed code for the block. Just copy the code and paste it into your website or blogging software.'), :style => 'margin-bottom: 1em;') +
               content_tag('textarea', embed_code, :style => 'margin-bottom: 1em; width:100%; height:40%;', :readonly => 'readonly') +
-              thickbox_close_button(_('Close')), :style => 'display: none;', :id => "embed-code-box-#{block.id}")
-      buttons << thickbox_inline_popup_icon(:embed, _('Embed code'), {}, "embed-code-box-#{block.id}") << html
+              modal_close_button(_('Close')), :style => 'display: none;', :id => "embed-code-box-#{block.id}")
+      buttons << modal_inline_icon(:embed, _('Embed code'), {}, "embed-code-box-#{block.id}") << html
     end
 
     content_tag('div', buttons.join("\n") + tag('br', :style => 'clear: left'), :class => 'button-bar')

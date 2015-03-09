@@ -93,6 +93,11 @@ class Theme
     config['public'] = value
   end
 
+  #FIXME make this test
+  def filesystem_path
+    File.join(self.class.system_themes_dir, self.id)
+  end
+
   def ==(other)
     other.is_a?(self.class) && (other.id == self.id)
   end

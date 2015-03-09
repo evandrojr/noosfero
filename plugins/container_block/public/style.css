@@ -57,3 +57,6 @@
 .container-block-plugin_container-block .block-target {
   background: #afd;
 }
+#box-organizer.shadow .container-block-plugin_container-block {
+  opacity: 1;
+}

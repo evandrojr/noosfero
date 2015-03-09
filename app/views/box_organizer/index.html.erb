@@ -1,6 +1,55 @@
+<%= stylesheet_link_tag 'slick.css' %>
+<%= stylesheet_link_tag 'slick-theme.css' %>
+
 <h1><%= _('Editing sideboxes')%></h1>
 
 <% button_bar :class=>'design-menu' do %>
-  <%= modal_button('add', _('Add a block'), { :action => 'add_block' }) %>
   <%= button(:back, _('Back to control panel'), :controller => (profile.nil? ? 'admin_panel': 'profile_editor')) %>
 <% end %>
+
+<div id="block-store">
+  <div id="block-types">
+    <% @available_blocks.each do |block| %>
+      <div id="block-<%= block.name.to_css_class %>" class="block-type <%= block.name.to_css_class %>" data-block-type="<%= block.name %>">
+        <div class="button-bar">
+          <%= modal_button 'help', _('Help on this block'),
+            {:action => 'show_block_type_info', :type => block.name},
+            :title => _('Help on this block') %>
+        </div>
+        <div>
+          <%= display_icon(block) %>
+        </div>
+        <span><%= _(block.pretty_name) %></span>
+        <%= block_draggable("block-#{block.name.to_css_class}") %>
+      </div>
+    <% end %>
+  </div>
+</div>
+<div id="block-store-draggables"></div>
+
+<script>
+var store = $('#block-store #block-types').slick({
+  infinite: true,
+  dots: true,
+  draggable: false,
+  respondTo: 'slider',
+  slidesToShow: 7,
+  slidesToScroll: 4,
+  responsive: [
+    {
+      breakpoint: 2048,
+      settings: {
+        slidesToShow: 10,
+        slidesToScroll: 4,
+      }
+    },
+    {
+      breakpoint: 1024,
+      settings: {
+        slidesToShow: 8,
+        slidesToScroll: 4,
+      }
+    }
+  ]
+});
+</script>
