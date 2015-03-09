@@ -47,7 +47,7 @@ class CommentParagraphPlugin < Noosfero::Plugin
   def article_toolbar_actions(article)
     return unless article.comment_paragraph_plugin_enabled?
     proc do
-      button :toggle_comment_paragraph, article.comment_paragraph_plugin_activated? ? _('Deactivate Comments') : _('Activate Comments'), :controller => 'comment_paragraph_plugin_myprofile', :action => 'toggle_activation', :id => article.id if article.allow_edit?(user)
+      button :toggle_comment_paragraph, article.comment_paragraph_plugin_activated? ? _('Deactivate Comments') : _('Activate Comments'), :controller => 'comment_paragraph_plugin_myprofile', :profile => article.profile.identifier, :action => 'toggle_activation', :id => article.id if article.allow_edit?(user)
     end
   end
 
