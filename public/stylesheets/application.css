@@ -1803,15 +1803,6 @@ a.button.disabled, input.disabled {
   background-repeat: no-repeat;
   background-position: top right;
 }
-#box-organizer div.box-1 {
-  background-image: url(../images/blocks/1.png);
-}
-#box-organizer div.box-2 {
-  background-image: url(../images/blocks/2.png);
-}
-#box-organizer div.box-3 {
-  background-image: url(../images/blocks/3.png);
-}
 #box-organizer .block {
   cursor: move;
 }
