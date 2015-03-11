@@ -10,10 +10,6 @@ class BoxOrganizerHelperTest < ActionView::TestCase
 
   attr_reader :environment
 
-  should 'max number of blocks be 7' do
-    assert_equal 7, max_number_of_blocks_per_line
-  end
-
   should 'display the default icon for block without icon' do
     class SomeBlock < Block; end
     block = SomeBlock
