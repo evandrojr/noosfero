@@ -169,7 +169,7 @@ class ProfileDesignControllerTest < ActionController::TestCase
     end
   end
 
-  should 'a block plugin with center position add new blocks only in this position' do
+  should 'a block plugin add new blocks' do
     class CustomBlock1 < Block; end;
     class CustomBlock2 < Block; end;
     class CustomBlock3 < Block; end;
@@ -197,60 +197,10 @@ class ProfileDesignControllerTest < ActionController::TestCase
     end
 
     Noosfero::Plugin::Manager.any_instance.stubs(:enabled_plugins).returns([TestBlockPlugin.new])
-    get :add_block, :profile => 'designtestuser'
+    get :index, :profile => 'designtestuser'
     assert_response :success
 
-    assert @controller.instance_variable_get('@center_block_types').include?(CustomBlock1)
-    assert @controller.instance_variable_get('@center_block_types').include?(CustomBlock2)
-    assert @controller.instance_variable_get('@center_block_types').include?(CustomBlock3)
-    assert !@controller.instance_variable_get('@center_block_types').include?(CustomBlock4)
-    assert !@controller.instance_variable_get('@center_block_types').include?(CustomBlock5)
-    assert !@controller.instance_variable_get('@center_block_types').include?(CustomBlock6)
-    assert !@controller.instance_variable_get('@center_block_types').include?(CustomBlock7)
-    assert !@controller.instance_variable_get('@center_block_types').include?(CustomBlock8)
-    assert !@controller.instance_variable_get('@center_block_types').include?(CustomBlock9)
-  end
-
-  should 'a block plugin with side position add new blocks only in this position' do
-    class CustomBlock1 < Block; end;
-    class CustomBlock2 < Block; end;
-    class CustomBlock3 < Block; end;
-    class CustomBlock4 < Block; end;
-    class CustomBlock5 < Block; end;
-    class CustomBlock6 < Block; end;
-    class CustomBlock7 < Block; end;
-    class CustomBlock8 < Block; end;
-    class CustomBlock9 < Block; end;
-
-    class TestBlockPlugin < Noosfero::Plugin
-      def self.extra_blocks
-        {
-          CustomBlock1 => {:type => Person, :position => [1]},
-          CustomBlock2 => {:type => Person, :position => 1},
-          CustomBlock3 => {:type => Person, :position => '1'},
-          CustomBlock4 => {:type => Person, :position => [2]},
-          CustomBlock5 => {:type => Person, :position => 2},
-          CustomBlock6 => {:type => Person, :position => '2'},
-          CustomBlock7 => {:type => Person, :position => [3]},
-          CustomBlock8 => {:type => Person, :position => 3},
-          CustomBlock9 => {:type => Person, :position => '3'},
-        }
-      end
-    end
-
-    Noosfero::Plugin::Manager.any_instance.stubs(:enabled_plugins).returns([TestBlockPlugin.new])
-    get :add_block, :profile => 'designtestuser'
-    assert_response :success
-
-    assert !@controller.instance_variable_get('@side_block_types').include?(CustomBlock1)
-    assert !@controller.instance_variable_get('@side_block_types').include?(CustomBlock2)
-    assert !@controller.instance_variable_get('@side_block_types').include?(CustomBlock3)
-    assert @controller.instance_variable_get('@side_block_types').include?(CustomBlock4)
-    assert @controller.instance_variable_get('@side_block_types').include?(CustomBlock5)
-    assert @controller.instance_variable_get('@side_block_types').include?(CustomBlock6)
-    assert @controller.instance_variable_get('@side_block_types').include?(CustomBlock7)
-    assert @controller.instance_variable_get('@side_block_types').include?(CustomBlock8)
-    assert @controller.instance_variable_get('@side_block_types').include?(CustomBlock9)
+    (1..9).each {|i| assert_tag :tag => 'div', :attributes => { 'data-block-type' => "ProfileDesignControllerTest::CustomBlock#{i}" } }
   end
 
   should 'a block plugin cannot be listed for unspecified types' do
@@ -279,17 +229,11 @@ class ProfileDesignControllerTest < ActionController::TestCase
     end
 
     Noosfero::Plugin::Manager.any_instance.stubs(:enabled_plugins).returns([TestBlockPlugin.new])
-    get :add_block, :profile => 'designtestuser'
+    get :index, :profile => 'designtestuser'
     assert_response :success
 
-    assert @controller.instance_variable_get('@center_block_types').include?(CustomBlock1)
-    assert !@controller.instance_variable_get('@center_block_types').include?(CustomBlock2)
-    assert !@controller.instance_variable_get('@center_block_types').include?(CustomBlock3)
-    assert !@controller.instance_variable_get('@center_block_types').include?(CustomBlock4)
-    assert @controller.instance_variable_get('@side_block_types').include?(CustomBlock5)
-    assert !@controller.instance_variable_get('@side_block_types').include?(CustomBlock6)
-    assert !@controller.instance_variable_get('@side_block_types').include?(CustomBlock7)
-    assert !@controller.instance_variable_get('@side_block_types').include?(CustomBlock8)
+    [1, 5].each {|i| assert_tag :tag => 'div', :attributes => { 'data-block-type' => "ProfileDesignControllerTest::CustomBlock#{i}" }}
+    [2, 3, 4, 6, 7, 8].each {|i| assert_no_tag :tag => 'div', :attributes => { 'data-block-type' => "ProfileDesignControllerTest::CustomBlock#{i}" }}
   end
 
   should 'not edit main block with never option' do
@@ -339,15 +283,9 @@ class ProfileDesignControllerTest < ActionController::TestCase
   # BEGIN - tests for ProfileDesignController features
   ######################################################
 
-  should 'display popup for adding a new block' do
-    get :add_block, :profile => 'designtestuser'
-    assert_response :success
-    assert_no_tag :tag => 'body' # e.g. no layout
-  end
-
   should 'actually add a new block' do
     assert_difference 'Block.count' do
-      post :add_block, :profile => 'designtestuser', :box_id => @box1.id, :type => RecentDocumentsBlock.name
+      post :move_block, :profile => 'designtestuser', :target => "end-of-box-#{@box1.id}", :type => RecentDocumentsBlock.name
       assert_redirected_to :action => 'index'
     end
   end
@@ -355,7 +293,7 @@ class ProfileDesignControllerTest < ActionController::TestCase
   should 'not allow to create unknown types' do
     assert_no_difference 'Block.count' do
       assert_raise ArgumentError do
-        post :add_block, :profile => 'designtestuser', :box_id => @box1.id, :type => "PleaseLetMeCrackYourSite"
+        post :move_block, :profile => 'designtestuser', :box_id => @box1.id, :type => "PleaseLetMeCrackYourSite"
       end
     end
   end
@@ -432,9 +370,9 @@ class ProfileDesignControllerTest < ActionController::TestCase
     person = create_user_with_permission('test_user', 'edit_profile_design', ent)
     login_as(person.user.login)
 
-    get :add_block, :profile => 'test_ent'
+    get :index, :profile => 'test_ent'
 
-    assert_no_tag :tag => 'input', :attributes => {:type => 'radio', :value => 'ProductsBlock'}
+    assert_no_tag :tag => 'div', :attributes => { 'data-block-type' => 'ProductsBlock' }
   end
 
   should 'create back link to profile control panel' do
@@ -448,18 +386,18 @@ class ProfileDesignControllerTest < ActionController::TestCase
 
   should 'offer to create blog archives block only if has blog' do
     holder.articles << Blog.new(:name => 'Blog test', :profile => holder)
-    get :add_block, :profile => 'designtestuser'
-    assert_tag :tag => 'input', :attributes => { :name => 'type', :value => 'BlogArchivesBlock' }
+    get :index, :profile => 'designtestuser'
+    assert_tag :tag => 'div', :attributes => { 'data-block-type' => 'BlogArchivesBlock' }
   end
 
   should 'not offer to create blog archives block if user dont have blog' do
-    get :add_block, :profile => 'designtestuser'
-    assert_no_tag :tag => 'input', :attributes => { :name => 'type', :value => 'BlogArchivesBlock' }
+    get :index, :profile => 'designtestuser'
+    assert_no_tag :tag => 'div', :attributes => { 'data-block-type' => 'BlogArchivesBlock' }
   end
 
   should 'offer to create feed reader block' do
-    get :add_block, :profile => 'designtestuser'
-    assert_tag :tag => 'input', :attributes => { :name => 'type', :value => 'FeedReaderBlock' }
+    get :index, :profile => 'designtestuser'
+    assert_tag :tag => 'div', :attributes => { 'data-block-type' => 'FeedReaderBlock' }
   end
 
   should 'be able to edit FeedReaderBlock' do
@@ -569,17 +507,17 @@ class ProfileDesignControllerTest < ActionController::TestCase
   end
 
   should 'allow admins to add RawHTMLBlock' do
-    profile.stubs(:is_admin?).with(profile.environment).returns(true)
+    profile.stubs(:is_admin?).returns(true)
     @controller.stubs(:user).returns(profile)
-    get :add_block, :profile => 'designtestuser'
-    assert_tag :tag => 'input', :attributes => { :name => 'type', :value => 'RawHTMLBlock' }
+    get :index, :profile => 'designtestuser'
+    assert_tag :tag => 'div', :attributes => { 'data-block-type' => 'RawHTMLBlock' }
   end
 
   should 'not allow normal users to add RawHTMLBlock' do
-    profile.stubs(:is_admin?).with(profile.environment).returns(false)
+    profile.stubs(:is_admin?).returns(false)
     @controller.stubs(:user).returns(profile)
-    get :add_block, :profile => 'designtestuser'
-    assert_no_tag :tag => 'input', :attributes => { :name => 'type', :value => 'RawHTMLBlock' }
+    get :index, :profile => 'designtestuser'
+    assert_no_tag :tag => 'div', :attributes => { 'data-block-type' => 'RawHTMLBlock' }
   end
 
   should 'editing article block displays right selected article' do

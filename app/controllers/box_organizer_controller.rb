@@ -7,7 +7,7 @@ class BoxOrganizerController < ApplicationController
   end
 
   def move_block
-    @block = boxes_holder.blocks.find(params[:id].gsub(/^block-/, ''))
+    @block = params[:id] ? boxes_holder.blocks.find(params[:id].gsub(/^block-/, '')) : nil
 
     target_position = nil
 
@@ -19,7 +19,7 @@ class BoxOrganizerController < ApplicationController
     else
       (params[:target] =~ /end-of-box-([0-9]+)/)
 
-      @target_box = boxes_holder.boxes.find($1)
+      @target_box = boxes_holder.boxes.find_by_id($1)
     end
 
     @block = new_block(params[:type], @target_box) if @block.nil?
