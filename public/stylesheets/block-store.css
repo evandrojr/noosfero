@@ -27,6 +27,9 @@
 /************************************************
  * block store styles
  ************************************************/
+#block-store {
+  display: none;
+}
 #content #block-store .block-type {
   position: relative;
   border: 0px solid #AAA;
