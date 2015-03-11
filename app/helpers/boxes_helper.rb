@@ -203,7 +203,7 @@ module BoxesHelper
   def block_handle(block)
     return "" unless modifiable?(block)
     block_draggable("block-#{block.id}",
-                    :helper => "function(){$(this).addClass('ui-draggable-dragging'); return '#{display_icon(block.class)}'}")
+                    :helper => "function() {return cloneDraggableBlock($(this), '#{display_icon(block.class)}')}")
   end
 
   def block_draggable(element_id, options={})
@@ -213,8 +213,8 @@ module BoxesHelper
       :helper => '"clone"',
       :revertDuration => 200,
       :scroll => false,
-      :start => "function() {$('#box-organizer').addClass('shadow')}",
-      :stop => "function() {$('#box-organizer').removeClass('shadow'); $('.ui-draggable-dragging').removeClass('ui-draggable-dragging')}"
+      :start => "startDragBlock",
+      :stop => "stopDragBlock",
     }.merge(options)
     draggable_element(element_id, draggable_options)
   end

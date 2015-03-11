@@ -26,30 +26,3 @@
   </div>
 </div>
 <div id="block-store-draggables"></div>
-
-<script>
-var store = $('#block-store #block-types').slick({
-  infinite: true,
-  dots: true,
-  draggable: false,
-  respondTo: 'slider',
-  slidesToShow: 7,
-  slidesToScroll: 4,
-  responsive: [
-    {
-      breakpoint: 2048,
-      settings: {
-        slidesToShow: 10,
-        slidesToScroll: 4,
-      }
-    },
-    {
-      breakpoint: 1024,
-      settings: {
-        slidesToShow: 8,
-        slidesToScroll: 4,
-      }
-    }
-  ]
-});
-</script>
