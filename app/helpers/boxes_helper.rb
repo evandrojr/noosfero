@@ -202,8 +202,9 @@ module BoxesHelper
   # makes the given block draggable so it can be moved away.
   def block_handle(block)
     return "" unless modifiable?(block)
+    icon = "<div><div>#{display_icon(block.class)}</div><span>#{_(block.class.pretty_name)}</span></div>"
     block_draggable("block-#{block.id}",
-                    :helper => "function() {return cloneDraggableBlock($(this), '#{display_icon(block.class)}')}")
+                    :helper => "function() {return cloneDraggableBlock($(this), '#{icon}')}")
   end
 
   def block_draggable(element_id, options={})
