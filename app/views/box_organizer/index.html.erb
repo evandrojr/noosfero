@@ -20,7 +20,8 @@
           <%= display_icon(block) %>
         </div>
         <span><%= _(block.pretty_name) %></span>
-        <%= block_draggable("block-#{block.name.to_css_class}") %>
+        <%= block_draggable("block-#{block.name.to_css_class}",
+                            :cursorAt => '{bottom: 30, left: 0}') %>
       </div>
     <% end %>
   </div>

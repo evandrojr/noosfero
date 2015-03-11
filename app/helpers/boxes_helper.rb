@@ -215,6 +215,8 @@ module BoxesHelper
       :scroll => false,
       :start => "startDragBlock",
       :stop => "stopDragBlock",
+      :cursor => "'move'",
+      :cursorAt => '{ left: 0, top:0, right:0, bottom:0 }',
     }.merge(options)
     draggable_element(element_id, draggable_options)
   end
