@@ -1,4 +1,5 @@
-<%= stylesheet_link_tag 'circlepop.css' %>
+<%= stylesheet_link_tag 'slick.css' %>
+<%= stylesheet_link_tag 'slick-theme.css' %>
 
 <h1><%= _('Editing sideboxes')%></h1>
 
@@ -6,53 +7,23 @@
   <%= button(:back, _('Back to control panel'), :controller => (profile.nil? ? 'admin_panel': 'profile_editor')) %>
 <% end %>
 
-<% n_blocks_in_line = 0 %>
-<% last_block = @available_blocks.last %>
-
-<div id="block-types-container">
+<div id="block-store">
   <div id="block-types">
-
     <% @available_blocks.each do |block| %>
-
-    <% if n_blocks_in_line == 0 %>
-    <div class="block-types-group">
-    <% end %>
-
-    <% n_blocks_in_line += 1 %>
-
-      <div id="block-<%=block.name%>" class="block-type <%= block.name.to_css_class %> drag">
+      <div id="block-<%= block.name.to_css_class %>" class="block-type <%= block.name.to_css_class %>" data-block-type="<%= block.name %>">
         <div class="button-bar">
-          <%= link_to content_tag('span', _('Help on this block')),
-                      {:action => 'show_block_type_info', :type => block.name},
-                      :class => "button icon-button icon-help colorbox",
-                      :title => _('Help on this block') %>
-          <br style="clear: left">
+          <%= modal_button 'help', _('Help on this block'),
+            {:action => 'show_block_type_info', :type => block.name},
+            :title => _('Help on this block') %>
         </div>
         <div>
           <%= display_icon(block) %>
         </div>
         <span><%= _(block.pretty_name) %></span>
+        <%= block_draggable("block-#{block.name.to_css_class}",
+                            :cursorAt => '{bottom: 30, left: 0}') %>
       </div>
-
-      <%= draggable_element("block-#{block.name}", :revert => true) %>
-
-    <% if n_blocks_in_line == max_number_of_blocks_per_line || last_block == block %>
-      <% n_blocks_in_line = 0 %>
-    </div>
     <% end %>
-
-    <% end %>
-
   </div>
 </div>
-
-<section id="block-types-navigation">
-  <nav class="nav-circlepop">
-    <a class="previous" href="javascript:void(0);"><span class="icon-wrap"></span></a>
-    <a class="next" href="javascript:void(0);"><span class="icon-wrap"></span></a>
-  </nav>
-</section>
-
-<div style="clear:both;"></div>
-
-<%= javascript_include_tag('block_store') %>
+<div id="block-store-draggables"></div>

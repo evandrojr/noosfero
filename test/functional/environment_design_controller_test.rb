@@ -165,14 +165,6 @@ class EnvironmentDesignControllerTest < ActionController::TestCase
     assert_tag :tag => 'a', :attributes => {:href => '/admin'}, :child => {:tag => 'span', :content => "Back to control panel"}
   end
 
-  should 'render block types container to add/move block functionality' do
-    login_as(create_admin_user(Environment.default))
-    get :index
-
-    assert_response :success
-    assert_tag :tag => 'div', :attributes => {:id => 'block-types-container'}
-  end
-
   should 'a environment block plugin add new blocks for environments' do
     class CustomBlock1 < Block; end;
 
@@ -212,7 +204,7 @@ class EnvironmentDesignControllerTest < ActionController::TestCase
     assert !@controller.available_blocks.include?(CustomBlock4)
   end
 
-  should 'a block plugin add new blocks in any position' do
+  should 'a block plugin add new blocks' do
     class CustomBlock1 < Block; end;
     class CustomBlock2 < Block; end;
     class CustomBlock3 < Block; end;
@@ -242,17 +234,9 @@ class EnvironmentDesignControllerTest < ActionController::TestCase
     Noosfero::Plugin::Manager.any_instance.stubs(:enabled_plugins).returns([TestBlockPlugin.new])
     login_as(create_admin_user(Environment.default))
     get :index
-
     assert_response :success
-    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock1)
-    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock2)
-    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock3)
-    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock4)
-    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock5)
-    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock6)
-    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock7)
-    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock8)
-    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock9)
+
+    (1..9).each {|i| assert_tag :tag => 'div', :attributes => { 'data-block-type' => "EnvironmentDesignControllerTest::CustomBlock#{i}" }}
   end
 
   should 'a block plugin cannot be listed for unspecified types' do
@@ -285,14 +269,8 @@ class EnvironmentDesignControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert !@controller.instance_variable_get('@available_blocks').include?(CustomBlock1)
-    assert !@controller.instance_variable_get('@available_blocks').include?(CustomBlock2)
-    assert !@controller.instance_variable_get('@available_blocks').include?(CustomBlock3)
-    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock4)
-    assert !@controller.instance_variable_get('@available_blocks').include?(CustomBlock5)
-    assert !@controller.instance_variable_get('@available_blocks').include?(CustomBlock6)
-    assert !@controller.instance_variable_get('@available_blocks').include?(CustomBlock7)
-    assert @controller.instance_variable_get('@available_blocks').include?(CustomBlock8)
+    [4, 8].each {|i| assert_tag :tag => 'div', :attributes => { 'data-block-type' => "EnvironmentDesignControllerTest::CustomBlock#{i}" }}
+    [1, 2, 3, 5, 6, 7].each {|i| assert_no_tag :tag => 'div', :attributes => { 'data-block-type' => "EnvironmentDesignControllerTest::CustomBlock#{i}" }}
   end
 
   should 'clone a block' do
@@ -336,23 +314,6 @@ class EnvironmentDesignControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_equal json_response, []
-  end
-
-  should 'display all available blocks in groups' do
-    login_as(create_admin_user(Environment.default))
-    get :index
-    assert_select 'div.block-types-group', 2
-
-    assert_select 'div.block-types-group' do |elements|
-     assert_select 'div.block-type', 14
-   end
-  end
-
-  should 'paginate the block store with 7 elements per line' do
-    assert_equal 14, @controller.available_blocks.length
-    login_as(create_admin_user(Environment.default))
-    get :index
-    assert_select 'div.block-types-group', 2, "something wrong happens with the pagination of the block store"
   end
 
 end

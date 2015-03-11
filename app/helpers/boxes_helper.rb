@@ -191,7 +191,9 @@ module BoxesHelper
         "before-block-#{block.id}"
       end
     if block.nil? or modifiable?(block)
-      content_tag('div', '&nbsp;', :id => id, :class => 'block-target' ) + drop_receiving_element(id, :url => { :action => 'add_or_move_block', :target => id }, :accept => box.acceptable_blocks, :hoverclass => 'block-target-hover')
+      draggable_id = "encodeURIComponent(jQuery(ui.draggable).attr('id'))"
+      draggable_type = "encodeURIComponent(jQuery(ui.draggable).attr('data-block-type'))"
+      content_tag('div', _('Drop Here'), :id => id, :class => 'block-target' ) + drop_receiving_element(id, :url => { :action => 'move_block', :target => id }, :accept => box.acceptable_blocks, :hoverclass => 'block-target-hover', :with => "'type='+"+draggable_type+"+'&id=' + "+draggable_id, :activeClass => 'block-target-active')
     else
       ""
     end
@@ -199,7 +201,25 @@ module BoxesHelper
 
   # makes the given block draggable so it can be moved away.
   def block_handle(block)
-    modifiable?(block) ? draggable_element("block-#{block.id}", :revert => true) : ""
+    return "" unless modifiable?(block)
+    icon = "<div><div>#{display_icon(block.class)}</div><span>#{_(block.class.pretty_name)}</span></div>"
+    block_draggable("block-#{block.id}",
+                    :helper => "function() {return cloneDraggableBlock($(this), '#{icon}')}")
+  end
+
+  def block_draggable(element_id, options={})
+    draggable_options = {
+      :revert => "'invalid'",
+      :appendTo => "'#block-store-draggables'",
+      :helper => '"clone"',
+      :revertDuration => 200,
+      :scroll => false,
+      :start => "startDragBlock",
+      :stop => "stopDragBlock",
+      :cursor => "'move'",
+      :cursorAt => '{ left: 0, top:0, right:0, bottom:0 }',
+    }.merge(options)
+    draggable_element(element_id, draggable_options)
   end
 
   def block_edit_buttons(block)
@@ -224,9 +244,9 @@ module BoxesHelper
       # FIXME too much hardcoded stuff
       if holder.layout_template == 'default'
         if block.box.position == 2 # area 2, left side => move to right side
-          buttons << icon_button('right', _('Move to the opposite side'), { :action => 'add_or_move_block', :target => 'end-of-box-' + holder.boxes[2].id.to_s, :id => block.id }, :method => 'post' )
+          buttons << icon_button('right', _('Move to the opposite side'), { :action => 'move_block', :target => 'end-of-box-' + holder.boxes[2].id.to_s, :id => block.id }, :method => 'post' )
         elsif block.box.position == 3 # area 3, right side => move to left side
-          buttons << icon_button('left', _('Move to the opposite side'), { :action => 'add_or_move_block', :target => 'end-of-box-' + holder.boxes[1].id.to_s, :id => block.id }, :method => 'post' )
+          buttons << icon_button('left', _('Move to the opposite side'), { :action => 'move_block', :target => 'end-of-box-' + holder.boxes[1].id.to_s, :id => block.id }, :method => 'post' )
         end
       end
 
@@ -251,8 +271,8 @@ module BoxesHelper
               content_tag('h2', _('Embed block code')) +
               content_tag('div', _('Below, you''ll see a field containing embed code for the block. Just copy the code and paste it into your website or blogging software.'), :style => 'margin-bottom: 1em;') +
               content_tag('textarea', embed_code, :style => 'margin-bottom: 1em; width:100%; height:40%;', :readonly => 'readonly') +
-              thickbox_close_button(_('Close')), :style => 'display: none;', :id => "embed-code-box-#{block.id}")
-      buttons << thickbox_inline_popup_icon(:embed, _('Embed code'), {}, "embed-code-box-#{block.id}") << html
+              modal_close_button(_('Close')), :style => 'display: none;', :id => "embed-code-box-#{block.id}")
+      buttons << modal_inline_icon(:embed, _('Embed code'), {}, "embed-code-box-#{block.id}") << html
     end
 
     content_tag('div', buttons.join("\n") + tag('br', :style => 'clear: left'), :class => 'button-bar')

@@ -6,7 +6,6 @@ class CommunitiesBlock < ProfileListBlock
     _("<p>Display all of your communities.</p><p>You could choose the amount of communities will be displayed and you could priorize that profiles with images.</p> <p>The view all button is always present in the block.</p>")
   end
 
-
   def self.short_description
     _('Communities')
   end

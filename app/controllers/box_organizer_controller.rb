@@ -3,9 +3,11 @@ class BoxOrganizerController < ApplicationController
   before_filter :login_required
 
   def index
+    @available_blocks = available_blocks.uniq
   end
 
-  def add_or_move_block
+  def move_block
+    @block = params[:id] ? boxes_holder.blocks.find(params[:id].gsub(/^block-/, '')) : nil
 
     target_position = nil
 
@@ -17,23 +19,15 @@ class BoxOrganizerController < ApplicationController
     else
       (params[:target] =~ /end-of-box-([0-9]+)/)
 
-      @target_box = boxes_holder.boxes.find($1)
+      @target_box = boxes_holder.boxes.find_by_id($1)
     end
 
-    type = params[:id].gsub(/^block-/,'')
+    @block = new_block(params[:type], @target_box) if @block.nil?
+    @source_box = @block.box
 
-    if available_blocks.map(&:name).include?(type)
-      @block = type.constantize.new
+    if (@source_box != @target_box)
+      @block.remove_from_list
       @block.box = @target_box
-      @block.position = target_position
-    else
-      @block = boxes_holder.blocks.find(params[:id].gsub(/^block-/, ''))
-      @source_box = @block.box
-
-      if (@source_box != @target_box)
-        @block.remove_from_list
-        @block.box = @target_box
-      end
     end
 
     if target_position.nil?
@@ -49,12 +43,9 @@ class BoxOrganizerController < ApplicationController
 
     @target_box.reload
 
-    if available_blocks.map(&:name).include?(type)
-      render :action => 'add_block'
-    else
-      render :action => 'move_block'
+    unless request.xhr?
+      redirect_to :action => 'index'
     end
-
   end
 
   def move_block_down
@@ -69,20 +60,6 @@ class BoxOrganizerController < ApplicationController
     redirect_to :action => 'index'
   end
 
-  def show_block_type_info
-    type = params[:type]
-    if ! type.blank?
-      if available_blocks.map(&:name).include?(type)
-        @block = type.constantize
-      else
-       raise ArgumentError.new("Type %s is not allowed. Go away." % type)
-      end
-      render :action => 'show_block_type_info', :layout => false
-    else
-      redirect_to :action => 'index'
-    end
-  end
-
   def edit
     @block = boxes_holder.blocks.find(params[:id])
     render :action => 'edit', :layout => false
@@ -94,7 +71,7 @@ class BoxOrganizerController < ApplicationController
       path_list = if boxes_holder.is_a?(Environment) && boxes_holder.enabled?('use_portal_community') && boxes_holder.portal_community
         boxes_holder.portal_community.articles.find(:all, :conditions=>"name ILIKE '%#{search}%' or path ILIKE '%#{search}%'", :limit=>20).map { |content| "/{portal}/"+content.path }
       elsif boxes_holder.is_a?(Profile)
-        boxes_holder.articles.find(:all, :conditions=>"articles.name ILIKE '%#{search}%' or articles.path ILIKE '%#{search}%'", :limit=>20).map { |content| "/{profile}/"+content.path }
+        boxes_holder.articles.find(:all, :conditions=>"name ILIKE '%#{search}%' or path ILIKE '%#{search}%'", :limit=>20).map { |content| "/{profile}/"+content.path }
       else
         []
       end
@@ -129,6 +106,27 @@ class BoxOrganizerController < ApplicationController
     redirect_to :action => 'index'
   end
 
+  def show_block_type_info
+    type = params[:type]
+    if type.blank? || !available_blocks.map(&:name).include?(type)
+      raise ArgumentError.new("Type %s is not allowed. Go away." % type)
+    end
+    @block = type.constantize.new
+    @block.box = Box.new(:owner => boxes_holder)
+    render :action => 'show_block_type_info', :layout => false
+  end
+
   protected :boxes_editor?
+
+  protected
+
+  def new_block(type, box)
+    if !available_blocks.map(&:name).include?(type)
+      raise ArgumentError.new("Type %s is not allowed. Go away." % type)
+    end
+    block = type.constantize.new
+    box.blocks << block
+    block
+  end
 
 end
