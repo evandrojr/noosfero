@@ -13,8 +13,14 @@ class Theme
       Rails.root.join('public', 'user_themes')
     end
 
+    #FIXME make this test
     def system_themes_dir
-      Rails.root.join('public', 'designs', 'themes')
+      Rails.root.join('public', relative_themes_dir)
+    end
+
+    #FIXME make this test
+    def relative_themes_dir
+      File.join('designs', 'themes')
     end
 
     def create(id, attributes = {})
@@ -91,6 +97,11 @@ class Theme
 
   def public=(value)
     config['public'] = value
+  end
+
+  #FIXME make this test
+  def public_path
+    File.join('/', self.class.relative_themes_dir, self.id)
   end
 
   #FIXME make this test
