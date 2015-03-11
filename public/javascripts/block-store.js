@@ -12,8 +12,8 @@ function stopDragBlock() {
   $('.ui-draggable-dragging').removeClass('ui-draggable-dragging');
 }
 
-jQuery(document).ready(function($) {
-  var store = $('#block-store #block-types').slick({
+function initBlockStore() {
+  var store = jQuery('#block-store #block-types').slick({
     infinite: true,
     dots: true,
     draggable: false,
@@ -37,4 +37,5 @@ jQuery(document).ready(function($) {
       }
     ]
   });
-});
+  jQuery('#block-store').show();
+}
