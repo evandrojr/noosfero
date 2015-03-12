@@ -1,3 +1,11 @@
+function filterBlocks() {
+  jQuery('#block-store #block-types').slick('slickFilter', function() {
+    var name = $(this).data('block-name');
+    var filter = $('#block-store #block-store-filter').val();
+    return name.toLowerCase().indexOf(filter.toLowerCase()) > -1;
+  });
+}
+
 function cloneDraggableBlock(el, blockIcon) {
   el.addClass('ui-draggable-dragging');
   return blockIcon;
@@ -38,4 +46,5 @@ function initBlockStore() {
     ]
   });
   jQuery('#block-store').show();
+  jQuery('#block-store #block-store-filter').keyup(filterBlocks);
 }
