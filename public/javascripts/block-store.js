@@ -22,25 +22,25 @@ function stopDragBlock() {
 
 function initBlockStore() {
   var store = jQuery('#block-store #block-types').slick({
-    infinite: true,
+    infinite: false,
     dots: true,
     draggable: false,
     respondTo: 'slider',
     slidesToShow: 7,
-    slidesToScroll: 4,
+    slidesToScroll: 6,
     responsive: [
       {
         breakpoint: 2048,
         settings: {
           slidesToShow: 10,
-          slidesToScroll: 4,
+          slidesToScroll: 9,
         }
       },
       {
         breakpoint: 1024,
         settings: {
           slidesToShow: 8,
-          slidesToScroll: 4,
+          slidesToScroll: 7,
         }
       }
     ]
