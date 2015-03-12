@@ -11,10 +11,6 @@
   margin-right: -2px;
 }
 
-.container-block-plugin_container-block .block-target {
-  clear: both;
-}
-
 #content .boxes .container-block-plugin_container-block .block .icon-down, #content .boxes .container-block-plugin_container-block .block .icon-down-disabled {
   background-image: url(/designs/icons/default/Tango/16x16/actions/go-next.png);
 }
