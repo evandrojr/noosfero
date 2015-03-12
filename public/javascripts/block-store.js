@@ -21,6 +21,7 @@ function stopDragBlock() {
 }
 
 function initBlockStore() {
+  jQuery('#block-store').show();
   var store = jQuery('#block-store #block-types').slick({
     infinite: false,
     dots: true,
@@ -45,6 +46,5 @@ function initBlockStore() {
       }
     ]
   });
-  jQuery('#block-store').show();
   jQuery('#block-store #block-store-filter').keyup(filterBlocks);
 }
