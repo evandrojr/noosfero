@@ -362,6 +362,12 @@ class ProfileDesignControllerTest < ActionController::TestCase
     assert_tag :tag => 'a', :content => 'Back to control panel'
   end
 
+  should 'display avaliable blocks in alphabetical order' do
+    @controller.stubs(:available_blocks).returns([TagsBlock, ArticleBlock])
+    get :index, :profile => 'designtestuser'
+    assert_equal assigns(:available_blocks), [ArticleBlock, TagsBlock]
+  end
+
   should 'not allow products block if environment do not let' do
     env = Environment.default
     env.disable('products_for_enterprises')

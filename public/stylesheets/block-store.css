@@ -27,6 +27,13 @@
 /************************************************
  * block store styles
  ************************************************/
+#block-store #block-store-filter {
+  float: right;
+  margin-bottom: 8px;
+}
+#block-store #block-types {
+  clear: both;
+}
 #block-store {
   display: none;
 }

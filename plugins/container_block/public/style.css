@@ -60,3 +60,6 @@
 #box-organizer.shadow .container-block-plugin_container-block {
   opacity: 1;
 }
+#content #box-organizer .container-block-plugin_container-block {
+  padding-top: 20px;
+}
