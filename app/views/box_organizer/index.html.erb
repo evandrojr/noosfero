@@ -11,7 +11,7 @@
   <input type="text" id="block-store-filter" placeholder="<%= _('Filter blocks') %>" title="<%= _('Filter blocks') %>">
   <div id="block-types">
     <% @available_blocks.each do |block| %>
-      <div id="block-<%= block.name.to_css_class %>" class="block-type <%= block.name.to_css_class %>" data-block-type="<%= block.name %>" data-block-name="<%= block.pretty_name %>">
+      <div id="block-<%= block.name.to_css_class %>" class="block-type <%= block.name.to_css_class %>" data-block-type="<%= block.name %>" data-block-name="<%= _(block.pretty_name) %>">
         <div class="button-bar">
           <%= modal_button 'help', _('Help on this block'),
             {:action => 'show_block_type_info', :type => block.name},
