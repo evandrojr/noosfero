@@ -48,3 +48,16 @@ function initBlockStore() {
   });
   jQuery('#block-store #block-store-filter').keyup(filterBlocks);
 }
+
+function dropBlock(url, loadingMessage, ev, ui) {
+  var blockType = jQuery(ui.draggable).attr('data-block-type');
+  var blockId = jQuery(ui.draggable).attr('id');
+  open_loading(loadingMessage);
+  jQuery.ajax({
+    data: 'type='+encodeURIComponent(blockType)+'&id=' + encodeURIComponent(blockId),
+    dataType: 'script',
+    type: 'post',
+    url: url,
+    complete: close_loading,
+  })
+}
