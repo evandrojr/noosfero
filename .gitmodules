@@ -1,0 +1,3 @@
+[submodule "public/designs/themes/serpro"]
+	path = public/designs/themes/serpro
+	url = http://gitlab.serpro/voce-serpro/serpro-theme.git
