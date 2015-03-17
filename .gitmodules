@@ -1,3 +1,6 @@
 [submodule "public/designs/themes/serpro"]
 	path = public/designs/themes/serpro
 	url = http://gitlab.serpro/voce-serpro/serpro-theme.git
+[submodule "public/designs/themes/consulta"]
+	path = public/designs/themes/consulta
+	url = http://gitlab.serpro/voce-serpro/palavra-aberta-theme.git
