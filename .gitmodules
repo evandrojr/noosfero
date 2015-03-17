@@ -4,3 +4,6 @@
 [submodule "public/designs/themes/consulta"]
 	path = public/designs/themes/consulta
 	url = http://gitlab.serpro/voce-serpro/palavra-aberta-theme.git
+[submodule "public/designs/themes/gradebasica"]
+	path = public/designs/themes/gradebasica
+	url = http://gitlab.serpro/leandro.santos/tema-grade-basica.git
