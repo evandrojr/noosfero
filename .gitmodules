@@ -7,3 +7,6 @@
 [submodule "public/designs/themes/gradebasica"]
 	path = public/designs/themes/gradebasica
 	url = http://gitlab.serpro/leandro.santos/tema-grade-basica.git
+[submodule "public/designs/themes/participa-web"]
+	path = public/designs/themes/participa-web
+	url = https://gitlab.com/participa/participa2-theme.git
