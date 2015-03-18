@@ -10,3 +10,6 @@
 [submodule "public/designs/themes/participa-web"]
 	path = public/designs/themes/participa-web
 	url = https://gitlab.com/participa/participa2-theme.git
+[submodule "plugins/pairwise"]
+	path = plugins/pairwise
+	url = git@gitlab.com:noosfero-plugins/pairwise.git
