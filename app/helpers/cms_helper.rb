@@ -9,10 +9,6 @@ module CmsHelper
     mime_type.gsub('/', '_').gsub('-', '')
   end
 
-  def add_upload_file_field(name, locals)
-    button_to_function :add, name, ("jQuery('#uploaded_files').append(jQuery('#uploaded_files>p').last().clone())")
-  end
-
   def pagination_links(collection, options={})
     options = {:previous_label => '&laquo; ', :next_label => ' &raquo;', :page_links => false}.merge(options)
     will_paginate(collection, options)
