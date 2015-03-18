@@ -1,5 +1,0 @@
-<% extend PairwisePlugin::Helpers::ViewerHelper %>
-
-<%= render :file =>  'layouts/_javascript' if embeded %>
-
-<%= render :partial => 'content_viewer/prompt_body', :locals => {:embeded => embeded, :pairwise_content => pairwise_content, :question => nil, :source => (defined?(source) ? source : '') }%>

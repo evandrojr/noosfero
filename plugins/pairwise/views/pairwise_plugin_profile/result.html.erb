@@ -1,8 +1,0 @@
-<% extend PairwisePlugin::Helpers::ViewerHelper %>
-
-<h1 class="title"><%= @page.name %></h1>
-
-<%= render :partial => "content_viewer/result", :locals => {
-                    :embeded => @embeded,
-                    :pairwise_content => @pairwise_content,
-        } %>
