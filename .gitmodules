@@ -1,0 +1,3 @@
+[submodule "plugins/pairwise"]
+	path = plugins/pairwise
+	url = git@gitlab.com:noosfero-plugins/pairwise.git
