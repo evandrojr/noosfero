@@ -13,3 +13,6 @@
 [submodule "plugins/pairwise"]
 	path = plugins/pairwise
 	url = git@gitlab.com:noosfero-plugins/pairwise.git
+[submodule "plugins/proposals_discussion"]
+	path = plugins/proposals_discussion
+	url = git@gitlab.com:noosfero-plugins/proposals_discussion.git
