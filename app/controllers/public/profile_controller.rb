@@ -64,15 +64,8 @@ class ProfileController < PublicController
   end
 
   def members
-    @profiles_focus = []
-
     if is_cache_expired?(profile.members_cache_key(params))
       @members = profile.members_by_name.includes(relations_to_include).paginate(:per_page => members_per_page, :page => params[:npage], :total_entries => profile.members.count)
-      if session[:invited_members]
-        @profiles_focus = session[:invited_members]
-
-        session.delete :invited_members
-      end
     end
   end
 
