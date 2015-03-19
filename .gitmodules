@@ -16,3 +16,6 @@
 [submodule "plugins/proposals_discussion"]
 	path = plugins/proposals_discussion
 	url = git@gitlab.com:noosfero-plugins/proposals_discussion.git
+[submodule "plugins/site_tour"]
+	path = plugins/site_tour
+	url = git@gitlab.com:noosfero-plugins/site_tour.git

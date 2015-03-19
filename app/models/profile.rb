@@ -3,7 +3,7 @@
 # which by default is the one returned by Environment:default.
 class Profile < ActiveRecord::Base
 
-  attr_accessible :name, :identifier, :public_profile, :nickname, :custom_footer, :custom_header, :address, :zip_code, :contact_phone, :image_builder, :description, :closed, :template_id, :environment, :lat, :lng, :is_template, :fields_privacy, :preferred_domain_id, :category_ids, :country, :city, :state, :national_region_code, :email, :contact_email, :redirect_l10n, :notification_time, :redirection_after_login, :email_suggestions, :allow_members_to_invite, :invite_friends_only, :custom_fields
+  attr_accessible :name, :identifier, :public_profile, :nickname, :custom_footer, :custom_header, :address, :zip_code, :contact_phone, :image_builder, :description, :closed, :template_id, :environment, :lat, :lng, :is_template, :fields_privacy, :preferred_domain_id, :category_ids, :country, :city, :state, :national_region_code, :email, :contact_email, :redirect_l10n, :notification_time, :redirection_after_login, :email_suggestions, :allow_members_to_invite, :invite_friends_only, :secret, :custom_fields
 
   # use for internationalizable human type names in search facets
   # reimplement on subclasses
@@ -115,16 +115,6 @@ class Profile < ActiveRecord::Base
   scope :communities, lambda { {:conditions => (Community.send(:subclasses).map(&:name) << 'Community').map { |klass| "profiles.type = '#{klass}'"}.join(" OR ")} }
   scope :templates, {:conditions => {:is_template => true}}
   scope :no_templates, {:conditions => {:is_template => false}}
-
-  #FIXME make this test
-  scope :newer_than, lambda { |reference_id|
-    {:conditions => ["profiles.id > #{reference_id}"]}
-  }
-
-  #FIXME make this test
-  scope :older_than, lambda { |reference_id|
-    {:conditions => ["profiles.id < #{reference_id}"]}
-  }
 
   def members
     scopes = plugins.dispatch_scopes(:organization_members, self)
@@ -703,32 +693,6 @@ private :generate_url, :url_options
     end
   end
 
-  # Adds many people to profile by id's or email's
-  def add_members(people_ids)
-
-    unless people_ids.nil? && people_ids.empty?
-      people = []
-
-      if people_ids.first =~ /\@/
-        people = User.where(email: people_ids)
-      else
-        people = Person.where(id: people_ids)
-      end
-
-      people.each do |profile|
-        person = profile
-
-        if profile.is_a? User
-          person = profile.person
-        end
-
-        unless person.is_member_of?(self)
-          add_member person
-        end
-      end
-    end
-  end
-
   def remove_member(person)
     self.disaffiliate(person, Profile::Roles.all_roles(environment.id))
   end
@@ -973,13 +937,6 @@ private :generate_url, :url_options
 
   def profile_custom_icon(gravatar_default=nil)
     image.public_filename(:icon) if image.present?
-  end
-
-  #FIXME make this test
-  def profile_custom_image(size = :icon)
-    image_path = profile_custom_icon if size == :icon
-    image_path ||= image.public_filename(size) if image.present?
-    image_path
   end
 
   def jid(options = {})
