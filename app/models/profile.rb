@@ -665,29 +665,26 @@ private :generate_url, :url_options
     end
   end
 
-  # Adds many people to profile by id's or email's
-  def add_members(people_ids)
+  # Adds many people to profile by id's
+  def add_members_by_id(people_ids)
 
     unless people_ids.nil? && people_ids.empty?
-      people = []
 
-      if people_ids.first =~ /\@/
-        people = User.where(email: people_ids)
-      else
-        people = Person.where(id: people_ids)
+      people = Person.where(id: people_ids)
+      people.each do |person|
+
+        add_member(person) unless person.is_member_of?(self)
       end
+    end
+  end
 
-      people.each do |profile|
-        person = profile
+  # Adds many people to profile by email's
+  def add_members_by_email(people_emails)
 
-        if profile.is_a? User
-          person = profile.person
-        end
+    people = User.where(email: people_emails)
+    people.each do |user|
 
-        unless person.is_member_of?(self)
-          add_member person
-        end
-      end
+      add_member(user.person) unless user.person.is_member_of?(self)
     end
   end
 
