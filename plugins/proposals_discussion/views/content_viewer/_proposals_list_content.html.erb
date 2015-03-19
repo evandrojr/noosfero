@@ -1,7 +1,0 @@
-<%= render :partial => 'content_viewer/proposal_card', :collection => proposals %>
-
-<% extend ProposalsDiscussionPlugin::ProposalsListHelper %>
-
-<div class="more">
-  <%= more_proposals(_('More'), holder, order, page) unless proposals.empty? %>
-</div>
