@@ -58,3 +58,9 @@
 .video-title-big{
   font-size: 2em;
 }
+
+.video-block-center{
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
