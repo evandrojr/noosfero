@@ -101,6 +101,7 @@ ActiveRecord::Schema.define(:version => 20150122165042) do
   end
 
   add_index "article_versions", ["article_id"], :name => "index_article_versions_on_article_id"
+  add_index "article_versions", ["parent_id"], :name => "index_article_versions_on_parent_id"
   add_index "article_versions", ["path", "profile_id"], :name => "index_article_versions_on_path_and_profile_id"
   add_index "article_versions", ["path"], :name => "index_article_versions_on_path"
   add_index "article_versions", ["published_at", "id"], :name => "index_article_versions_on_published_at_and_id"
@@ -217,7 +218,10 @@ ActiveRecord::Schema.define(:version => 20150122165042) do
     t.string  "acronym"
     t.string  "abbreviation"
     t.string  "display_color",   :limit => 6
+    t.text    "ancestry"
   end
+
+  add_index "categories", ["parent_id"], :name => "index_categories_on_parent_id"
 
   create_table "categories_profiles", :id => false, :force => true do |t|
     t.integer "profile_id"
@@ -235,6 +239,14 @@ ActiveRecord::Schema.define(:version => 20150122165042) do
     t.integer  "environment_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "chat_messages", :force => true do |t|
+    t.integer  "to_id"
+    t.integer  "from_id"
+    t.string   "body"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "comments", :force => true do |t|
@@ -356,6 +368,8 @@ ActiveRecord::Schema.define(:version => 20150122165042) do
     t.integer "height"
     t.boolean "thumbnails_processed", :default => false
   end
+
+  add_index "images", ["parent_id"], :name => "index_images_on_parent_id"
 
   create_table "inputs", :force => true do |t|
     t.integer  "product_id",                                    :null => false
@@ -641,15 +655,18 @@ ActiveRecord::Schema.define(:version => 20150122165042) do
   end
 
   add_index "taggings", ["tag_id", "taggable_id", "taggable_type", "context", "tagger_id", "tagger_type"], :name => "taggings_idx", :unique => true
+  add_index "taggings", ["taggable_id", "taggable_type", "context"], :name => "index_taggings_on_taggable_id_and_taggable_type_and_context"
   add_index "taggings", ["taggable_id", "taggable_type"], :name => "index_taggings_on_taggable_id_and_taggable_type"
 
   create_table "tags", :force => true do |t|
     t.string  "name"
     t.integer "parent_id"
-    t.boolean "pending",   :default => false
+    t.boolean "pending",        :default => false
+    t.integer "taggings_count", :default => 0
   end
 
   add_index "tags", ["name"], :name => "index_tags_on_name", :unique => true
+  add_index "tags", ["parent_id"], :name => "index_tags_on_parent_id"
 
   create_table "tasks", :force => true do |t|
     t.text     "data"
@@ -689,6 +706,8 @@ ActiveRecord::Schema.define(:version => 20150122165042) do
     t.string  "thumbnail"
   end
 
+  add_index "thumbnails", ["parent_id"], :name => "index_thumbnails_on_parent_id"
+
   create_table "units", :force => true do |t|
     t.string  "singular",       :null => false
     t.string  "plural",         :null => false
@@ -716,6 +735,7 @@ ActiveRecord::Schema.define(:version => 20150122165042) do
     t.string   "activation_code",           :limit => 40
     t.datetime "activated_at"
     t.string   "return_to"
+    t.datetime "last_login_at"
   end
 
   create_table "validation_infos", :force => true do |t|

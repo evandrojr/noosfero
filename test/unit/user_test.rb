@@ -302,6 +302,17 @@ class UserTest < ActiveSupport::TestCase
     assert !user.email_activation_pending?
   end
 
+  should 'has moderate registration pending' do
+    user = create_user('cooler')
+    ModerateUserRegistration.create!(:requestor => user.person, :target => Environment.default)
+    assert user.moderate_registration_pending?
+  end
+
+  should 'not has moderate registration pending if not have a pending task' do
+    user = create_user('cooler')
+    assert !user.moderate_registration_pending?
+  end
+
   should 'be able to use [] operator to find users by login' do
     user = fast_create(User)
     assert_equal user, User[user.login]
@@ -526,9 +537,19 @@ class UserTest < ActiveSupport::TestCase
     assert user.activated?
   end
 
-  should 'delay activation check' do
+  should 'delay activation check with default time' do
     user = new_user
-    assert_match /UserActivationJob/, Delayed::Job.last.handler
+    job = Delayed::Job.last
+    assert_match /UserActivationJob/, job.handler
+    assert_equal 72, ((job.run_at - user.created_at)/1.hour).round
+  end
+
+  should 'delay activation check with custom time' do
+    NOOSFERO_CONF.stubs(:[]).with('hours_until_user_activation_check').returns(240)
+    user = new_user
+    job = Delayed::Job.last
+    assert_match /UserActivationJob/, job.handler
+    assert_equal 240, ((job.run_at - user.created_at)/1.hour).round
   end
 
   should 'not create job to check activation to template users' do

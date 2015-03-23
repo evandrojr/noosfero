@@ -324,7 +324,9 @@ class PersonTest < ActiveSupport::TestCase
   should 'already request friendship' do
     p1 = create_user('testuser1').person
     p2 = create_user('testuser2').person
-    create(AddFriend, :person => p1, :friend => p2)
+    create(AddFriend, person: p1, friend: p2).finish
+    assert !p1.already_request_friendship?(p2)
+    create(AddFriend, person: p1, friend: p2)
     assert p1.already_request_friendship?(p2)
   end
 
@@ -1629,6 +1631,11 @@ class PersonTest < ActiveSupport::TestCase
     person = create_user('person').person
     person.environment.expects(:enabled?).with('cant_change_homepage').returns(false)
     assert person.can_change_homepage?
+  end
+
+  should 'follow? return false when no profile is passed as parameter' do
+    person = Person.new
+    assert_equal false, person.follows?(nil)
   end
 
 end

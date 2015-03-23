@@ -2,24 +2,16 @@ require 'noosfero/i18n'
 
 module DatesHelper
 
-  # FIXME Date#strftime should translate this for us !!!!
-  MONTHS = [
-    N_('January'),
-    N_('February'),
-    N_('March'),
-    N_('April'),
-    N_('May'),
-    N_('June'),
-    N_('July'),
-    N_('August'),
-    N_('September'),
-    N_('October'),
-    N_('November'),
-    N_('December')
-  ]
+  def months
+    I18n.t('date.month_names')
+  end
 
-  def month_name(n)
-    _(MONTHS[n-1])
+  def month_name(n, abbreviated = false)
+    if abbreviated
+      I18n.t('date.abbr_month_names')[n]
+    else
+      months[n]
+    end
   end
 
   # formats a date for displaying.
@@ -47,7 +39,7 @@ module DatesHelper
     end
   end
 
-  # formats a datetime for displaying. 
+  # formats a datetime for displaying.
   def show_time(time)
     if time
       _('%{day} %{month} %{year}, %{hour}:%{minutes}') % { :year => time.year, :month => month_name(time.month), :day => time.day, :hour => time.hour, :minutes => time.strftime("%M") }
@@ -91,15 +83,7 @@ module DatesHelper
       _(date.strftime("%a"))
     else
       # FIXME Date#strftime should translate this for us !!!!
-      _([
-        N_('Sunday'),
-        N_('Monday'),
-        N_('Tuesday'),
-        N_('Wednesday'),
-        N_('Thursday'),
-        N_('Friday'),
-        N_('Saturday'),
-      ][date.wday])
+      I18n.t('date.day_names')[date.wday]
     end
   end
 
@@ -111,7 +95,7 @@ module DatesHelper
       date = date << 1
     end
     if opts[:only_month]
-      _('%{month}') % {:month => month_name(date.month.to_i) }
+      _('%{month}') % { :month => month_name(date.month.to_i) }
     else
       _('%{month} %{year}') % { :year => date.year, :month => month_name(date.month.to_i) }
     end
@@ -156,7 +140,7 @@ module DatesHelper
     else
       order = [:day, :month, :year]
     end
-    date_select(object, method, html_options.merge(options.merge(:include_blank => true, :order => order, :use_month_names => MONTHS.map {|item| gettext(item)})))
+    date_select(object, method, html_options.merge(options.merge(:include_blank => true, :order => order, :use_month_names => months)))
   end
 
 end

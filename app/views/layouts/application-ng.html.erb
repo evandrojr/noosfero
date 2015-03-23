@@ -5,12 +5,10 @@
     <%= yield(:feeds) %>
     <!--<meta http-equiv="refresh" content="1"/>-->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <meta name="description" content="<%= @environment.name %>" />
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" value="summary">
-    <meta name="twitter:title" content="<%= h page_title %>">
-    <meta name="twitter:description" content="<%= meta_description_tag(@page) %>">
+    <% unless defined? MetadataPlugin and environment.enabled_plugins.include? 'MetadataPlugin' %>
+      <meta name="description" content="<%= @environment.name %>" />
+    <% end %>
 
     <!-- site root -->
     <meta property="noosfero:root" content="<%= Noosfero.root %>"/>
@@ -23,7 +21,7 @@
     <%= yield :head %>
     <%=
       @plugins.dispatch(:head_ending).map do |content|
-        if content.respond_to?(:call) then instance_exec(&content).html_safe else content.html_safe end
+        if content.respond_to?(:call) then instance_exec(&content).to_s.html_safe else content.to_s.html_safe end
       end.join("\n")
     %>
 
@@ -37,7 +35,7 @@
 
     <%=
       @plugins.dispatch(:body_beginning).map do |content|
-        if content.respond_to?(:call) then instance_exec(&content).html_safe else content.html_safe end
+        if content.respond_to?(:call) then instance_exec(&content).to_s.html_safe else content.to_s.html_safe end
       end.join("\n")
     %>
 
@@ -61,7 +59,7 @@
         </div><!-- end id="content" -->
       </div><!-- end id="wrap-2" -->
     </div><!-- end id="wrap-1" -->
-    <%= render_environment_features(:logged_in) %>
+    <%= render_environment_features(:logged_in) if logged_in? %>
     <div id="theme-footer">
       <%= theme_footer %>
     </div><!-- end id="theme-footer" -->

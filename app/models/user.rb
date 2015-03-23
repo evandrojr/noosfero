@@ -54,7 +54,7 @@ class User < ActiveRecord::Base
 
       user.person = p
     end
-    if user.environment.enabled?('skip_new_user_email_confirmation') 
+    if user.environment.enabled?('skip_new_user_email_confirmation')
       if user.environment.enabled?('admin_must_approve_new_users')
         create_moderate_task
       else
@@ -102,6 +102,7 @@ class User < ActiveRecord::Base
   validates_length_of       :email,    :within => 3..100, :if => (lambda {|user| !user.email.blank?})
   validates_uniqueness_of   :login, :email, :case_sensitive => false, :scope => :environment_id
   before_save :encrypt_password
+  before_save :normalize_email, if: proc{ |u| u.email.present? }
   validates_format_of :email, :with => Noosfero::Constants::EMAIL_FORMAT, :if => (lambda {|user| !user.email.blank?})
 
   validates_inclusion_of :terms_accepted, :in => [ '1' ], :if => lambda { |u| ! u.terms_of_use.blank? }, :message => N_('{fn} must be checked in order to signup.').fix_i18n
@@ -112,6 +113,10 @@ class User < ActiveRecord::Base
     u = self.first :conditions => ['(login = ? OR email = ?) AND environment_id = ? AND activated_at IS NOT NULL',
                                    login, login, environment.id] # need to get the salt
     u && u.authenticated?(password) ? u : nil
+  end
+
+  def register_login
+    self.update_attribute :last_login_at, Time.now
   end
 
   # Activates the user in the database.
@@ -154,6 +159,7 @@ class User < ActiveRecord::Base
     @task.name = self.name
     @task.email = self.email
     @task.target = self.environment
+    @task.requestor = self.person
     @task.save
   end
 
@@ -296,6 +302,10 @@ class User < ActiveRecord::Base
     end
   end
 
+  def moderate_registration_pending?
+    return ModerateUserRegistration.exists?(:requestor_id => self.person.id, :target_id => self.environment.id, :status => Task::Status::ACTIVE)
+  end
+
   def data_hash(gravatar_default = nil)
     friends_list = {}
     enterprises = person.enterprises.map { |e| { 'name' => e.short_name, 'identifier' => e.identifier } }
@@ -332,6 +342,11 @@ class User < ActiveRecord::Base
   end
 
   protected
+
+    def normalize_email
+      self.email = self.email.squish.downcase
+    end
+
     # before filter
     def encrypt_password
       return if password.blank?
@@ -359,6 +374,6 @@ class User < ActiveRecord::Base
 
     def delay_activation_check
       return if person.is_template?
-      Delayed::Job.enqueue(UserActivationJob.new(self.id), {:priority => 0, :run_at => 72.hours.from_now})
+      Delayed::Job.enqueue(UserActivationJob.new(self.id), {:priority => 0, :run_at => (NOOSFERO_CONF['hours_until_user_activation_check'] || 72).hours.from_now})
     end
 end

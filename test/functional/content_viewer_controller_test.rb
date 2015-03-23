@@ -958,6 +958,8 @@ class ContentViewerControllerTest < ActionController::TestCase
   end
 
   should 'display add translation link if article is translatable' do
+    environment.languages = ['en']
+    environment.save
     login_as @profile.identifier
     textile = fast_create(TextileArticle, :profile_id => @profile.id, :path => 'textile', :language => 'en')
     xhr :get, :view_page, :profile => @profile.identifier, :page => textile.path, :toolbar => true
@@ -1401,30 +1403,6 @@ class ContentViewerControllerTest < ActionController::TestCase
       get 'view_page', :profile => profile.identifier, :page => article.path.split('/')
       article.reload
     end
-  end
-
-  should 'add meta tags with article info' do
-    a = TinyMceArticle.create(:name => 'Article to be shared', :body => 'This article should be shared with all social networks', :profile => profile)
-
-    get :view_page, :profile => profile.identifier, :page => [ a.name.to_slug ]
-
-    assert_tag :tag => 'meta', :attributes => { :name => 'twitter:title', :content => /#{a.name} - #{a.profile.name}/ }
-    assert_tag :tag => 'meta', :attributes => { :name => 'twitter:description', :content => a.body }
-    assert_no_tag :tag => 'meta', :attributes => { :name => 'twitter:image' }
-    assert_tag :tag => 'meta', :attributes => { :property => 'og:type', :content => 'article' }
-    assert_tag :tag => 'meta', :attributes => { :property => 'og:url', :content => /\/#{profile.identifier}\/#{a.name.to_slug}/ }
-    assert_tag :tag => 'meta', :attributes => { :property => 'og:title', :content => /#{a.name} - #{a.profile.name}/ }
-    assert_tag :tag => 'meta', :attributes => { :property => 'og:site_name', :content => a.profile.name }
-    assert_tag :tag => 'meta', :attributes => { :property => 'og:description', :content => a.body }
-    assert_no_tag :tag => 'meta', :attributes => { :property => 'og:image' }
-  end
-
-  should 'add meta tags with article images' do
-    a = TinyMceArticle.create(:name => 'Article to be shared with images', :body => 'This article should be shared with all social networks <img src="/images/x.png" />', :profile => profile)
-
-    get :view_page, :profile => profile.identifier, :page => [ a.name.to_slug ]
-    assert_tag :tag => 'meta', :attributes => { :name => 'twitter:image', :content => /\/images\/x.png/ }
-    assert_tag :tag => 'meta', :attributes => { :property => 'og:image', :content => /\/images\/x.png/  }
   end
 
   should 'manage  private article visualization' do

@@ -107,10 +107,12 @@ class ContentViewerController < ApplicationController
           if translation.language == locale
             @page = translation
             redirect_to :profile => @page.profile.identifier, :page => @page.explode_path
+            return true
           end
         end
       end
     end
+    false
   end
 
   def pass_without_comment_captcha?
@@ -221,7 +223,7 @@ class ContentViewerController < ApplicationController
       #      relation.
       posts = posts.native_translations if blog_with_translation?(@page)
 
-      @posts = posts.paginate({ :page => params[:npage], :per_page => @page.posts_per_page }.merge(Article.display_filter(user, profile))).to_a
+      @posts = posts.display_filter(user, profile).paginate({ :page => params[:npage], :per_page => @page.posts_per_page }).to_a
 
       if blog_with_translation?(@page)
         @posts.replace @posts.map{ |p| p.get_translation_to(FastGettext.locale) }.compact

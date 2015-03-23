@@ -28,6 +28,7 @@ class ApplicationController < ActionController::Base
       unless environment.access_control_allow_methods.blank?
         response.headers["Access-Control-Allow-Methods"] = environment.access_control_allow_methods
       end
+      response.headers["Access-Control-Allow-Credentials"] = 'true'
     elsif environment.restrict_to_access_control_origins
       render_access_denied _('Origin not in allowed.')
     end
@@ -59,15 +60,7 @@ class ApplicationController < ActionController::Base
   helper :document
   helper :language
 
-  def self.no_design_blocks
-    @no_design_blocks = true
-  end
-  def self.uses_design_blocks?
-    !@no_design_blocks
-  end
-  def uses_design_blocks?
-    !@no_design_blocks && self.class.uses_design_blocks?
-  end
+  include DesignHelper
 
   # Be sure to include AuthenticationSystem in Application Controller instead
   include AuthenticatedSystem
