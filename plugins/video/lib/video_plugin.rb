@@ -1,9 +1,7 @@
-require_dependency File.dirname(__FILE__) + '/video_block'
-
 class VideoPlugin < Noosfero::Plugin
 
   def self.plugin_name
-    "Video Block Plugin"
+    "Video Content type, Video Block and Video Gallery Plugin"
   end
 
   def self.plugin_description
@@ -11,9 +9,40 @@ class VideoPlugin < Noosfero::Plugin
   end
 
   def self.extra_blocks
-    {
-      VideoBlock => {}
-    }
+      { VideoPlugin::VideoBlock => {}, VideoPlugin::VideoGalleryBlock => {:position=>['1']} }
+  end
+
+  def stylesheet?
+    true
+  end
+
+  def content_types
+    [VideoPlugin::VideoGallery, VideoPlugin::Video]
+  end
+
+  def content_remove_new(content)
+    if content.kind_of?(VideoPlugin::VideoGallery) or content.kind_of?(VideoPlugin::Video)
+      true
+    end
+  end
+
+  def content_remove_upload(content)
+    if content.kind_of?(VideoPlugin::VideoGallery) or content.kind_of?(VideoPlugin::Video)
+      true
+    end
+  end
+
+  def article_extra_toolbar_buttons(content)
+    if content.kind_of?(VideoPlugin::VideoGallery)
+      proc do
+        content_tag('a', _("New Video"),
+        { :id=>"new-video-btn",
+          :class=>"button with-text icon-new",
+          :href=>url_for(:action => 'new', :type=>'VideoPlugin::Video', :controller=>'cms', :parent_id => content.id),
+          :title=>_("New Video")
+        })
+      end
+    end
   end
 
 end

@@ -1,7 +1,5 @@
 <div<%= user && " class='logged-in'" %>>
   <div id="article-actions">
-
-
     <% if @page.allow_edit?(user) && !remove_content_button(:edit, @page) %>
       <% content = content_tag('span', label_for_edit_article(@page)) %>
       <% url = profile.admin_url.merge({ :controller => 'cms', :action => 'edit', :id => @page.id }) %>
@@ -46,8 +44,10 @@
       <%= button(:clock, _('All versions'), {:controller => 'content_viewer', :profile => profile.identifier, :action => 'article_versions'}, :id => 'article-versions-link') %>
     <% end %>
 
+    <%#*Adds extra buttons to the toolbar%>
+    <%= @plugins.dispatch(:article_extra_toolbar_buttons, @page).collect { |content| instance_exec(&content) }.join("") %>
+    
     <%= report_abuse(profile, :link, @page) %>
-
   </div>
   <div id="article-header">
     <% if @page.blog? and !@page.image.nil? %>
