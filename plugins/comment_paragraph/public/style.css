@@ -364,3 +364,9 @@ div.article-comments-list-more{
 #content .comment-paragraph-plugin .button-bar {
   margin: 5px 0;
 }
+
+li span[data-macro="comment_paragraph_plugin/allow_comment"] {
+  display: inline-block;
+  vertical-align: top;
+  min-height: 30px;
+}
