@@ -49,6 +49,14 @@ class ArticleTest < ActiveSupport::TestCase
     assert_mark_paragraph article.body, 'li', 'item2'
   end
 
+  should 'parse inner html li when activate comment paragraph' do
+    article.body = '<div><ul><li class="custom_class">item1</li><li>item2</li></ul><div>'
+    article.comment_paragraph_plugin_activate = true
+    article.save!
+    assert_mark_paragraph article.body, 'li', 'item1'
+    assert_mark_paragraph article.body, 'li', 'item2'
+  end
+
   should 'do not remove macro div when disable comment paragraph' do
     article.body = "<p>paragraph 1</p>"
     article.comment_paragraph_plugin_activate = true
