@@ -24,14 +24,14 @@ class Article
     if body && (body_changed? || setting_changed?(:comment_paragraph_plugin_activate))
       updated = body_changed? ? body_change[1] : body
       doc =  Nokogiri::HTML(updated)
-      doc.css('body > div, body > span, body > p, li').each do |paragraph|
+      doc.css('li, body > div, body > span, body > p').each do |paragraph|
         next if paragraph.css('[data-macro="comment_paragraph_plugin/allow_comment"]').present? || paragraph.content.blank?
 
         commentable = Nokogiri::XML::Node.new("span", doc)
         commentable['class'] = "macro article_comments paragraph_comment #{paragraph['class']}"
         commentable['data-macro'] = 'comment_paragraph_plugin/allow_comment'
         commentable['data-macro-paragraph_uuid'] = SecureRandom.uuid
-        commentable.inner_html = paragraph.content
+        commentable.inner_html = paragraph.inner_html
         paragraph.inner_html = commentable
       end
       self.body = doc.at('body').inner_html
