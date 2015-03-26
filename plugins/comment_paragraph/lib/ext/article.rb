@@ -22,22 +22,19 @@ class Article
     comment_paragraph_plugin_set_initial_value unless persisted?
     return unless comment_paragraph_plugin_activated?
     if body && (body_changed? || setting_changed?(:comment_paragraph_plugin_activate))
-      parsed_paragraphs = []
       updated = body_changed? ? body_change[1] : body
-      doc =  Nokogiri::HTML(updated).css('body')
-      
-      doc.children.each do |paragraph|
-        if paragraph.to_html =~ /^<div(.*)paragraph_comment(.*)$/ || paragraph.to_html =~ /^<p>\W<\/p>$/
-          parsed_paragraphs << paragraph.to_html
-        else
-          if paragraph.to_html =~ /^(<div|<table|<p|<ul).*/
-            parsed_paragraphs << comment_paragraph_plugin_parse_paragraph(paragraph.to_html, SecureRandom.uuid)
-          else
-            parsed_paragraphs << paragraph.to_html
-          end
-        end
+      doc =  Nokogiri::HTML(updated)
+      doc.css('body > div, body > span, body > p, li').each do |paragraph|
+        next if paragraph.css('[data-macro="comment_paragraph_plugin/allow_comment"]').present? || paragraph.content.blank?
+
+        commentable = Nokogiri::XML::Node.new("span", doc)
+        commentable['class'] = "macro article_comments paragraph_comment #{paragraph['class']}"
+        commentable['data-macro'] = 'comment_paragraph_plugin/allow_comment'
+        commentable['data-macro-paragraph_uuid'] = SecureRandom.uuid
+        commentable.inner_html = paragraph.content
+        paragraph.inner_html = commentable
       end
-      self.body = parsed_paragraphs.join()
+      self.body = doc.at('body').inner_html
     end
   end
 
@@ -48,12 +45,6 @@ class Article
 
   def comment_paragraph_plugin_settings
     @comment_paragraph_plugin_settings ||= Noosfero::Plugin::Settings.new(environment, CommentParagraphPlugin)
-  end
-
-  def comment_paragraph_plugin_parse_paragraph(paragraph_content, paragraph_uuid)
-    "<div class='macro article_comments paragraph_comment' " +
-      "data-macro='comment_paragraph_plugin/allow_comment' " +
-      "data-macro-paragraph_uuid='#{paragraph_uuid}'>#{paragraph_content}</div>\r\n"
   end
 
 end

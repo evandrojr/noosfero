@@ -33,20 +33,30 @@ class ArticleTest < ActiveSupport::TestCase
   end
 
   should 'parse html if the plugin is not enabled' do
-    article.body = "<p>paragraph 1</p><p>paragraph 2</p>"
+    article.body = "<p>paragraph 1</p><div>div 1</div><span>span 1</span>"
     article.comment_paragraph_plugin_activate = true
     article.save!
-    assert_match /data-macro="comment_paragraph_plugin\/allow_comment"/, article.body
+    assert_mark_paragraph article.body, 'p', 'paragraph 1'
+    assert_mark_paragraph article.body, 'div', 'div 1'
+    assert_mark_paragraph article.body, 'span', 'span 1'
+  end
+
+  should 'parse html li when activate comment paragraph' do
+    article.body = '<ul><li class="custom_class">item1</li><li>item2</li></ul>'
+    article.comment_paragraph_plugin_activate = true
+    article.save!
+    assert_mark_paragraph article.body, 'li', 'item1'
+    assert_mark_paragraph article.body, 'li', 'item2'
   end
 
   should 'do not remove macro div when disable comment paragraph' do
-    article.body = "<p>paragraph 1</p><p>paragraph 2</p>"
+    article.body = "<p>paragraph 1</p>"
     article.comment_paragraph_plugin_activate = true
     article.save!
-    assert_match /data-macro="comment_paragraph_plugin\/allow_comment"/, article.body
+    assert_mark_paragraph article.body, 'p', 'paragraph 1'
     article.comment_paragraph_plugin_activate = false
     article.save!
-    assert_match /data-macro="comment_paragraph_plugin\/allow_comment"/, article.body
+    assert_mark_paragraph article.body, 'p', 'paragraph 1'
   end
 
   should 'parse html when activate comment paragraph' do
@@ -56,7 +66,42 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal "<p>paragraph 1</p><p>paragraph 2</p>", article.body
     article.comment_paragraph_plugin_activate = true
     article.save!
-    assert_match /data-macro="comment_paragraph_plugin\/allow_comment"/, article.body
+
+    assert_mark_paragraph article.body, 'p', 'paragraph 1'
+    assert_mark_paragraph article.body, 'p', 'paragraph 2'
+  end
+
+  should 'parse html when add new paragraph' do
+    article.body = "<p>paragraph 1</p>"
+    article.comment_paragraph_plugin_activate = true
+    article.save!
+    assert_mark_paragraph article.body, 'p', 'paragraph 1'
+
+    article.body += "<p>paragraph 2</p>"
+    article.save!
+    assert_mark_paragraph article.body, 'p', 'paragraph 1'
+    assert_mark_paragraph article.body, 'p', 'paragraph 2'
+  end
+
+  should 'keep already marked paragraph attributes when add new paragraph' do
+    article.body = "<p>paragraph 1</p>"
+    article.comment_paragraph_plugin_activate = true
+    article.save!
+    assert_mark_paragraph article.body, 'p', 'paragraph 1'
+    uuid = Nokogiri::HTML(article.body).at('p span.paragraph_comment')['data-macro-paragraph_uuid']
+
+    article.body += "<p>paragraph 2</p>"
+    article.save!
+    assert_mark_paragraph article.body, 'p', 'paragraph 1'
+    new_uuid = Nokogiri::HTML(article.body).at('p span.paragraph_comment')['data-macro-paragraph_uuid']
+    assert_equal uuid, new_uuid
+  end
+
+  should 'not parse empty element' do
+    article.body = '<div></div>'
+    article.comment_paragraph_plugin_activate = true
+    article.save!
+    assert_equal '<div></div>', article.body
   end
 
   should 'be enabled if plugin is enabled and article is a kind of TextArticle' do
