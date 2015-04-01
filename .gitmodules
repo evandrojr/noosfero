@@ -13,3 +13,6 @@
 [submodule "plugins/comment_paragraph"]
 	path = plugins/comment_paragraph
 	url = git@gitlab.com:noosfero-plugins/comment-paragraph.git
+[submodule "plugins/notification"]
+	path = plugins/notification
+	url = git@gitlab.com:noosfero-plugins/notification.git
