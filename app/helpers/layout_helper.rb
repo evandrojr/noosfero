@@ -50,6 +50,7 @@ module LayoutHelper
       'inputosaurus',
       'chat',
       'selectordie-theme',
+      'block-store',
       pngfix_stylesheet_path,
     ] + tokeninput_stylesheets
     plugins_stylesheets = @plugins.select(&:stylesheet?).map { |plugin| plugin.class.public_path('style.css') }
