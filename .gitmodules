@@ -28,3 +28,6 @@
 [submodule "plugins/notification"]
 	path = plugins/notification
 	url = git@gitlab.com:noosfero-plugins/notification.git
+[submodule "plugins/email_article"]
+	path = plugins/email_article
+	url = git@gitlab.com:noosfero-plugins/email_article.git
