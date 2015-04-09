@@ -19,3 +19,12 @@
 [submodule "plugins/site_tour"]
 	path = plugins/site_tour
 	url = git@gitlab.com:noosfero-plugins/site_tour.git
+[submodule "plugins/gamification"]
+	path = plugins/gamification
+	url = git@gitlab.com:noosfero-plugins/gamification.git
+[submodule "plugins/comment_paragraph"]
+	path = plugins/comment_paragraph
+	url = git@gitlab.com:noosfero-plugins/comment-paragraph.git
+[submodule "plugins/notification"]
+	path = plugins/notification
+	url = git@gitlab.com:noosfero-plugins/notification.git
