@@ -2,7 +2,7 @@ source "https://rubygems.org"
 gem 'rails',                    '~> 3.2.21'
 gem 'minitest',                 '~> 3.2.0'
 gem 'fast_gettext',             '~> 0.6.8'
-gem 'acts-as-taggable-on',      '~> 3.0.2'
+gem 'acts-as-taggable-on',      '~> 3.4.2'
 gem 'rails_autolink',           '~> 1.1.5'
 gem 'pg',                       '~> 0.13.2'
 gem 'rmagick',                  '~> 2.13.1'
@@ -15,10 +15,10 @@ gem 'nokogiri',                 '~> 1.5.5'
 gem 'rake', :require => false
 gem 'rest-client',              '~> 1.6.7'
 gem 'exception_notification',   '~> 4.0.1'
-gem 'gettext',                  '~> 2.2.1', :require => false, :group => :development
+gem 'gettext',                  '~> 2.2.1', :require => false
 gem 'locale',                   '~> 2.0.5'
 gem 'whenever', :require => false
-gem 'eita-jrails', :require => false
+gem 'eita-jrails', '>= 0.9.5', :require => 'jrails'
 
 group :production do
   gem 'dalli', '~> 2.7.0'

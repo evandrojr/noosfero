@@ -443,6 +443,24 @@ class ProfileTest < ActiveSupport::TestCase
     assert_not_includes result, p2
   end
 
+  should 'be able to find the public profiles but not secret ones' do
+    p1 = create(Profile, :public_profile => true)
+    p2 = create(Profile, :public_profile => true, :secret => true)
+
+    result = Profile.public
+    assert_includes result, p1
+    assert_not_includes result, p2
+  end
+
+  should 'be able to find visible profiles but not secret ones' do
+    p1 = create(Profile, :visible => true)
+    p2 = create(Profile, :visible => true, :secret => true)
+
+    result = Profile.visible
+    assert_includes result, p1
+    assert_not_includes result, p2
+  end
+
   should 'have public content by default' do
     assert_equal true, Profile.new.public_content
   end
@@ -485,7 +503,7 @@ class ProfileTest < ActiveSupport::TestCase
   should 'categorize in the entire category hierarchy' do
     c1 = fast_create(Category)
     c2 = fast_create(Category, :parent_id => c1.id)
-    c3 = fast_create(Category, :parent_id => c2.id) 
+    c3 = fast_create(Category, :parent_id => c2.id)
 
     profile = create_user('testuser').person
     profile.add_category(c3)
@@ -1006,7 +1024,7 @@ class ProfileTest < ActiveSupport::TestCase
 
   should 'copy header when applying template' do
     template = fast_create(Profile)
-    template[:custom_header] = '{name}' 
+    template[:custom_header] = '{name}'
     template.save!
 
     p = create(Profile, :name => 'test prof')
@@ -1260,7 +1278,7 @@ class ProfileTest < ActiveSupport::TestCase
     task2 = Task.create!(:requestor => person, :target => another)
 
     person.stubs(:is_admin?).with(other).returns(true)
-    Environment.find(:all).select{|i| i != other }.each do |env| 
+    Environment.find(:all).select{|i| i != other }.each do |env|
       person.stubs(:is_admin?).with(env).returns(false)
     end
 
@@ -1386,6 +1404,71 @@ class ProfileTest < ActiveSupport::TestCase
     assert_includes environment.profiles.templates, t1
     assert_includes environment.profiles.templates, t2
     assert_not_includes environment.profiles.templates, profile
+  end
+
+  should 'return an specific template when specified' do
+    environment = Environment.default
+    t1 = fast_create(Profile, :is_template => true)
+    t2 = fast_create(Profile, :is_template => true)
+    profile = fast_create(Profile)
+
+    assert_equal [t1], environment.profiles.templates(t1)
+    assert_equal [t2], environment.profiles.templates(t2)
+  end
+
+  should 'not return a template when and invalid template is specified' do
+    environment = Environment.default
+    t1 = fast_create(Profile, :is_template => true)
+    t2 = fast_create(Profile, :is_template => true)
+    t3 = fast_create(Profile)
+
+    assert_equal [], environment.profiles.templates(t3)
+  end
+
+  should 'return profiles of specified template passing object' do
+    environment = Environment.default
+    t1 = fast_create(Profile, :is_template => true)
+    t2 = fast_create(Profile, :is_template => true)
+    p1 = fast_create(Profile, :template_id => t1.id)
+    p2 = fast_create(Profile, :template_id => t2.id)
+    p3 = fast_create(Profile, :template_id => t1.id)
+
+    assert_equivalent [p1,p3], environment.profiles.with_templates(t1)
+  end
+
+  should 'return profiles of specified template passing id' do
+    environment = Environment.default
+    t1 = fast_create(Profile, :is_template => true)
+    t2 = fast_create(Profile, :is_template => true)
+    p1 = fast_create(Profile, :template_id => t1.id)
+    p2 = fast_create(Profile, :template_id => t2.id)
+    p3 = fast_create(Profile, :template_id => t1.id)
+
+    assert_equivalent [p1,p3], environment.profiles.with_templates(t1.id)
+  end
+
+  should 'return profiles of a list of specified templates' do
+    environment = Environment.default
+    t1 = fast_create(Profile, :is_template => true)
+    t2 = fast_create(Profile, :is_template => true)
+    t3 = fast_create(Profile, :is_template => true)
+    p1 = fast_create(Profile, :template_id => t1.id)
+    p2 = fast_create(Profile, :template_id => t2.id)
+    p3 = fast_create(Profile, :template_id => t3.id)
+
+    assert_equivalent [p1,p2], environment.profiles.with_templates([t1,t2])
+  end
+
+  should 'return all profiles without any template if nil is passed as parameter' do
+    environment = Environment.default
+    Profile.delete_all
+    t1 = fast_create(Profile, :is_template => true)
+    t2 = fast_create(Profile, :is_template => true)
+    p1 = fast_create(Profile, :template_id => t1.id)
+    p2 = fast_create(Profile, :template_id => t2.id)
+    p3 = fast_create(Profile)
+
+    assert_equivalent [t1,t2,p3], environment.profiles.with_templates(nil)
   end
 
   should 'return a list of profiles that are not templates' do
@@ -1729,7 +1812,7 @@ class ProfileTest < ActiveSupport::TestCase
     assert profile.is_on_homepage?("/#{profile.identifier}/#{homepage.slug}", homepage)
   end
 
-  
+
   should 'find profiles with image' do
     env = fast_create(Environment)
     2.times do |n|

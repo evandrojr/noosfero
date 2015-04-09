@@ -9,6 +9,7 @@ class SearchController < PublicController
   before_filter :load_search_assets, :except => :suggestions
   before_filter :load_query, :except => :suggestions
   before_filter :load_order, :except => :suggestions
+  before_filter :load_templates, :except => :suggestions
 
   # Backwards compatibility with old URLs
   def redirect_asset_param
@@ -61,7 +62,7 @@ class SearchController < PublicController
   end
 
   def articles
-    @scope = @environment.articles.public
+    @scope = @environment.articles.public.paginate(paginate_options)
     full_text_search
   end
 
@@ -75,7 +76,7 @@ class SearchController < PublicController
   end
 
   def products
-    @scope = @environment.products
+    @scope = @environment.products.paginate(paginate_options)
     full_text_search
   end
 
@@ -210,6 +211,11 @@ class SearchController < PublicController
     end
   end
 
+  def load_templates
+    @templates = {}
+    @templates[@asset] = environment.send(@asset.to_s).templates if [:people, :enterprises, :communities].include?(@asset)
+  end
+
   def limit
     if map_search?(@searches)
       MAP_SEARCH_LIMIT
@@ -230,7 +236,7 @@ class SearchController < PublicController
   end
 
   def full_text_search
-    @searches[@asset] = find_by_contents(@asset, environment, @scope, @query, paginate_options, {:category => @category, :filter => @order})
+    @searches[@asset] = find_by_contents(@asset, environment, @scope, @query, paginate_options, {:category => @category, :filter => @order, :template_id => params[:template_id]})
   end
 
   private
@@ -238,7 +244,7 @@ class SearchController < PublicController
   def visible_profiles(klass, *extra_relations)
     relations = [:image, :domains, :environment, :preferred_domain]
     relations += extra_relations
-    @environment.send(klass.name.underscore.pluralize).visible.includes(relations)
+    @environment.send(klass.name.underscore.pluralize).visible.includes(relations).paginate(paginate_options)
   end
 
   def per_page
