@@ -54,7 +54,7 @@ module Noosfero
   end
 
   def self.identifier_format
-    '[a-z0-9][a-z0-9~.]*([_\-][a-z0-9~.]+)*'
+    '(?!index)[a-z0-9][a-z0-9~.]*([_\-][a-z0-9~.]+)*'
   end
 
   def self.default_hostname
