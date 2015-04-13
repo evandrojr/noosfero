@@ -1,3 +1,21 @@
+/*
+ * thidparty libraries
+ *= require colorbox
+ *= require selectordie
+ *= require selectordie-theme
+ *= require inputosaurus
+ *= require token-input
+ *= require token-input-facebook
+ *= require token-input-mac
+ *= require token-input-facet
+ * noosfero libraries
+ *= require_self
+ *= require iepngfix/iepngfix
+ * views specifics
+ *= require chat
+ *= require search
+ */
+
 /* browser fixes */
 
 img:-moz-broken {
@@ -76,19 +94,6 @@ div#errorExplanation h2 {
 }
 #footer_content {
   clear: both;
-}
-#footer {
-  text-align: center;
-  clear: both;
-  font-size: 10px;
-  color: #777;
-}
-#footer a {
-  color: #777;
-  text-decoration: none;
-}
-#footer a:hover {
-  color: #555;
 }
 div#profile-disabled {
   border: 2px solid #944;
@@ -4427,7 +4432,8 @@ h1#agenda-title {
 #groups-list li {
   display: block;
   list-style: none;
-  margin-bottom: 20px background-color: #B8CFE7;
+  margin-bottom: 20px;
+  background-color: #B8CFE7;
 }
 
 #groups-list li .vcard {
@@ -6932,8 +6938,8 @@ li.profile-activity-item.upload_image .activity-gallery-images-count-1 img {
 }
 
 .fetching-overlay {
-  position: absolute; 
-  top: 0px; 
+  position: absolute;
+  top: 0px;
   left: 0px;
   right: 0px;
   bottom: 0px;

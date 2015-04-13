@@ -463,13 +463,13 @@ class ApplicationHelperTest < ActionView::TestCase
 
   should 'base theme uses default icon theme' do
     stubs(:current_theme).returns('base')
-    assert_equal "/designs/icons/default/style.css", icon_theme_stylesheet_path.first
+    assert_equal "designs/icons/default/style.css", icon_theme_stylesheet_path.first
   end
 
   should 'base theme uses config to specify more then an icon theme' do
     stubs(:current_theme).returns('base')
-    assert_includes icon_theme_stylesheet_path, "/designs/icons/default/style.css"
-    assert_includes icon_theme_stylesheet_path, "/designs/icons/pidgin/style.css"
+    assert_includes icon_theme_stylesheet_path, "designs/icons/default/style.css"
+    assert_includes icon_theme_stylesheet_path, "designs/icons/pidgin/style.css"
   end
 
   should 'not display active field if only required' do
@@ -959,6 +959,47 @@ class ApplicationHelperTest < ActionView::TestCase
     stubs(:user).returns(profile)
     expects(:manage_link).with(profile.communities, :communities, _('My communities')).never
     assert_equal '', manage_communities
+  end
+
+  should 'include file from current theme out of a profile page' do
+    def profile; nil; end
+    def environment; e={}; def e.theme; 'env-theme'; end; e; end
+    def render(opt); opt; end
+    File.stubs(:exists?).returns(false)
+    file = Rails.root.join 'public/designs/themes/env-theme/somefile.html.erb'
+    assert_nil theme_include('somefile') # exists? = false
+    File.expects(:exists?).with(file).returns(true).at_least_once
+    assert_equal file, theme_include('somefile')[:file] # exists? = true
+  end
+
+  should 'include file from current theme inside a profile page' do
+    def profile; p={}; def p.theme; 'my-theme'; end; p; end
+    def render(opt); opt; end
+    File.stubs(:exists?).returns(false)
+    file = Rails.root.join 'public/designs/themes/my-theme/otherfile.html.erb'
+    assert_nil theme_include('otherfile') # exists? = false
+    File.expects(:exists?).with(file).returns(true).at_least_once
+    assert_equal file, theme_include('otherfile')[:file] # exists? = true
+  end
+
+  should 'include file from env theme' do
+    def profile; p={}; def p.theme; 'my-theme'; end; p; end
+    def environment; e={}; def e.theme; 'env-theme'; end; e; end
+    def render(opt); opt; end
+    File.stubs(:exists?).returns(false)
+    file = Rails.root.join 'public/designs/themes/env-theme/afile.html.erb'
+    assert_nil env_theme_include('afile') # exists? = false
+    File.expects(:exists?).with(file).returns(true).at_least_once
+    assert_equal file, env_theme_include('afile')[:file] # exists? = true
+  end
+
+  should 'include file from some theme' do
+    def render(opt); opt; end
+    File.stubs(:exists?).returns(false)
+    file = Rails.root.join 'public/designs/themes/atheme/afile.html.erb'
+    assert_nil from_theme_include('atheme', 'afile') # exists? = false
+    File.expects(:exists?).with(file).returns(true).at_least_once
+    assert_equal file, from_theme_include('atheme', 'afile')[:file] # exists? = true
   end
 
   protected
