@@ -13,7 +13,7 @@ msgstr ""
 #: plugins/community_hub/facebook_stream/lib_facebook_koala_stream.rb:36 plugins/community_hub/facebook_stream/lib_facebook_stream.rb:94
 #: plugins/community_hub/facebook_stream/lib_facebook_stream.rb:109
 msgid "said"
-msgstr "dito"
+msgstr "disse"
 
 #: plugins/community_hub/lib/community_hub_plugin/hub.rb:45
 msgid "Hub"
