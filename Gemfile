@@ -25,6 +25,9 @@ gem 'grape-swagger'
 gem 'rack-cors'
 gem 'rack-contrib'
 
+gem 'therubyracer'
+gem 'execjs'
+
 #gem 'grape-swagger-rails'
 
 # FIXME list here all actual dependencies (i.e. the ones in debian/control),
