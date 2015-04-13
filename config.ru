@@ -2,11 +2,15 @@
 
 require ::File.expand_path('../config/environment',  __FILE__)
 
+#use Rails::Rack::LogTailer
+#use Rails::Rack::Static
+#run ActionController::Dispatcher.news
+
 rails_app = Rack::Builder.new do
   run Noosfero::Application
 end
 
 run Rack::Cascade.new([
-  API::API,
+  Noosfero::API::API,
   rails_app
 ])

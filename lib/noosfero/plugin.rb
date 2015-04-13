@@ -141,7 +141,7 @@ class Noosfero::Plugin
     def available_plugin_names
       available_plugins.map { |f| File.basename(f).camelize }
     end
- 
+
     def all
       @all ||= available_plugins.map{ |dir| (File.basename(dir) + "_plugin").camelize }
     end
@@ -710,7 +710,6 @@ class Noosfero::Plugin
     #content_expire too.
     %w[edit delete spread locale suggest home new upload undo]
   end
-
 
 end
 
