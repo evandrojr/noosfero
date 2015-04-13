@@ -83,8 +83,12 @@ class BoxOrganizerController < ApplicationController
 
   def save
     @block = boxes_holder.blocks.find(params[:id])
-    @block.update_attributes(params[:block])
-    redirect_to :action => 'index'
+    if @block.kind_of?(RawHTMLBlock) && !user.is_admin?(environment)
+      render_access_denied
+    else
+      @block.update_attributes(params[:block])
+      redirect_to :action => 'index'
+    end
   end
 
   def boxes_editor?
