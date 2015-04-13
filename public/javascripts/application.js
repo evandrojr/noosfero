@@ -27,6 +27,9 @@
 *= require manage-products.js
 *= require catalog.js
 *= require autogrow.js
+*= require slick.js
+*= require select-or-die/_src/selectordie.js
+*= require block-store.js
 */
 
 // scope for noosfero stuff

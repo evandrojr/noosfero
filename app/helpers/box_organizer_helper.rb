@@ -10,9 +10,9 @@ module BoxOrganizerHelper
     elsif plugin && File.exists?(File.join(Rails.root, 'public', plugin.public_path, 'images', block.icon_path))
       image_path = File.join('/', plugin.public_path, 'images', block.icon_path)
     elsif File.exists?(File.join(Rails.root, 'public', 'images', block.icon_path))
-      image_path = block.icon_path
+      image_path = File.join('images', block.icon_path)
     else
-      image_path = block.default_icon_path
+      image_path = File.join('images', block.default_icon_path)
     end
 
     image_tag(image_path, height: '48', width: '48', class: 'block-type-icon', alt: '' )
@@ -33,7 +33,7 @@ module BoxOrganizerHelper
     images_path = Dir.glob(File.join(Rails.root, 'public', 'images', block.preview_path, '*')) if images_path.empty?
     images_path = images_path.map{|path| path.gsub(File.join(Rails.root, 'public'), '') } unless images_path.empty?
 
-    images_path = 1.upto(3).map{block.default_preview_path} if images_path.empty?
+    images_path = 1.upto(3).map{File.join('images', block.default_preview_path)} if images_path.empty?
 
     content_tag(:ul,
       images_path.map do |preview|
