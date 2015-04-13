@@ -2061,7 +2061,7 @@ a.button.disabled, input.disabled {
 }
 #content .comment-header .comment-actions-reply {
   float: right;
-  background-image: url(../designs/icons/tango/Tango/16x16/actions/go-jump.png);
+  background-image: url(/designs/icons/tango/Tango/16x16/actions/go-jump.png);
   height: 12px;
 }
 #content .comment-header ul {
