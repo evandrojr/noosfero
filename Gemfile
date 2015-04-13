@@ -13,7 +13,6 @@ gem 'daemons',                  '~> 1.1.5'
 gem 'thin',                     '~> 1.3.1'
 gem 'nokogiri',                 '~> 1.5.5'
 gem 'rake', :require => false
-gem 'grape',					'~> 0.2.1'
 gem 'rest-client',              '~> 1.6.7'
 gem 'exception_notification',   '~> 4.0.1'
 gem 'gettext',                  '~> 2.2.1', :require => false
