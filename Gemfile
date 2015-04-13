@@ -11,7 +11,7 @@ gem 'will_paginate',            '~> 3.0.3'
 gem 'ruby-feedparser',          '~> 0.7'
 gem 'daemons',                  '~> 1.1.5'
 gem 'thin',                     '~> 1.3.1'
-gem 'nokogiri',                 '~> 1.5.5'
+gem 'nokogiri',                 '~> 1.6.0'
 gem 'rake', :require => false
 gem 'rest-client',              '~> 1.6.7'
 gem 'exception_notification',   '~> 4.0.1'
