@@ -1,33 +1,25 @@
-[submodule "public/designs/themes/serpro"]
-	path = public/designs/themes/serpro
-	url = http://gitlab.serpro/voce-serpro/serpro-theme.git
-[submodule "public/designs/themes/consulta"]
-	path = public/designs/themes/consulta
-	url = http://gitlab.serpro/voce-serpro/palavra-aberta-theme.git
-[submodule "public/designs/themes/gradebasica"]
-	path = public/designs/themes/gradebasica
-	url = http://gitlab.serpro/leandro.santos/tema-grade-basica.git
 [submodule "public/designs/themes/participa-web"]
 	path = public/designs/themes/participa-web
 	url = https://gitlab.com/participa/participa2-theme.git
 [submodule "plugins/pairwise"]
 	path = plugins/pairwise
-	url = git@gitlab.com:noosfero-plugins/pairwise.git
+	url = https://gitlab.com/noosfero-plugins/pairwise.git
 [submodule "plugins/proposals_discussion"]
 	path = plugins/proposals_discussion
-	url = git@gitlab.com:noosfero-plugins/proposals_discussion.git
+	url = https://gitlab.com/noosfero-plugins/proposals_discussion.git
 [submodule "plugins/site_tour"]
 	path = plugins/site_tour
-	url = git@gitlab.com:noosfero-plugins/site_tour.git
+	url = https://gitlab.com/noosfero-plugins/site_tour.git
 [submodule "plugins/gamification"]
 	path = plugins/gamification
-	url = git@gitlab.com:noosfero-plugins/gamification.git
+	url = https://gitlab.com/noosfero-plugins/gamification.git
 [submodule "plugins/comment_paragraph"]
 	path = plugins/comment_paragraph
 	url = git@gitlab.com:noosfero-plugins/comment-paragraph.git
+	url = https://gitlab.com/noosfero-plugins/comment-paragraph.git
 [submodule "plugins/notification"]
 	path = plugins/notification
-	url = git@gitlab.com:noosfero-plugins/notification.git
+	url = https://gitlab.com/noosfero-plugins/notification.git
 [submodule "plugins/email_article"]
 	path = plugins/email_article
-	url = git@gitlab.com:noosfero-plugins/email_article.git
+	url = https://gitlab.com/noosfero-plugins/email_article.git
