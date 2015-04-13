@@ -96,56 +96,7 @@
     <!-- End Piwik Code -->
 
     <!-- Feedback -->
-
-    <link href='//feedback.participa.br/assets/feedback.css' media='all' rel='stylesheet'>
-    <script src='//feedback.participa.br/assets/feedback_client.js'></script>
-    
-    <script type="text/javascript">
-        $(document).ready(function() {
-          Feedback(
-                  {
-                      label: "Dê um Feedback!",
-                      header: "Registro do Feedback",
-                      url: "//feedback.participa.br/api/v1/feedbacks?access_token=pINDdceSPik_4vRCleHTQg",
-                      nextLabel: "Continuar",
-                      reviewLabel: "Revisar",
-                      sendLabel:  "Enviar",
-                      closeLabel: "Fechar",
-                      highlightBlackoutHelp: "Você pode destacar informações úteis ou ocultar informações sensíveis.",
-                      blackoutButtonLabel: "Ocultar",
-                      highlightButtonLabel: "Destacar",
-                      messageSuccess: "O seu relato foi enviado com sucesso!",
-                      messageError: "Houve um erro ao enviar o feedback...",
-                      pages: [
-                              new window.Feedback.Form([
-                                      {
-                                          type: "select",
-                                          name: "tipo_relato",
-                                          label: "Tipo de Relato",
-                                          options: ["Sugestão", "Erro", "Elogio"],
-                                          required: true
-                                      },
-                                      {
-                                          type: "starrating",
-                                          name: "starrating",
-                                          label: "Avalie",
-                                          options: ["1", "2", "3", "4", "5"],
-                                          required: true
-                                      },
-                                     {
-                                          type: "textarea",
-                                          name: "observacao",
-                                          label: "Observação"
-                                      }
-                                      ]
-                              ),
-                              new window.Feedback.Screenshot(),
-                              new window.Feedback.Review()
-                      ]
-                   });
-        });
-    
-    </script>
+    <script async src="//feedback.participa.br/widget/LaO2ZHfEDYP8U3PoSCHUHw"></script>
     <!-- End Feedback Code -->
   </body>
 </html>
