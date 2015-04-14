@@ -31,6 +31,8 @@ class OauthClientPluginPublicController < PublicController
     else
       session[:notice] = _("Can't login with #{provider.name}")
     end
+    session[:oauth_client_login] = true
+    session[:return_to] = '/'
 
     redirect_to :controller => :account, :action => :login
   end
@@ -38,6 +40,8 @@ class OauthClientPluginPublicController < PublicController
   def signup(auth)
     login = auth.info.email.split('@').first
     session[:oauth_data] = auth
+    session[:oauth_client_login] = true
+    session[:return_to] = '/'
     name = auth.info.name
     name ||= auth.extra && auth.extra.raw_info ? auth.extra.raw_info.name : ''
     redirect_to :controller => :account, :action => :signup, :user => {:login => login, :email => auth.info.email}, :profile_data => {:name => name}
