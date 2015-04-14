@@ -29,10 +29,6 @@ class OauthClientPlugin < Noosfero::Plugin
     end
   end
 
-  def js_files
-    'main.js'
-  end
-
   PROVIDERS = {
     :facebook => {
       :name => 'Facebook'
