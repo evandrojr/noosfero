@@ -30,7 +30,7 @@ class OauthClientPlugin < Noosfero::Plugin
   end
 
   def body_ending
-    "<script>oauthPluginCloseLoginPopup(#{logged_in?});</script>"
+    session.delete(:oauth_client_login) ? "<script>oauthPluginCloseLoginPopup(#{logged_in?}, '#{current_user.private_token}');</script>" : ''
   end
 
   def js_files

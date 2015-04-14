@@ -31,6 +31,7 @@ class OauthClientPluginPublicController < PublicController
     else
       session[:notice] = _("Can't login with #{provider.name}")
     end
+    session[:oauth_client_login] = true
 
     redirect_to :controller => :account, :action => :login
   end
