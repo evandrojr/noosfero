@@ -30,7 +30,7 @@ class OauthClientPlugin < Noosfero::Plugin
   end
 
   def body_ending
-    if session.delete(:oauth_client_login)
+    if logged_in? && session.delete(:oauth_client_login)
       current_user.private_token_expired? if current_user.present?
       private_token = current_user.present? ? current_user.private_token : ''
       "<script>oauthPluginCloseLoginPopup(#{logged_in?}, '#{private_token}');</script>"
