@@ -28,7 +28,16 @@ module Noosfero
             article = find_article(environment.articles, params[:id])
             present article, :with => Entities::Article
           end
-  
+
+          post ':id/vote' do
+            value = (params[:value] || 1).to_i
+            # FIXME verify allowed values
+            render_api_error!('Vote value not allowed', 400) unless [-1, 1].include?(value)
+            article = find_article(environment.articles, params[:id])
+            Vote.create!(:voteable => article, :voter => current_person, :vote => value)
+            {:vote => true}
+          end
+
           get ':id/children' do
             article = find_article(environment.articles, params[:id])
             articles = select_filtered_collection_of(article, 'children', params)

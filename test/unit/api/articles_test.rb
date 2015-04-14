@@ -442,5 +442,38 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equal user.person, Article.last.last_changed_by
   end
 
+  should 'vote for an article' do
+    article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
+    params[:value] = 1
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert json["vote"]
+    assert_equal 1, Vote.where(:voteable_id => article.id).sum(:vote)
+  end
+
+  should 'vote for an article with default value' do
+    article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert json["vote"]
+    assert_equal 1, Vote.where(:voteable_id => article.id).sum(:vote)
+  end
+
+  should 'vote against an article' do
+    article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
+    params[:value] = -1
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert json["vote"]
+    assert_equal -1, Vote.where(:voteable_id => article.id).sum(:vote)
+  end
+
+  should 'do not allow forbidden vote value' do
+    article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
+    params[:value] = 100
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal 400, last_response.status
+  end
 
 end
