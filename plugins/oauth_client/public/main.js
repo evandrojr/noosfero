@@ -1,7 +1,7 @@
 function oauthPluginCloseLoginPopup(loggedIn, privateToken) {
-  if (window.opener && typeof window.opener.handleLoginResult == 'function') {
+  if (window.opener && typeof window.opener.oauthPluginHandleLoginResult == 'function') {
     try {
-      window.opener.handleLoginResult(loggedIn, privateToken);
+      window.opener.oauthPluginHandleLoginResult(loggedIn, privateToken);
     } catch (err) {}
     window.close();
   }
