@@ -18,6 +18,16 @@ class OauthClientPluginPublicController < PublicController
     redirect_to root_url
   end
 
+  def finish
+    if logged_in? && session.delete(:oauth_client_popup)
+      current_user.private_token_expired? if current_user.present?
+      private_token = current_user.present? ? current_user.private_token : ''
+      render 'oauth_client_plugin_public/finish', :locals => {:private_token => private_token}
+    else
+      redirect_to :controller => :home
+    end
+  end
+
   protected
 
   def login(user)
@@ -31,8 +41,8 @@ class OauthClientPluginPublicController < PublicController
     else
       session[:notice] = _("Can't login with #{provider.name}")
     end
-    session[:oauth_client_login] = true
-    session[:return_to] = '/'
+    session[:oauth_client_popup] = true if request.env["omniauth.params"]['oauth_client_popup']
+    session[:return_to] = url_for(:controller => :oauth_client_plugin_public, :action => :finish)
 
     redirect_to :controller => :account, :action => :login
   end
@@ -40,8 +50,8 @@ class OauthClientPluginPublicController < PublicController
   def signup(auth)
     login = auth.info.email.split('@').first
     session[:oauth_data] = auth
-    session[:oauth_client_login] = true
-    session[:return_to] = '/'
+    session[:oauth_client_popup] = true if request.env["omniauth.params"]['oauth_client_popup']
+    session[:return_to] = url_for(:controller => :oauth_client_plugin_public, :action => :finish)
     name = auth.info.name
     name ||= auth.extra && auth.extra.raw_info ? auth.extra.raw_info.name : ''
     redirect_to :controller => :account, :action => :signup, :user => {:login => login, :email => auth.info.email}, :profile_data => {:name => name}
