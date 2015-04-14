@@ -29,6 +29,14 @@ class OauthClientPlugin < Noosfero::Plugin
     end
   end
 
+  def body_ending
+    "<script>oauthPluginCloseLoginPopup(#{logged_in?});</script>"
+  end
+
+  def js_files
+    'main.js'
+  end
+
   PROVIDERS = {
     :facebook => {
       :name => 'Facebook'
