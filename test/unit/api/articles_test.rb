@@ -476,4 +476,11 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equal 400, last_response.status
   end
 
+  should 'allow multiple votes for an article' do
+    article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    assert_equal 2, Vote.where(:voteable_id => article.id).sum(:vote)
+  end
+
 end
