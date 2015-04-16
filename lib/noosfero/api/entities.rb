@@ -2,11 +2,11 @@ module Noosfero
   module API
     module Entities
   
-      Grape::Entity.format_with :timestamp do |date|
+      Entity.format_with :timestamp do |date|
         date.strftime('%Y/%m/%d %H:%M:%S') if date
       end
   
-      class Image < Grape::Entity
+      class Image < Entity
         root 'images', 'image'
 
         expose  :url do |image, options|
@@ -30,7 +30,7 @@ module Noosfero
         end
       end
   
-      class Profile < Grape::Entity
+      class Profile < Entity
         expose :identifier, :name, :id
         expose :created_at, :format_with => :timestamp
         expose :image, :using => Image
@@ -47,13 +47,13 @@ module Noosfero
         expose :description
       end
   
-      class Category < Grape::Entity
+      class Category < Entity
         root 'categories', 'category'
         expose :name, :id, :slug
         expose :image, :using => Image
       end
   
-      class ArticleChild < Grape::Entity
+      class ArticleChild < Entity
         root 'articles', 'article'
         expose :id, :body, :abstract
         expose :created_at, :format_with => :timestamp
@@ -63,8 +63,8 @@ module Noosfero
         expose :categories, :using => Category
         expose :image, :using => Image
       end
-  
-      class Article < Grape::Entity
+
+      class Article < Entity
         root 'articles', 'article'
         expose :id, :body, :abstract
         expose :created_at, :format_with => :timestamp
@@ -73,12 +73,12 @@ module Noosfero
         expose :profile, :using => Profile
         expose :categories, :using => Category
         # FIXME: create a method that overrides expose and include conditions for return attributes
-        expose :parent, :using => Article, :if => lambda { |article, options| options[:fields].blank? || options[:fields].include?(:parent) }
+        expose :parent, :using => Article
         expose :children, :using => ArticleChild
         expose :image, :using => Image
       end
 
-      class Comment < Grape::Entity
+      class Comment < Entity
         root 'comments', 'comment'
         expose :body, :title, :id
         expose :created_at, :format_with => :timestamp
@@ -86,7 +86,7 @@ module Noosfero
       end
   
   
-      class User < Grape::Entity
+      class User < Entity
         root 'users', 'user'
         expose :id
         expose :login
