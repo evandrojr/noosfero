@@ -483,4 +483,13 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equal 2, Vote.where(:voteable_id => article.id).sum(:vote)
   end
 
+ should 'list article children with partial fields' do
+    article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
+    child1 = fast_create(Article, :parent_id => article.id, :profile_id => user.person.id, :name => "Some thing")
+    params[:fields] = [:title]
+    get "/api/v1/articles/#{article.id}/children?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal ['title'], json['articles'].first.keys
+  end
+
 end
