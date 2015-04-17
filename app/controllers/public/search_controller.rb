@@ -3,7 +3,10 @@ class SearchController < PublicController
   helper TagsHelper
   include SearchHelper
   include ActionView::Helpers::NumberHelper
+  include SanitizeParams
 
+
+  before_filter :sanitize_params
   before_filter :redirect_asset_param, :except => [:assets, :suggestions]
   before_filter :load_category, :except => :suggestions
   before_filter :load_search_assets, :except => :suggestions
