@@ -769,6 +769,22 @@ class SearchControllerTest < ActionController::TestCase
     assert_equivalent [t1,t2,c1,c2,c3,c4] , assigns(:searches)[:communities][:results]
   end
 
+  should 'not allow query injection' do
+    injection = '<iMg SrC=x OnErRoR=document.documentElement.innerHTML=1>SearchParam'
+    get :tag, :tag => injection
+    tag = assigns(:tag)
+    assert !tag.upcase.include?('IMG') && tag.include?('SearchParam')
+  end
+
+  should 'not allow query injection array' do
+    injection = ['<iMg SrC=x OnErRoR=document.documentElement.innerHTML=1>', '<script>document.innerHTML = \'x\'</script>']
+    get :tag, :tag => injection
+    tag = assigns(:tag)
+    tag.each { |t| 
+      assert !t.upcase.include?('IMG') && !t.upcase.include?('SCRIPT') 
+    }
+  end
+
   protected
 
   def create_event(profile, options)
