@@ -1,7 +1,10 @@
 class ProfileSearchController < PublicController
 
   include SearchHelper
+  include SanitizeParams
 
+
+  before_filter :sanitize_params
   needs_profile
   before_filter :check_access_to_profile
 
