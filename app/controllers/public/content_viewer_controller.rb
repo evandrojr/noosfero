@@ -6,6 +6,10 @@ class ContentViewerController < ApplicationController
 
   helper ProfileHelper
   helper TagsHelper
+  include SanitizeParams
+
+
+  before_filter :sanitize_params
 
   def view_page
     path = get_path(params[:page], params[:format])
