@@ -1,6 +1,9 @@
 class CommentGroupPluginProfileController < ProfileController
   append_view_path File.join(File.dirname(__FILE__) + '/../../views')
 
+  include SanitizeParams
+  before_filter :sanitize_params
+
   def view_comments
     @article_id = params[:article_id]
     @group_id = params[:group_id]
