@@ -57,6 +57,21 @@ module Noosfero
             present find_article(article.children, params[:child_id]), :with => Entities::Article, :fields => params[:fields]
           end
 
+          post ':id/children/suggest' do
+            parent_article = environment.articles.find(params[:id])
+
+            suggest_article = SuggestArticle.new
+            suggest_article.article = params[:article]
+            suggest_article.article[:parent_id] = parent_article.id
+            suggest_article.target = parent_article.profile
+            suggest_article.requestor = current_person
+
+            unless suggest_article.save
+              render_api_errors!(suggest_article.article_object.errors.full_messages)
+            end
+            present suggest_article, :with => Entities::Task, :fields => params[:fields]
+          end
+
           # Example Request:
           #  POST api/v1/articles/:id/children?private_token=234298743290432&article[name]=title&article[body]=body
           post ':id/children' do
@@ -81,7 +96,6 @@ module Noosfero
             present article, :with => Entities::Article, :fields => params[:fields]
           end
 
-  
         end
   
         resource :communities do

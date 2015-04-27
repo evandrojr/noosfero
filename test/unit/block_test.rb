@@ -364,4 +364,10 @@ class BlockTest < ActiveSupport::TestCase
     assert_equal 'block_preview.png', NewBlock.default_preview_path
   end
 
+  should 'get limit as a number when limit is string' do
+    block = RecentDocumentsBlock.new
+    block.settings[:limit] = '5'
+    assert block.get_limit.is_a?(Fixnum)
+  end
+
 end
