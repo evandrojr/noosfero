@@ -221,4 +221,13 @@ class SuggestArticleTest < ActiveSupport::TestCase
     assert_equal person.name, t.sender
   end
 
+  should 'create an event on perfom method' do
+    t = SuggestArticle.new
+    t.article = {:name => 'name', :body => 'body', :type => 'Event'}
+    t.target = @profile
+    assert_difference "Event.count" do
+      t.perform
+    end
+  end
+
 end
