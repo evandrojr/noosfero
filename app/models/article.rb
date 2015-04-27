@@ -5,7 +5,7 @@ class Article < ActiveRecord::Base
                   :allow_members_to_edit, :translation_of_id, :language,
                   :license_id, :parent_id, :display_posts_in_current_language,
                   :category_ids, :posts_per_page, :moderate_comments,
-                  :accept_comments, :feed, :published, :source,
+                  :accept_comments, :feed, :published, :source, :source_name,
                   :highlighted, :notify_comments, :display_hits, :slug,
                   :external_feed_builder, :display_versions, :external_link,
                   :image_builder, :show_to_followers
@@ -784,7 +784,9 @@ class Article < ActiveRecord::Base
   end
 
   def first_image
-    img = Nokogiri::HTML.fragment(self.lead.to_s).css('img[src]').first || Nokogiri::HTML.fragment(self.body.to_s).search('img').first
+    img = ( image.present? && { 'src' => image.public_filename } ) ||
+          Nokogiri::HTML.fragment(self.lead.to_s).css('img[src]').first ||
+          Nokogiri::HTML.fragment(self.body.to_s).search('img').first
     img.nil? ? '' : img['src']
   end
 
