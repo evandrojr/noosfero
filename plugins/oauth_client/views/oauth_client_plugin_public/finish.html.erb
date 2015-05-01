@@ -1,12 +1,7 @@
 <script>
-  function oauthPluginCloseLoginPopup(loggedIn, privateToken) {
-    if (window.opener && typeof window.opener.oauthPluginHandleLoginResult == 'function') {
-      try {
-        window.opener.oauthPluginHandleLoginResult(loggedIn, privateToken);
-      } catch (err) {}
-      window.close();
+  window.addEventListener("message", function(ev) {
+    if (ev.data.message === "requestOauthClientPluginResult") {
+      ev.source.postMessage({ message: "oauthClientPluginResult", logged_in: <%= logged_in? %>, private_token: '<%= private_token %>' }, "*");
     }
-    return false;
-  }
-  oauthPluginCloseLoginPopup(<%= logged_in? %>, '<%= private_token %>');
+  });
 </script>
