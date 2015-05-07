@@ -719,7 +719,7 @@ class Noosfero::Plugin
     elsif method.to_s =~ /^content_expire_(#{content_actions.join('|')})$/
       nil
     elsif context.respond_to?(method)
-      context.send(method)
+      context.send(method, *args)
     else
       super
     end
