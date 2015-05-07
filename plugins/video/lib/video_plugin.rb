@@ -9,9 +9,7 @@ class VideoPlugin < Noosfero::Plugin
   end
 
   def self.extra_blocks
-  {
-      VideoPlugin::VideoBlock => {}
-  }
+      { VideoPlugin::VideoBlock => {}, VideoPlugin::VideoGalleryBlock => {:position=>['1']} }
   end
 
   def stylesheet?
@@ -36,14 +34,8 @@ class VideoPlugin < Noosfero::Plugin
 
   def article_extra_toolbar_buttons(content)
     if content.kind_of?(VideoPlugin::VideoGallery)
-      proc do
-        content_tag('a', _("New Video"),
-        { :id=>"new-video-btn",
-          :class=>"button with-text icon-new",
-          :href=>url_for(:action => 'new', :type=>'VideoPlugin::Video', :controller=>'cms', :parent_id => content.id),
-          :title=>_("New Video")
-        })
-      end
+      url = url_for(:action => 'new', :type=>'VideoPlugin::Video', :controller=>'cms', :parent_id => content.id)
+      {:title => _('New Video'), :url => url, :icon => 'button with-text icon-new'}
     end
   end
 
