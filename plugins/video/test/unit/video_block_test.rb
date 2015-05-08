@@ -15,12 +15,6 @@ class VideoBlockTest < ActiveSupport::TestCase
     assert block.is_youtube?
   end
 
-  should "is_youtube return true when the url contains https://www.youtube.com" do
-    block = VideoPlugin::VideoBlock.new
-    block.url = "https://www.youtube.com/?v=XXXXX"
-    assert block.is_youtube?
-  end
-
   should "is_youtube return true when the url contains www.youtube.com" do
     block = VideoPlugin::VideoBlock.new
     block.url = "www.youtube.com/?v=XXXXX"
