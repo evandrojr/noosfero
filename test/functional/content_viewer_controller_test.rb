@@ -175,7 +175,7 @@ class ContentViewerControllerTest < ActionController::TestCase
     admin = fast_create(Person)
     community.add_member(admin)
 
-    folder = fast_create(Folder, :profile_id => community.id, :published => false)
+    folder = fast_create(Folder, :profile_id => community.id, :published => false, :show_to_followers => false)
     community.add_member(profile)
     login_as(profile.identifier)
 
@@ -278,7 +278,7 @@ class ContentViewerControllerTest < ActionController::TestCase
   should 'not give access to private articles if logged in and only member' do
     person = create_user('test_user').person
     profile = Profile.create!(:name => 'test profile', :identifier => 'test_profile')
-    intranet = Folder.create!(:name => 'my_intranet', :profile => profile, :published => false)
+    intranet = Folder.create!(:name => 'my_intranet', :profile => profile, :published => false, :show_to_followers => false)
     profile.affiliate(person, Profile::Roles.member(profile.environment.id))
     login_as('test_user')
 
@@ -778,6 +778,20 @@ class ContentViewerControllerTest < ActionController::TestCase
 
     assert_tag :tag => 'div', :attributes => { :class => 'short-post'}, :content => /Content to be displayed./
     assert_no_tag :tag => 'div', :attributes => { :class => 'short-post'}, :content => /Anything/
+  end
+
+  should 'show only first paragraph with picture of posts if visualization_format is short+pic' do
+    login_as(profile.identifier)
+
+    blog = Blog.create!(:name => 'A blog test', :profile => profile, :visualization_format => 'short+pic')
+
+    blog.posts << TinyMceArticle.create!(:name => 'first post', :parent => blog, :profile => profile, :body => '<p>Content to be displayed.</p> <img src="pic.jpg">')
+
+    get :view_page, :profile => profile.identifier, :page => blog.path
+
+    assert_select '.blog-post .post-pic' do |el|
+      assert_match /background-image:url\(pic.jpg\)/, el.to_s
+    end
   end
 
   should 'display link to edit blog for allowed' do
