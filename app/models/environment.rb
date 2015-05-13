@@ -19,6 +19,8 @@ class Environment < ActiveRecord::Base
     filename
   end
 
+  NUMBER_OF_BOXES = 4
+
   PERMISSIONS['Environment'] = {
     'view_environment_admin_panel' => N_('View environment admin panel'),
     'edit_environment_features' => N_('Edit environment features'),
@@ -172,7 +174,7 @@ class Environment < ActiveRecord::Base
   acts_as_having_boxes
 
   after_create do |env|
-    3.times do
+    NUMBER_OF_BOXES.times do
       env.boxes << Box.new
     end
 
@@ -737,8 +739,8 @@ class Environment < ActiveRecord::Base
   end
 
   def is_default_template?(template)
-    is_default = template == community_default_template 
-    is_default = is_default || template == person_default_template 
+    is_default = template == community_default_template
+    is_default = is_default || template == person_default_template
     is_default = is_default || template == enterprise_default_template
     is_default
   end
