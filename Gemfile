@@ -27,23 +27,17 @@ gem 'api-pagination',           '~> 4.1.1'
 gem 'rack-cors'
 gem 'rack-contrib'
 
-#gem 'grape-swagger-rails'
-
-# FIXME list here all actual dependencies (i.e. the ones in debian/control),
-# with their GEM names (not the Debian package names)
-
+# asset pipeline
+gem 'uglifier', '>= 1.0.3'
 gem 'sass-rails'
-group :assets do
-  gem 'uglifier', '>= 1.0.3'
-end
 
 group :production do
   gem 'dalli', '~> 2.7.0'
 end
 
 group :test do
-  gem 'rspec',                  '~> 2.10.0'
-  gem 'rspec-rails',            '~> 2.10.1'
+  gem 'rspec',                  '~> 2.14.0'
+  gem 'rspec-rails',            '~> 2.14.1'
   gem 'mocha',                  '~> 1.1.0', :require => false
 end
 

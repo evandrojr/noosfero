@@ -31,6 +31,7 @@
 *= require select-or-die/_src/selectordie.js
 *= require block-store.js
 *= require jquery.typewatch.js
+*= require require_login.js
 */
 
 // scope for noosfero stuff

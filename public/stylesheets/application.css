@@ -1817,6 +1817,18 @@ a.button.disabled, input.disabled {
   background-repeat: no-repeat;
   background-position: top right;
 }
+#box-organizer div.box-1 {
+  background-image: url(../images/blocks/1.png);
+}
+#box-organizer div.box-2 {
+  background-image: url(../images/blocks/2.png);
+}
+#box-organizer div.box-3 {
+  background-image: url(../images/blocks/3.png);
+}
+#box-organizer div.box-4 {
+  background-image: url(../images/blocks/4.png);
+}
 #box-organizer .block {
   cursor: move;
 }
@@ -4674,6 +4686,12 @@ h1#agenda-title {
 }
 .controller-profile_editor a.control-panel-welcome-page {
   background-image: url(../images/control-panel/welcome-page.png)
+}
+.controller-profile_editor a.control-panel-roles {
+  background-image: url(../images/control-panel/role-management.png)
+}
+.controller-profile_editor .msie6 a.control-panel-roles {
+  background-image: url(../images/control-panel/role-management.gif)
 }
 /* ==> public/stylesheets/controller_profile_members.css <== */
 .controller-profile_members .no-boxes {

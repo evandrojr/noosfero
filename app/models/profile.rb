@@ -50,6 +50,8 @@ class Profile < ActiveRecord::Base
     self.template.custom_fields[field][:title]
   end
 
+  NUMBER_OF_BOXES = 4
+
   def self.default_search_display
     'compact'
   end
@@ -71,7 +73,7 @@ class Profile < ActiveRecord::Base
       find_role('editor', env_id)
     end
     def self.organization_member_roles(env_id)
-      all_roles(env_id).select{ |r| r.key.match(/^profile_/) unless r.key.blank? }
+      all_roles(env_id).select{ |r| r.key.match(/^profile_/) unless r.key.blank? || !r.profile_id.nil?}
     end
     def self.all_roles(env_id)
       Role.all :conditions => { :environment_id => env_id }
@@ -103,6 +105,7 @@ class Profile < ActiveRecord::Base
     'publish_content'      => N_('Publish content'),
     'invite_members'       => N_('Invite members'),
     'send_mail_to_members' => N_('Send e-Mail to members'),
+    'manage_custom_roles'  => N_('Manage custom roles'),
   }
 
   acts_as_accessible
@@ -399,7 +402,7 @@ class Profile < ActiveRecord::Base
     if template
       apply_template(template, :copy_articles => false)
     else
-      3.times do
+      NUMBER_OF_BOXES.times do
         self.boxes << Box.new
       end
 
@@ -442,6 +445,7 @@ class Profile < ActiveRecord::Base
   alias_method_chain :template, :default
 
   def apply_template(template, options = {:copy_articles => true})
+    self.template = template
     copy_blocks_from(template)
     copy_articles_from(template) if options[:copy_articles]
     self.apply_type_specific_template(template)

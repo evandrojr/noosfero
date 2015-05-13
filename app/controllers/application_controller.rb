@@ -14,6 +14,7 @@ class ApplicationController < ActionController::Base
   def log_user
     Rails.logger.info "Logged in: #{user.identifier}" if user
   end
+  before_filter :redirect_to_current_user
 
   def verify_members_whitelist
     render_access_denied unless user.is_admin? || environment.in_whitelist?(user)
@@ -197,4 +198,15 @@ class ApplicationController < ActionController::Base
   def private_environment?
     @environment.enabled?(:restrict_to_members)
   end
+
+  def redirect_to_current_user
+    if params[:profile] == '~'
+      if logged_in?
+        redirect_to params.merge(:profile => user.identifier)
+      else
+        render_not_found
+      end
+    end
+  end
+
 end
