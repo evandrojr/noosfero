@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+require File.dirname(__FILE__) + '/../config/environment'
+
+
+comments = Comment.find(:all, :order => :created_at)
+
+file = File.open('comments.csv', 'w+')
+
+file.write("'ID do Artigo','ID do Comentario','Titulo','Criado em','Votos', 'Origem', 'Profile que escreveu','Id que o comentario se refere'\n")
+comments.map do |c|
+begin
+  line = "'#{c.source_id}','#{c.id}','#{c.title}','#{c.created_at.strftime("%d/%m/%Y")}','#{c.votes.count}','#{c.profile.identifier}','#{c.author ? c.author.identifier : ''}','#{c.reply_of_id}'\n"
+  puts line
+  file.write(line)
+rescue
+  puts "SOMETHING WRONG HAPPENED WITH COMMENT #{c.id}"
+end
+
+end
+

@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+require File.dirname(__FILE__) + '/../config/environment'
+
+
+articles = Article.public(:order => :created_at)
+
+file = File.open('articles.csv', 'w+')
+
+file.write("'ID','Titulo','Tipo','Criado em','Votos','Comentarios','Hits','Criado Por','Criado Onde'\n")
+articles.map do |a|
+  line = "'#{a.id}','#{a.title}','#{a.type}','#{a.created_at.strftime("%d/%m/%Y")}','#{a.votes.count}','#{a.comments.count}','#{a.hits}','#{a.author ? a.author.identifier : ''}','#{a.profile ? a.profile.identifier : ''}'\n"
+  puts line
+  file.write(line)
+
+end
+
