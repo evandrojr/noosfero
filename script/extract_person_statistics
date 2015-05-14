@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+require File.dirname(__FILE__) + '/../config/environment'
+
+
+people = Person.public(:order => :created_at)
+
+file = File.open('people.csv', 'w+')
+
+file.write("'ID','Identifier','Nome','Data de Criacao','Qtd Artigos','Qtd Amigos','Qtd Comentatios'\n")
+people.map do |p|
+  line = "'#{p.id}','#{p.identifier}','#{p.name}','#{p.created_at.strftime("%d/%m/%Y")}','#{p.articles.count}','#{p.friends.count}','#{p.comments_received.count}'\n"
+  puts line
+  file.write(line)
+
+end
+
