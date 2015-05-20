@@ -26,6 +26,7 @@ gem 'grape_logging'
 gem 'api-pagination',           '~> 4.1.1'
 gem 'rack-cors'
 gem 'rack-contrib'
+gem 'therubyracer'
 
 # asset pipeline
 gem 'uglifier', '>= 1.0.3'
