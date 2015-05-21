@@ -1,12 +1,14 @@
 <div<%= user && " class='logged-in'" %>>
   <div id="article-actions">
+
     <%= fullscreen_buttons('#article') %>
+
     <% if @page.allow_edit?(user) && !remove_content_button(:edit, @page) %>
       <% content = content_tag('span', label_for_edit_article(@page)) %>
       <% url = profile.admin_url.merge({ :controller => 'cms', :action => 'edit', :id => @page.id }) %>
       <%= expirable_button @page, :edit, content, url %>
     <% end %>
-    
+
     <% if @page != profile.home_page && !@page.has_posts?  && @page.allow_delete?(user) && !remove_content_button(:delete, @page)%>
       <% content = content_tag( 'span', _('Delete') ) %>
       <% url = profile.admin_url.merge({ :controller => 'cms', :action => 'destroy', :id => @page.id}) %>
@@ -50,6 +52,7 @@
     <% end %>
 
     <%= report_abuse(profile, :link, @page) %>
+
   </div>
   <div id="article-header">
     <% if @page.blog? and !@page.image.nil? %>
