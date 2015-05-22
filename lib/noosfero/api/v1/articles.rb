@@ -34,8 +34,8 @@ module Noosfero
             # FIXME verify allowed values
             render_api_error!('Vote value not allowed', 400) unless [-1, 1].include?(value)
             article = find_article(environment.articles, params[:id])
-            Vote.create!(:voteable => article, :voter => nil, :vote => value)
-            {:vote => true}
+            vote = Vote.new(:voteable => article, :voter => current_person, :vote => value)
+            {:vote => vote.save}
           end
 
           get ':id/children' do
