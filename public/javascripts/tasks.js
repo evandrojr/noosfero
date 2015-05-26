@@ -47,3 +47,18 @@
 
 })(jQuery)
 
+function change_task_responsible(url, task_id, old_responsible_id, el) {
+  jQuery.post(url, {task_id: task_id,
+                    responsible_id: $(el).val(),
+                    old_responsible_id: old_responsible_id}, function(data) {
+    if (data.success) {
+      $(el).effect("highlight");
+    } else {
+      $(el).effect("highlight", {color: 'red'});
+    }
+    if (data.notice) {
+      display_notice(data.notice);
+    }
+  });
+}
+
