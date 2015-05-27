@@ -12,6 +12,7 @@
 class Task < ActiveRecord::Base
 
   acts_as_having_settings :field => :data
+  acts_as_ordered_taggable
 
   module Status
     # the status of tasks just created
