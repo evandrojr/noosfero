@@ -31,7 +31,7 @@ class TasksController < MyProfileController
     responsible = profile.members.find(params[:responsible_id]) if params[:responsible_id].present?
     task.responsible = responsible
     task.save!
-    render :json => {:notice => _('Task responsible successfully updated!'), :success => true}
+    render :json => {:notice => _('Task responsible successfully updated!'), :success => true, :new_responsible => {:id => responsible.present? ? responsible.id : nil}}
   end
 
   VALID_DECISIONS = [ 'finish', 'cancel', 'skip' ]

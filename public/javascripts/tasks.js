@@ -63,12 +63,13 @@
 
 })(jQuery)
 
-function change_task_responsible(url, task_id, old_responsible_id, el) {
-  jQuery.post(url, {task_id: task_id,
+function change_task_responsible(el) {
+  jQuery.post($(el).data('url'), {task_id: $(el).data('task'),
                     responsible_id: $(el).val(),
-                    old_responsible_id: old_responsible_id}, function(data) {
+                    old_responsible_id: $(el).data('old-responsible')}, function(data) {
     if (data.success) {
       $(el).effect("highlight");
+      $(el).data('old-responsible', data.new_responsible.id);
     } else {
       $(el).effect("highlight", {color: 'red'});
     }

@@ -7,7 +7,7 @@
       <span class="label"><%= _('Responsible:') %></span>
       <span>
         <% change_responsible_url = url_for :action => :change_responsible, :controller => :tasks %>
-        <%= select_tag "tasks[#{task.id}][responsible]", options_from_collection_for_select(@responsible_candidates, :id, :name, task.responsible.present? ? task.responsible.id : nil), :include_blank => true, :onchange => "change_task_responsible('#{change_responsible_url}', #{task.id}, #{task.responsible.present? ? task.responsible.id : 'null'}, this);" %>
+        <%= select_tag "tasks[#{task.id}][responsible]", options_from_collection_for_select(@responsible_candidates, :id, :name, task.responsible.present? ? task.responsible.id : nil), :include_blank => true, :onchange => "change_task_responsible(this);", 'data-old-responsible' => task.responsible.present? ? task.responsible.id : nil, 'data-task' => task.id, 'data-url' => change_responsible_url %>
       </span>
     </div>
   <% end %>
