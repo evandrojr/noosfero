@@ -72,6 +72,13 @@
       <% end %>
     </ul>
 
+    <script>
+      jQuery('.tag-list').inputosaurus({
+        autoCompleteSource: <%= "'/myprofile/#{profile.identifier}/cms/search_tags'," %>
+        activateFinalResult : true
+      })
+    </script>
+
     <%= pagination_links(@tasks)%>
 
     <% button_bar(:class => 'task-actions') do %>

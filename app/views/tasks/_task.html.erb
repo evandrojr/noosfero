@@ -61,6 +61,13 @@
         <%= render :partial => partial_for_class(task.class, nil, :reject_details), :locals => {:task => task, :f => f} %>
       </div>
     <% end %>
+
+    <div class="formfieldline">
+      <div class="formfield tag-list-fields">
+        <%= labelled_text_field(_('Tags'),"tasks[#{task.id}][task][tag_list]", '', :size => 36, :class => 'tag-list') %>
+      </div>
+    </div>
+
   <% end %>
 
 </div><!-- class="task_box" -->
