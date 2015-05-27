@@ -64,7 +64,7 @@
 
     <div class="formfieldline">
       <div class="formfield tag-list-fields">
-        <%= labelled_text_field(_('Tags'),"tasks[#{task.id}][task][tag_list]", '', :size => 36, :class => 'tag-list') %>
+        <%= labelled_text_field(_('Tags'),"tasks[#{task.id}][task][tag_list]", task.tag_list.to_s, :size => 36, :class => 'tag-list') %>
       </div>
     </div>
 
