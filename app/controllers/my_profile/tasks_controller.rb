@@ -41,18 +41,33 @@ class TasksController < MyProfileController
 
   def close
     failed = {}
+    save = false
 
     if params[:tasks]
       params[:tasks].each do |id, value|
         decision = value[:decision]
-        if request.post? && VALID_DECISIONS.include?(decision) && id && decision != 'skip'
+
+        if value[:task].is_a?(Hash) && value[:task][:tag_list]
+
           task = profile.find_in_all_tasks(id)
-          begin
-            task.update_attributes(value[:task])
-            task.send(decision)
-          rescue Exception => ex
-            message = "#{task.title} (#{task.requestor ? task.requestor.name : task.author_name})"
-            failed[ex.message] ? failed[ex.message] << message : failed[ex.message] = [message]
+          task.tag_list = value[:task][:tag_list]
+          value[:task].delete('tag_list')
+
+          save = true
+        end
+
+        if request.post?
+          if VALID_DECISIONS.include?(decision) && id && decision != 'skip'
+            task ||= profile.find_in_all_tasks(id)
+            begin
+              task.update_attributes(value[:task])
+              task.send(decision)
+            rescue Exception => ex
+              message = "#{task.title} (#{task.requestor ? task.requestor.name : task.author_name})"
+              failed[ex.message] ? failed[ex.message] << message : failed[ex.message] = [message]
+            end
+          elsif save
+            task.save!
           end
         end
       end
