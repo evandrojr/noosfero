@@ -17,6 +17,11 @@
   font-size: 120%;
 }
 
+.task_date {
+  color: gray;
+  font-size: 12px;
+}
+
 .task_icon {
   float: left;
   margin-right: 10px;
@@ -43,4 +48,28 @@
 .task_target {
   text-decoration: underline;
   font-weight: bold;
+}
+
+.task_responsible {
+  text-align: right;
+}
+
+/* Task tags list */
+
+.formfieldline label {
+  font-weight: bold;
+  margin: 0 5px 0 10px;
+}
+
+.formfieldline .inputosaurus-container {
+  vertical-align: middle;
+}
+
+.tag-list-fields input {
+  background-color: #fff !important;
+}
+
+.formfield.tag-list-fields .ui-autocomplete-loading {
+  background: url('/images/loading-small.gif') right center no-repeat !important;
+  background-color: #fff !important;
 }

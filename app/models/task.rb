@@ -12,6 +12,7 @@
 class Task < ActiveRecord::Base
 
   acts_as_having_settings :field => :data
+  acts_as_ordered_taggable
 
   module Status
     # the status of tasks just created
@@ -33,6 +34,7 @@ class Task < ActiveRecord::Base
 
   belongs_to :requestor, :class_name => 'Profile', :foreign_key => :requestor_id
   belongs_to :target, :foreign_key => :target_id, :polymorphic => true
+  belongs_to :responsible, :class_name => 'Person', :foreign_key => :responsible_id
 
   validates_uniqueness_of :code, :on => :create
   validates_presence_of :code
@@ -239,9 +241,9 @@ class Task < ActiveRecord::Base
   scope :opened, :conditions => { :status =>  [Task::Status::ACTIVE, Task::Status::HIDDEN] }
   scope :of, lambda { |type| conditions = type ? "type LIKE '#{type}'" : "1=1"; {:conditions =>  [conditions]} }
   scope :order_by, lambda { |attribute, ord| {:order => "#{attribute} #{ord}"} }
-  scope :like, ->(field,value) { where("LOWER(#{field}) LIKE ?", "%#{value.downcase}%") if value}
-  scope :pending_all, ->(profile, params){
-    self.to(profile).without_spam.pending.of(params[:filter_type]).like('data', params[:filter_text])
+  scope :like, lambda { |field, value| where("LOWER(#{field}) LIKE ?", "%#{value.downcase}%") if value}
+  scope :pending_all, lambda { |profile, filter_type, filter_text|
+    self.to(profile).without_spam.pending.of(filter_type).like('data', filter_text)
   }
 
   scope :to, lambda { |profile|
