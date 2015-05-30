@@ -75,7 +75,13 @@
     <script>
       jQuery('.tag-list').inputosaurus({
         autoCompleteSource: <%= "'/myprofile/#{profile.identifier}/cms/search_tags'," %>
-        activateFinalResult : true
+        activateFinalResult: true,
+        submitTags: {
+          url: <%= "'/myprofile/#{profile.identifier}/tasks/save_tags'" %>,
+          success: function(response){
+            console.dir(response);
+          }
+        }
       })
     </script>
 

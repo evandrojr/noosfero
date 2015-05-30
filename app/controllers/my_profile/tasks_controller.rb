@@ -41,33 +41,18 @@ class TasksController < MyProfileController
 
   def close
     failed = {}
-    save = false
 
     if params[:tasks]
       params[:tasks].each do |id, value|
         decision = value[:decision]
-
-        if value[:task].is_a?(Hash) && value[:task][:tag_list]
-
+        if request.post? && VALID_DECISIONS.include?(decision) && id && decision != 'skip'
           task = profile.find_in_all_tasks(id)
-          task.tag_list = value[:task][:tag_list]
-          value[:task].delete('tag_list')
-
-          save = true
-        end
-
-        if request.post?
-          if VALID_DECISIONS.include?(decision) && id && decision != 'skip'
-            task ||= profile.find_in_all_tasks(id)
-            begin
-              task.update_attributes(value[:task])
-              task.send(decision)
-            rescue Exception => ex
-              message = "#{task.title} (#{task.requestor ? task.requestor.name : task.author_name})"
-              failed[ex.message] ? failed[ex.message] << message : failed[ex.message] = [message]
-            end
-          elsif save
-            task.save!
+          begin
+            task.update_attributes(value[:task])
+            task.send(decision)
+          rescue Exception => ex
+            message = "#{task.title} (#{task.requestor ? task.requestor.name : task.author_name})"
+            failed[ex.message] ? failed[ex.message] << message : failed[ex.message] = [message]
           end
         end
       end
@@ -102,6 +87,26 @@ class TasksController < MyProfileController
 
   def ticket_details
     @ticket = Ticket.find(:first, :conditions => ['(requestor_id = ? or target_id = ?) and id = ?', profile.id, profile.id, params[:id]])
+  end
+
+  def save_tags
+
+    if request.post? && params[:tag_list]
+      result = {
+        success: false
+      }
+
+      ActsAsTaggableOn.remove_unused_tags = true
+
+      task = Task.find_by_id params[:task_id]
+      save = user.tag(task, with: params[:tag_list], on: :tags)
+
+      if save
+        result[:success] = true
+      end
+    end
+
+    render json: result
   end
 
 end
