@@ -19,10 +19,10 @@ class OauthClientPluginPublicController < PublicController
   end
 
   def finish
-    if logged_in? && session.delete(:oauth_client_popup)
+    if session.delete(:oauth_client_popup)
       current_user.private_token_expired? if current_user.present?
       private_token = current_user.present? ? current_user.private_token : ''
-      render 'oauth_client_plugin_public/finish', :locals => {:private_token => private_token}
+      render 'oauth_client_plugin_public/finish', :locals => {:private_token => private_token, :user => params[:user]}, :layout => false
     else
       redirect_to :controller => :home
     end
@@ -54,7 +54,12 @@ class OauthClientPluginPublicController < PublicController
     session[:return_to] = url_for(:controller => :oauth_client_plugin_public, :action => :finish)
     name = auth.info.name
     name ||= auth.extra && auth.extra.raw_info ? auth.extra.raw_info.name : ''
-    redirect_to :controller => :account, :action => :signup, :user => {:login => login, :email => auth.info.email}, :profile_data => {:name => name}
+
+    if session[:oauth_client_popup]
+      redirect_to :controller => :oauth_client_plugin_public, :action => :finish, :user => {:login => login, :email => auth.info.email}, :profile_data => {:name => name}
+    else
+      redirect_to :controller => :account, :action => :signup, :user => {:login => login, :email => auth.info.email}, :profile_data => {:name => name}
+    end
   end
 
 end
