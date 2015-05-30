@@ -56,7 +56,7 @@ class OauthClientPluginPublicController < PublicController
     name ||= auth.extra && auth.extra.raw_info ? auth.extra.raw_info.name : ''
 
     if session[:oauth_client_popup]
-      redirect_to :controller => :oauth_client_plugin_public, :action => :finish, :user => {:login => login, :email => auth.info.email}, :profile_data => {:name => name}
+      redirect_to :controller => :oauth_client_plugin_public, :action => :finish, :user => {:login => login, :email => auth.info.email, :oauth_providers => [session[:provider_id]]}, :profile_data => {:name => name}
     else
       redirect_to :controller => :account, :action => :signup, :user => {:login => login, :email => auth.info.email}, :profile_data => {:name => name}
     end
