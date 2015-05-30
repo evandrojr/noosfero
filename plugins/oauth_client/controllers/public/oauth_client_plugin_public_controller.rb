@@ -19,7 +19,7 @@ class OauthClientPluginPublicController < PublicController
   end
 
   def finish
-    if session.delete(:oauth_client_popup) || request.env.fetch('omniauth.params', {})['oauth_client_popup']
+    if session.delete(:oauth_client_popup) || params[:oauth_client_popup]
       current_user.private_token_expired? if current_user.present?
       private_token = current_user.present? ? current_user.private_token : ''
       render 'oauth_client_plugin_public/finish', :locals => {:private_token => private_token, :user => params[:user]}, :layout => false
@@ -56,7 +56,7 @@ class OauthClientPluginPublicController < PublicController
     name ||= auth.extra && auth.extra.raw_info ? auth.extra.raw_info.name : ''
 
     if session[:oauth_client_popup]
-      redirect_to :controller => :oauth_client_plugin_public, :action => :finish, :user => {:login => login, :email => auth.info.email, :oauth_providers => [session[:provider_id]]}, :profile_data => {:name => name}
+      redirect_to :controller => :oauth_client_plugin_public, :action => :finish, :user => {:login => login, :email => auth.info.email, :oauth_providers => [session[:provider_id]]}, :profile_data => {:name => name}, :oauth_client_popup => session[:oauth_client_popup]
     else
       redirect_to :controller => :account, :action => :signup, :user => {:login => login, :email => auth.info.email}, :profile_data => {:name => name}
     end
