@@ -78,8 +78,35 @@
         activateFinalResult: true,
         submitTags: {
           url: <%= "'/myprofile/#{profile.identifier}/tasks/save_tags'" %>,
+          beforeSend: function(){
+            this.element.parents('.task_box')
+                        .prev('.fg-state-error')
+                        .remove();
+          },
           success: function(response){
-            console.dir(response);
+
+            this.element.parents('.task_box')
+                        .prev('.fg-state-error')
+                        .remove();
+
+            if(!response.success){
+
+              var errorIcon = $('<span/>',{
+                'class':'ui-icon ui-icon-alert',
+                style:'float: left; margin-right: .3em;'
+              });
+
+              var content = $('<p/>',{
+                html:'<strong>'+response.message+'</strong>'
+              }).prepend(errorIcon);
+
+              var div = $('<div/>',{
+                  'class':'alert fg-state-error ui-state-error'
+              }).append(content);
+
+              this.element.parents('.task_box').before(div);
+            }
+
           }
         }
       })

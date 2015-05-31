@@ -537,7 +537,8 @@
 					url: requestTags.url,
 					dataType: 'json',
 					data:{},
-					type:'POST'
+					type:'POST',
+					context:this
 				},requestTags);
 
 				var extraValues = this.element.data('submit-values');

@@ -93,7 +93,8 @@ class TasksController < MyProfileController
 
     if request.post? && params[:tag_list]
       result = {
-        success: false
+        success: false,
+        message: _('Error to save tags. Please, contact the system admin')
       }
 
       ActsAsTaggableOn.remove_unused_tags = true
