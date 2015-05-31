@@ -36,7 +36,8 @@ class OauthClientPluginPublicController < PublicController
     unless user_provider
       user_provider = user.oauth_user_providers.create(:user => user, :provider => provider, :enabled => true)
     end
-    if user_provider.enabled? && provider.enabled?
+    # FIXME find a better way to disable providers
+    if user_provider.enabled?# && provider.enabled?
       session[:user] = user.id
     else
       session[:notice] = _("Can't login with #{provider.name}")
