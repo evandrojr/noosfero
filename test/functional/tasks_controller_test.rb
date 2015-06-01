@@ -66,6 +66,21 @@ class TasksControllerTest < ActionController::TestCase
     assert_not_includes assigns(:tasks), task_spam
   end
 
+  should 'save tasks tags' do
+
+    requestor = fast_create(Person)
+
+    task_one = Task.create!(:requestor => requestor, :target => profile, :data => {:name => 'Task Test'})
+    task_two = Task.create!(:requestor => requestor, :target => profile, :data => {:name => 'Another Task'})
+
+    post :save_tags, :task_id => task_one.id, :tag_list => 'noosfero,test'
+    post :save_tags, :task_id => task_two.id, :tag_list => 'test'
+
+    assert_includes task_one.tags_from(nil), 'test'
+    assert_not_includes task_two.tags_from(nil), 'noosfero'
+
+  end
+
   should 'be able to finish a task' do
     t = profile.tasks.build; t.save!
 
@@ -149,7 +164,7 @@ class TasksControllerTest < ActionController::TestCase
 
   should 'create a ticket with profile requestor' do
     post :new, :profile => profile.identifier, :ticket => {:name => 'new task'}
-    
+
     assert_equal profile, assigns(:ticket).requestor
   end
 
@@ -381,13 +396,13 @@ class TasksControllerTest < ActionController::TestCase
     t2 = CleanHouse.create!(:requestor => requestor, :target => profile)
     t3 = FeedDog.create!(:requestor => requestor, :target => profile)
 
-    post :index, :filter_type => t1.type
+    get :index, :filter_type => t1.type
 
     assert_includes assigns(:tasks), t1
     assert_includes assigns(:tasks), t2
     assert_not_includes assigns(:tasks), t3
 
-    post :index
+    get :index
 
     assert_includes assigns(:tasks), t1
     assert_includes assigns(:tasks), t2
@@ -414,6 +429,22 @@ class TasksControllerTest < ActionController::TestCase
     assert_includes assigns(:tasks), t1
     assert_includes assigns(:tasks), t2
     assert_includes assigns(:tasks), t3
+  end
+
+  should 'filter tasks by tags' do
+
+    requestor = fast_create(Person)
+
+    task_one = Task.create!(:requestor => requestor, :target => profile, :data => {:name => 'Task Test'})
+    task_two = Task.create!(:requestor => requestor, :target => profile, :data => {:name => 'Another Task'})
+
+    profile.tag(task_one, with: 'noosfero,test', on: :tags)
+    profile.tag(task_two, with: 'test', on: :tags)
+
+    get :index, :filter_tags => 'noosfero'
+
+    assert_includes assigns(:tasks), task_one
+    assert_not_includes assigns(:tasks), task_two
   end
 
   should 'return tasks ordered accordingly and limited by pages' do
