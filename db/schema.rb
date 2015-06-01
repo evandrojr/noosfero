@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150513213939) do
+ActiveRecord::Schema.define(:version => 20150525101430) do
 
   create_table "abuse_reports", :force => true do |t|
     t.integer  "reporter_id"
@@ -684,12 +684,13 @@ ActiveRecord::Schema.define(:version => 20150513213939) do
     t.date     "end_date"
     t.integer  "requestor_id"
     t.integer  "target_id"
-    t.string   "code",         :limit => 40
+    t.string   "code",           :limit => 40
     t.string   "type"
     t.datetime "created_at"
     t.string   "target_type"
     t.integer  "image_id"
-    t.boolean  "spam",                       :default => false
+    t.boolean  "spam",                         :default => false
+    t.integer  "responsible_id"
   end
 
   add_index "tasks", ["requestor_id"], :name => "index_tasks_on_requestor_id"
@@ -728,24 +729,26 @@ ActiveRecord::Schema.define(:version => 20150513213939) do
   create_table "users", :force => true do |t|
     t.string   "login"
     t.string   "email"
-    t.string   "crypted_password",          :limit => 40
-    t.string   "salt",                      :limit => 40
+    t.string   "crypted_password",           :limit => 40
+    t.string   "salt",                       :limit => 40
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "remember_token"
     t.datetime "remember_token_expires_at"
     t.text     "terms_of_use"
-    t.string   "terms_accepted",            :limit => 1
+    t.string   "terms_accepted",             :limit => 1
     t.integer  "environment_id"
     t.string   "password_type"
-    t.boolean  "enable_email",                            :default => false
-    t.string   "last_chat_status",                        :default => ""
-    t.string   "chat_status",                             :default => ""
+    t.boolean  "enable_email",                             :default => false
+    t.string   "last_chat_status",                         :default => ""
+    t.string   "chat_status",                              :default => ""
     t.datetime "chat_status_at"
-    t.string   "activation_code",           :limit => 40
+    t.string   "activation_code",            :limit => 40
     t.datetime "activated_at"
     t.string   "return_to"
     t.datetime "last_login_at"
+    t.string   "private_token"
+    t.datetime "private_token_generated_at"
   end
 
   create_table "validation_infos", :force => true do |t|
