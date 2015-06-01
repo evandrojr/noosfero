@@ -63,6 +63,9 @@
 			// when you check for duplicates it check for the case
 			caseSensitiveDuplicates: false,
 
+			//Hide input to inform tags. This is cool when you create tags from another way
+			hideInput: false,
+
 			//Ajax options to send tags
 			submitTags: null
 		},
@@ -202,6 +205,31 @@
 			}
 
 			widget._resetPlaceholder();
+		},
+
+		addTags: function(list){
+
+			if(arguments.length == 1){
+				list = [list];
+			}
+
+			if(arguments[1]){
+				list = Array.prototype.slice.call(arguments);
+			}
+
+			if(!$.isArray(list)){
+				var msg = 'Tag list needs be an Array';
+
+				if(console){
+					console.error(msg);
+
+					return false;
+				}else{
+					throw new Error(msg);
+				}
+
+			}
+			this._setChosen(list);
 		},
 
 		_inputFocus : function(ev) {
@@ -399,6 +427,10 @@
 				}
 			});
 			self._setValue(self._buildValue());
+
+			if(this.options.hideInput){
+				this.elements.input.parent().hide();
+			}
 		},
 
 		_buildValue : function() {
