@@ -442,7 +442,6 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equal user.person, Article.last.last_changed_by
   end
 
-<<<<<<< HEAD
   should 'vote for an article' do
     article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
     params[:value] = 1
