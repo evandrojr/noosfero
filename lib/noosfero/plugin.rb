@@ -263,10 +263,11 @@ class Noosfero::Plugin
   end
 
   # -> Adds buttons to the control panel
-  # returns = { :title => title, :icon => icon, :url => url }
-  #   title = name that will be displayed.
-  #   icon  = css class name (for customized icons include them in a css file).
-  #   url   = url or route to which the button will redirect.
+  # returns        = { :title => title, :icon => icon, :url => url }
+  #   title        = name that will be displayed.
+  #   icon         = css class name (for customized icons include them in a css file).
+  #   url          = url or route to which the button will redirect.
+  #   html_options = aditional html options.
   def control_panel_buttons
     nil
   end
@@ -309,6 +310,18 @@ class Noosfero::Plugin
     nil
   end
 
+  # -> Filters the types of organizations that are shown on manage organizations
+  # returns a scope filtered by the specified type
+  def filter_manage_organization_scope type
+    nil
+  end
+
+  # -> Add new options for manage organization filters
+  # returns an array of new options
+  # i.e [[_('Type'), 'type'], [_('Type2'), 'type2']]
+  def organization_types_filter_options
+    nil
+  end
   # -> Adds content to profile editor info and settings
   # returns = lambda block that creates html code or raw rhtml/html.erb
   def profile_editor_extras
