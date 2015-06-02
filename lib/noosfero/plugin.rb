@@ -205,9 +205,9 @@ class Noosfero::Plugin
     def api_mount_points
       []
     end
+
   end
 
-  #FIXME make this test
   def has_block?(block)
     self.class.extra_blocks.keys.include?(block)
   end
