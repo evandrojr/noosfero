@@ -1,0 +1,186 @@
+#!/usr/bin/env ruby
+require File.dirname(__FILE__) + '/../config/environment'
+
+
+communities = Community.public(:order => :created_at)
+
+file = File.open('communities.csv', 'w+')
+
+file.write("'Identifier','Qtd Artigos'\n")
+communities.map do |c|
+  line = "'#{c.identifier}','#{c.articles.count}'\n"
+  puts line
+  file.write(line)
+end
+
+file.write("\n")
+file.write("'Identifier','Qtd Membros'\n")
+communities.map do |c|
+  line = "'#{c.identifier}','#{c.members.count}'\n"
+  puts line
+  file.write(line)
+end
+  
+file.write("\n")
+file.write("'Identifier','Qtd Atividades'\n")
+communities.map do |c|
+  line = "'#{c.identifier}','#{c.activities.count}'\n"
+  puts line
+  file.write(line)
+end
+
+file.close
+
+file = File.open('artigos.csv', 'w+')
+articles = Article.public(:order => :created_at)
+
+file.write("\n")
+file.write("'ID','Views'\n")
+articles.map do |a|
+  line = "'#{a.id}','#{a.hits}'\n"
+  puts line
+  file.write(line)
+end
+
+file.write("\n")
+file.write("'ID','Comentarios'\n")
+articles.map do |a|
+  line = "'#{a.id}','#{a.comments.count}'\n"
+  puts line
+  file.write(line)
+end
+
+file.write("\n")
+file.write("'ID','Votos'\n")
+articles.map do |a|
+  line = "'#{a.id}','#{a.votes.count}'\n"
+  puts line
+  file.write(line)
+end
+
+file.close
+file = File.open('people.csv', 'w+')
+people = Person.public(:order => :created_at)
+
+
+file.write("'Identifier','Qtd Curtidas recebidas'\n")
+people.map do |p|
+  amount = 0
+  p.articles.text_articles.select(:id).map do |article|
+    amount += Vote.count(:conditions => {:voteable_id => article.id, :vote => 1})
+  end
+  Comment.all(:conditions => {:source_id => p.articles.map{|a|a.id}}, :select => :id).map do |comment|
+    amount += Vote.count(:conditions => {:voteable_id => comment.id, :vote => 1})
+  end
+  line = "'#{p.identifier}','#{amount}'\n"
+  puts line
+  file.write(line)
+end
+
+file.write("\n")
+file.write("'Identifier','Qtd Dislikes recebidos'\n")
+people.map do |p|
+  amount = 0
+  p.articles.text_articles.select(:id).map do |article|
+    amount += Vote.count(:conditions => {:voteable_id => article.id, :vote => -1})
+  end
+  Comment.all(:conditions => {:source_id => p.articles.map{|a|a.id}}, :select => :id).map do |comment|
+    amount += Vote.count(:conditions => {:voteable_id => comment.id, :vote => -1})
+  end
+  line = "'#{p.identifier}','#{amount * -1}'\n"
+  puts line
+  file.write(line)
+end
+
+file.write("\n")
+file.write("'Identifier','Qtd Curtidas realizadas'\n")
+people.map do |p|
+  line = "'#{p.identifier}','#{Vote.count(:conditions => {:voter_id => p.id})}'\n"
+  puts line
+  file.write(line)
+end
+
+file.write("\n")
+file.write("'Identifier','Qtd Artigos'\n")
+people.map do |p|
+  line = "'#{p.identifier}','#{p.articles.count}'\n"
+  puts line
+  file.write(line)
+end
+
+file.write("\n")
+file.write("'Identifier','Qtd Comentarios Criados'\n")
+people.map do |p|
+  line = "'#{p.identifier}','#{Comment.count(:conditions => {:author_id => p.id})}'\n"
+  puts line
+  file.write(line)
+end
+
+file.write("\n")
+file.write("'Identifier','Qtd Comentarios Recebidos'\n")
+people.map do |p|
+  line = "'#{p.identifier}','#{p.comments_received.count}'\n"
+  puts line
+  file.write(line)
+end
+
+file.write("\n")
+file.write("'Identifier','Qtd Amigos'\n")
+people.map do |p|
+  line = "'#{p.identifier}','#{p.friends.count}'\n"
+  puts line
+  file.write(line)
+end
+
+file.write("\n")
+file.write("'Identifier','Qtd de Comunidades'\n")
+people.map do |p|
+  line = "'#{p.identifier}','#{p.communities.count}'\n"
+  puts line
+  file.write(line)
+end
+
+file.write("'Identifier','Qtd de Videos Publicados'\n")
+people.map do |p|
+  line = "'#{p.identifier}','#{p.articles.where(:type => 'VideoPlugin::Video').count}'\n"
+  puts line
+  file.write(line)
+end
+
+file.write("\n")
+file.write("'Identifier','Dono de Comunidade com Pessoas'\n")
+people.map do |p|
+  amount = 0
+  communities.map do |community|
+    amount += 1 if community.admins.include?(p) 
+  end
+  line = "'#{p.identifier}','#{amount}'\n"
+  puts line
+  file.write(line)
+end
+
+file.write("'Identifier','Qtd Artigos com Conteudo Negativo'\n")
+people.map do |p|
+  amount = 0
+  p.articles.text_articles.select(:id).map do |article|
+    amount += Vote.count(:conditions => {:voteable_id => article.id, :vote => -1})
+  end
+  line = "'#{p.identifier}','#{amount * -1}'\n"
+  puts line
+  file.write(line)
+end
+
+file.write("\n")
+file.write("'Identifier','Qtd Artigos que nao pode ser comentado'\n")
+people.map do |p|
+  amount = 0
+  p.articles.text_articles.map do |article|
+    amount += 1 if article.moderate_comments?
+  end
+  line = "'#{p.identifier}','#{amount}'\n"
+  puts line
+  file.write(line)
+end
+
+
+

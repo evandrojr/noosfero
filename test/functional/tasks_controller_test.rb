@@ -497,6 +497,15 @@ class TasksControllerTest < ActionController::TestCase
     assert_select '.task_responsible', 0
   end
 
+  should 'do not display responsible assignment filter if profile is not an organization' do
+    profile = create_user('personprofile').person
+    @controller.stubs(:profile).returns(profile)
+    login_as profile.user.login
+    get :index
+
+    assert_select '.filter_responsible', 0
+  end
+
   should 'display responsible assignment if profile is an organization' do
     profile = fast_create(Community)
     person1 = create_user('person1').person
@@ -540,6 +549,116 @@ class TasksControllerTest < ActionController::TestCase
     assert_equal person1, task.reload.responsible
     json_response = ActiveSupport::JSON.decode(response.body)
     assert !json_response['success']
+  end
+
+  should 'list tasks for user with only view_tasks permission' do
+    community = fast_create(Community)
+    @controller.stubs(:profile).returns(community)
+    person = create_user_with_permission('taskviewer', 'view_tasks', community)
+    login_as person.user.login
+    get :index
+    assert_response :success
+    assert assigns(:view_only)
+  end
+
+  should 'forbid user with only view_tasks permission to close a task' do
+    community = fast_create(Community)
+    @controller.stubs(:profile).returns(community)
+    person = create_user_with_permission('taskviewer', 'view_tasks', community)
+    login_as person.user.login
+    post :close
+    assert_response 403
+  end
+
+  should 'hide tasks actions when user has only view_tasks permission' do
+    community = fast_create(Community)
+    @controller.stubs(:profile).returns(community)
+    person = create_user_with_permission('taskviewer', 'view_tasks', community)
+    login_as person.user.login
+
+    Task.create!(:requestor => person, :target => community)
+    get :index
+
+    assert_select '.task-actions', 0
+  end
+
+  should 'display tasks actions when user has perform_task permission' do
+    community = fast_create(Community)
+    @controller.stubs(:profile).returns(community)
+    person = create_user_with_permission('taskperformer', 'perform_task', community)
+    login_as person.user.login
+
+    Task.create!(:requestor => person, :target => community)
+    get :index
+
+    assert_select '.task-actions', 2
+  end
+
+  should 'hide decision selector when user has only view_tasks permission' do
+    community = fast_create(Community)
+    @controller.stubs(:profile).returns(community)
+    person = create_user_with_permission('taskviewer', 'view_tasks', community)
+    login_as person.user.login
+
+    Task.create!(:requestor => person, :target => community)
+    get :index
+
+    assert_select '#up-set-all-tasks-to', 0
+    assert_select '#down-set-all-tasks-to', 0
+  end
+
+  should 'display decision selector when user has perform_task permission' do
+    community = fast_create(Community)
+    @controller.stubs(:profile).returns(community)
+    person = create_user_with_permission('taskperformer', 'perform_task', community)
+    login_as person.user.login
+
+    Task.create!(:requestor => person, :target => community)
+    get :index
+
+    assert_select '#up-set-all-tasks-to'
+    assert_select '#down-set-all-tasks-to'
+  end
+
+  should 'hide decision buttons when user has only view_tasks permission' do
+    community = fast_create(Community)
+    @controller.stubs(:profile).returns(community)
+    person = create_user_with_permission('taskviewer', 'view_tasks', community)
+    login_as person.user.login
+
+    task = Task.create!(:requestor => person, :target => community)
+    get :index
+
+    assert_select "#decision-finish-#{task.id}", 0
+    assert_select "#decision-cancel-#{task.id}", 0
+    assert_select "#decision-skip-#{task.id}", 0
+  end
+
+  should 'display decision buttons when user has perform_task permission' do
+    community = fast_create(Community)
+    @controller.stubs(:profile).returns(community)
+    person = create_user_with_permission('taskperformer', 'perform_task', community)
+    login_as person.user.login
+
+    task = Task.create!(:requestor => person, :target => community)
+    get :index
+
+    assert_select "#decision-finish-#{task.id}"
+    assert_select "#decision-cancel-#{task.id}"
+    assert_select "#decision-skip-#{task.id}"
+  end
+
+  should 'hide responsive selection when user has only view_tasks permission' do
+    community = fast_create(Community)
+    @controller.stubs(:profile).returns(community)
+    person = create_user_with_permission('taskviewer', 'view_tasks', community)
+    login_as person.user.login
+
+    task = Task.create!(:requestor => person, :target => community, :responsible => person)
+    get :index
+
+    assert_select ".task_responsible select", 0
+    assert_select ".task_responsible .value"
   end
 
 end

@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+require File.dirname(__FILE__) + '/../config/environment'
+
+
+date = Person.find(:first, :order => :created_at).created_at
+
+file = File.open('data.csv', 'w+')
+
+file.write("Numero de pessoas por mes\n")
+puts "Numero de pessoas por mes"
+while(date <= Date.today) do
+  date = date.beginning_of_month
+
+  amount = Person.count(:conditions => {:created_at => date...date.end_of_month})
+  
+  file.write("#{date.strftime('%m/%Y')},#{amount}\n")
+  puts "Amount in #{date.strftime('%m/%Y')} #{amount}"
+
+  date = date.next_month
+
+end
+
+file.write("Numero de comunidades por mes\n")
+puts "Numero de comunidades por mes"
+date = Community.find(:first, :order => :created_at).created_at
+while(date <= Date.today) do
+  date = date.beginning_of_month
+
+  amount = Community.count(:conditions => {:created_at => date...date.end_of_month})
+  
+  file.write("#{date.strftime('%m/%Y')},#{amount}\n")
+  puts "Amount in #{date.strftime('%m/%Y')} #{amount}"
+
+  date = date.next_month
+
+end
+
+file.write("Numero de artigos por mes\n")
+puts "Numero de artigos por mes"
+date = Article.find(:first, :order => :created_at).created_at
+while(date <= Date.today) do
+  date = date.beginning_of_month
+
+  amount = Article.count(:conditions => {:created_at => date...date.end_of_month})
+  
+  file.write("#{date.strftime('%m/%Y')},#{amount}\n")
+  puts "Amount in #{date.strftime('%m/%Y')} #{amount}"
+
+  date = date.next_month
+
+end
+
+file.close

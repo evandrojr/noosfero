@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+require File.dirname(__FILE__) + '/../config/environment'
+
+
+communities = Community.find(:all, :order => :created_at)
+
+file = File.open('/tmp/palavraaberta.csv', 'w+')
+domain = Domain.find_by_name('palavraaberta.serpro')
+
+community = domain.owner
+
+articles = community.articles.find([798926, 378862,1062230,1062444,1063517,1065845,1032289,290145, 989503,963769,964368,974547])
+file.write("'ID','Caminho','Data de Criacao','Votos','Comentarios','Author','Profile'\n")
+articles.map do |a|
+  line = "'#{a.id}','http://voce.serpro/#{a.profile.identifier}/#{a.path}','#{a.created_at.strftime("%d/%m/%Y")}','#{a.votes.count}','#{a.comments.count}','#{a.author ? a.author.identifier : ''}','#{a.profile ? a.profile.identifier : ''}'\n"
+  puts line
+  file.write(line)
+end
+
+file.write("\n\n")
+
+file.write("'ID do Artigo','ID do Comentario','Titulo','Corpo','Criado em','Votos','Author', 'Resposta de'\n")
+articles.map do |a|
+  a.comments.map do |c|
+    line = "'#{c.source_id}','#{c.id}','#{c.title}','#{c.body.chomp}','#{c.created_at.strftime("%d/%m/%Y")}','#{c.votes.count}','#{c.author ? c.author.identifier : ''}','#{c.reply_of_id}'\n"
+    puts line
+    file.write(line)
+  end
+end
+
