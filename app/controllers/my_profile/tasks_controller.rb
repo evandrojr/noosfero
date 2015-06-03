@@ -1,16 +1,20 @@
 class TasksController < MyProfileController
 
-  protect [:perform_task, :view_tasks], :profile, :only => [:index]
-  protect :perform_task, :profile, :except => [:index]
+  protect [:perform_task, :view_tasks], :profile, :only => [:index, :save_tags, :search_tags]
+  protect :perform_task, :profile, :except => [:index, :save_tags, :search_tags]
 
   def index
     @filter_type = params[:filter_type].presence
     @filter_text = params[:filter_text].presence
     @filter_responsible = params[:filter_responsible]
+    @filter_tags = params[:filter_tags]
+
     @task_types = Task.pending_types_for(profile)
+    @task_tags = [OpenStruct.new(:name => _('All'), :id => nil) ] + Task.all_tags
 
     @tasks = Task.pending_all(profile, @filter_type, @filter_text).order_by('created_at', 'asc')
     @tasks = @tasks.where(:responsible_id => @filter_responsible.to_i != -1 ? @filter_responsible : nil) if @filter_responsible.present?
+    @tasks = @tasks.tagged_with(@filter_tags, any: true) if @filter_tags.present?
     @tasks = @tasks.paginate(:per_page => Task.per_page, :page => params[:page])
 
     @failed = params ? params[:failed] : {}
@@ -110,6 +114,38 @@ class TasksController < MyProfileController
     result = Task.pending_all(profile,params)
 
     render :json => result.map { |task| {:label => task.data[:name], :value => task.data[:name]} }
+  end
+
+  def save_tags
+
+    if request.post? && params[:tag_list]
+      result = {
+        success: false,
+        message: _('Error to save tags. Please, contact the system admin')
+      }
+
+      ActsAsTaggableOn.remove_unused_tags = true
+
+      task = profile.tasks.find_by_id params[:task_id]
+      save = user.tag(task, with: params[:tag_list], on: :tags)
+
+      if save
+        result[:success] = true
+      end
+    end
+
+    render json: result
+  end
+
+  #FIXME make this test
+  # Should not search for article tasks
+  # Should not search for other profile tags
+  # Should search only task tags
+  # Should check the permissions
+  def search_tags
+    arg = params[:term].downcase
+    result = ActsAsTaggableOn::Tag.find(:all, :conditions => ['LOWER(name) LIKE ?', "%#{arg}%"])
+    render :text => prepare_to_token_input_by_label(result).to_json, :content_type => 'application/json'
   end
 
 end

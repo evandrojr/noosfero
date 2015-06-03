@@ -329,7 +329,7 @@ class TaskTest < ActiveSupport::TestCase
     assert_includes Task.to(another_person), t4
   end
 
-  should 'filter tasks by type with named_scope' do
+  should 'filter tasks by type with named scope' do
     class CleanHouse < Task; end
     class FeedDog < Task; end
     requestor = fast_create(Person)
@@ -343,6 +343,25 @@ class TaskTest < ActiveSupport::TestCase
     assert_includes Task.of(type), t2
     assert_not_includes Task.of(type), t3
     assert_includes Task.of(nil), t3
+  end
+
+  should 'filter tasks by tags with named scope' do
+
+    requestor = fast_create(Person)
+    target = fast_create(Person)
+    profile = sample_user
+
+    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'})
+    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'})
+
+    profile.tag(task_one, with: 'noosfero,test', on: :tags)
+    profile.tag(task_two, with: 'test', on: :tags)
+
+    data = Task.tagged_with('noosfero', any: true)
+
+    assert_includes data, task_one
+    assert_not_includes data, task_two
+
   end
 
   should 'order tasks by some attribute correctly' do
@@ -450,6 +469,23 @@ class TaskTest < ActiveSupport::TestCase
     task.responsible = person
     task.save!
     assert_equal person, task.responsible
+  end
+
+  should 'save tasks tags' do
+
+    requestor = fast_create(Person)
+    target = fast_create(Person)
+    profile = sample_user
+
+    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'})
+    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'})
+
+    profile.tag(task_one, with: 'noosfero,test', on: :tags)
+    profile.tag(task_two, with: 'test', on: :tags)
+
+    assert_includes task_one.tags_from(nil), 'test'
+    assert_not_includes task_two.tags_from(nil), 'noosfero'
+
   end
 
   protected
