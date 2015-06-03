@@ -107,7 +107,7 @@
   });
 
   jQuery('.tag-list').inputosaurus({
-    autoCompleteSource: <%= "'/myprofile/#{profile.identifier}/cms/search_tags'," %>
+    autoCompleteSource: <%= "'/myprofile/#{profile.identifier}/tasks/search_tags'," %>
     activateFinalResult: true,
     submitTags: {
       url: <%= "'/myprofile/#{profile.identifier}/tasks/save_tags'" %>,

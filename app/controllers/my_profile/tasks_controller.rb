@@ -1,7 +1,7 @@
 class TasksController < MyProfileController
 
-  protect [:perform_task, :view_tasks], :profile, :only => [:index, :save_tags]
-  protect :perform_task, :profile, :except => [:index, :save_tags]
+  protect [:perform_task, :view_tasks], :profile, :only => [:index, :save_tags, :search_tags]
+  protect :perform_task, :profile, :except => [:index, :save_tags, :search_tags]
 
   def index
     @filter_type = params[:filter_type].presence
@@ -112,6 +112,17 @@ class TasksController < MyProfileController
     end
 
     render json: result
+  end
+
+  #FIXME make this test
+  # Should not search for article tasks
+  # Should not search for other profile tags
+  # Should search only task tags
+  # Should check the permissions
+  def search_tags
+    arg = params[:term].downcase
+    result = ActsAsTaggableOn::Tag.find(:all, :conditions => ['LOWER(name) LIKE ?', "%#{arg}%"])
+    render :text => prepare_to_token_input_by_label(result).to_json, :content_type => 'application/json'
   end
 
 end
