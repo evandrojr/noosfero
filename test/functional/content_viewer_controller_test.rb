@@ -218,6 +218,19 @@ class ContentViewerControllerTest < ActionController::TestCase
     assert_equal profile, assigns(:profile)
   end
 
+  should 'redirect to custom profile url when access a content using the environment domain' do
+    environment = Environment.default
+    environment.domains << Domain.create!(:name => 'environmentdomain.net')
+    profile = create_user('mytestuser').person
+    profile.domains << Domain.create!(:name => 'myowndomain.net')
+    profile.articles.create!(:name => 'myarticle', :body => 'test article')
+
+    ActionController::TestRequest.any_instance.expects(:host).returns('environmentdomain.net').at_least_once
+
+    get :view_page, :page => ['myarticle'], :profile => 'mytestuser'
+    assert_redirected_to 'http://myowndomain.net/myarticle'
+  end
+
   should 'give link to edit the article for owner' do
     login_as('testinguser')
     xhr :get, :view_page, :profile => 'testinguser', :page => [], :toolbar => true
