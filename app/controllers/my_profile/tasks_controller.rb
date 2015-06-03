@@ -1,7 +1,7 @@
 class TasksController < MyProfileController
 
-  protect [:perform_task, :view_tasks], :profile, :only => [:index]
-  protect :perform_task, :profile, :except => [:index]
+  protect [:perform_task, :view_tasks], :profile, :only => [:index, :save_tags]
+  protect :perform_task, :profile, :except => [:index, :save_tags]
 
   def index
     @filter_type = params[:filter_type].presence
@@ -103,7 +103,7 @@ class TasksController < MyProfileController
 
       ActsAsTaggableOn.remove_unused_tags = true
 
-      task = Task.find_by_id params[:task_id]
+      task = profile.tasks.find_by_id params[:task_id]
       save = user.tag(task, with: params[:tag_list], on: :tags)
 
       if save

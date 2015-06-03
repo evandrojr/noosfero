@@ -671,4 +671,32 @@ class TasksControllerTest < ActionController::TestCase
     assert_not_includes task_two.tags_from(nil), 'noosfero'
   end
 
+  should 'not tag task without permission' do
+    Role.delete_all
+    requestor = fast_create(Person)
+    community = fast_create(Community)
+    community.add_member(person)
+
+    @controller.stubs(:profile).returns(community)
+    task_one = Task.create!(:requestor => requestor, :target => community, :data => {:name => 'Task Test'})
+
+    post :save_tags, :task_id => task_one.id, :tag_list => 'test'
+
+    assert_not_includes task_one.tags_from(nil), 'test'
+  end
+#region_validators_controller_test.rb:    give_permission('ze', 'manage_environment_validators', environment)
+#profile_editor_controller_test.rb:    user2.stubs(:has_permission?).with('edit_profile', anything).returns(true)
+#profile_editor_controller_test.rb:    user2.expects(:has_permission?).with(:manage_friends, anything).returns(true)
+
+  should 'not tag task with permission but another user' do
+    requestor = fast_create(Person)
+    target = fast_create(Person)
+
+    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'})
+
+    post :save_tags, :task_id => task_one.id, :tag_list => 'test'
+
+    assert_not_includes task_one.tags_from(nil), 'test'
+  end
+
 end
