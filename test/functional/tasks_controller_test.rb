@@ -12,14 +12,14 @@ class TasksControllerTest < ActionController::TestCase
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
 
-    self.profile = create_user('testuser').person
-    @controller.stubs(:profile).returns(profile)
+    @person = create_user('testuser').person
+    @controller.stubs(:profile).returns(@person)
     login_as 'testuser'
   end
-  attr_accessor :profile
+  attr_accessor :person
 
   def assert_redirected_to(options)
-    super({ :controller => 'tasks', :profile => profile.identifier }.merge(options))
+    super({ :controller => 'tasks', :profile => person.identifier }.merge(options))
   end
 
   should 'list pending tasks' do
@@ -32,8 +32,8 @@ class TasksControllerTest < ActionController::TestCase
 
   should 'list pending tasks without spam' do
     requestor = fast_create(Person)
-    task_spam = Task.create!(:requestor => requestor, :target => profile, :spam => true)
-    task_ham = Task.create!(:requestor => requestor, :target => profile, :spam => false)
+    task_spam = Task.create!(:requestor => requestor, :target => person, :spam => true)
+    task_ham = Task.create!(:requestor => requestor, :target => person, :spam => false)
 
     get :index
     assert_response :success
@@ -50,15 +50,15 @@ class TasksControllerTest < ActionController::TestCase
   end
 
   should 'display task created_at' do
-    Task.create!(:requestor => fast_create(Person), :target => profile, :spam => false)
+    Task.create!(:requestor => fast_create(Person), :target => person, :spam => false)
     get :index
     assert_select '.task_date'
   end
 
   should 'list processed tasks without spam' do
     requestor = fast_create(Person)
-    task_spam = create(Task, :status => Task::Status::FINISHED, :requestor => requestor, :target => profile, :spam => true)
-    task_ham = create(Task, :status => Task::Status::FINISHED, :requestor => requestor, :target => profile, :spam => false)
+    task_spam = create(Task, :status => Task::Status::FINISHED, :requestor => requestor, :target => person, :spam => true)
+    task_ham = create(Task, :status => Task::Status::FINISHED, :requestor => requestor, :target => person, :spam => false)
 
     get :processed
     assert_response :success
@@ -66,23 +66,8 @@ class TasksControllerTest < ActionController::TestCase
     assert_not_includes assigns(:tasks), task_spam
   end
 
-  should 'save tasks tags' do
-
-    requestor = fast_create(Person)
-
-    task_one = Task.create!(:requestor => requestor, :target => profile, :data => {:name => 'Task Test'})
-    task_two = Task.create!(:requestor => requestor, :target => profile, :data => {:name => 'Another Task'})
-
-    post :save_tags, :task_id => task_one.id, :tag_list => 'noosfero,test'
-    post :save_tags, :task_id => task_two.id, :tag_list => 'test'
-
-    assert_includes task_one.tags_from(nil), 'test'
-    assert_not_includes task_two.tags_from(nil), 'noosfero'
-
-  end
-
   should 'be able to finish a task' do
-    t = profile.tasks.build; t.save!
+    t = person.tasks.build; t.save!
 
     post :close, :tasks => {t.id => {:decision => 'finish', :task => {}}}
     assert_redirected_to :action => 'index'
@@ -92,7 +77,7 @@ class TasksControllerTest < ActionController::TestCase
   end
 
   should 'be able to cancel a task' do
-    t = profile.tasks.build; t.save!
+    t = person.tasks.build; t.save!
 
     post :close, :tasks => {t.id => {:decision => 'cancel', :task => {}}}
     assert_redirected_to :action => 'index'
@@ -102,7 +87,7 @@ class TasksControllerTest < ActionController::TestCase
   end
 
   should 'be able to skip a task' do
-    t = profile.tasks.build; t.save!
+    t = person.tasks.build; t.save!
 
     post :close, :tasks => {t.id => {:decision => 'skip', :task => {}}}
     assert_redirected_to :action => 'index'
@@ -112,9 +97,9 @@ class TasksControllerTest < ActionController::TestCase
   end
 
   should 'be able to apply different decisions to multiples tasks at the same time' do
-    t1 = profile.tasks.build; t1.save!
-    t2 = profile.tasks.build; t2.save!
-    t3 = profile.tasks.build; t3.save!
+    t1 = person.tasks.build; t1.save!
+    t2 = person.tasks.build; t2.save!
+    t3 = person.tasks.build; t3.save!
 
     post :close, :tasks => {t1.id => {:decision => 'finish', :task => {}}, t2.id => {:decision => 'cancel', :task => {}}, t3.id => {:decision => 'skip', :task => {}}}
     assert_redirected_to :action => 'index'
@@ -129,56 +114,60 @@ class TasksControllerTest < ActionController::TestCase
   end
 
   should 'affiliate roles to user after finish add member task' do
-    t = AddMember.create!(:person => profile, :organization => profile)
-    count = profile.members.size
+    community = fast_create(Community)
+    community.add_member(person)
+    another_person = fast_create(Person)
+    t = AddMember.create!(:person => another_person, :organization => community)
+    count = community.members.size
+    @controller.stubs(:profile).returns(community)
     post :close, :tasks => {t.id => {:decision => 'finish', :task => {}}}
-    profile = Profile.find(@profile.id)
-    assert_equal count + 1, profile.members.size
+    community = Profile.find(community.id)
+    assert_equal count + 1, community.members.size
   end
 
   should 'display a create ticket form' do
-    get :new, :profile => profile.identifier
+    get :new, :profile => person.identifier
 
     assert_template 'new'
   end
 
   should 'add a hidden field with target_id when informed in the URL' do
     friend = create_user('myfriend').person
-    profile.add_friend(friend)
+    person.add_friend(friend)
 
-    get :new, :profile => profile.identifier, :target_id => friend.id.to_s
+    get :new, :profile => person.identifier, :target_id => friend.id.to_s
 
     assert_tag :tag => 'input', :attributes => { :type => 'hidden', :name => 'ticket[target_id]', :value => friend.id }
   end
 
   should 'select friend from list when not already informed' do
-    get :new, :profile => profile.identifier
+    get :new, :profile => person.identifier
     assert_tag :tag => 'select', :attributes => { :name =>  'ticket[target_id]' }
   end
 
   should 'create a ticket' do
     assert_difference 'Ticket.count' do
-      post :new, :profile => profile.identifier, :ticket => {:name => 'test ticket'}
+      post :new, :profile => person.identifier, :ticket => {:name => 'test ticket'}
     end
   end
 
   should 'create a ticket with profile requestor' do
-    post :new, :profile => profile.identifier, :ticket => {:name => 'new task'}
+    post :new, :profile => person.identifier, :ticket => {:name => 'new task'}
 
-    assert_equal profile, assigns(:ticket).requestor
+    assert_equal person, assigns(:ticket).requestor
   end
 
   should 'list tasks that this profile created' do
-    task = Ticket.create!(:name => 'test', :requestor => profile)
-    get :list_requested, :profile => profile.identifier
+    task = Ticket.create!(:name => 'test', :requestor => person)
+    get :list_requested, :profile => person.identifier
 
     assert_includes assigns(:tasks), task
   end
 
   should 'list tasks that this profile created without spam' do
-    task_spam = Ticket.create!(:name => 'test', :requestor => profile, :spam => true)
-    task_ham = Ticket.create!(:name => 'test', :requestor => profile, :spam => false)
-    get :list_requested, :profile => profile.identifier
+    task_spam = Ticket.create!(:name => 'test', :requestor => person, :spam => true)
+    task_ham = Ticket.create!(:name => 'test', :requestor => person, :spam => false)
+    get :list_requested, :profile => person.identifier
 
     assert_includes assigns(:tasks), task_ham
     assert_not_includes assigns(:tasks), task_spam
@@ -186,9 +175,9 @@ class TasksControllerTest < ActionController::TestCase
 
   should 'set target of ticket when creating it' do
      f = create_user('friend').person
-     profile.add_friend f
+     person.add_friend f
 
-     post :new, :profile => profile.identifier, :ticket => {:name => 'test ticket', :target_id => f.id, :target_type => 'Profile'}
+     post :new, :profile => person.identifier, :ticket => {:name => 'test ticket', :target_id => f.id, :target_type => 'Profile'}
      assert_response :redirect
 
      assert_equal f, assigns(:ticket).target
@@ -198,9 +187,9 @@ class TasksControllerTest < ActionController::TestCase
     c = fast_create(Community)
     c.update_attributes(:moderated_articles => false)
     @controller.stubs(:profile).returns(c)
-    c.affiliate(profile, Profile::Roles.all_roles(profile.environment.id))
-    article = profile.articles.create!(:name => 'something interesting', :body => 'ruby on rails')
-    t = ApproveArticle.create!(:name => 'test name', :article => article, :target => c, :requestor => profile)
+    c.affiliate(person, Profile::Roles.all_roles(person.environment.id))
+    article = person.articles.create!(:name => 'something interesting', :body => 'ruby on rails')
+    t = ApproveArticle.create!(:name => 'test name', :article => article, :target => c, :requestor => person)
 
     post :close, :tasks => {t.id => {:decision => 'finish', :task => {:name => 'new_name'}}}
     assert_equal article, c.articles.find_by_name('new_name').reference_article
@@ -211,9 +200,9 @@ class TasksControllerTest < ActionController::TestCase
     c.update_attributes(:moderated_articles => false)
     @controller.stubs(:profile).returns(c)
     folder = create(Folder, :profile => c, :name => 'test folder')
-    c.affiliate(profile, Profile::Roles.all_roles(profile.environment.id))
-    article = profile.articles.create!(:name => 'something interesting', :body => 'ruby on rails')
-    t = ApproveArticle.create!(:name => 'test name', :article => article, :target => c, :requestor => profile)
+    c.affiliate(person, Profile::Roles.all_roles(person.environment.id))
+    article = person.articles.create!(:name => 'something interesting', :body => 'ruby on rails')
+    t = ApproveArticle.create!(:name => 'test name', :article => article, :target => c, :requestor => person)
 
     post :close, :tasks => {t.id => {:decision => 'finish', :task => {:name => 'new_name', :article_parent_id => folder.id}}}
     assert_equal folder, c.articles.find_by_name('new_name').parent
@@ -224,9 +213,9 @@ class TasksControllerTest < ActionController::TestCase
     c.update_attributes(:moderated_articles => false)
     @controller.stubs(:profile).returns(c)
     folder = create(Article, :profile => c, :name => 'test folder', :type => 'Folder')
-    c.affiliate(profile, Profile::Roles.all_roles(profile.environment.id))
-    article = profile.articles.create!(:name => 'something interesting', :body => 'ruby on rails')
-    t = ApproveArticle.create!(:article => article, :target => c, :requestor => profile)
+    c.affiliate(person, Profile::Roles.all_roles(person.environment.id))
+    article = person.articles.create!(:name => 'something interesting', :body => 'ruby on rails')
+    t = ApproveArticle.create!(:article => article, :target => c, :requestor => person)
 
     post :close, :tasks => {t.id => {:decision => 'finish', :task => {:name => 'new_name', :article_parent_id => folder.id, :highlighted => true}}}
     assert_equal true, c.articles.find_by_name('new_name').highlighted
@@ -236,9 +225,9 @@ class TasksControllerTest < ActionController::TestCase
     c = fast_create(Community)
     c.update_attributes(:moderated_articles => false)
     @controller.stubs(:profile).returns(c)
-    c.affiliate(profile, Profile::Roles.all_roles(profile.environment.id))
-    article = profile.articles.create!(:name => 'something interesting', :body => 'ruby on rails')
-    t = ApproveArticle.create!(:article => article, :target => c, :requestor => profile)
+    c.affiliate(person, Profile::Roles.all_roles(person.environment.id))
+    article = person.articles.create!(:name => 'something interesting', :body => 'ruby on rails')
+    t = ApproveArticle.create!(:article => article, :target => c, :requestor => person)
 
     post :close, :tasks => {t.id => {:decision => 'finish', :task => {:name => 'new_name', :article_parent_id => ""}}}
     assert_not_nil c.articles.find_by_name('new_name')
@@ -247,7 +236,7 @@ class TasksControllerTest < ActionController::TestCase
   should 'handle blank names for published articles' do
     c = fast_create(Community)
     @controller.stubs(:profile).returns(c)
-    c.affiliate(profile, Profile::Roles.all_roles(c.environment))
+    c.affiliate(person, Profile::Roles.all_roles(c.environment))
     person = create_user('test_user').person
     p_blog = Blog.create!(:profile => person, :name => 'Blog')
     c_blog1 = Blog.create!(:profile => c, :name => 'Blog')
@@ -266,8 +255,8 @@ class TasksControllerTest < ActionController::TestCase
 
   should 'display error if there is an enterprise with the same identifier and keep the task active' do
     e = Environment.default
-    e.add_admin(profile)
-    task = CreateEnterprise.create!(:name => "My Enterprise", :identifier => "my-enterprise", :requestor => profile, :target => e)
+    e.add_admin(person)
+    task = CreateEnterprise.create!(:name => "My Enterprise", :identifier => "my-enterprise", :requestor => person, :target => e)
     enterprise = fast_create(Enterprise, :name => "My Enterprise", :identifier => "my-enterprise")
 
     assert_nothing_raised do
@@ -283,7 +272,7 @@ class TasksControllerTest < ActionController::TestCase
   should 'render TinyMce Editor when approving suggested article task' do
     Task.destroy_all
     c = fast_create(Community)
-    c.add_admin profile
+    c.add_admin person
     @controller.stubs(:profile).returns(c)
     t = SuggestArticle.create!(:article => {:name => 'test name', :abstract => 'test abstract', :body => 'test body'}, :name => 'some name', :email => 'test@localhost.com', :target => c)
 
@@ -295,7 +284,7 @@ class TasksControllerTest < ActionController::TestCase
   should 'create TinyMceArticle article after finish approve suggested article task' do
     TinyMceArticle.destroy_all
     c = fast_create(Community)
-    c.affiliate(profile, Profile::Roles.all_roles(profile.environment.id))
+    c.affiliate(person, Profile::Roles.all_roles(person.environment.id))
     @controller.stubs(:profile).returns(c)
     t = SuggestArticle.create!(:article => {:name => 'test name', :body => 'test body'}, :name => 'some name', :email => 'test@localhost.com', :target => c)
 
@@ -306,7 +295,7 @@ class TasksControllerTest < ActionController::TestCase
   should "change the article's attributes on suggested article task approval" do
     TinyMceArticle.destroy_all
     c = fast_create(Community)
-    c.affiliate(profile, Profile::Roles.all_roles(profile.environment.id))
+    c.affiliate(person, Profile::Roles.all_roles(person.environment.id))
     @controller.stubs(:profile).returns(c)
     t = SuggestArticle.new
     t.article = {:name => 'test name', :body => 'test body', :source => 'http://test.com', :source_name => 'some source name'}
@@ -326,7 +315,7 @@ class TasksControllerTest < ActionController::TestCase
   should "display name from article suggestion when requestor was not setted" do
     Task.destroy_all
     c = fast_create(Community)
-    c.add_admin profile
+    c.add_admin person
     @controller.stubs(:profile).returns(c)
     t = SuggestArticle.create!(:article => {:name => 'test name', :abstract => 'test abstract', :body => 'test body'}, :name => 'some name', :email => 'test@localhost.com', :target => c)
 
@@ -337,7 +326,7 @@ class TasksControllerTest < ActionController::TestCase
   should "append hidden tag with type value from article suggestion" do
     Task.destroy_all
     c = fast_create(Community)
-    c.add_admin profile
+    c.add_admin person
     @controller.stubs(:profile).returns(c)
     t = SuggestArticle.create!(:article => {:name => 'test name', :abstract => 'test abstract', :body => 'test body', :type => 'TextArticle'}, :name => 'some name', :email => 'test@localhost.com', :target => c)
 
@@ -348,7 +337,7 @@ class TasksControllerTest < ActionController::TestCase
   should "display parent_id selection from article suggestion with predefined value" do
     Task.destroy_all
     c = fast_create(Community)
-    c.add_admin profile
+    c.add_admin person
     @controller.stubs(:profile).returns(c)
     parent = fast_create(Folder, :profile_id => c.id)
     t = SuggestArticle.create!(:article => {:name => 'test name', :abstract => 'test abstract', :body => 'test body', :parent_id => parent.id}, :name => 'some name', :email => 'test@localhost.com', :target => c)
@@ -360,7 +349,7 @@ class TasksControllerTest < ActionController::TestCase
   should "not display name from article suggestion when requestor was setted" do
     Task.destroy_all
     c = fast_create(Community)
-    c.add_admin profile
+    c.add_admin person
     @controller.stubs(:profile).returns(c)
     t = SuggestArticle.create!(:article => {:name => 'test name', :abstract => 'test abstract', :body => 'test body'}, :requestor => fast_create(Person), :target => c)
 
@@ -376,7 +365,7 @@ class TasksControllerTest < ActionController::TestCase
 
   should 'close create enterprise if trying to cancel even if there is already an existing identifier' do
     identifier = "common-identifier"
-    task = CreateEnterprise.create!(:identifier => identifier, :name => identifier, :requestor => profile, :target => profile)
+    task = CreateEnterprise.create!(:identifier => identifier, :name => identifier, :requestor => person, :target => person)
     fast_create(Profile, :identifier => identifier)
 
     assert_nothing_raised do
@@ -392,9 +381,9 @@ class TasksControllerTest < ActionController::TestCase
     class FeedDog < Task; end
     Task.stubs(:per_page).returns(3)
     requestor = fast_create(Person)
-    t1 = CleanHouse.create!(:requestor => requestor, :target => profile)
-    t2 = CleanHouse.create!(:requestor => requestor, :target => profile)
-    t3 = FeedDog.create!(:requestor => requestor, :target => profile)
+    t1 = CleanHouse.create!(:requestor => requestor, :target => person)
+    t2 = CleanHouse.create!(:requestor => requestor, :target => person)
+    t3 = FeedDog.create!(:requestor => requestor, :target => person)
 
     get :index, :filter_type => t1.type
 
@@ -414,9 +403,9 @@ class TasksControllerTest < ActionController::TestCase
     class FeedDog < Task; end
     Task.stubs(:per_page).returns(3)
     requestor = fast_create(Person)
-    t1 = CleanHouse.create!(:requestor => requestor, :target => profile, :data => {:name => 'Task Test'})
-    t2 = CleanHouse.create!(:requestor => requestor, :target => profile)
-    t3 = FeedDog.create!(:requestor => requestor, :target => profile)
+    t1 = CleanHouse.create!(:requestor => requestor, :target => person, :data => {:name => 'Task Test'})
+    t2 = CleanHouse.create!(:requestor => requestor, :target => person)
+    t3 = FeedDog.create!(:requestor => requestor, :target => person)
 
     get :index, :filter_type => t1.type, :filter_text => 'test'
 
@@ -435,11 +424,11 @@ class TasksControllerTest < ActionController::TestCase
 
     requestor = fast_create(Person)
 
-    task_one = Task.create!(:requestor => requestor, :target => profile, :data => {:name => 'Task Test'})
-    task_two = Task.create!(:requestor => requestor, :target => profile, :data => {:name => 'Another Task'})
+    task_one = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Task Test'})
+    task_two = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Another Task'})
 
-    profile.tag(task_one, with: 'noosfero,test', on: :tags)
-    profile.tag(task_two, with: 'test', on: :tags)
+    person.tag(task_one, with: 'noosfero,test', on: :tags)
+    person.tag(task_two, with: 'test', on: :tags)
 
     get :index, :filter_tags => 'noosfero'
 
@@ -449,11 +438,11 @@ class TasksControllerTest < ActionController::TestCase
 
   should 'return tasks ordered accordingly and limited by pages' do
     time = Time.now
-    person = fast_create(Person)
-    t1 = create(Task, :status => Task::Status::ACTIVE, :target => profile, :requestor => person, :created_at => time)
-    t2 = create(Task, :status => Task::Status::ACTIVE, :target => profile, :requestor => person, :created_at => time + 1.second)
-    t3 = create(Task, :status => Task::Status::ACTIVE, :target => profile, :requestor => person, :created_at => time + 2.seconds)
-    t4 = create(Task, :status => Task::Status::ACTIVE, :target => profile, :requestor => person, :created_at => time + 3.seconds)
+    requestor = fast_create(Person)
+    t1 = create(Task, :status => Task::Status::ACTIVE, :target => person, :requestor => requestor, :created_at => time)
+    t2 = create(Task, :status => Task::Status::ACTIVE, :target => person, :requestor => requestor, :created_at => time + 1.second)
+    t3 = create(Task, :status => Task::Status::ACTIVE, :target => person, :requestor => requestor, :created_at => time + 2.seconds)
+    t4 = create(Task, :status => Task::Status::ACTIVE, :target => person, :requestor => requestor, :created_at => time + 3.seconds)
 
     Task.stubs(:per_page).returns(2)
 
@@ -469,9 +458,9 @@ class TasksControllerTest < ActionController::TestCase
     Task.stubs(:per_page).returns(3)
     requestor = fast_create(Person)
     responsible = fast_create(Person)
-    t1 = Task.create!(:requestor => requestor, :target => profile, :responsible => responsible)
-    t2 = Task.create!(:requestor => requestor, :target => profile, :responsible => responsible)
-    t3 = Task.create!(:requestor => requestor, :target => profile)
+    t1 = Task.create!(:requestor => requestor, :target => person, :responsible => responsible)
+    t2 = Task.create!(:requestor => requestor, :target => person, :responsible => responsible)
+    t3 = Task.create!(:requestor => requestor, :target => person)
 
     get :index, :filter_responsible => responsible.id
 
@@ -659,6 +648,27 @@ class TasksControllerTest < ActionController::TestCase
 
     assert_select ".task_responsible select", 0
     assert_select ".task_responsible .value"
+  end
+
+  should 'save task tags' do
+    requestor = fast_create(Person)
+
+    task_one = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Task Test'})
+    post :save_tags, :task_id => task_one.id, :tag_list => 'test'
+
+    assert_includes task_one.tags_from(nil), 'test'
+  end
+
+  should 'tag attribution in one task not affect another' do
+    requestor = fast_create(Person)
+
+    task_one = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Task Test'})
+    task_two = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Another Task'})
+
+    post :save_tags, :task_id => task_one.id, :tag_list => 'noosfero,test'
+    post :save_tags, :task_id => task_two.id, :tag_list => 'test'
+
+    assert_not_includes task_two.tags_from(nil), 'noosfero'
   end
 
 end
