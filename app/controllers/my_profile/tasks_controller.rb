@@ -129,6 +129,4 @@ class TasksController < MyProfileController
 
   end
 
- end
-
 end
