@@ -94,53 +94,7 @@
 <%= javascript_include_tag 'tasks' %>
 
 <script type="text/javascript">
-
-  jQuery('.filter-tags').inputosaurus({
-    hideInput: true
-  });
-
-  $('#filter-add-tag').change(function(){
-
-    if($(this).val() != ''){
-      jQuery('.filter-tags').inputosaurus('addTags',$(this).children(':selected').text());
-    }
-  });
-
-  jQuery('.tag-list').inputosaurus({
-    autoCompleteSource: <%= "'/myprofile/#{profile.identifier}/tasks/search_tags'," %>
-    activateFinalResult: true,
-    submitTags: {
-      url: <%= "'/myprofile/#{profile.identifier}/tasks/save_tags'" %>,
-      beforeSend: function(){
-        this.element.parents('.task_box')
-                    .prev('.fg-state-error')
-                    .remove();
-      },
-      success: function(response){
-
-        this.element.parents('.task_box')
-                    .prev('.fg-state-error')
-                    .remove();
-
-        if(!response.success){
-
-          var errorIcon = $('<span/>',{
-            'class':'ui-icon ui-icon-alert',
-            style:'float: left; margin-right: .3em;'
-          });
-
-          var content = $('<p/>',{
-            html:'<strong>'+response.message+'</strong>'
-          }).prepend(errorIcon);
-
-          var div = $('<div/>',{
-              'class':'alert fg-state-error ui-state-error'
-          }).append(content);
-
-          this.element.parents('.task_box').before(div);
-        }
-
-      }
-    }
+  Task.showTags({
+    profileIdentifier: <%= "'#{profile.identifier}'" %>
   })
 </script>

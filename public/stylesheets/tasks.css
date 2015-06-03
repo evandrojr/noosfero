@@ -61,8 +61,9 @@
   margin: 0 5px 0 10px;
 }
 
-.formfieldline .inputosaurus-container {
+.inputosaurus-container {
   vertical-align: middle;
+  margin-top: -2px;
 }
 
 .tag-list-fields input {
@@ -72,4 +73,24 @@
 .formfield.tag-list-fields .ui-autocomplete-loading {
   background: url('/images/loading-small.gif') right center no-repeat !important;
   background-color: #fff !important;
+}
+
+.tag-saved {
+  width: 24px;
+  height: 24px;
+  background: none !important;
+}
+
+.ok {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: url('/images/ok.png') right center no-repeat
+}
+
+.loading {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: url('/images/loading-small.gif') right center no-repeat
 }

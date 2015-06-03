@@ -1,5 +1,109 @@
 (function($) {
 
+  /**
+  * @class Task singleton created with module pattern
+  */
+  Task = (function(){
+
+    var _showError = function(context,response){
+
+      var errorIcon = $('<span/>',{
+        'class':'ui-icon ui-icon-alert',
+        style:'float: left; margin-right: .3em;'
+      });
+
+      var content = $('<p/>',{
+        html:'<strong>'+response.message+'</strong>'
+      }).prepend(errorIcon);
+
+      var div = $('<div/>',{
+          'class':'alert fg-state-error ui-state-error'
+      }).append(content);
+
+      context.element.parents('.task_box').before(div);
+
+    };
+
+    var _showSuccess = function(context,response){
+      _addIcon(context,'ok');
+
+      setTimeout(function(){
+        $('.ok').parent().remove();
+      },1000);
+    };
+
+    var _addIcon = function(context,className){
+      $('.'+className).parent().remove();
+
+      var item = $('<li/>',{
+        'class':'inputosaurus-input tag-saved',
+        html:'<i class="'+className+'"></i>'
+      });
+
+      if(className == 'ok'){
+        $('.loading').parent().remove();
+      }
+      context.elements.input.parent().before(item);
+    }
+
+    return {
+
+      /**
+      * @see inputosaurus#_sendTags The 'this' context here is the jquery ui widget component
+      */
+      onAddTag: function(response){
+        this.element.parents('.task_box')
+                    .prev('.fg-state-error')
+                    .remove();
+
+        if(response.success){
+
+          _showSuccess(this,response);
+        }else{
+
+          _showError(this,response);
+        }
+      },
+      showTags: function(cfg){
+
+        jQuery('.filter-tags').inputosaurus({
+          hideInput: true
+        });
+
+        $('#filter-add-tag').change(function(){
+
+          if($(this).val() != ''){
+            jQuery('.filter-tags').inputosaurus('addTags',$(this).children(':selected').text());
+          }
+        });
+
+        jQuery('.tag-list').inputosaurus({
+          autoCompleteSource: '/myprofile/'+cfg.profileIdentifier+'/tasks/search_tags',
+          activateFinalResult: true,
+          submitTags: {
+            url:  '/myprofile/'+cfg.profileIdentifier+'/tasks/save_tags',
+            beforeSend: function(){
+
+              $('.ok').parent().remove();
+
+              this.element.parents('.task_box')
+                          .prev('.fg-state-error')
+                          .remove();
+
+              _addIcon(this,'loading');
+
+              //Add loading here!
+            },
+            success: this.onAddTag
+          }
+        });
+
+      }
+
+    };
+
+  })();
+
   $("input.task_accept_radio").click(function(){
     task_id = this.getAttribute("task_id");
     $('#on-accept-information-' + task_id).show('fast');
@@ -62,4 +166,3 @@ function change_task_responsible(el) {
     }
   });
 }
-

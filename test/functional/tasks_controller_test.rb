@@ -684,6 +684,9 @@ class TasksControllerTest < ActionController::TestCase
 
     assert_not_includes task_one.tags_from(nil), 'test'
   end
+#region_validators_controller_test.rb:    give_permission('ze', 'manage_environment_validators', environment)
+#profile_editor_controller_test.rb:    user2.stubs(:has_permission?).with('edit_profile', anything).returns(true)
+#profile_editor_controller_test.rb:    user2.expects(:has_permission?).with(:manage_friends, anything).returns(true)
 
   should 'not tag task with permission but another user' do
     requestor = fast_create(Person)
