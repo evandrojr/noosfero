@@ -117,7 +117,6 @@ class TasksController < MyProfileController
   end
 
   def save_tags
-
     if request.post? && params[:tag_list]
       result = {
         success: false,
@@ -126,7 +125,7 @@ class TasksController < MyProfileController
 
       ActsAsTaggableOn.remove_unused_tags = true
 
-      task = profile.tasks.find_by_id params[:task_id]
+      task = Task.to(profile).find_by_id params[:task_id]
       save = user.tag(task, with: params[:tag_list], on: :tags)
 
       if save
@@ -137,15 +136,20 @@ class TasksController < MyProfileController
     render json: result
   end
 
-  #FIXME make this test
+  # FIXME make this test
   # Should not search for article tasks
   # Should not search for other profile tags
   # Should search only task tags
   # Should check the permissions
+
   def search_tags
+
     arg = params[:term].downcase
+
     result = ActsAsTaggableOn::Tag.find(:all, :conditions => ['LOWER(name) LIKE ?', "%#{arg}%"])
+
     render :text => prepare_to_token_input_by_label(result).to_json, :content_type => 'application/json'
+
   end
 
 end
