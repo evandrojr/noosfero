@@ -485,7 +485,20 @@ class TaskTest < ActiveSupport::TestCase
 
     assert_includes task_one.tags_from(nil), 'test'
     assert_not_includes task_two.tags_from(nil), 'noosfero'
+  end
 
+  should 'store who finish the task' do
+    t = Task.create
+    person = fast_create(Person)
+    t.finish(person)
+    assert_equal person, t.reload.closed_by
+  end
+
+  should 'store who cancel the task' do
+    t = Task.create
+    person = fast_create(Person)
+    t.cancel(person)
+    assert_equal person, t.reload.closed_by
   end
 
   protected
