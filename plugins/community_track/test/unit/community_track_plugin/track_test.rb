@@ -3,10 +3,12 @@ require File.dirname(__FILE__) + '/../../test_helper'
 class TrackTest < ActiveSupport::TestCase
 
   def setup
-    @profile = fast_create(Community)
+    @profile = create(Community)
     @track = create_track('track', @profile)
     @step = CommunityTrackPlugin::Step.create!(:parent => @track, :start_date => Date.today, :end_date => Date.today, :name => 'step', :profile => @profile)
+    @track.children << @step
     @tool = fast_create(Article, :parent_id => @step.id, :profile_id => @profile.id)
+    @step.children << @tool
   end
 
   should 'describe yourself' do
@@ -25,8 +27,18 @@ class TrackTest < ActiveSupport::TestCase
     assert_equal 0, @track.comments_count
     owner = create_user('testuser').person
     article = create(Article, :name => 'article', :parent_id => @step.id, :profile_id => owner.id)
+    @track.children << @step
+    @step.children << article
     comment = create(Comment, :source => article, :author_id => owner.id)
-    assert_equal 1, @track.comments_count
+    @step2 = CommunityTrackPlugin::Step.create!(:parent => @track, :start_date => Date.today, :end_date => Date.today, :name => 'step2', :profile => @profile)
+    @step2.tool_type = 'Forum'
+    forum = fast_create(Forum, :parent_id => @step2.id)
+    article_forum = create(Article, :name => 'article_forum', :parent_id => forum.id, :profile_id => owner.id)
+    forum.children << article_forum
+    forum_comment = create(Comment, :source => article_forum, :author_id => owner.id)
+    @track.stubs(:children).returns([@step, @step2])
+    #@track.children = [@step, @step2]
+    assert_equal 2, @track.comments_count
   end
 
   should 'return children steps' do
