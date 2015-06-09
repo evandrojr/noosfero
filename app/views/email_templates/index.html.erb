@@ -1,0 +1,23 @@
+<h1><%= _('Email Templates') %></h1>
+
+<table>
+  <tr>
+    <th><%= _('Name') %></th>
+    <th></th>
+  </tr>
+
+<% @email_templates.each do |email_template| %>
+  <tr>
+    <td><%= email_template.name %></td>
+    <td>
+      <%= link_to 'Edit', url_for(:controller => :email_templates, :action => :edit, :id => email_template.id) %>
+      <%= link_to 'Destroy', url_for(:controller => :email_templates, :action => :destroy, :id => email_template.id), method: :delete, data: { confirm: 'Are you sure?' } %>
+    </td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= button(:new, _('New template'), :controller => :email_templates, :action => :new) %>
+<%= button(:back, _('Back to control panel'), :controller => :profile_editor) %>

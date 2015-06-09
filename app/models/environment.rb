@@ -982,6 +982,10 @@ class Environment < ActiveRecord::Base
     self.licenses.any?
   end
 
+  def to_liquid
+    HashWithIndifferentAccess.new :name => name
+  end
+
   private
 
   def default_language_available

@@ -4,6 +4,8 @@ class EmailTemplate < ActiveRecord::Base
 
   attr_accessible :template_type, :subject, :body, :owner, :name
 
+  validates_presence_of :name
+
   def parsed_body(params)
     @parsed_body ||= parse(body, params)
   end

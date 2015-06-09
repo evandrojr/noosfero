@@ -28,6 +28,7 @@
 *= require catalog.js
 *= require autogrow.js
 *= require require_login.js
+*= require email_templates.js
 */
 
 // scope for noosfero stuff
