@@ -70,6 +70,8 @@ module Noosfero
         expose :setting
         expose :position
         expose :hits
+        expose :start_date
+        expose :end_date
       end
 
       class Article < ArticleBase
