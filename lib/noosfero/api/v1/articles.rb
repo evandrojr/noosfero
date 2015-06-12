@@ -101,7 +101,10 @@ module Noosfero
           end
 
         end
-  
+
+# Request example:
+# /api/v1/communities/64/articles?from=2013-04-04-14:41:43&until=2015-06-11-14:41:43&limit=10&categories_ids[]=7&categories_ids[]=8&private_token=a97b6a5cae2c4c54e4ae18dde1829a49
+
         resource :communities do
           segment '/:community_id' do
             resource :articles do
