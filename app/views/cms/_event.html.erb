@@ -8,9 +8,11 @@
 <%= render :partial => 'general_fields' %>
 <%= render :partial => 'translatable' %>
 
-<%= labelled_form_field(_('Start date'), pick_date(:article, :start_date)) %>
+<%= labelled_form_field(_('Start date and time'), datetime_select(:article, :start_date)) %>
 
-<%= labelled_form_field(_('End date'), pick_date(:article, :end_date)) %>
+<%= labelled_form_field(_('End date and time'), datetime_select(:article, :end_date)) %>
+
+<%= labelled_form_field(_('Presenter:'), text_field(:article, :presenter)) %>
 
 <%= labelled_form_field(_('Event website:'), text_field(:article, :link)) %>
 
