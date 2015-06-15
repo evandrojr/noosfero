@@ -112,6 +112,11 @@ class CmsController < MyProfileController
         end
       end
     end
+
+    unless @article.kind_of?(RssFeed)
+      @escaped_body = CGI::escapeHTML(@article.body || '')
+      @escaped_abstract = CGI::escapeHTML(@article.abstract || '')
+    end
   end
 
   def new
@@ -144,7 +149,13 @@ class CmsController < MyProfileController
     article_data = environment.enabled?('articles_dont_accept_comments_by_default') ? { :accept_comments => false } : {}
     article_data.merge!(params[:article]) if params[:article]
     article_data.merge!(:profile => profile) if profile
-    @article = klass.new(article_data)
+
+    @article = if params[:clone]
+      current_article = profile.articles.find(params[:id])
+      current_article.copy_without_save
+    else
+      klass.new(article_data)
+    end
 
     parent = check_parent(params[:parent_id])
     if parent

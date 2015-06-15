@@ -1122,6 +1122,23 @@ class ProfileTest < ActiveSupport::TestCase
     assert_equal 'default title', p.boxes[0].blocks.first[:title]
   end
 
+  should 'have blocks observer on template when applying template with mirror' do
+    template = fast_create(Profile)
+    template.boxes.destroy_all
+    template.boxes << Box.new
+    b = Block.new(:title => 'default title', :mirror => true)
+    template.boxes[0].blocks << b
+
+    p = create(Profile)
+    assert !b[:title].blank?
+
+    p.copy_blocks_from(template)
+
+    assert_equal 'default title', p.boxes[0].blocks.first[:title]
+    assert_equal p.boxes[0].blocks.first, template.boxes[0].blocks.first.observers.first
+
+  end
+
   TMP_THEMES_DIR = Rails.root.join('test', 'tmp', 'profile_themes')
   should 'have themes' do
     Theme.stubs(:user_themes_dir).returns(TMP_THEMES_DIR)
@@ -2120,6 +2137,16 @@ class ProfileTest < ActiveSupport::TestCase
 
     community.add_member person
     assert_equal false, ProfileSuggestion.find(suggestion.id).enabled
+  end
+
+  should 'destroy related suggestion if profile is destroyed' do
+    person = fast_create(Person)
+    suggested_person = fast_create(Person)
+    suggestion = ProfileSuggestion.create(:person => person, :suggestion => suggested_person, :enabled => true)
+
+    assert_difference 'ProfileSuggestion.find_all_by_suggestion_id(suggested_person.id).count', -1 do
+      suggested_person.destroy
+    end
   end
 
   should 'enable profile visibility' do
