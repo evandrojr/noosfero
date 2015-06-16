@@ -3,13 +3,14 @@ require 'builder'
 
 class Event < Article
 
-  attr_accessible :start_date, :end_date, :link, :address
+  attr_accessible :start_date, :end_date, :link, :address, :start_hour, :start_minute, :presenter
 
   def self.type_name
     _('Event')
   end
 
   settings_items :address, :type => :string
+  settings_items :presenter, :type => :string
 
   def link=(value)
     self.setting[:link] = maybe_add_http(value)
