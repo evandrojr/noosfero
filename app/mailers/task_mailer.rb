@@ -33,11 +33,14 @@ class TaskMailer < ActionMailer::Base
     @requestor = task.requestor.name
     @environment = task.requestor.environment.name
     @url = url_for(:host => task.requestor.environment.default_hostname, :controller => 'home')
+    @email_template = task.email_template
+    template_params = {:environment => task.requestor.environment, :task => task}
 
     mail(
       to: task.requestor.notification_emails,
       from: self.class.generate_from(task),
-      subject: '[%s] %s' % [task.requestor.environment.name, task.target_notification_description]
+      subject: @email_template.present? ? @email_template.parsed_subject(template_params) : '[%s] %s' % [task.requestor.environment.name, task.target_notification_description],
+      body: @email_template.present? ? @email_template.parsed_body(template_params) : nil
     )
   end
 
