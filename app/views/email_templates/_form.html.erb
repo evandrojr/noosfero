@@ -5,6 +5,7 @@
   <div class="template-fields">
     <div class="header-fields">
       <%= labelled_form_field(_('Template Name:'), f.text_field(:name)) %>
+      <%= labelled_form_field(_('Template Type:'), f.select(:template_type, @email_template.available_types.map {|k,v| [v[:description], k]}, :include_blank => true)) %>
       <%= labelled_form_field(_('Subject:'), f.text_field(:subject)) %>
     </div>
     <div class="available-params">

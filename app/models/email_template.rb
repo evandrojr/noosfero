@@ -14,6 +14,13 @@ class EmailTemplate < ActiveRecord::Base
     @parsed_subject ||= parse(subject, params)
   end
 
+  def available_types
+    HashWithIndifferentAccess.new ({
+      :task_rejection => {:description => _('Task Rejection')},
+      :organization_members => {:description => _('Organization Members')}
+    })
+  end
+
   protected
 
   def parse(source, params)
