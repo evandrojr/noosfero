@@ -189,6 +189,8 @@ class Profile < ActiveRecord::Base
 
   has_many :comments_received, :class_name => 'Comment', :through => :articles, :source => :comments
 
+  has_many :email_templates, :foreign_key => :owner_id
+
   # Although this should be a has_one relation, there are no non-silly names for
   # a foreign key on article to reference the template to which it is
   # welcome_page... =P
@@ -507,6 +509,10 @@ class Profile < ActiveRecord::Base
                                  true, true, 'UploadedFile', 'RssFeed', 'Blog'],
                 :order => 'articles.published_at desc, articles.id desc' }.merge(options)
     self.articles.find(:all, options)
+  end
+
+  def to_liquid
+    HashWithIndifferentAccess.new :name => name, :identifier => identifier
   end
 
   class << self

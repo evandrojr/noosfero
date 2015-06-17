@@ -15,6 +15,7 @@
  *= require chat
  *= require search
  *= require block-store
+ *= require email-templates
  */
 
 /* browser fixes */
@@ -4656,6 +4657,9 @@ h1#agenda-title {
 }
 .controller-profile_editor a.control-panel-design-editor {
   background-image: url(../images/control-panel/preferences-desktop-wallpaper.png)
+}
+.controller-profile_editor a.control-panel-email-templates {
+  background-image: url(../images/control-panel/email.png)
 }
 .controller-profile_editor .msie6 a.control-panel-design-editor {
   background-image: url(../images/control-panel/preferences-desktop-wallpaper.gif)

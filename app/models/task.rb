@@ -42,6 +42,8 @@ class Task < ActiveRecord::Base
 
   attr_protected :status
 
+  settings_items :email_template_id, :type => :integer
+
   def initialize(*args)
     super
     self.status = (args.first ? args.first[:status] : nil) || Task::Status::ACTIVE
@@ -235,6 +237,17 @@ class Task < ActiveRecord::Base
     rescue NotImplementedError => ex
       Rails.logger.info ex.to_s
     end
+  end
+
+  def email_template
+    @email_template ||= email_template_id.present? ? EmailTemplate.find_by_id(email_template_id) : nil
+  end
+
+  def to_liquid
+    HashWithIndifferentAccess.new({
+      :requestor => requestor,
+      :reject_explanation => reject_explanation
+    })
   end
 
   scope :pending, :conditions => { :status =>  Task::Status::ACTIVE }
