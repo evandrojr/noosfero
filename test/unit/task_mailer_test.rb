@@ -190,6 +190,7 @@ class TaskMailerTest < ActiveSupport::TestCase
     task.send(:send_notification, :cancelled).deliver
     assert !ActionMailer::Base.deliveries.empty?
     mail = ActionMailer::Base.deliveries.last
+    assert_match /text\/html/, mail.content_type
     assert_equal 'template subject - example', mail.subject.to_s
     assert_equal 'template body - example - my name - explanation', mail.body.to_s
   end

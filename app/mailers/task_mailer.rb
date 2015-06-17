@@ -40,7 +40,8 @@ class TaskMailer < ActionMailer::Base
       to: task.requestor.notification_emails,
       from: self.class.generate_from(task),
       subject: @email_template.present? ? @email_template.parsed_subject(template_params) : '[%s] %s' % [task.requestor.environment.name, task.target_notification_description],
-      body: @email_template.present? ? @email_template.parsed_body(template_params) : nil
+      body: @email_template.present? ? @email_template.parsed_body(template_params) : nil,
+      content_type: @email_template.present? ? "text/html" : nil
     )
   end
 
