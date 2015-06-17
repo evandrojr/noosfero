@@ -1,6 +1,6 @@
 class EmailTemplatesController < MyProfileController
 
-  protect 'send_mail_to_members', :profile
+  protect 'manage_email_templates', :profile
 
   def index
     @email_templates = profile.email_templates
