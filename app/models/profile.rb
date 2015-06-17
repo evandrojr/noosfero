@@ -107,6 +107,7 @@ class Profile < ActiveRecord::Base
     'invite_members'       => N_('Invite members'),
     'send_mail_to_members' => N_('Send e-Mail to members'),
     'manage_custom_roles'  => N_('Manage custom roles'),
+    'manage_email_templates' => N_('Manage Email Templates'),
   }
 
   acts_as_accessible
