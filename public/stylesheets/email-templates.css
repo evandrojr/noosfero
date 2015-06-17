@@ -13,3 +13,6 @@
   text-decoration: none;
   font-size: 10px;
 }
+.email-templates table td {
+  text-align: center;
+}
