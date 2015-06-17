@@ -32,7 +32,7 @@ module Noosfero
           desc "Returns the total followers for the article"
           get ':id/followers' do
             article = find_article(environment.articles, params[:id])
-            total = article.person_followers.size
+            total = article.person_followers.count
             {:total_followers => total}
           end
 
