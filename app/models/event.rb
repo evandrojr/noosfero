@@ -3,7 +3,7 @@ require 'builder'
 
 class Event < Article
 
-  attr_accessible :start_date, :end_date, :link, :address, :start_hour, :start_minute, :presenter
+  attr_accessible :start_date, :end_date, :link, :address, :presenter
 
   def self.type_name
     _('Event')

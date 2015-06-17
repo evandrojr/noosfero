@@ -32,6 +32,7 @@
 *= require block-store.js
 *= require jquery.typewatch.js
 *= require require_login.js
+*= require email_templates.js
 */
 
 // scope for noosfero stuff
