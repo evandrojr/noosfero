@@ -1,4 +1,3 @@
-
 class Article < ActiveRecord::Base
 
   attr_accessible :name, :body, :abstract, :profile, :tag_list, :parent,
@@ -8,7 +7,8 @@ class Article < ActiveRecord::Base
                   :accept_comments, :feed, :published, :source, :source_name,
                   :highlighted, :notify_comments, :display_hits, :slug,
                   :external_feed_builder, :display_versions, :external_link,
-                  :image_builder, :show_to_followers, :published_at
+                  :image_builder, :show_to_followers, :published_at, :person_followers
+
 
   acts_as_having_image
 
@@ -70,6 +70,10 @@ class Article < ActiveRecord::Base
   belongs_to :author, :class_name => 'Person'
   belongs_to :last_changed_by, :class_name => 'Person', :foreign_key => 'last_changed_by_id'
   belongs_to :created_by, :class_name => 'Person', :foreign_key => 'created_by_id'
+
+  #Article followers relation
+  has_many :article_followers, :dependent => :destroy
+  has_many :person_followers, :class_name => 'Person', :through => :article_followers, :source => :person
 
   has_many :comments, :class_name => 'Comment', :foreign_key => 'source_id', :dependent => :destroy, :order => 'created_at asc'
 

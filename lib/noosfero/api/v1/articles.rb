@@ -28,6 +28,23 @@ module Noosfero
             article = find_article(environment.articles, params[:id])
             present article, :with => Entities::Article, :fields => params[:fields]
           end
+          
+          desc "Returns the total followers for the article"
+          get ':id/followers' do
+            article = find_article(environment.articles, params[:id])
+            total = article.person_followers.size
+            {:total_followers => total}
+          end
+
+          desc "Add a follower for the article"
+          get ':id/follow' do
+            article = find_article(environment.articles, params[:id])
+            article_follower = ArticleFollower.new
+            article_follower.article = article
+            article_follower.person = current_person
+            article_follower.save!            
+          end
+          
 
           post ':id/vote' do
             value = (params[:value] || 1).to_i
