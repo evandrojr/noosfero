@@ -37,7 +37,7 @@ module Noosfero
           end
 
           desc "Add a follower for the article"
-          get ':id/follow' do
+          post ':id/follow' do
             article = find_article(environment.articles, params[:id])
             article_follower = ArticleFollower.new
             article_follower.article = article
