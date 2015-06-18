@@ -21,7 +21,7 @@ class TasksController < MyProfileController
 
     @failed = params ? params[:failed] : {}
 
-    @responsible_candidates = profile.members.by_role(profile.roles.reject {|r| !r.has_permission?('perform_task')}) if profile.organization?
+    @responsible_candidates = profile.members.by_role(profile.roles.reject {|r| !r.has_permission?('perform_task') && !r.has_permission?('view_tasks')}) if profile.organization?
 
     @view_only = !current_person.has_permission?(:perform_task, profile)
   end
