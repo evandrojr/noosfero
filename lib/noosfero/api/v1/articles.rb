@@ -39,7 +39,7 @@ module Noosfero
           desc "Add a follower for the article"
           post ':id/follow' do
             article = find_article(environment.articles, params[:id])
-            if article.article_followers.include?(current_person)
+            if article.article_followers.exists?(:person_id => current_person.id)
               {:success => false, :already_follow => true}
             else
               article_follower = ArticleFollower.new
