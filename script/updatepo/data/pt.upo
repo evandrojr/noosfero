@@ -111,3 +111,7 @@ msgid "The following parameters may be used in subject and body:"# msgstr "Os se
 msgid "Save"# msgstr "Salvar"
 msgid "Back"# msgstr "Retornar"
 msgid "Body:"# msgstr "Corpo"
+msgid "Type of task"# msgstr "Tipo da tarefa"
+msgid "Text filter"# msgstr "Filtro de texto"
+msgid "Assigned to"# msgstr "Atribuído para"
+msgid "Assigned to:"# msgstr "Atribuído para:"
