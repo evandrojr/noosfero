@@ -76,20 +76,20 @@ class CommunityTrackPlugin::Step < Folder
   end
 
   def active?
-    (start_date..end_date).include?(Date.today)
+    (start_date.to_date..end_date.to_date).include?(Date.today)
   end
 
   def finished?
-    Date.today > end_date
+    Date.today > end_date.to_date
   end
 
   def waiting?
-    Date.today < start_date
+    Date.today < start_date.to_date
   end
 
   def schedule_activation
     return if !changes['start_date'] && !changes['end_date']
-    if Date.today <= end_date || accept_comments
+    if Date.today <= end_date.to_date || accept_comments
       schedule_date = !accept_comments ? start_date : end_date + 1.day
       CommunityTrackPlugin::ActivationJob.find(id).destroy_all
       Delayed::Job.enqueue(CommunityTrackPlugin::ActivationJob.new(self.id), :run_at => schedule_date)
