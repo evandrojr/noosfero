@@ -132,11 +132,11 @@ class Event < Article
     }
 
     if self.body
-      if options[:format] == 'short'
-        result.sub!('_____XXXX_DESCRIPTION_GOES_HERE_XXXX_____', display_short_format(self))
-      else
+      #if options[:format] == 'short'
+      #  result.sub!('_____XXXX_DESCRIPTION_GOES_HERE_XXXX_____', display_short_format(self))
+      #else
         result.sub!('_____XXXX_DESCRIPTION_GOES_HERE_XXXX_____', self.body)
-      end
+      #end
     end
 
     result
