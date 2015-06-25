@@ -46,7 +46,7 @@ class TasksControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_template 'processed'
-    assert_kind_of Array, assigns(:tasks)
+    assert !assigns(:tasks).nil?
   end
 
   should 'display task created_at' do
