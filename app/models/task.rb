@@ -72,7 +72,7 @@ class Task < ActiveRecord::Base
         if target_msg && task.target && !task.target.notification_emails.empty?
           TaskMailer.target_notification(task, target_msg).deliver
         end
-      rescue NotImplementedError => ex
+      rescue Exception => ex
         Rails.logger.info ex.to_s
       end
     end
