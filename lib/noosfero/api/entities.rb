@@ -114,6 +114,10 @@ module Noosfero
         expose :type
       end
 
+      class Environment < Entity
+        expose :name
+      end
+
     end
   end
 end
