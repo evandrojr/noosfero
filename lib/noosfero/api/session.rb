@@ -38,7 +38,7 @@ module Noosfero
       post "/register" do
         binding.pry
         unique_attributes! User, [:email, :login]
-        attrs = attributes_for_keys [:email, :login, :password]
+        attrs = attributes_for_keys [:email, :login, :password] + environment.signup_person_fields
         attrs[:password_confirmation] = attrs[:password]
 
         remote_ip = (request.respond_to?(:remote_ip) && request.remote_ip) || (env && env['REMOTE_ADDR'])
