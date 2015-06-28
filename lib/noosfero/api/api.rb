@@ -9,7 +9,7 @@ module Noosfero
 
       logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
       logger.formatter = GrapeLogging::Formatters::Default.new
-      use RequestLogger, { logger: logger }
+      use GrapeLogging::Middleware::RequestLogger, { logger: logger }
 
       rescue_from :all do |e|
         logger.error e
@@ -45,6 +45,7 @@ module Noosfero
       mount V1::Enterprises
       mount V1::Categories
       mount V1::Tasks
+      mount V1::Environments
       mount Session
 
       # hook point which allow plugins to add Grape::API extensions to API::API

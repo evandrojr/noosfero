@@ -37,7 +37,7 @@ module Noosfero
       end
       post "/register" do
         unique_attributes! User, [:email, :login]
-        attrs = attributes_for_keys [:email, :login, :password]
+        attrs = attributes_for_keys [:email, :login, :password] + environment.signup_person_fields
         attrs[:password_confirmation] = attrs[:password]
         remote_ip = (request.respond_to?(:remote_ip) && request.remote_ip) || (env && env['REMOTE_ADDR'])
         private_key = API.NOOSFERO_CONF['api_recaptcha_private_key']
