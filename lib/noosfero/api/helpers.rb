@@ -1,6 +1,6 @@
-module Noosfero
-  module API
-    module APIHelpers
+  module Noosfero
+    module API
+      module APIHelpers
       PRIVATE_TOKEN_PARAM = :private_token
       ALLOWED_PARAMETERS = [:parent_id, :from, :until, :content_type]
 
@@ -113,20 +113,6 @@ module Noosfero
         attrs
       end
 
-      def verify_recaptcha_v2(remote_ip, g_recaptcha_response, private_key, api_recaptcha_verify_uri)
-        verify_hash = {
-            "secret"    => private_key,
-            "remoteip"  => remote_ip,
-            "response"  => g_recaptcha_response
-        }
-        uri = URI(api_recaptcha_verify_uri)
-        https = Net::HTTP.new(uri.host, uri.port)
-        https.use_ssl = true
-        request = Net::HTTP::Post.new(uri.path)
-        request.set_form_data(verify_hash)
-        captcha_result = JSON.parse(https.request(request).body)
-        captcha_result["success"] ? true : captcha_result
-      end
 
       ##########################################
       #              error helpers             #
@@ -217,7 +203,47 @@ module Noosfero
         begin_period..end_period
       end
 
-      def verify_recaptcha_v1(remote_ip, recaptcha_response_field, private_key, recaptcha_challenge_field, api_recaptcha_verify_uri)
+      ##########################################
+      #              captcha_helpers           #
+      ##########################################
+
+      def test_captcha(remote_ip, params)
+        return true unless API.NOOSFERO_CONF['api_captcha_enabled'] === true
+
+        private_key = API.NOOSFERO_CONF['api_recaptcha_private_key']
+        if private_key == nil
+          raise ArgumentError, "API.NOOSFERO_CONF['api_recaptcha_private_key'] not defined"
+        end
+
+        api_captcha_version = API.NOOSFERO_CONF['api_captcha_version']
+        unless api_captcha_version == 1 || api_captcha_version == 2
+          raise ArgumentError, "API.NOOSFERO_CONF['api_captcha_version'] not defined"
+        end
+
+        if api_captcha_version == 1
+          api_recaptcha_verify_uri = API.NOOSFERO_CONF['api_recaptcha_v1_verify_uri']
+          if api_recaptcha_verify_uri == nil
+            raise ArgumentError, "API.NOOSFERO_CONF['api_recaptcha_v1_verify_uri'] not defined"
+          end
+          return verify_recaptcha_v1(remote_ip, private_key, api_recaptcha_verify_uri, params[:recaptcha_challenge_field], params[:recaptcha_response_field])
+        end
+
+        if api_captcha_version == 2
+          api_recaptcha_verify_uri = API.NOOSFERO_CONF['api_recaptcha_v2_verify_uri']
+          if api_recaptcha_verify_uri == nil
+            raise ArgumentError, "API.NOOSFERO_CONF['api_recaptcha_v2_verify_uri'] not defined"
+          end
+          return verify_recaptcha_v2(remote_ip, private_key, api_recaptcha_verify_uri, params[:g_recaptcha_response])
+        end
+
+      end
+
+      def verify_recaptcha_v1(remote_ip, private_key, api_recaptcha_verify_uri, recaptcha_challenge_field, recaptcha_response_field)
+
+        if recaptcha_challenge_field == nil || recaptcha_response_field == nil
+          return _('Missing captcha data')
+        end
+
         verify_hash = {
             "privatekey"  => private_key,
             "remoteip"    => remote_ip,
@@ -231,6 +257,26 @@ module Noosfero
         request.set_form_data(verify_hash)
         body = https.request(request).body
         body == "true\nsuccess" ? true : body
+      end
+
+      def verify_recaptcha_v2(remote_ip, private_key, api_recaptcha_verify_uri, g_recaptcha_response)
+
+        if g_recaptcha_response == nil
+          return _('Missing captcha data')
+        end
+
+        verify_hash = {
+            "secret"    => private_key,
+            "remoteip"  => remote_ip,
+            "response"  => g_recaptcha_response
+        }
+        uri = URI(api_recaptcha_verify_uri)
+        https = Net::HTTP.new(uri.host, uri.port)
+        https.use_ssl = true
+        request = Net::HTTP::Post.new(uri.path)
+        request.set_form_data(verify_hash)
+        captcha_result = JSON.parse(https.request(request).body)
+        captcha_result["success"] ? true : captcha_result
       end
 
     end

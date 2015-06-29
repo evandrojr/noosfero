@@ -34,28 +34,18 @@ module Noosfero
         requires :email, type: String, desc: _("Email")
         requires :login, type: String, desc: _("Login")
         requires :password, type: String, desc: _("Password")
+        requires :password_confirmation, type: String, desc: _("Password confirmation")
       end
       post "/register" do
         unique_attributes! User, [:email, :login]
-        attrs = attributes_for_keys [:email, :login, :password] + environment.signup_person_fields
-        attrs[:password_confirmation] = attrs[:password]
+        attrs = attributes_for_keys [:email, :login, :password, :password_confirmation] + environment.signup_person_fields
         remote_ip = (request.respond_to?(:remote_ip) && request.remote_ip) || (env && env['REMOTE_ADDR'])
-        private_key = API.NOOSFERO_CONF['api_recaptcha_private_key']
-        api_recaptcha_verify_uri = API.NOOSFERO_CONF['api_recaptcha_v1_verify_uri']
-        # TODO: FIX THAT
-        # TEST WILL NOT STUB WITHOUT Noosfero::API::APIHelpers
-        # Leave with the full namespace otherwise the stub for the test will fail
-        begin
-          # This will run from test
-          captcha_result = Noosfero::API::APIHelpers.verify_recaptcha_v1(remote_ip, params['recaptcha_response_field'], private_key, params['recaptcha_challenge_field'], api_recaptcha_verify_uri)
-        rescue NoMethodError
-          # Normal execution
-          captcha_result = verify_recaptcha_v1(remote_ip, params['recaptcha_response_field'], private_key, params['recaptcha_challenge_field'], api_recaptcha_verify_uri)
-        end
-        unless  captcha_result === true
-          render_api_error!(_('Please solve the test in order to register.'), 400)
+
+        unless test_captcha(remote_ip, params) === true
+          render_api_error!(_('Please solve the test in order to register.'), 401)
           return
         end
+
         user = User.new(attrs)
         if  user.save
           user.activate
