@@ -1,12 +1,9 @@
 require File.dirname(__FILE__) + '/test_helper'
-require "#{Rails.root}/lib/noosfero/api/helpers.rb"
-include Noosfero::API::APIHelpers
 
 class SessionTest < ActiveSupport::TestCase
 
   def setup
     login_api
-    Noosfero::API::APIHelpers.stubs(:verify_recaptcha_v1).returns(true)
   end
 
   should 'generate private token when login' do
