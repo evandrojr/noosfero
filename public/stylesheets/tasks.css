@@ -104,11 +104,11 @@
 }
 
 .task-processed .task.status-3 {
-  background-color: rgb(255, 203, 203);
+  background-color: rgb(205, 252, 218);
 }
 
 .task-processed .task.status-2 {
-  background-color: rgb(205, 252, 218);
+  background-color: rgb(255, 203, 203);
 }
 
 
