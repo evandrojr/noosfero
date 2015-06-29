@@ -114,7 +114,6 @@ module Noosfero
       end
 
       def verify_recaptcha_v2(remote_ip, g_recaptcha_response, private_key, api_recaptcha_verify_uri)
-        binding.pry
         verify_hash = {
             "secret"    => private_key,
             "remoteip"  => remote_ip,
@@ -125,7 +124,8 @@ module Noosfero
         https.use_ssl = true
         request = Net::HTTP::Post.new(uri.path)
         request.set_form_data(verify_hash)
-        JSON.parse(https.request(request).body)
+        captcha_result = JSON.parse(https.request(request).body)
+        captcha_result["success"] ? true : captcha_result
       end
 
       ##########################################
@@ -218,7 +218,6 @@ module Noosfero
       end
 
       def verify_recaptcha_v1(remote_ip, recaptcha_response_field, private_key, recaptcha_challenge_field, api_recaptcha_verify_uri)
-        binding.pry
         verify_hash = {
             "privatekey"  => private_key,
             "remoteip"    => remote_ip,
@@ -230,11 +229,8 @@ module Noosfero
         https.use_ssl = true
         request = Net::HTTP::Post.new(uri.path)
         request.set_form_data(verify_hash)
-        if https.request(request).body == "true\nsuccess"
-            captcha_result["success"]=true
-        else
-            captcha_result["success"]=false
-        end
+        body = https.request(request).body
+        body == "true\nsuccess" ? true : body
       end
 
     end
