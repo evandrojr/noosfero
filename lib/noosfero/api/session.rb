@@ -34,25 +34,20 @@ module Noosfero
         requires :email, type: String, desc: _("Email")
         requires :login, type: String, desc: _("Login")
         requires :password, type: String, desc: _("Password")
+        requires :password_confirmation, type: String, desc: _("Password confirmation")
       end
       post "/register" do
-        binding.pry
         unique_attributes! User, [:email, :login]
-        attrs = attributes_for_keys [:email, :login, :password] + environment.signup_person_fields
-        attrs[:password_confirmation] = attrs[:password]
-
+        attrs = attributes_for_keys [:email, :login, :password, :password_confirmation] + environment.signup_person_fields
         remote_ip = (request.respond_to?(:remote_ip) && request.remote_ip) || (env && env['REMOTE_ADDR'])
-        private_key = API.NOOSFERO_CONF['api_recaptcha_private_key']
-        api_recaptcha_verify_uri = API.NOOSFERO_CONF['api_recaptcha_verify_uri']
 
-#        "recaptcha_challenge_field" => "03AHJ_VutRW6eOgTKZyK-77J96k121W0fUHIEvThyCPtqG2FUPBWzidBOqptzk0poh_UkMNPxAd_m0CqUz1Dip-6uV_zlwlviaXXvymwCFXPaWuvvyUfZ3LvZy6M1CoPfbhOQZjTkf_VNjlVnCRuuJXmGy4MhhuJ8om1J_R2C_oIAfP3KbpmlqLXU5nLlE7WpW-h-OhRTQzupTo9UL-4-ZDRk1bMkCSEJnwYUomOboqFBEpJBv0iaOCaSnu9_UKObmWmpbQZSHxYK7",
-#            "recaptcha_response_field" => "1221"
+        unless test_captcha(remote_ip, params) === true
+          render_api_error!(_('Please solve the test in order to register.'), 401)
+          return
+        end
 
-        #captcha_result = verify_recaptcha_v2(remote_ip, params['g-recaptcha-response'], private_key, api_recaptcha_verify_uri)
-        captcha_result = verify_recaptcha_v1(remote_ip, params['recaptcha_response_field'], private_key, params['recaptcha_challenge_field'], api_recaptcha_verify_uri)
-        binding.pry
-        user = User.new(attrs)  
-        if captcha_result["success"] and user.save
+        user = User.new(attrs)
+        if  user.save
           user.activate
           user.generate_private_token!
           present user, :with => Entities::UserLogin
