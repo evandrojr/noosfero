@@ -35,7 +35,7 @@
 <% else %>
   <ul class="task-list">
     <% @tasks.each do |item| %>
-      <li class="task">
+      <li class="task status-<%= item.status%>">
         <div class="title">
           <strong><%= task_information(item) %></strong> <br/>
         </div>
