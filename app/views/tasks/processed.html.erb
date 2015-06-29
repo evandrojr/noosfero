@@ -22,9 +22,9 @@
       <%= labelled_form_field(_('Creation date'), date_range_field(:filter_created_from, :filter_created_until, @filter_created_from, @filter_created_until, '%Y-%m-%d', { :change_month => true, :change_year => true, :date_format => 'yy-mm-dd' }, { :size => 14, :from_id => 'filter_created_from', :to_id => 'filter_created_until' })) %>
       <%= labelled_form_field(_('Processed date'), date_range_field(:filter_closed_from, :filter_closed_until, @filter_closed_from, @filter_closed_until, '%Y-%m-%d', { :change_month => true, :change_year => true, :date_format => 'yy-mm-dd' }, { :size => 14, :from_id => 'filter_closed_from', :to_id => 'filter_closed_until' })) %>
 
-      <p>
+      <div class="actions">
         <%= submit_button(:search, _('Search')) %>
-      </p>
+      </div>
     <% end %>
   <% end %>
 </div>
