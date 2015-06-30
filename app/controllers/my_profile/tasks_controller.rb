@@ -22,6 +22,7 @@ class TasksController < MyProfileController
 
   def processed
     @filter_requestor = params[:filter_requestor].presence
+    @filter_closed_by = params[:filter_closed_by].presence
     @filter_type = params[:filter_type].presence
     @filter_text = params[:filter_text].presence
     @filter_status = params[:filter_status].presence
@@ -36,6 +37,8 @@ class TasksController < MyProfileController
     @tasks = @tasks.where('tasks.created_at >= ?', @filter_created_from.beginning_of_day) unless @filter_created_from.blank?
     @tasks = @tasks.where('tasks.created_at <= ?', @filter_created_until.end_of_day) unless @filter_created_until.blank?
     @tasks = @tasks.joins(:requestor).like('profiles.name', @filter_requestor) unless @filter_requestor.blank?
+    @tasks = @tasks.joins(:closed_by).like('closed_bies_tasks.name', @filter_closed_by) unless @filter_closed_by.blank?
+
     @tasks = @tasks.like('tasks.data', @filter_text) unless @filter_text.blank?
 
     @tasks = @tasks.paginate(:per_page => Task.per_page, :page => params[:page])
