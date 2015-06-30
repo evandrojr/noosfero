@@ -10,21 +10,21 @@
   <%= form_tag '#', :method => 'get' do %>
     <%= field_set_tag _('Filter'), :class => 'filter_fields' do %>
       <div>
-        <%= labelled_select(_('Type of task')+': ', :filter_type, :first, :last, @filter_type,  type_collection, {:id => 'filter-type'}) %>
-        <%= labelled_select(_('Status:'), :filter_status, :last, :first, @filter_status, [[_('Any'), nil], [_(Task::Status.names[Task::Status::CANCELLED]), 2], [_(Task::Status.names[Task::Status::FINISHED]), 3] ]) %>
+        <%= labelled_select(_('Type of task')+': ', 'filter[type]', :first, :last, @filter[:type],  type_collection, {:id => 'filter-type'}) %>
+        <%= labelled_select(_('Status:'), 'filter[status]', :last, :first, @filter[:status], [[_('Any'), nil], [_(Task::Status.names[Task::Status::CANCELLED]), 2], [_(Task::Status.names[Task::Status::FINISHED]), 3] ]) %>
       </div>
 
       <div>
-        <%= labelled_text_field(_('Text Filter:'), :filter_text, @filter_text) %>
+        <%= labelled_text_field(_('Text Filter:'), 'filter[text]', @filter[:text]) %>
       </div>
 
       <div>
-        <%= labelled_text_field(_('Requestor:'), :filter_requestor, @filter_requestor) %>
-        <%= labelled_text_field(_('Closed by:'), :filter_closed_by, @filter_closed_by) %>
+        <%= labelled_text_field(_('Requestor:'), 'filter[requestor]', @filter[:requestor]) %>
+        <%= labelled_text_field(_('Closed by:'), 'filter[closed_by]', @filter[:closed_by]) %>
       </div>
 
-      <%= labelled_form_field(_('Creation date'), date_range_field(:filter_created_from, :filter_created_until, @filter_created_from, @filter_created_until, '%Y-%m-%d', { :change_month => true, :change_year => true, :date_format => 'yy-mm-dd' }, { :size => 14, :from_id => 'filter_created_from', :to_id => 'filter_created_until' })) %>
-      <%= labelled_form_field(_('Processed date'), date_range_field(:filter_closed_from, :filter_closed_until, @filter_closed_from, @filter_closed_until, '%Y-%m-%d', { :change_month => true, :change_year => true, :date_format => 'yy-mm-dd' }, { :size => 14, :from_id => 'filter_closed_from', :to_id => 'filter_closed_until' })) %>
+      <%= labelled_form_field(_('Creation date'), date_range_field('filter[created_from]', 'filter[created_until]', @filter[:created_from], @filter[:created_until], '%Y-%m-%d', { :change_month => true, :change_year => true, :date_format => 'yy-mm-dd' }, { :size => 14, :from_id => 'filter_created_from', :to_id => 'filter_created_until' })) %>
+      <%= labelled_form_field(_('Processed date'), date_range_field('filter[closed_from]', 'filter[closed_until]', @filter[:closed_from], @filter[:closed_until], '%Y-%m-%d', { :change_month => true, :change_year => true, :date_format => 'yy-mm-dd' }, { :size => 14, :from_id => 'filter_closed_from', :to_id => 'filter_closed_until' })) %>
 
       <div class="actions">
         <%= submit_button(:search, _('Search')) %>

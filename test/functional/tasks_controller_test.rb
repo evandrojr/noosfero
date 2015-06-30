@@ -636,4 +636,30 @@ class TasksControllerTest < ActionController::TestCase
     assert_equal profile, t.reload.closed_by
   end
 
+  should 'filter processed tasks by all filters' do
+    requestor = fast_create(Person)
+    closed_by = fast_create(Person)
+    class AnotherTask < Task; end
+
+    created_date = DateTime.now
+    processed_date = DateTime.now
+
+    task_params = {:status => Task::Status::FINISHED, :requestor => requestor, :target => profile, :created_at => created_date, :end_date => processed_date, :closed_by => closed_by, :data => {:field => 'some data field'}}
+
+    task = create(AnotherTask, task_params)
+    create(Task, task_params)
+    create(AnotherTask, task_params.clone.merge(:status => Task::Status::CANCELLED))
+    create(AnotherTask, task_params.clone.merge(:created_at => created_date - 1.day))
+    create(AnotherTask, task_params.clone.merge(:created_at => created_date + 1.day))
+    create(AnotherTask, task_params.clone.merge(:end_date => processed_date - 1.day))
+    create(AnotherTask, task_params.clone.merge(:end_date => processed_date + 1.day))
+    create(AnotherTask, task_params.clone.merge(:requestor => fast_create(Person, :name => 'another-requestor')))
+    create(AnotherTask, task_params.clone.merge(:closed_by => fast_create(Person, :name => 'another-closer')))
+    create(AnotherTask, task_params.clone.merge(:data => {:field => 'other data field'}))
+
+    get :processed, :filter => {:type => AnotherTask, :status => Task::Status::FINISHED, :created_from => created_date, :created_until => created_date, :closed_from => processed_date, :closed_until => processed_date, :requestor => requestor.name, :closed_by => closed_by.name, :text => 'some data field'}
+    assert_response :success
+    assert_equal [task], assigns(:tasks)
+  end
+
 end
