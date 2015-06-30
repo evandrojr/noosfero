@@ -127,3 +127,13 @@
   color: rgb(156, 156, 156);
   font-weight: bold;
 }
+
+.task-processed .task .dates {
+  font-size: 11px;
+}
+.task-processed .task .closed-by {
+  font-size: 11px;
+}
+.task-processed .task .label {
+  font-weight: bold
+}
