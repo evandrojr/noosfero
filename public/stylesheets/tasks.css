@@ -117,5 +117,13 @@
 }
 
 .task-processed .task-list .task .title {
-  border-bottom: 1px solid rgb(221, 221, 221);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  color: rgb(44, 44, 44);
+}
+
+.task-processed .task .status {
+  float: right;
+  color: rgb(156, 156, 156);
+  font-weight: bold;
 }

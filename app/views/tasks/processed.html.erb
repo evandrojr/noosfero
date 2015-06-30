@@ -11,7 +11,7 @@
     <%= field_set_tag _('Filter'), :class => 'filter_fields' do %>
       <div>
         <%= labelled_select(_('Type of task')+': ', :filter_type, :first, :last, @filter_type,  type_collection, {:id => 'filter-type'}) %>
-        <%= labelled_select(_('Status:'), :filter_status, :last, :first, @filter_status, [[_('Any'), nil], [Task::Status.names[Task::Status::CANCELLED], 2], [Task::Status.names[Task::Status::FINISHED], 3] ]) %>
+        <%= labelled_select(_('Status:'), :filter_status, :last, :first, @filter_status, [[_('Any'), nil], [_(Task::Status.names[Task::Status::CANCELLED]), 2], [_(Task::Status.names[Task::Status::FINISHED]), 3] ]) %>
       </div>
 
       <div>
@@ -37,13 +37,10 @@
     <% @tasks.each do |item| %>
       <li class="task status-<%= item.status%>">
         <div class="title">
-          <strong><%= task_information(item) %></strong> <br/>
+          <%= task_information(item) %>
         </div>
-        <div>
-          <span><%= _('Status: ') %></span>
-          <span>
-            <%= Task::Status.names[item.status] %>
-          </span>
+        <div class="status">
+          <%= _(Task::Status.names[item.status]) %>
         </div>
         <small>
           <%= _('Created:')   +' '+ show_date(item.created_at) %>
