@@ -37,13 +37,13 @@ class TasksController < MyProfileController
     @filter_closed_from = Date.parse(params[:filter_closed_from]) unless params[:filter_closed_from].blank?
     @filter_closed_until = Date.parse(params[:filter_closed_until]) unless params[:filter_closed_until].blank?
 
-    @tasks = Task.to(profile).without_spam.closed.order('tasks.created_at DESC')
+    @tasks = Task.to(profile).without_spam.closed.joins([:requestor, :closed_by]).order('tasks.created_at DESC')
     @tasks = @tasks.of(@filter_type)
     @tasks = @tasks.where(:status => params[:filter_status]) unless @filter_status.blank?
     @tasks = @tasks.where('tasks.created_at >= ?', @filter_created_from.beginning_of_day) unless @filter_created_from.blank?
     @tasks = @tasks.where('tasks.created_at <= ?', @filter_created_until.end_of_day) unless @filter_created_until.blank?
-    @tasks = @tasks.joins(:requestor).like('profiles.name', @filter_requestor) unless @filter_requestor.blank?
-    @tasks = @tasks.joins(:closed_by).like('closed_bies_tasks.name', @filter_closed_by) unless @filter_closed_by.blank?
+    @tasks = @tasks.like('profiles.name', @filter_requestor) unless @filter_requestor.blank?
+    @tasks = @tasks.like('closed_bies_tasks.name', @filter_closed_by) unless @filter_closed_by.blank?
 
     @tasks = @tasks.like('tasks.data', @filter_text) unless @filter_text.blank?
 
