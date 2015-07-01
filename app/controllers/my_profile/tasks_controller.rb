@@ -27,28 +27,10 @@ class TasksController < MyProfileController
   end
 
   def processed
-    @filter_requestor = params[:filter_requestor].presence
-    @filter_closed_by = params[:filter_closed_by].presence
-    @filter_type = params[:filter_type].presence
-    @filter_text = params[:filter_text].presence
-    @filter_status = params[:filter_status].presence
-    @filter_created_from = Date.parse(params[:filter_created_from]) unless params[:filter_created_from].blank?
-    @filter_created_until = Date.parse(params[:filter_created_until]) unless params[:filter_created_until].blank?
-    @filter_closed_from = Date.parse(params[:filter_closed_from]) unless params[:filter_closed_from].blank?
-    @filter_closed_until = Date.parse(params[:filter_closed_until]) unless params[:filter_closed_until].blank?
-
-    @tasks = Task.to(profile).without_spam.closed.joins([:requestor, :closed_by]).order('tasks.created_at DESC')
-    @tasks = @tasks.of(@filter_type)
-    @tasks = @tasks.where(:status => params[:filter_status]) unless @filter_status.blank?
-    @tasks = @tasks.where('tasks.created_at >= ?', @filter_created_from.beginning_of_day) unless @filter_created_from.blank?
-    @tasks = @tasks.where('tasks.created_at <= ?', @filter_created_until.end_of_day) unless @filter_created_until.blank?
-    @tasks = @tasks.like('profiles.name', @filter_requestor) unless @filter_requestor.blank?
-    @tasks = @tasks.like('closed_bies_tasks.name', @filter_closed_by) unless @filter_closed_by.blank?
-
-    @tasks = @tasks.like('tasks.data', @filter_text) unless @filter_text.blank?
-
+    @tasks = Task.to(profile).without_spam.closed.includes(:requestor, :closed_by).order('tasks.created_at DESC')
+    @filter = params[:filter] || {}
+    @tasks = filter_tasks(@filter, @tasks)
     @tasks = @tasks.paginate(:per_page => Task.per_page, :page => params[:page])
-
     @task_types = Task.closed_types_for(profile)
   end
 
@@ -173,7 +155,29 @@ class TasksController < MyProfileController
     result = ActsAsTaggableOn::Tag.find(:all, :conditions => ['LOWER(name) LIKE ?', "%#{arg}%"])
 
     render :text => prepare_to_token_input_by_label(result).to_json, :content_type => 'application/json'
+  end
 
+  protected
+
+  def filter_tasks(filter, tasks)
+    filter[:created_from] = Date.parse(filter[:created_from]) unless filter[:created_from].blank?
+    filter[:created_until] = Date.parse(filter[:created_until]) unless filter[:created_until].blank?
+    filter[:closed_from] = Date.parse(filter[:closed_from]) unless filter[:closed_from].blank?
+    filter[:closed_until] = Date.parse(filter[:closed_until]) unless filter[:closed_until].blank?
+
+    tasks = tasks.of(filter[:type].presence)
+    tasks = tasks.where(:status => filter[:status]) unless filter[:status].blank?
+
+    tasks = tasks.where('tasks.created_at >= ?', filter[:created_from].beginning_of_day) unless filter[:created_from].blank?
+    tasks = tasks.where('tasks.created_at <= ?', filter[:created_until].end_of_day) unless filter[:created_until].blank?
+
+    tasks = tasks.where('tasks.end_date >= ?', filter[:closed_from].beginning_of_day) unless filter[:closed_from].blank?
+    tasks = tasks.where('tasks.end_date <= ?', filter[:closed_until].end_of_day) unless filter[:closed_until].blank?
+
+    tasks = tasks.like('profiles.name', filter[:requestor]) unless filter[:requestor].blank?
+    tasks = tasks.like('closed_bies_tasks.name', filter[:closed_by]) unless filter[:closed_by].blank?
+    tasks = tasks.like('tasks.data', filter[:text]) unless filter[:text].blank?
+    tasks
   end
 
 end
