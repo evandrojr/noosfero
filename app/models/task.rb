@@ -57,7 +57,6 @@ class Task < ActiveRecord::Base
   end
 
   after_create do |task|
-    binding.pry
     unless task.status == Task::Status::HIDDEN
       begin
         task.send(:send_notification, :created)
