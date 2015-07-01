@@ -735,6 +735,29 @@ private :generate_url, :url_options
     end
   end
 
+  # Adds many people to profile by id's
+  def add_members_by_id(people_ids)
+
+    unless people_ids.nil? && people_ids.empty?
+
+      people = Person.where(id: people_ids)
+      people.each do |person|
+
+        add_member(person) unless person.is_member_of?(self)
+      end
+    end
+  end
+
+  # Adds many people to profile by email's
+  def add_members_by_email(people_emails)
+
+    people = User.where(email: people_emails)
+    people.each do |user|
+
+      add_member(user.person) unless user.person.is_member_of?(self)
+    end
+  end
+
   def remove_member(person)
     self.disaffiliate(person, Profile::Roles.all_roles(environment.id))
   end
