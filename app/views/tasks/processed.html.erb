@@ -59,7 +59,7 @@
         </div>
         <% if item.closed_by.present? %>
           <div class="closed-by">
-            <span class="label"><%= _('Closed by: ') %></span>
+            <span class="label"><%= _('Closed by:') %></span>
             <span class="value"><%= link_to(item.closed_by.name, item.closed_by.url) %></span>
           </div>
         <% end %>
