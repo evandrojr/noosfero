@@ -45,6 +45,7 @@ module Noosfero
       mount V1::Enterprises
       mount V1::Categories
       mount V1::Tasks
+      mount V1::Tags
       mount V1::Environments
       mount Session
 
