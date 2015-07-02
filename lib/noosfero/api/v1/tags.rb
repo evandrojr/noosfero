@@ -10,7 +10,7 @@ module Noosfero
   
             get do
               article = find_article(environment.articles, params[:id])
-              present article.tag_list, :with => Entities::Tag
+              present article.tag_list
             end
     
             desc "Add a tag to an article"
@@ -18,7 +18,7 @@ module Noosfero
               article = find_article(environment.articles, params[:id])
               article.tag_list=params[:tags]
               article.save
-              present article.tag_list, :with => Entities::Tag
+              present article.tag_list
             end
     
           end

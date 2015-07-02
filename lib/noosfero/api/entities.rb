@@ -114,11 +114,6 @@ module Noosfero
         expose :type
       end
 
-      class Tag < Entity
-        root 'tags', 'tag'
-        expose :name
-      end
-
       class Environment < Entity
         expose :name
       end
