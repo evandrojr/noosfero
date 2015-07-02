@@ -28,6 +28,35 @@ module Noosfero
             article = find_article(environment.articles, params[:id])
             present article, :with => Entities::Article, :fields => params[:fields]
           end
+
+          post ':id/report_abuse' do
+            article = find_article(environment.articles, params[:id])
+            profile = article.profile
+            begin
+              abuse_report = AbuseReport.new(:reason => params[:report_abuse])
+              if !params[:content_type].blank?
+                article = params[:content_type].constantize.find(params[:content_id])
+                abuse_report.content = article_reported_version(article)
+              end
+          
+              current_person.register_report(abuse_report, profile)
+          
+              if !params[:content_type].blank?
+                abuse_report = AbuseReport.find_by_reporter_id_and_abuse_complaint_id(current_person.id, profile.opened_abuse_complaint.id)
+                Delayed::Job.enqueue DownloadReportedImagesJob.new(abuse_report, article)
+              end
+          
+              {
+                :success => true,
+                :message => _('Your abuse report was registered. The administrators are reviewing your report.'),
+              }
+            rescue Exception => exception
+              #logger.error(exception.to_s)
+              render_api_error!(_('Your report couldn\'t be saved due to some problem. Please contact the administrator.'), 400)
+            end
+
+          end
+
           
           desc "Returns the total followers for the article"
           get ':id/followers' do
@@ -141,7 +170,7 @@ module Noosfero
                 article = find_article(community.articles, params[:id])
                 present article, :with => Entities::Article, :fields => params[:fields]
               end
-  
+
               # Example Request:
               #  POST api/v1/communites/:community_id/articles?private_token=234298743290432&article[name]=title&article[body]=body
               post do
