@@ -72,6 +72,7 @@ module Noosfero
         expose :hits
         expose :start_date
         expose :end_date
+        expose :tag_list
       end
 
       class Article < ArticleBase
