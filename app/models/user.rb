@@ -128,7 +128,8 @@ class User < ActiveRecord::Base
   end
 
   #FIXME make this test
-  def private_token_expired?
+   def private_token_expired?
+    return true if self.private_token_generated_at.nil?
     self.generate_private_token! if self.private_token.nil? || (self.private_token_generated_at + 2.weeks < DateTime.now)
   end
 
@@ -353,19 +354,6 @@ class User < ActiveRecord::Base
   def not_require_password!
     @is_password_required = false
   end
-
-  #FIXME make this test
-  def generate_private_token!
-    self.private_token = SecureRandom.hex
-    self.private_token_generated_at = DateTime.now
-    save(:validate => false)
-  end
-
-  #FIXME make this test
-  def private_token_expired?
-    self.generate_private_token! if self.private_token.nil? || (self.private_token_generated_at + 2.weeks < DateTime.now)
-  end
-
 
   protected
 
