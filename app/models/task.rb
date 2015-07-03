@@ -70,12 +70,26 @@ class Task < ActiveRecord::Base
       begin
         target_msg = task.target_notification_message
         if target_msg && task.target && !task.target.notification_emails.empty?
-          TaskMailer.target_notification(task, target_msg).deliver
+          if target_profile_accepts_notification?(task)
+            TaskMailer.target_notification(task, target_msg).deliver
+          end
         end
       rescue Exception => ex
         Rails.logger.info ex.to_s
       end
     end
+  end
+
+  def target_profile_accepts_notification?(task)
+    if target_is_profile?(task)
+      return task.target.administrator_mail_notification
+    else
+      true
+    end
+  end
+
+  def target_is_profile?(task)
+    task.target.kind_of? Profile
   end
 
   # this method finished the task. It calls #perform, which must be overriden

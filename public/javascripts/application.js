@@ -14,6 +14,7 @@
 *= require jquery.ba-bbq.min.js
 *= require jquery.tokeninput.js
 *= require jquery-timepicker-addon/dist/jquery-ui-timepicker-addon.js
+*= require select-or-die/_src/selectordie
 *= require inputosaurus.js
 *= require reflection.js
 *= require rails.js
@@ -845,7 +846,7 @@ Array.min = function(array) {
 
 function hideAndGetUrl(link) {
   document.body.style.cursor = 'wait';
-  link.hide();
+  jQuery(link).hide();
   url = jQuery(link).attr('href');
   jQuery.get(url, function( data ) {
     document.body.style.cursor = 'default';
