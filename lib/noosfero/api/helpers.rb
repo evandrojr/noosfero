@@ -217,7 +217,7 @@
           raise ArgumentError, "Environment api_captcha_settings private_key not defined" if d[:private_key].nil?
           raise ArgumentError, "Environment api_captcha_settings version not defined" unless d[:version] == 1 || d[:version] == 2
           raise ArgumentError, "Environment api_captcha_settings verify_uri not defined" if d[:verify_uri].nil?
-          if d[:version] == 1
+          if d[:version]  == 1
             return verify_recaptcha_v1(remote_ip, d[:private_key], d[:verify_uri], params[:recaptcha_challenge_field], params[:recaptcha_response_field])
           end
           if d[:version] == 2

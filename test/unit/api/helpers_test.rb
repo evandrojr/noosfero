@@ -161,6 +161,20 @@ class APIHelpersTest < ActiveSupport::TestCase
     assert_nil make_conditions_with_parameter[:type]
   end
 
+  should 'do not test captcha when there are no settings' do
+    environment = Environment.new
+    assert test_captcha("127.0.0.1", {}, environment)
+  end
+
+  should 'do not test captcha when captcha is disabled on settings' do
+    environment = Environment.new
+    environment.api_captcha_settings = {
+        enabled: false,
+    }
+    assert   test_captcha("127.0.0.1", {}, environment)
+  end
+
+
   should 'fail display recaptcha v1' do
     environment = Environment.new
     environment.api_captcha_settings = {
