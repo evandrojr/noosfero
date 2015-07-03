@@ -5,11 +5,11 @@ module SanitizeParams
   # Check each request parameter for 
   # improper HTML or Script tags
   def sanitize_params
-    sanitize_params(request.params)    
+    sanitize_params_array(request.params)    
   end
 
   # Given a params list sanitize all
-  def sanitize_params(params)
+  def sanitize_params_array(params)
     params.each { |k, v|
       if v.is_a?(String)        
         params[k] = sanitize_param v
