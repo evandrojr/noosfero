@@ -161,6 +161,32 @@ class APIHelpersTest < ActiveSupport::TestCase
     assert_nil make_conditions_with_parameter[:type]
   end
 
+  should 'fail display recaptcha v1' do
+    environment = Environment.new
+    environment.api_captcha_settings = {
+        enabled: true,
+        provider: 'google',
+        version:  1,
+        private_key:  '6LdsWAcTAAAAAB6maB_HalVyCc4asDAxPxloIMvY',
+        public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
+        verify_uri:   'https://www.google.com/recaptcha/api/verify',
+    }
+    assert_equal test_captcha("127.0.0.1", {}, environment), "Missing captcha data"
+  end
+
+  should 'fail display recaptcha v2' do
+    environment = Environment.new
+    environment.api_captcha_settings = {
+        enabled: true,
+        provider: 'google',
+        version:  2,
+        private_key:  '6LdsWAcTAAAAAB6maB_HalVyCc4asDAxPxloIMvY',
+        public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
+        verify_uri:   'https://www.google.com/recaptcha/api/siteverify',
+    }
+    assert_equal test_captcha("127.0.0.1", {}, environment), "Missing captcha data"
+  end
+
   protected
 
   def error!(info, status)

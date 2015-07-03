@@ -1,11 +1,6 @@
 require 'grape'
 #require 'rack/contrib'
-
-if Rails.env == "production"
-  Dir["#{Rails.root}/lib/noosfero/api/*.rb"].each {|file| require file unless file =~ /api\.rb/}
-else
-  Dir["#{Rails.root}/lib/noosfero/api/*.rb"].each {|file| load file unless file =~ /api\.rb/}
-end
+Dir["#{Rails.root}/lib/noosfero/api/*.rb"].each {|file| require_dependency file unless file =~ /api\.rb/}
 
 module Noosfero
   module API
@@ -17,7 +12,7 @@ module Noosfero
       use GrapeLogging::Middleware::RequestLogger, { logger: logger }
 
       rescue_from :all do |e|
-        # Many brave warriors have fallen in the battle of fixing the API log
+        # Many brave warriors have fallen in the battle for fixing the API log
         # Please, don't remove these 2 lines until the API log problem has
         # been PROPERLY fixed by our savior!!!
         # Otherwise we will have no clue of what went wrong in the API

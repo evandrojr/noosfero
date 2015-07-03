@@ -91,6 +91,7 @@
       end
 
       def authenticate!
+
         unauthorized! unless current_user
       end
 
@@ -207,39 +208,29 @@
       #              captcha_helpers           #
       ##########################################
 
-      def test_captcha(remote_ip, params)
-        return true unless API.NOOSFERO_CONF['api_captcha_enabled'] === true
+      def test_captcha(remote_ip, params, _environment = nil)
+        environment ||= _environment
+        d = environment.api_captcha_settings
+        return true unless d[:enabled] == true
 
-        private_key = API.NOOSFERO_CONF['api_recaptcha_private_key']
-        if private_key == nil
-          raise ArgumentError, "API.NOOSFERO_CONF['api_recaptcha_private_key'] not defined"
-        end
-
-        api_captcha_version = API.NOOSFERO_CONF['api_captcha_version']
-        unless api_captcha_version == 1 || api_captcha_version == 2
-          raise ArgumentError, "API.NOOSFERO_CONF['api_captcha_version'] not defined"
-        end
-
-        if api_captcha_version == 1
-          api_recaptcha_verify_uri = API.NOOSFERO_CONF['api_recaptcha_v1_verify_uri']
-          if api_recaptcha_verify_uri == nil
-            raise ArgumentError, "API.NOOSFERO_CONF['api_recaptcha_v1_verify_uri'] not defined"
+        if d[:provider] == 'google'
+          raise ArgumentError, "Environment api_captcha_settings private_key not defined" if d[:private_key].nil?
+          raise ArgumentError, "Environment api_captcha_settings version not defined" unless d[:version] == 1 || d[:version] == 2
+          raise ArgumentError, "Environment api_captcha_settings verify_uri not defined" if d[:verify_uri].nil?
+          if d[:version] == 1
+            return verify_recaptcha_v1(remote_ip, d[:private_key], d[:verify_uri], params[:recaptcha_challenge_field], params[:recaptcha_response_field])
           end
-          return verify_recaptcha_v1(remote_ip, private_key, api_recaptcha_verify_uri, params[:recaptcha_challenge_field], params[:recaptcha_response_field])
-        end
-
-        if api_captcha_version == 2
-          api_recaptcha_verify_uri = API.NOOSFERO_CONF['api_recaptcha_v2_verify_uri']
-          if api_recaptcha_verify_uri == nil
-            raise ArgumentError, "API.NOOSFERO_CONF['api_recaptcha_v2_verify_uri'] not defined"
+          if d[:version] == 2
+            return verify_recaptcha_v2(remote_ip, d[:private_key], d[:verify_uri], params[:g_recaptcha_response])
           end
-          return verify_recaptcha_v2(remote_ip, private_key, api_recaptcha_verify_uri, params[:g_recaptcha_response])
         end
 
+        if d[:provider] == 'serpro'
+              #TODO ADD SERPRO's CAPTCHA
+        end
       end
 
       def verify_recaptcha_v1(remote_ip, private_key, api_recaptcha_verify_uri, recaptcha_challenge_field, recaptcha_response_field)
-
         if recaptcha_challenge_field == nil || recaptcha_response_field == nil
           return _('Missing captcha data')
         end
