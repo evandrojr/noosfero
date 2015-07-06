@@ -636,4 +636,30 @@ class TasksControllerTest < ActionController::TestCase
     assert_equal profile, t.reload.closed_by
   end
 
+  should "display email template selection when accept a task" do
+    community = fast_create(Community)
+    @controller.stubs(:profile).returns(community)
+    person = create_user_with_permission('taskviewer', 'view_tasks', community)
+    login_as person.user.login
+
+    email_template = EmailTemplate.create!(:name => 'template', :owner => community, :template_type => :task_acceptance)
+    task = ApproveArticle.create!(:requestor => person, :target => community, :responsible => person)
+    get :index
+    assert_select "#on-accept-information-#{task.id} .template-selection"
+    assert_equal [email_template], assigns(:acceptance_email_templates)
+  end
+
+  should "display email template selection when reject a task" do
+    community = fast_create(Community)
+    @controller.stubs(:profile).returns(community)
+    person = create_user_with_permission('taskviewer', 'view_tasks', community)
+    login_as person.user.login
+
+    email_template = EmailTemplate.create!(:name => 'template', :owner => community, :template_type => :task_rejection)
+    task = ApproveArticle.create!(:requestor => person, :target => community, :responsible => person)
+    get :index
+    assert_select "#on-reject-information-#{task.id} .template-selection"
+    assert_equal [email_template], assigns(:rejection_email_templates)
+  end
+
 end
