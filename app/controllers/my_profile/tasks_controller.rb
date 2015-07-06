@@ -4,7 +4,8 @@ class TasksController < MyProfileController
   protect :perform_task, :profile, :except => [:index, :save_tags, :search_tags]
 
   def index
-    @email_templates = profile.email_templates.find_all_by_template_type(:task_rejection)
+    @rejection_email_templates = profile.email_templates.find_all_by_template_type(:task_rejection)
+    @acceptance_email_templates = profile.email_templates.find_all_by_template_type(:task_acceptance)
 
     @filter_type = params[:filter_type].presence
     @filter_text = params[:filter_text].presence
