@@ -209,6 +209,7 @@
       ##########################################
 
       def test_captcha(remote_ip, params, _environment = nil)
+        binding.pry
         environment ||= _environment
         d = environment.api_captcha_settings
         return true unless d[:enabled] == true
@@ -226,8 +227,10 @@
         end
 
         if d[:provider] == 'serpro'
-              #TODO ADD SERPRO's CAPTCHA
+          return verify_serpro_captcha(d[:serpro_client_id], params[:txtToken_captcha_serpro_gov_br], params[:captcha_text])
         end
+
+        raise ArgumentError, "Environment api_captcha_settings provider not defined"
       end
 
       def verify_recaptcha_v1(remote_ip, private_key, api_recaptcha_verify_uri, recaptcha_challenge_field, recaptcha_response_field)
@@ -268,6 +271,20 @@
         request.set_form_data(verify_hash)
         captcha_result = JSON.parse(https.request(request).body)
         captcha_result["success"] ? true : captcha_result
+      end
+
+      def verify_serpro_captcha(client_id, token, captcha_text)
+        verify_uri = 'http://homcaptcha.servicoscorporativos.serpro.gov.br/captchavalidar/1.0.0/validar'
+        if token == nil || captcha_text == nil
+          return _('Missing captcha data')
+        end
+        uri = URI(verify_uri)
+        https = Net::HTTP.new(uri.host, uri.port)
+        request = Net::HTTP::Post.new(uri.path)
+        verify_string = "#{client_id}&#{token}&#{captcha_text}"
+        request.body = verify_string
+        body = https.request(request).body
+        body == '1' ? true : body 
       end
 
     end
