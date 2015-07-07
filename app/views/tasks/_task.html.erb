@@ -52,14 +52,12 @@
   <%= fields_for "tasks[#{task.id}][task]", task do |f| %>
     <% if task.accept_details %>
       <div id="on-accept-information-<%=task.id%>" style="display: none">
-        <%= task_email_template(_('Select an acceptance email template:'), @acceptance_email_templates, task) %>
         <%= render :partial => partial_for_class(task.class, nil, :accept_details), :locals => {:task => task, :f => f} %>
       </div>
     <% end %>
 
     <% if task.reject_details %>
       <div id="on-reject-information-<%=task.id%>" style="display: none">
-        <%= task_email_template(_('Select a rejection email template:'), @rejection_email_templates, task) %>
         <%= render :partial => partial_for_class(task.class, nil, :reject_details), :locals => {:task => task, :f => f} %>
       </div>
     <% end %>
