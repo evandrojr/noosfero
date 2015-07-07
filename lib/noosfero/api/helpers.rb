@@ -202,7 +202,6 @@
       def period(from_date, until_date)
         begin_period = from_date.nil? ? Time.at(0).to_datetime : from_date
         end_period = until_date.nil? ? DateTime.now : until_date
-
         begin_period..end_period
       end
 
@@ -211,7 +210,6 @@
       ##########################################
 
       def test_captcha(remote_ip, params, _environment = nil)
-        binding.pry
         environment ||= _environment
         d = environment.api_captcha_settings
         return true unless d[:enabled] == true
@@ -219,19 +217,20 @@
         if d[:provider] == 'google'
           raise ArgumentError, "Environment api_captcha_settings private_key not defined" if d[:private_key].nil?
           raise ArgumentError, "Environment api_captcha_settings version not defined" unless d[:version] == 1 || d[:version] == 2
-          raise ArgumentError, "Environment api_captcha_settings verify_uri not defined" if d[:verify_uri].nil?
           if d[:version]  == 1
+            d[:verify_uri] ||= 'https://www.google.com/recaptcha/api/verify'
             return verify_recaptcha_v1(remote_ip, d[:private_key], d[:verify_uri], params[:recaptcha_challenge_field], params[:recaptcha_response_field])
           end
           if d[:version] == 2
+            d[:verify_uri] ||= 'https://www.google.com/recaptcha/api/siteverify'
             return verify_recaptcha_v2(remote_ip, d[:private_key], d[:verify_uri], params[:g_recaptcha_response])
           end
         end
 
         if d[:provider] == 'serpro'
-          return verify_serpro_captcha(d[:serpro_client_id], params[:txtToken_captcha_serpro_gov_br], params[:captcha_text])
+          d[:verify_uri] ||= 'http://captcha.servicoscorporativos.serpro.gov.br'
+          return verify_serpro_captcha(d[:serpro_client_id], params[:txtToken_captcha_serpro_gov_br], params[:captcha_text], d[:verify_uri])
         end
-
         raise ArgumentError, "Environment api_captcha_settings provider not defined"
       end
 
@@ -256,7 +255,6 @@
       end
 
       def verify_recaptcha_v2(remote_ip, private_key, api_recaptcha_verify_uri, g_recaptcha_response)
-
         if g_recaptcha_response == nil
           return _('Missing captcha data')
         end
@@ -275,8 +273,7 @@
         captcha_result["success"] ? true : captcha_result
       end
 
-      def verify_serpro_captcha(client_id, token, captcha_text)
-        verify_uri = 'http://homcaptcha.servicoscorporativos.serpro.gov.br/captchavalidar/1.0.0/validar'
+      def verify_serpro_captcha(client_id, token, captcha_text, verify_uri)
         if token == nil || captcha_text == nil
           return _('Missing captcha data')
         end
