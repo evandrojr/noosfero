@@ -28,7 +28,7 @@ class Article < ActiveRecord::Base
   def initialize(*params)
     super
 
-    if !params.blank? && params.first.has_key?(:profile)
+    if !params.blank? && params.first.has_key?(:profile) && !params.first[:profile].blank?
       profile = params.first[:profile]
       self.published = false unless profile.public?
     end
@@ -95,6 +95,8 @@ class Article < ActiveRecord::Base
   has_many :translations, :class_name => 'Article', :foreign_key => :translation_of_id
   belongs_to :translation_of, :class_name => 'Article', :foreign_key => :translation_of_id
   before_destroy :rotate_translations
+
+  acts_as_voteable
 
   before_create do |article|
     article.published_at ||= Time.now
@@ -498,13 +500,13 @@ class Article < ActiveRecord::Base
 
   scope :display_filter, lambda {|user, profile|
     return published if (user.nil? && profile && profile.public?)
-    return [] if user.nil? || profile.nil? || (profile && !profile.public? && !user.follows?(profile))
+    return [] if user.nil? || (profile && !profile.public? && !user.follows?(profile))
     where(
       [
        "published = ? OR last_changed_by_id = ? OR profile_id = ? OR ?
         OR  (show_to_followers = ? AND ? AND profile_id = ?)", true, user.id, user.id,
         profile.nil? ?  false : user.has_permission?(:view_private_content, profile),
-        true, user.follows?(profile), profile.id
+        true, user.follows?(profile), (profile.nil? ? nil : profile.id)
       ]
     )
   }
@@ -577,25 +579,24 @@ class Article < ActiveRecord::Base
     profile.visible? && profile.public? && published?
   end
 
-
-  def copy(options = {})
+  def copy_without_save(options = {})
     attrs = attributes.reject! { |key, value| ATTRIBUTES_NOT_COPIED.include?(key.to_sym) }
     attrs.merge!(options)
     object = self.class.new
     attrs.each do |key, value|
       object.send(key.to_s+'=', value)
     end
+    object
+  end
+
+  def copy(options = {})
+    object = copy_without_save(options)
     object.save
     object
   end
 
   def copy!(options = {})
-    attrs = attributes.reject! { |key, value| ATTRIBUTES_NOT_COPIED.include?(key.to_sym) }
-    attrs.merge!(options)
-    object = self.class.new
-    attrs.each do |key, value|
-      object.send(key.to_s+'=', value)
-    end
+    object = copy_without_save(options)
     object.save!
     object
   end
