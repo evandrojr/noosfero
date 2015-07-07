@@ -31,3 +31,6 @@
 [submodule "plugins/juventude"]
 	path = plugins/juventude
 	url = https://gitlab.com/noosfero-plugins/juventude.git
+[submodule "plugins/gravatar-provider"]
+	path = plugins/gravatar-provider
+	url = https://gitlab.com/noosfero-plugins/gravatar-provider.git
