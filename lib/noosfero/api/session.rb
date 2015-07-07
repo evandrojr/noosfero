@@ -29,7 +29,7 @@ module Noosfero
       #   password (required)               - Password
       #   login                             - login
       # Example Request:
-      #   POST /register?email=some@mail.com&password=pas&login=some
+      #   POST /register?email=some@mail.com&password=pas&password_confirmation=pas&login=some
       params do
         requires :email, type: String, desc: _("Email")
         requires :login, type: String, desc: _("Login")

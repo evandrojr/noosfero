@@ -1,7 +1,7 @@
 require 'grape'
 #require 'rack/contrib'
+Dir["#{Rails.root}/lib/noosfero/api/*.rb"].each {|file| require_dependency file unless file =~ /api\.rb/}
 
-Dir["#{Rails.root}/lib/noosfero/api/*.rb"].each {|file| require file unless file =~ /api\.rb/}
 module Noosfero
   module API
     class API < Grape::API
@@ -12,6 +12,13 @@ module Noosfero
       use GrapeLogging::Middleware::RequestLogger, { logger: logger }
 
       rescue_from :all do |e|
+        # Many brave warriors have fallen in the battle for fixing the API log
+        # Please, don't remove these 2 lines until the API log problem has
+        # been PROPERLY fixed by our savior!!!
+        # Otherwise we will have no clue of what went wrong in the API
+          puts "API error during processing: #{$!}"
+          puts "Backtrace:\n\t#{e.backtrace.join("\n\t")}"
+        # Thanks!  
         logger.error e
       end
 
