@@ -28,7 +28,7 @@ class Article < ActiveRecord::Base
   def initialize(*params)
     super
 
-    if !params.blank? && params.first.has_key?(:profile)
+    if !params.blank? && params.first.has_key?(:profile) && !params.first[:profile].blank?
       profile = params.first[:profile]
       self.published = false unless profile.public?
     end
@@ -133,15 +133,7 @@ class Article < ActiveRecord::Base
     {:include => 'categories_including_virtual', :conditions => { 'categories.id' => category.id }}
   }
 
-  #FIXME make this test
-  scope :newer_than, lambda { |reference_id|
-    {:conditions => ["articles.id > #{reference_id}"]}
-  }
-
-  #FIXME make this test
-  scope :older_than, lambda { |reference_id|
-    {:conditions => ["articles.id < #{reference_id}"]}
-  }
+  include TimeScopes
 
   scope :by_range, lambda { |range| {
     :conditions => [
@@ -748,8 +740,9 @@ class Article < ActiveRecord::Base
     paragraphs.empty? ? '' : paragraphs.first.to_html
   end
 
-  def lead
-    abstract.blank? ? first_paragraph.html_safe : abstract.html_safe
+  def lead(length = nil)
+    content = abstract.blank? ? first_paragraph.html_safe : abstract.html_safe
+    length.present? ? content.truncate(length) : content
   end
 
   def short_lead

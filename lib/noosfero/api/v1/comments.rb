@@ -3,7 +3,7 @@ module Noosfero
     module V1
       class Comments < Grape::API
         before { authenticate! }
-  
+
         resource :articles do
           # Collect comments from articles
           #
@@ -15,32 +15,26 @@ module Noosfero
           # Example Request:
           #  GET /articles/12/comments?oldest&limit=10&reference_id=23
           get ":id/comments" do
-  
-            conditions = make_conditions_with_parameter(params)
             article = find_article(environment.articles, params[:id])
-  
-            if params[:reference_id]
-              comments = article.comments.send("#{params.key?(:oldest) ? 'older_than' : 'newer_than'}", params[:reference_id]).reorder("created_at DESC").find(:all, :conditions => conditions, :limit => limit)
-            else
-              comments = article.comments.reorder("created_at DESC").find(:all, :conditions => conditions, :limit => limit)
-            end
+            comments = select_filtered_collection_of(article, :comments, params)
+
             present comments, :with => Entities::Comment
-  
           end
-  
+
           get ":id/comments/:comment_id" do
             article = find_article(environment.articles, params[:id])
             present article.comments.find(params[:comment_id]), :with => Entities::Comment
           end
-  
+
           # Example Request:
-          #  POST api/v1/articles/12/comments?private_toke=234298743290432&body=new comment
+          #  POST api/v1/articles/12/comments?private_token=2298743290432&body=new comment&title=New
           post ":id/comments" do
             article = find_article(environment.articles, params[:id])
-            present article.comments.create(:author => current_person, :body => params[:body]), :with => Entities::Comment
+            options = params.select { |key,v| !['id','private_token'].include?(key) }.merge(:author => current_person)
+            present article.comments.create(options), :with => Entities::Comment
           end
         end
-  
+
       end
     end
   end

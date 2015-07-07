@@ -128,15 +128,49 @@ class Profile < ActiveRecord::Base
   }
   scope :no_templates, {:conditions => {:is_template => false}}
 
-  #FIXME make this test
-  scope :newer_than, lambda { |reference_id|
-    {:conditions => ["profiles.id > #{reference_id}"]}
-  }
+  # Returns a scoped object to select profiles in a given location or in a radius
+  # distance from the given location center.
+  # The parameter can be the `request.params` with the keys:
+  # * `country`: Country code string.
+  # * `state`: Second-level administrative country subdivisions.
+  # * `city`: City full name for center definition, or as set by users.
+  # * `lat`: The latitude to define the center of georef search.
+  # * `lng`: The longitude to define the center of georef search.
+  # * `distance`: Define the search radius in kilometers.
+  # NOTE: This method may return an exception object, to inform filter error.
+  # When chaining scopes, is hardly recommended you to add this as the last one,
+  # if you can't be sure about the provided parameters.
+  def self.by_location(params)
+    params = params.with_indifferent_access
+    if params[:distance].blank?
+      where_code = []
+      [ :city, :state, :country ].each do |place|
+        unless params[place].blank?
+          # ... So we must to find on this named location
+          # TODO: convert location attrs to a table collumn
+          where_code << "(profiles.data like '%#{place}: #{params[place]}%')"
+        end
+      end
+      self.where where_code.join(' AND ')
+    else # Filter in a georef circle
+      unless params[:lat].blank? && params[:lng].blank?
+        lat, lng = [ params[:lat].to_f, params[:lng].to_f ]
+      end
+      if !lat
+        location = [ params[:city], params[:state], params[:country] ].compact.join(', ')
+        if location.blank?
+          return Exception.new (
+            _('You must to provide `lat` and `lng`, or `city` and `country` to define the center of the search circle, defined by `distance`.')
+          )
+        end
+        lat, lng = Noosfero::GeoRef.location_to_georef location
+      end
+      dist = params[:distance].to_f
+      self.where "#{Noosfero::GeoRef.sql_dist lat, lng} <= #{dist}"
+    end
+  end
 
-  #FIXME make this test
-  scope :older_than, lambda { |reference_id|
-    {:conditions => ["profiles.id < #{reference_id}"]}
-  }
+  include TimeScopes
 
   def members
     scopes = plugins.dispatch_scopes(:organization_members, self)
@@ -1006,17 +1040,9 @@ private :generate_url, :url_options
     self.save
   end
 
-  def disabled?
-    !visible
-  end
-
   def enable
     self.visible = true
     self.save
-  end
-
-  def enabled?
-    visible
   end
 
   def control_panel_settings_button

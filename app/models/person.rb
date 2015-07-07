@@ -1,9 +1,9 @@
 # A person is the profile of an user holding all relationships with the rest of the system
 class Person < Profile
 
-  attr_accessible :organization, :contact_information, :sex, :birth_date, :cell_phone, 
-    :comercial_phone, :jabber_id, :personal_website, :nationality, :address_reference, 
-    :district, :schooling, :schooling_status, :formation, :custom_formation, :area_of_study, 
+  attr_accessible :organization, :contact_information, :sex, :birth_date, :cell_phone,
+    :comercial_phone, :jabber_id, :personal_website, :nationality, :address_reference,
+    :district, :schooling, :schooling_status, :formation, :custom_formation, :area_of_study,
     :custom_area_of_study, :professional_activity, :organization_website, :following_articiles
 
   SEARCH_FILTERS = {
@@ -45,12 +45,16 @@ roles] }
   }
 
   scope :visible_for_person, lambda { |person|
-    joins('LEFT JOIN "friendships" ON "friendships"."friend_id" = "profiles"."id"')
-    .where(
-      ['( ( friendships.person_id = ? ) OR (profiles.public_profile = ?)) AND (profiles.visible = ?)', person.id,  true, true]
-    ).uniq
+   joins('LEFT JOIN "role_assignments" ON
+         "role_assignments"."resource_id" = "profiles"."environment_id" AND
+         "role_assignments"."resource_type" = \'Environment\'')
+   .joins('LEFT JOIN "roles" ON "role_assignments"."role_id" = "roles"."id"')
+   .joins('LEFT JOIN "friendships" ON "friendships"."friend_id" = "profiles"."id"')
+   .where(
+     ['( roles.key = ? AND role_assignments.accessor_type = ? AND role_assignments.accessor_id = ? ) OR (
+       ( ( friendships.person_id = ? ) OR (profiles.public_profile = ?)) AND (profiles.visible = ?) )', 'environment_administrator', Profile.name, person.id, person.id,  true, true]
+   ).uniq
   }
-
 
   def has_permission_with_admin?(permission, resource)
     return true if resource.blank? || resource.admins.include?(self)
