@@ -2,7 +2,7 @@
     module API
       module APIHelpers
       PRIVATE_TOKEN_PARAM = :private_token
-      ALLOWED_PARAMETERS = [:parent_id, :from, :until, :content_type]
+      DEFAULT_ALLOWED_PARAMETERS = [:parent_id, :from, :until, :content_type]
 
       include SanitizeParams
 
@@ -47,9 +47,39 @@
         end
       end
 
+      ARTICLE_TYPES = Article.descendants.map{|a| a.to_s}
+
       def find_article(articles, id)
         article = articles.find(id)
         #article.display_to?(current_user.person) ? article : forbidden!
+      end
+
+      def post_article(asset, params)
+        return forbidden! unless current_person.can_post_content?(asset)
+
+        klass_type= params[:content_type].nil? ? 'TinyMceArticle' : params[:content_type]
+        return forbidden! unless ARTICLE_TYPES.include?(klass_type)
+
+        article = klass_type.constantize.new(params[:article])
+        article.last_changed_by = current_person
+        article.created_by= current_person
+        article.profile = asset
+
+        if !article.save
+          render_api_errors!(article.errors.full_messages)
+        end
+        present article, :with => Entities::Article, :fields => params[:fields]
+      end
+
+      def present_article(asset)
+        article = find_article(asset.articles, params[:id])
+        present article, :with => Entities::Article, :fields => params[:fields]
+      end
+
+      def present_articles(asset)
+        articles = select_filtered_collection_of(asset, 'articles', params)
+        articles = articles.display_filter(current_person, nil)
+        present articles, :with => Entities::Article, :fields => params[:fields]
       end
 
       def find_task(tasks, id)
@@ -75,25 +105,27 @@
         params[:order] || "created_at DESC"
       end
 
+      def by_reference(scope, params)
+        if params[:reference_id]
+          created_at = scope.find(params[:reference_id]).created_at
+          scope.send("#{params.key?(:oldest) ? 'older_than' : 'younger_than'}", created_at)
+        else
+          scope
+        end
+      end
+
       def select_filtered_collection_of(object, method, params)
         conditions = make_conditions_with_parameter(params)
         order = make_order_with_parameters(params)
 
-        if params[:reference_id]
-          objects = object.send(method).send("#{params.key?(:oldest) ? 'older_than' : 'newer_than'}", params[:reference_id]).where(conditions).limit(limit).order(order)
-        else
-          objects = object.send(method).where(conditions).limit(limit).order(order)
-        end
-
-        if params[:categories_ids]
-          objects = objects.joins(:categories).where('category_id in (?)', params[:categories_ids])
-        end
+        objects = object.send(method)
+        objects = by_reference(objects, params)
+        objects = objects.where(conditions).limit(limit).order(order)
 
         objects
       end
 
       def authenticate!
-
         unauthorized! unless current_user
       end
 
@@ -116,10 +148,27 @@
         attrs
       end
 
+      def verify_recaptcha_v2(remote_ip, g_recaptcha_response, private_key, api_recaptcha_verify_uri)
+        verify_hash = {
+          "secret"    => private_key,
+          "remoteip"  => remote_ip,
+          "response"  => g_recaptcha_response
+        }
+        uri = URI(api_recaptcha_verify_uri)
+        https = Net::HTTP.new(uri.host, uri.port)
+        https.use_ssl = true
+        request = Net::HTTP::Post.new(uri.path)
+        request.set_form_data(verify_hash)
+        JSON.parse(https.request(request).body)
+      end
 
       ##########################################
       #              error helpers             #
       ##########################################
+
+      def not_found!
+        render_api_error!('404 Not found', 404)
+      end
 
       def forbidden!
         render_api_error!('403 Forbidden', 403)
@@ -178,12 +227,16 @@
         end
       end
 
+      def filter_disabled_plugins_endpoints
+        not_found! if Noosfero::API::API.endpoint_unavailable?(self, !@environment)
+      end
+
       private
 
       def parser_params(params)
         parsed_params = {}
         params.map do |k,v|
-          parsed_params[k.to_sym] = v if ALLOWED_PARAMETERS.include?(k.to_sym)
+          parsed_params[k.to_sym] = v if DEFAULT_ALLOWED_PARAMETERS.include?(k.to_sym)
         end
         parsed_params
       end
@@ -202,7 +255,6 @@
       def period(from_date, until_date)
         begin_period = from_date.nil? ? Time.at(0).to_datetime : from_date
         end_period = until_date.nil? ? DateTime.now : until_date
-
         begin_period..end_period
       end
 
@@ -218,18 +270,20 @@
         if d[:provider] == 'google'
           raise ArgumentError, "Environment api_captcha_settings private_key not defined" if d[:private_key].nil?
           raise ArgumentError, "Environment api_captcha_settings version not defined" unless d[:version] == 1 || d[:version] == 2
-          raise ArgumentError, "Environment api_captcha_settings verify_uri not defined" if d[:verify_uri].nil?
           if d[:version]  == 1
+            d[:verify_uri] ||= 'https://www.google.com/recaptcha/api/verify'
             return verify_recaptcha_v1(remote_ip, d[:private_key], d[:verify_uri], params[:recaptcha_challenge_field], params[:recaptcha_response_field])
           end
           if d[:version] == 2
+            d[:verify_uri] ||= 'https://www.google.com/recaptcha/api/siteverify'
             return verify_recaptcha_v2(remote_ip, d[:private_key], d[:verify_uri], params[:g_recaptcha_response])
           end
         end
-
         if d[:provider] == 'serpro'
-              #TODO ADD SERPRO's CAPTCHA
+          d[:verify_uri] ||= 'http://captcha2.servicoscorporativos.serpro.gov.br/captchavalidar/1.0.0/validar'
+          return verify_serpro_captcha(d[:serpro_client_id], params[:txtToken_captcha_serpro_gov_br], params[:captcha_text], d[:verify_uri])
         end
+        raise ArgumentError, "Environment api_captcha_settings provider not defined"
       end
 
       def verify_recaptcha_v1(remote_ip, private_key, api_recaptcha_verify_uri, recaptcha_challenge_field, recaptcha_response_field)
@@ -253,7 +307,6 @@
       end
 
       def verify_recaptcha_v2(remote_ip, private_key, api_recaptcha_verify_uri, g_recaptcha_response)
-
         if g_recaptcha_response == nil
           return _('Missing captcha data')
         end
@@ -270,6 +323,19 @@
         request.set_form_data(verify_hash)
         captcha_result = JSON.parse(https.request(request).body)
         captcha_result["success"] ? true : captcha_result
+      end
+
+      def verify_serpro_captcha(client_id, token, captcha_text, verify_uri)
+        if token == nil || captcha_text == nil
+          return _('Missing captcha data')
+        end
+        uri = URI(verify_uri)
+        http = Net::HTTP.new(uri.host, uri.port)
+        request = Net::HTTP::Post.new(uri.path)
+        verify_string = "#{client_id}&#{token}&#{captcha_text}"
+        request.body = verify_string
+        body = http.request(request).body
+        body == '1' ? true : body 
       end
 
     end

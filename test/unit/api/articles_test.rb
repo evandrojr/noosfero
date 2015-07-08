@@ -83,162 +83,146 @@ class ArticlesTest < ActiveSupport::TestCase
   end
 
   #############################
-  #     Community Articles    #
+  #     Profile Articles      #
   #############################
 
-  should 'return article by community' do
-    community = fast_create(Community)
-    article = fast_create(Article, :profile_id => community.id, :name => "Some thing")
-    get "/api/v1/communities/#{community.id}/articles/#{article.id}?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_equal article.id, json["article"]["id"]
+  profile_kinds = %w(community person enterprise)
+  profile_kinds.each do |kind|
+    should "return article by #{kind}" do
+      profile = fast_create(kind.camelcase.constantize)
+      article = fast_create(Article, :profile_id => profile.id, :name => "Some thing")
+      get "/api/v1/#{kind.pluralize}/#{profile.id}/articles/#{article.id}?#{params.to_query}"
+      json = JSON.parse(last_response.body)
+      assert_equal article.id, json["article"]["id"]
+    end
+
+    should "not return article by #{kind} if user has no permission to view it" do
+      profile = fast_create(kind.camelcase.constantize)
+      article = fast_create(Article, :profile_id => profile.id, :name => "Some thing", :published => false)
+      assert !article.published?
+
+      get "/api/v1/#{kind.pluralize}/#{profile.id}/articles/#{article.id}?#{params.to_query}"
+      assert_equal 403, last_response.status
+    end
+
+    should "not list forbidden article when listing articles by #{kind}" do
+      profile = fast_create(kind.camelcase.constantize)
+      article = fast_create(Article, :profile_id => profile.id, :name => "Some thing", :published => false)
+      assert !article.published?
+
+      get "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
+      json = JSON.parse(last_response.body)
+      assert_not_includes json['articles'].map {|a| a['id']}, article.id
+    end
   end
 
-  should 'not return article by community if user has no permission to view it' do
-    community = fast_create(Community)
-    article = fast_create(Article, :profile_id => community.id, :name => "Some thing", :published => false)
-    assert !article.published?
+  #############################
+  #  Group Profile Articles   #
+  #############################
 
-    get "/api/v1/communities/#{community.id}/articles/#{article.id}?#{params.to_query}"
-    assert_equal 403, last_response.status
-  end
+  group_kinds = %w(community enterprise)
+  group_kinds.each do |kind|
+    should "#{kind}: create article" do
+      profile = fast_create(kind.camelcase.constantize)
+      give_permission(user.person, 'post_content', profile)
+      params[:article] = {:name => "Title"}
+      post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
+      json = JSON.parse(last_response.body)
+      assert_equal "Title", json["article"]["title"]
+    end
 
-  should 'not list forbidden article when listing articles by community' do
-    community = fast_create(Community)
-    article = fast_create(Article, :profile_id => community.id, :name => "Some thing", :published => false)
-    assert !article.published?
+    should "#{kind}: do not create article if user has no permission to post content" do
+      profile = fast_create(kind.camelcase.constantize)
+      give_permission(user.person, 'invite_members', profile)
+      params[:article] = {:name => "Title"}
+      post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
+      assert_equal 403, last_response.status
+    end
 
-    get "/api/v1/communities/#{community.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_not_includes json['articles'].map {|a| a['id']}, article.id
-  end
+    should "#{kind}: create article with parent" do
+      profile = fast_create(kind.camelcase.constantize)
+      profile.add_member(user.person)
+      article = fast_create(Article)
 
-  should 'create article in a community' do
-    community = fast_create(Community)
-    give_permission(user.person, 'post_content', community)
-    params[:article] = {:name => "Title"}
-    post "/api/v1/communities/#{community.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_equal "Title", json["article"]["title"]
-  end
+      params[:article] = {:name => "Title", :parent_id => article.id}
+      post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
+      json = JSON.parse(last_response.body)
+      assert_equal article.id, json["article"]["parent"]["id"]
+    end
 
-  should 'do not create article if user has no permission to post content' do
-    community = fast_create(Community)
-    give_permission(user.person, 'invite_members', community)
-    params[:article] = {:name => "Title"}
-    post "/api/v1/communities/#{community.id}/articles?#{params.to_query}"
-    assert_equal 403, last_response.status
-  end
+    should "#{kind}: create article with content type passed as parameter" do
+      profile = fast_create(kind.camelcase.constantize)
+      profile.add_member(user.person)
 
-  should 'create article with parent' do
-    community = fast_create(Community)
-    community.add_member(user.person)
-    article = fast_create(Article)
+      Article.delete_all
+      params[:article] = {:name => "Title"}
+      params[:content_type] = 'TextArticle'
+      post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
+      json = JSON.parse(last_response.body)
 
-    params[:article] = {:name => "Title", :parent_id => article.id}
-    post "/api/v1/communities/#{community.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_equal article.id, json["article"]["parent"]["id"]
-  end
+      assert_kind_of TextArticle, Article.last
+    end
 
-  should 'create article with content type passed as parameter' do
-    community = fast_create(Community)
-    community.add_member(user.person)
+    should "#{kind}: create article of TinyMceArticle type if no content type is passed as parameter" do
+      profile = fast_create(kind.camelcase.constantize)
+      profile.add_member(user.person)
 
-    Article.delete_all
-    params[:article] = {:name => "Title"}
-    params[:content_type] = 'TextArticle'
-    post "/api/v1/communities/#{community.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    
-    assert_kind_of TextArticle, Article.last
-  end
-  
-  should 'create article of TinyMceArticle type if no content type is passed as parameter' do
-    community = fast_create(Community)
-    community.add_member(user.person)
+      params[:article] = {:name => "Title"}
+      post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
+      json = JSON.parse(last_response.body)
 
-    params[:article] = {:name => "Title"}
-    post "/api/v1/communities/#{community.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    
-    assert_kind_of TinyMceArticle, Article.last
-  end
+      assert_kind_of TinyMceArticle, Article.last
+    end
 
-  should 'not create article with invalid article content type' do
-    community = fast_create(Community)
-    community.add_member(user.person)
+    should "#{kind}: not create article with invalid article content type" do
+      profile = fast_create(kind.camelcase.constantize)
+      profile.add_member(user.person)
 
-    params[:article] = {:name => "Title"}
-    params[:content_type] = 'Person'
-    post "/api/v1/communities/#{community.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    
-    assert_equal 403, last_response.status
-  end
+      params[:article] = {:name => "Title"}
+      params[:content_type] = 'Person'
+      post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
+      json = JSON.parse(last_response.body)
 
-  should 'create article defining the correct profile' do
-    community = fast_create(Community)
-    community.add_member(user.person)
+      assert_equal 403, last_response.status
+    end
 
-    params[:article] = {:name => "Title"}
-    post "/api/v1/communities/#{community.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    
-    assert_equal community, Article.last.profile
-  end
+    should "#{kind}: create article defining the correct profile" do
+      profile = fast_create(kind.camelcase.constantize)
+      profile.add_member(user.person)
 
-  should 'create article defining the created_by' do
-    community = fast_create(Community)
-    community.add_member(user.person)
+      params[:article] = {:name => "Title"}
+      post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
+      json = JSON.parse(last_response.body)
 
-    params[:article] = {:name => "Title"}
-    post "/api/v1/communities/#{community.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    
-    assert_equal user.person, Article.last.created_by
-  end
+      assert_equal profile, Article.last.profile
+    end
 
-  should 'create article defining the last_changed_by' do
-    community = fast_create(Community)
-    community.add_member(user.person)
+    should "#{kind}: create article defining the created_by" do
+      profile = fast_create(kind.camelcase.constantize)
+      profile.add_member(user.person)
 
-    params[:article] = {:name => "Title"}
-    post "/api/v1/communities/#{community.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    
-    assert_equal user.person, Article.last.last_changed_by
+      params[:article] = {:name => "Title"}
+      post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
+      json = JSON.parse(last_response.body)
+
+      assert_equal user.person, Article.last.created_by
+    end
+
+    should "#{kind}: create article defining the last_changed_by" do
+      profile = fast_create(kind.camelcase.constantize)
+      profile.add_member(user.person)
+
+      params[:article] = {:name => "Title"}
+      post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
+      json = JSON.parse(last_response.body)
+
+      assert_equal user.person, Article.last.last_changed_by
+    end
   end
 
   #############################
   #       Person Articles     #
   #############################
-
-  should 'return article by person' do
-    person = fast_create(Person)
-    article = fast_create(Article, :profile_id => person.id, :name => "Some thing")
-    get "/api/v1/people/#{person.id}/articles/#{article.id}?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_equal article.id, json["article"]["id"]
-  end
-
-  should 'not return article by person if user has no permission to view it' do
-    person = fast_create(Person)
-    article = fast_create(Article, :profile_id => person.id, :name => "Some thing", :published => false)
-    assert !article.published?
-
-    get "/api/v1/people/#{person.id}/articles/#{article.id}?#{params.to_query}"
-    assert_equal 403, last_response.status
-  end
-
-  should 'not list forbidden article when listing articles by person' do
-    person = fast_create(Person)
-    article = fast_create(Article, :profile_id => person.id, :name => "Some thing", :published => false)
-    assert !article.published?
-    get "/api/v1/people/#{person.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_not_includes json['articles'].map {|a| a['id']}, article.id
-  end
 
   should 'create article in a person' do
     params[:article] = {:name => "Title"}
@@ -269,15 +253,15 @@ class ArticlesTest < ActiveSupport::TestCase
     params[:content_type] = 'TextArticle'
     post "/api/v1/people/#{user.person.id}/articles?#{params.to_query}"
     json = JSON.parse(last_response.body)
-    
+
     assert_kind_of TextArticle, Article.last
   end
-  
+
   should 'person create article of TinyMceArticle type if no content type is passed as parameter' do
     params[:article] = {:name => "Title"}
     post "/api/v1/people/#{user.person.id}/articles?#{params.to_query}"
     json = JSON.parse(last_response.body)
-    
+
     assert_kind_of TinyMceArticle, Article.last
   end
 
@@ -286,7 +270,7 @@ class ArticlesTest < ActiveSupport::TestCase
     params[:content_type] = 'Person'
     post "/api/v1/people/#{user.person.id}/articles?#{params.to_query}"
     json = JSON.parse(last_response.body)
-    
+
     assert_equal 403, last_response.status
   end
 
@@ -294,7 +278,7 @@ class ArticlesTest < ActiveSupport::TestCase
     params[:article] = {:name => "Title"}
     post "/api/v1/people/#{user.person.id}/articles?#{params.to_query}"
     json = JSON.parse(last_response.body)
-    
+
     assert_equal user.person, Article.last.profile
   end
 
@@ -302,7 +286,7 @@ class ArticlesTest < ActiveSupport::TestCase
     params[:article] = {:name => "Title"}
     post "/api/v1/people/#{user.person.id}/articles?#{params.to_query}"
     json = JSON.parse(last_response.body)
-    
+
     assert_equal user.person, Article.last.created_by
   end
 
@@ -310,177 +294,8 @@ class ArticlesTest < ActiveSupport::TestCase
     params[:article] = {:name => "Title"}
     post "/api/v1/people/#{user.person.id}/articles?#{params.to_query}"
     json = JSON.parse(last_response.body)
-    
+
     assert_equal user.person, Article.last.last_changed_by
-  end
-
-  #############################
-  #     Enterprise Articles    #
-  #############################
-
-  should 'return article by enterprise' do
-    enterprise = fast_create(Enterprise)
-    article = fast_create(Article, :profile_id => enterprise.id, :name => "Some thing")
-    get "/api/v1/enterprises/#{enterprise.id}/articles/#{article.id}?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_equal article.id, json["article"]["id"]
-  end
-
-  should 'not return article by enterprise if user has no permission to view it' do
-    enterprise = fast_create(Enterprise)
-    article = fast_create(Article, :profile_id => enterprise.id, :name => "Some thing", :published => false)
-    assert !article.published?
-
-    get "/api/v1/enterprises/#{enterprise.id}/articles/#{article.id}?#{params.to_query}"
-    assert_equal 403, last_response.status
-  end
-
-  should 'not list forbidden article when listing articles by enterprise' do
-    enterprise = fast_create(Enterprise)
-    article = fast_create(Article, :profile_id => enterprise.id, :name => "Some thing", :published => false)
-    assert !article.published?
-
-    get "/api/v1/enterprises/#{enterprise.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_not_includes json['articles'].map {|a| a['id']}, article.id
-  end
-
-  should 'create article in a enterprise' do
-    enterprise = fast_create(Enterprise)
-    give_permission(user.person, 'post_content', enterprise)
-    params[:article] = {:name => "Title"}
-    post "/api/v1/enterprises/#{enterprise.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_equal "Title", json["article"]["title"]
-  end
-
-  should 'enterprise: do not create article if user has no permission to post content' do
-    enterprise = fast_create(Enterprise)
-    give_permission(user.person, 'invite_members', enterprise)
-    params[:article] = {:name => "Title"}
-    post "/api/v1/enterprises/#{enterprise.id}/articles?#{params.to_query}"
-    assert_equal 403, last_response.status
-  end
-
-  should 'enterprise: create article with parent' do
-    enterprise = fast_create(Enterprise)
-    enterprise.add_member(user.person)
-    article = fast_create(Article)
-
-    params[:article] = {:name => "Title", :parent_id => article.id}
-    post "/api/v1/enterprises/#{enterprise.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_equal article.id, json["article"]["parent"]["id"]
-  end
-
-  should 'enterprise: create article with content type passed as parameter' do
-    enterprise = fast_create(Enterprise)
-    enterprise.add_member(user.person)
-
-    Article.delete_all
-    params[:article] = {:name => "Title"}
-    params[:content_type] = 'TextArticle'
-    post "/api/v1/enterprises/#{enterprise.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    
-    assert_kind_of TextArticle, Article.last
-  end
-  
-  should 'enterprise: create article of TinyMceArticle type if no content type is passed as parameter' do
-    enterprise = fast_create(Enterprise)
-    enterprise.add_member(user.person)
-
-    params[:article] = {:name => "Title"}
-    post "/api/v1/enterprises/#{enterprise.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    
-    assert_kind_of TinyMceArticle, Article.last
-  end
-
-  should 'enterprise: not create article with invalid article content type' do
-    enterprise = fast_create(Enterprise)
-    enterprise.add_member(user.person)
-
-    params[:article] = {:name => "Title"}
-    params[:content_type] = 'Person'
-    post "/api/v1/enterprises/#{enterprise.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    
-    assert_equal 403, last_response.status
-  end
-
-  should 'enterprise: create article defining the correct profile' do
-    enterprise = fast_create(Enterprise)
-    enterprise.add_member(user.person)
-
-    params[:article] = {:name => "Title"}
-    post "/api/v1/enterprises/#{enterprise.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    
-    assert_equal enterprise, Article.last.profile
-  end
-
-  should 'enterprise: create article defining the created_by' do
-    enterprise = fast_create(Enterprise)
-    enterprise.add_member(user.person)
-
-    params[:article] = {:name => "Title"}
-    post "/api/v1/enterprises/#{enterprise.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    
-    assert_equal user.person, Article.last.created_by
-  end
-
-  should 'enterprise: create article defining the last_changed_by' do
-    enterprise = fast_create(Enterprise)
-    enterprise.add_member(user.person)
-
-    params[:article] = {:name => "Title"}
-    post "/api/v1/enterprises/#{enterprise.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    
-    assert_equal user.person, Article.last.last_changed_by
-  end
-
-  should 'vote for an article' do
-    article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
-    params[:value] = 1
-    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert json["vote"]
-    assert_equal 1, Vote.where(:voteable_id => article.id).sum(:vote)
-  end
-
-  should 'vote for an article with default value' do
-    article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
-    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert json["vote"]
-    assert_equal 1, Vote.where(:voteable_id => article.id).sum(:vote)
-  end
-
-  should 'vote against an article' do
-    article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
-    params[:value] = -1
-    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert json["vote"]
-    assert_equal -1, Vote.where(:voteable_id => article.id).sum(:vote)
-  end
-
-  should 'do not allow forbidden vote value' do
-    article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
-    params[:value] = 100
-    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_equal 400, last_response.status
-  end
-
-  should 'allow multiple votes for an article' do
-    article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
-    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
-    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
-    assert_equal 2, Vote.where(:voteable_id => article.id).sum(:vote)
   end
 
   should 'list article children with partial fields' do
@@ -500,7 +315,7 @@ class ArticlesTest < ActiveSupport::TestCase
       post "/api/v1/articles/#{article.id}/children/suggest?#{params.to_query}"
     end
     json = JSON.parse(last_response.body)
-    assert_equal 'SuggestArticle', json['type']
+    assert_equal 'SuggestArticle', json['task']['type']
   end
 
   should 'suggest event children' do
@@ -511,7 +326,7 @@ class ArticlesTest < ActiveSupport::TestCase
       post "/api/v1/articles/#{article.id}/children/suggest?#{params.to_query}"
     end
     json = JSON.parse(last_response.body)
-    assert_equal 'SuggestArticle', json['type']
+    assert_equal 'SuggestArticle', json['task']['type']
   end
 
   should 'update hit attribute of article children' do

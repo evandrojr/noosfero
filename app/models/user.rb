@@ -34,6 +34,14 @@ class User < ActiveRecord::Base
     alias_method_chain :human_attribute_name, :customization
   end
 
+  def self.build(user_data, person_data, environment)
+    user = User.new(user_data)
+    user.terms_of_use = environment.terms_of_use
+    user.environment = environment
+    user.person_data = person_data
+    user
+  end
+
   before_create do |user|
     if user.environment.nil?
       user.environment = Environment.default
@@ -121,17 +129,15 @@ class User < ActiveRecord::Base
     self.update_attribute :last_login_at, Time.now
   end
 
-  #FIXME make this test
   def generate_private_token!
     self.private_token = SecureRandom.hex
     self.private_token_generated_at = DateTime.now
     save(:validate => false)
   end
 
-  #FIXME make this test
-   def private_token_expired?
-    return true if self.private_token_generated_at.nil?
-    self.generate_private_token! if self.private_token.nil? || (self.private_token_generated_at + 2.weeks < DateTime.now)
+  TOKEN_VALIDITY = 2.weeks
+  def private_token_expired?
+    self.private_token.nil? || (self.private_token_generated_at + TOKEN_VALIDITY < DateTime.now)
   end
 
   # Activates the user in the database.

@@ -326,7 +326,7 @@ class Environment < ActiveRecord::Base
 
   settings_items :signup_welcome_screen_body, :type => String
 
-  #Captcha setings
+  #Captcha settings
   settings_items :api_captcha_settings, :type => ActiveSupport::HashWithIndifferentAccess, :default => {}
 
   def has_custom_welcome_screen?

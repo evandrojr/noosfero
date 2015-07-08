@@ -21,19 +21,19 @@ class SessionTest < ActiveSupport::TestCase
   end
 
   should 'register a user' do
-    params = {:login => "newuserapi", :password => "newuserapi", :email => "newuserapi@email.com" }
+    params = {:login => "newuserapi", :password => "newuserapi", :password_confirmation => "newuserapi", :email => "newuserapi@email.com" }
     post "/api/v1/register?#{params.to_query}"
     assert_equal 201, last_response.status
   end
 
   should 'do not register a user without email' do
-    params = {:login => "newuserapi", :password => "newuserapi", :email => nil }
+    params = {:login => "newuserapi", :password => "newuserapi", :password_confirmation => "newuserapi", :email => nil }
     post "/api/v1/register?#{params.to_query}"
     assert_equal 400, last_response.status
   end
 
   should 'do not register a duplicated user' do
-    params = {:login => "newuserapi", :password => "newuserapi", :email => "newuserapi@email.com" }
+    params = {:login => "newuserapi", :password => "newuserapi", :password_confirmation => "newuserapi", :email => "newuserapi@email.com" }
     post "/api/v1/register?#{params.to_query}"
     post "/api/v1/register?#{params.to_query}"
     assert_equal 400, last_response.status
