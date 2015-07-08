@@ -64,6 +64,7 @@
           _showError(this,response);
         }
       },
+      addIcon: _addIcon,
       showTags: function(cfg){
 
         jQuery('.filter-tags').inputosaurus({
