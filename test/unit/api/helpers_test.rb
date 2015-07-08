@@ -164,7 +164,8 @@ class APIHelpersTest < ActiveSupport::TestCase
 
   should 'do not test captcha when there are no settings' do
     environment = Environment.new
-    assert test_captcha("127.0.0.1", {}, environment)
+    stubs(:environment).returns(environment)
+    assert test_captcha("127.0.0.1", {})
   end
 
   should 'do not test captcha when captcha is disabled on settings' do
@@ -172,9 +173,9 @@ class APIHelpersTest < ActiveSupport::TestCase
     environment.api_captcha_settings = {
         enabled: false,
     }
-    assert   test_captcha("127.0.0.1", {}, environment)
+    stubs(:environment).returns(environment)
+    assert test_captcha("127.0.0.1", {})
   end
-
 
   should 'fail display recaptcha v1' do
     environment = Environment.new
@@ -186,7 +187,8 @@ class APIHelpersTest < ActiveSupport::TestCase
         public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
         verify_uri:   'https://www.google.com/recaptcha/api/verify',
     }
-    assert_equal test_captcha("127.0.0.1", {}, environment), "Missing captcha data"
+    stubs(:environment).returns(environment)
+    assert_equal test_captcha("127.0.0.1", {}), "Missing captcha data"
   end
 
   should 'fail display recaptcha v2' do
@@ -199,7 +201,19 @@ class APIHelpersTest < ActiveSupport::TestCase
         public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
         verify_uri:   'https://www.google.com/recaptcha/api/siteverify',
     }
-    assert_equal test_captcha("127.0.0.1", {}, environment), "Missing captcha data"
+    stubs(:environment).returns(environment)
+    assert_equal test_captcha("127.0.0.1", {}), "Missing captcha data"
+  end
+
+  should 'fail display Serpro captcha' do
+    environment = Environment.new
+    environment.api_captcha_settings = {
+        enabled: true,
+        provider: 'serpro',
+        serpro_client_id:  '0000000000000000',
+    }
+    stubs(:environment).returns(environment)
+    assert_equal test_captcha("127.0.0.1", {}), "Missing captcha data"
   end
 
   should 'render not_found if endpoint is unavailable' do
