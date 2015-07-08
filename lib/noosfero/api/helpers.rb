@@ -226,9 +226,8 @@
             return verify_recaptcha_v2(remote_ip, d[:private_key], d[:verify_uri], params[:g_recaptcha_response])
           end
         end
-
         if d[:provider] == 'serpro'
-          d[:verify_uri] ||= 'http://captcha.servicoscorporativos.serpro.gov.br'
+          d[:verify_uri] ||= 'http://captcha2.servicoscorporativos.serpro.gov.br/captchavalidar/1.0.0/validar'
           return verify_serpro_captcha(d[:serpro_client_id], params[:txtToken_captcha_serpro_gov_br], params[:captcha_text], d[:verify_uri])
         end
         raise ArgumentError, "Environment api_captcha_settings provider not defined"
@@ -278,11 +277,11 @@
           return _('Missing captcha data')
         end
         uri = URI(verify_uri)
-        https = Net::HTTP.new(uri.host, uri.port)
+        http = Net::HTTP.new(uri.host, uri.port)
         request = Net::HTTP::Post.new(uri.path)
         verify_string = "#{client_id}&#{token}&#{captcha_text}"
         request.body = verify_string
-        body = https.request(request).body
+        body = http.request(request).body
         body == '1' ? true : body 
       end
 
