@@ -101,7 +101,8 @@ class User < ActiveRecord::Base
   validates_confirmation_of :password,                   :if => :password_required?
   validates_length_of       :login,    :within => 2..40, :if => (lambda {|user| !user.login.blank?})
   validates_length_of       :email,    :within => 3..100, :if => (lambda {|user| !user.email.blank?})
-  validates_uniqueness_of   :login, :email, :case_sensitive => false, :scope => :environment_id
+  validates_uniqueness_of   :login, :message => _('login already taken')
+  validates_uniqueness_of   :email, :case_sensitive => false, :scope => :environment_id
   before_save :encrypt_password
   before_save :normalize_email, if: proc{ |u| u.email.present? }
   validates_format_of :email, :with => Noosfero::Constants::EMAIL_FORMAT, :if => (lambda {|user| !user.email.blank?})
