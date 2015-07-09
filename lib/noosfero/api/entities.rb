@@ -57,12 +57,11 @@ module Noosfero
 
       class CategoryBase < Entity
         root 'categories', 'category'
-        expose :name, :id
+        expose :name, :id, :slug
       end
 
       class Category < CategoryBase
         root 'categories', 'category'
-        expose :slug
         expose :full_name do |category, options|
           category.full_name
         end
