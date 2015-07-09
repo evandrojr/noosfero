@@ -62,6 +62,7 @@ module Noosfero
 
       class Category < CategoryBase
         root 'categories', 'category'
+        expose :id
         expose :slug
         expose :full_name do |category, options|
           category.full_name
