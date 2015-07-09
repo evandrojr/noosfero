@@ -228,7 +228,7 @@
       end
 
       def filter_disabled_plugins_endpoints
-        not_found! if Noosfero::API::API.endpoint_unavailable?(self, !@environment)
+        not_found! if Noosfero::API::API.endpoint_unavailable?(self, @environment)
       end
 
       private
