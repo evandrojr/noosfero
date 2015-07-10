@@ -114,7 +114,7 @@ module Noosfero
         expose :permissions do |user, options|
           output = {}
           user.person.role_assignments.map do |role_assigment|
-            if role_assigment.resource.respond_to?(:identifier)
+            if role_assigment.resource.respond_to?(:identifier) && !role_assigment.role.nil?
               output[role_assigment.resource.identifier] = role_assigment.role.permissions
             end
           end
