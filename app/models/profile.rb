@@ -356,7 +356,7 @@ class Profile < ActiveRecord::Base
   end
 
   # registar callback for creating boxes after the object is created.
-  after_create :create_default_set_of_boxes
+  before_create :create_default_set_of_boxes
 
   # creates the initial set of boxes when the profile is created. Can be
   # overriden for each subclass to create a custom set of boxes for its
@@ -422,9 +422,6 @@ class Profile < ActiveRecord::Base
     self.custom_footer = template[:custom_footer]
     self.custom_header = template[:custom_header]
     self.public_profile = template.public_profile
-
-    # flush
-    self.save(:validate => false)
   end
 
   def apply_type_specific_template(template)
@@ -613,15 +610,15 @@ private :generate_url, :url_options
   after_create :insert_default_article_set
   def insert_default_article_set
     if template
-      copy_articles_from template
+      self.save! if copy_articles_from template
     else
       default_set_of_articles.each do |article|
         article.profile = self
         article.advertise = false
         article.save!
       end
+      self.save!
     end
-    self.save!
   end
 
   # Override this method in subclasses of Profile to create a default article
@@ -642,10 +639,12 @@ private :generate_url, :url_options
   end
 
   def copy_articles_from other
+    return false if other.top_level_articles.empty?
     other.top_level_articles.each do |a|
       copy_article_tree a
     end
     self.articles.reload
+    true
   end
 
   def copy_article_tree(article, parent=nil)
