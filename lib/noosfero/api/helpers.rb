@@ -262,8 +262,7 @@
       #              captcha_helpers           #
       ##########################################
 
-      def test_captcha(remote_ip, params, _environment = nil)
-        environment ||= _environment
+      def test_captcha(remote_ip, params, environment)
         d = environment.api_captcha_settings
         return true unless d[:enabled] == true
 
