@@ -21,6 +21,14 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
+  def test_should_not_allow_duplicate_login
+    user1 = create_user('new_user', :email => 'new_user1@example.com', :password => 'test', :password_confirmation => 'test')
+    assert !user1.errors[:login].present?
+    user1.save!
+    user2 = new_user(:login => 'new_user')
+    assert user2.errors[:login].present?
+  end
+
   def test_should_require_password
     assert_no_difference 'User.count' do
       u = new_user(:password => nil)
@@ -38,6 +46,13 @@ class UserTest < ActiveSupport::TestCase
   def test_should_require_email
     assert_no_difference 'User.count' do
       u = new_user(:email => nil)
+      assert u.errors[:email].present?
+    end
+  end
+
+  def test_email_format
+    assert_no_difference 'User.count' do
+      u = new_user(:email => 'test.email')
       assert u.errors[:email].present?
     end
   end
