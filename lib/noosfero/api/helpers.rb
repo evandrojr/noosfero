@@ -1,4 +1,5 @@
-  module Noosfero
+  module Noosfero;
+
     module API
       module APIHelpers
       PRIVATE_TOKEN_PARAM = :private_token
@@ -77,9 +78,21 @@
       end
 
       def present_articles(asset)
-        articles = select_filtered_collection_of(asset, 'articles', params)
-        articles = articles.display_filter(current_person, nil)
+        articles = find_articles(asset)
+        articles = paginate articles
         present articles, :with => Entities::Article, :fields => params[:fields]
+      end
+
+      def find_articles(asset)
+        articles = select_filtered_collection_of(asset, 'articles', params)
+        if current_person.present?
+          articles = articles.display_filter(current_person, nil)
+        else
+          articles = articles.published
+        end
+        if params[:categories_ids]
+          articles = articles.joins(:categories).where('category_id in (?)', params[:categories_ids])
+        end
       end
 
       def find_task(tasks, id)
@@ -335,7 +348,7 @@
         verify_string = "#{client_id}&#{token}&#{captcha_text}"
         request.body = verify_string
         body = http.request(request).body
-        body == '1' ? true : body 
+        body == '1' ? true : body
       end
 
     end

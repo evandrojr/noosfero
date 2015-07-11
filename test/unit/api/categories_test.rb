@@ -33,7 +33,7 @@ class CategoriesTest < ActiveSupport::TestCase
 
     get "/api/v1/categories/#{category.id}/?#{params.to_query}"
     json = JSON.parse(last_response.body)
-    assert_equal({'id' => parent.id, 'name' => parent.name}, json['category']['parent'])
+    assert_equal({'id' => parent.id, 'name' => parent.name, 'slug' => parent.slug}, json['category']['parent'])
     assert_equivalent [child_1.id, child_2.id], json['category']['children'].map { |c| c['id'] }
   end
 

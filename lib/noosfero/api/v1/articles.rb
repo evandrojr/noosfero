@@ -2,11 +2,14 @@ module Noosfero
   module API
     module V1
       class Articles < Grape::API
-        before { authenticate! }
 
         ARTICLE_TYPES = Article.descendants.map{|a| a.to_s}
 
+        MAX_PER_PAGE = 50
+
         resource :articles do
+
+          paginate per_page: MAX_PER_PAGE, max_per_page: MAX_PER_PAGE
 
           # Collect articles
           #
@@ -17,6 +20,7 @@ module Noosfero
           #
           # Example Request:
           #  GET host/api/v1/articles?from=2013-04-04-14:41:43&until=2015-04-04-14:41:43&limit=10&private_token=e96fff37c2238fdab074d1dcea8e6317
+
           get do
             present_articles(environment)
           end
@@ -54,7 +58,6 @@ module Noosfero
 
           end
 
-
           desc "Returns the total followers for the article"
           get ':id/followers' do
             article = find_article(environment.articles, params[:id])
@@ -64,6 +67,7 @@ module Noosfero
 
           desc "Add a follower for the article"
           post ':id/follow' do
+            authenticate!
             article = find_article(environment.articles, params[:id])
             if article.article_followers.exists?(:person_id => current_person.id)
               {:success => false, :already_follow => true}
@@ -77,6 +81,7 @@ module Noosfero
           end
 
           post ':id/vote' do
+            authenticate!
             value = (params[:value] || 1).to_i
             # FIXME verify allowed values
             render_api_error!('Vote value not allowed', 400) unless [-1, 1].include?(value)
@@ -109,6 +114,7 @@ module Noosfero
           end
 
           post ':id/children/suggest' do
+            authenticate!
             parent_article = environment.articles.find(params[:id])
 
             suggest_article = SuggestArticle.new
@@ -126,7 +132,7 @@ module Noosfero
           # Example Request:
           #  POST api/v1/articles/:id/children?private_token=234298743290432&article[name]=title&article[body]=body
           post ':id/children' do
-
+            authenticate!
             parent_article = environment.articles.find(params[:id])
             return forbidden! unless parent_article.allow_create?(current_person)
 
