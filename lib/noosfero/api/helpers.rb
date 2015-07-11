@@ -279,7 +279,7 @@
           end
         end
         if d[:provider] == 'serpro'
-          d[:verify_uri] ||= 'http://captcha2.servicoscorporativos.serpro.gov.br/captchavalidar/1.0.0/validar'
+          raise ArgumentError, "Environment api_captcha_settings verify_uri not defined" if d[:verify_uri].nil?
           return verify_serpro_captcha(d[:serpro_client_id], params[:txtToken_captcha_serpro_gov_br], params[:captcha_text], d[:verify_uri])
         end
         raise ArgumentError, "Environment api_captcha_settings provider not defined"

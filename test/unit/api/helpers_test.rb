@@ -207,6 +207,7 @@ class APIHelpersTest < ActiveSupport::TestCase
         enabled: true,
         provider: 'serpro',
         serpro_client_id:  '0000000000000000',
+        verify_uri:   'http://localhost/api/verify',
     }
     assert_equal test_captcha("127.0.0.1", {}, environment), "Missing captcha data"
   end
