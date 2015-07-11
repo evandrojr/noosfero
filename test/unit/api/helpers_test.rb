@@ -164,8 +164,7 @@ class APIHelpersTest < ActiveSupport::TestCase
 
   should 'do not test captcha when there are no settings' do
     environment = Environment.new
-    stubs(:environment).returns(environment)
-    assert test_captcha("127.0.0.1", {})
+    assert test_captcha("127.0.0.1", {}, environment)
   end
 
   should 'do not test captcha when captcha is disabled on settings' do
@@ -173,8 +172,7 @@ class APIHelpersTest < ActiveSupport::TestCase
     environment.api_captcha_settings = {
         enabled: false,
     }
-    stubs(:environment).returns(environment)
-    assert test_captcha("127.0.0.1", {})
+    assert test_captcha("127.0.0.1", {}, environment)
   end
 
   should 'fail display recaptcha v1' do
@@ -187,8 +185,7 @@ class APIHelpersTest < ActiveSupport::TestCase
         public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
         verify_uri:   'https://www.google.com/recaptcha/api/verify',
     }
-    stubs(:environment).returns(environment)
-    assert_equal test_captcha("127.0.0.1", {}), "Missing captcha data"
+    assert_equal test_captcha("127.0.0.1", {}, environment), "Missing captcha data"
   end
 
   should 'fail display recaptcha v2' do
@@ -201,8 +198,7 @@ class APIHelpersTest < ActiveSupport::TestCase
         public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
         verify_uri:   'https://www.google.com/recaptcha/api/siteverify',
     }
-    stubs(:environment).returns(environment)
-    assert_equal test_captcha("127.0.0.1", {}), "Missing captcha data"
+    assert_equal test_captcha("127.0.0.1", {}, environment), "Missing captcha data"
   end
 
   should 'fail display Serpro captcha' do
@@ -211,9 +207,9 @@ class APIHelpersTest < ActiveSupport::TestCase
         enabled: true,
         provider: 'serpro',
         serpro_client_id:  '0000000000000000',
+        verify_uri:   'http://localhost/api/verify',
     }
-    stubs(:environment).returns(environment)
-    assert_equal test_captcha("127.0.0.1", {}), "Missing captcha data"
+    assert_equal test_captcha("127.0.0.1", {}, environment), "Missing captcha data"
   end
 
   should 'render not_found if endpoint is unavailable' do
