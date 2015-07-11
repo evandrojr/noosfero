@@ -219,6 +219,21 @@ class APIHelpersTest < ActiveSupport::TestCase
     filter_disabled_plugins_endpoints
   end
 
+  should 'find all published articles on environment' do
+    #user = create_user('someuser')
+    #p = fast_create(Profile)
+    #a = fast_create(Article, :published => false, :profile_id => p.id)
+    #fast_create(Article, :profile_id => p.id)
+
+    #user.generate_private_token!
+    #User.expects(:find_by_private_token).returns(user)
+    #assert_equal 403, find_article(p.articles, a.id).last
+
+    #assert_equals [article1, article2], present_articles
+
+
+  end
+
   protected
 
   def error!(info, status)
