@@ -92,4 +92,5 @@ class SuggestArticle < Task
   def after_ham!
     self.delay.marked_as_ham
   end
+
 end
