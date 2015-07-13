@@ -209,7 +209,9 @@ class APIHelpersTest < ActiveSupport::TestCase
         serpro_client_id:  '0000000000000000',
         verify_uri:   'http://localhost/api/verify',
     }
-    assert_equal test_captcha("127.0.0.1", {}, environment), "Missing captcha data"
+    params = {}
+    params[:txtToken_captcha_serpro_gov_br] = '4324343'
+    assert_equal test_captcha("127.0.0.1", params, environment), _('Captcha text has not been filled')
   end
 
   should 'render not_found if endpoint is unavailable' do
@@ -233,6 +235,23 @@ class APIHelpersTest < ActiveSupport::TestCase
 
 
   end
+
+  should 'captcha serpro say Name or service not known' do
+    environment = Environment.new
+    environment.api_captcha_settings = {
+        enabled: true,
+        provider: 'serpro',
+        serpro_client_id:  '0000000000000000',
+        verify_uri:  'http://someserverthatdoesnotexist.mycompanythatdoesnotexist.com/validate',
+    }
+    params = {}
+    params[:txtToken_captcha_serpro_gov_br] = '4324343'
+    params[:captcha_text] = '4324343'
+    logger = Logger.new(File.join(Rails.root, 'log', 'test_api.log'))
+    stubs(:logger).returns(logger)
+    assert_equal test_captcha('127.0.0.1', params, environment), 'Serpro captcha error: getaddrinfo: Name or service not known'
+  end
+
 
   protected
 
