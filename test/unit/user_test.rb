@@ -27,6 +27,8 @@ class UserTest < ActiveSupport::TestCase
     user1.save!
     user2 = new_user(:login => 'new_user')
     assert user2.errors[:login].present?
+    expected = ["has already been taken"]
+    assert_equal expected, user2.errors[:login]
   end
 
   def test_should_require_password
