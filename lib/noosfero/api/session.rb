@@ -37,7 +37,6 @@ module Noosfero
         requires :password_confirmation, type: String, desc: _("Password confirmation")
       end
       post "/register" do
-        unique_attributes! User, [:email, :login]
         attrs = attributes_for_keys [:email, :login, :password, :password_confirmation] + environment.signup_person_fields
         remote_ip = (request.respond_to?(:remote_ip) && request.remote_ip) || (env && env['REMOTE_ADDR'])
 
