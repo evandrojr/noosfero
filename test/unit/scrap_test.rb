@@ -218,7 +218,7 @@ class ScrapTest < ActiveSupport::TestCase
   should "update the scrap on reply creation" do
     person = create_user.person
     s = fast_create(Scrap, :updated_at => DateTime.parse('2010-01-01'))
-    assert_equal DateTime.parse('2010-01-01'), s.updated_at.strftime('%Y-%m-%d')
+    assert_equal DateTime.parse('2010-01-01'), s.updated_at
     DateTime.stubs(:now).returns(DateTime.parse('2010-09-07'))
     s1 = create(Scrap, :content => 'some content', :sender => person, :receiver => person, :scrap_id => s.id)
     s.reload

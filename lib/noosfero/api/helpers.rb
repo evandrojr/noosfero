@@ -52,7 +52,8 @@
         end
       end
 
-      ARTICLE_TYPES = Article.descendants.map{|a| a.to_s}
+      ARTICLE_TYPES = ['Article'] + Article.descendants.map{|a| a.to_s}
+      TASK_TYPES = ['Task'] + Task.descendants.map{|a| a.to_s}
 
       def find_article(articles, id)
         article = articles.find(id)
@@ -97,11 +98,39 @@
         if params[:categories_ids]
           articles = articles.joins(:categories).where('category_id in (?)', params[:categories_ids])
         end
+        articles
       end
 
-      def find_task(tasks, id)
-        task = tasks.find(id)
-        task.display_to?(current_user.person) ? task : forbidden!
+      def find_task(asset, id)
+        task = asset.tasks.find(id)
+        current_person.has_permission?(task.permission, asset) ? task : forbidden!
+      end
+
+      def post_task(asset, params)
+        klass_type= params[:content_type].nil? ? 'Task' : params[:content_type]
+        return forbidden! unless TASK_TYPES.include?(klass_type)
+
+        task = klass_type.constantize.new(params[:task])
+        task.requestor_id = current_person.id
+        task.target_id = asset.id
+        task.target_type = 'Profile'
+
+        if !task.save
+          render_api_errors!(task.errors.full_messages)
+        end
+        present task, :with => Entities::Task, :fields => params[:fields]
+      end
+
+      def present_task(asset)
+        task = find_task(asset, params[:id])
+        present task, :with => Entities::Task, :fields => params[:fields]
+      end
+
+      def present_tasks(asset)
+        tasks = select_filtered_collection_of(asset, 'tasks', params)
+        tasks = tasks.select {|t| current_person.has_permission?(t.permission, asset)}
+        return forbidden! if tasks.empty? && !current_person.has_permission?(:perform_task, asset)
+        present tasks, :with => Entities::Task, :fields => params[:fields]
       end
 
       def make_conditions_with_parameter(params = {})
@@ -318,7 +347,13 @@
         https.use_ssl = true
         request = Net::HTTP::Post.new(uri.path)
         request.set_form_data(verify_hash)
-        body = https.request(request).body
+        begin
+          body = https.request(request).body
+        rescue Exception => e
+          logger.error e
+          return _("Google recaptcha error: #{e.message}")
+        end
+        body = JSON.parse(body)
         body == "true\nsuccess" ? true : body
       end
 
@@ -337,20 +372,36 @@
         https.use_ssl = true
         request = Net::HTTP::Post.new(uri.path)
         request.set_form_data(verify_hash)
-        captcha_result = JSON.parse(https.request(request).body)
+        begin
+          body = https.request(request).body
+        rescue Exception => e
+          logger.error e
+          return _("Google recaptcha error: #{e.message}")
+        end
+        captcha_result = JSON.parse(body)
         captcha_result["success"] ? true : captcha_result
       end
 
       def verify_serpro_captcha(client_id, token, captcha_text, verify_uri)
-        if token == nil || captcha_text == nil
-          return _('Missing captcha data')
-        end
+        return _('Missing Serpro Captcha token') if token == nil
+        return _('Captcha text has not been filled') if captcha_text == nil
         uri = URI(verify_uri)
         http = Net::HTTP.new(uri.host, uri.port)
         request = Net::HTTP::Post.new(uri.path)
         verify_string = "#{client_id}&#{token}&#{captcha_text}"
         request.body = verify_string
+<<<<<<< HEAD
         body = http.request(request).body
+=======
+        begin
+          body = http.request(request).body
+        rescue Exception => e
+          logger.error e
+          return _("Serpro captcha error: #{e.message}")
+        end
+        return _("Wrong captcha text, please try again") if body == 0
+        return _("Token not found") if body == 2
+>>>>>>> serpro_api
         body == '1' ? true : body
       end
 
