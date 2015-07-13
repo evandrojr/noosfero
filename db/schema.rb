@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150617222204) do
+ActiveRecord::Schema.define(:version => 20150603182105) do
 
   create_table "abuse_reports", :force => true do |t|
     t.integer  "reporter_id"
@@ -48,18 +48,6 @@ ActiveRecord::Schema.define(:version => 20150617222204) do
   add_index "action_tracker_notifications", ["profile_id", "action_tracker_id"], :name => "index_action_tracker_notif_on_prof_id_act_tracker_id", :unique => true
   add_index "action_tracker_notifications", ["profile_id"], :name => "index_action_tracker_notifications_on_profile_id"
 
-  create_table "article_followers", :force => true do |t|
-    t.integer  "person_id",  :null => false
-    t.integer  "article_id", :null => false
-    t.datetime "since"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
-  add_index "article_followers", ["article_id"], :name => "index_article_followers_on_article_id"
-  add_index "article_followers", ["person_id", "article_id"], :name => "index_article_followers_on_person_id_and_article_id", :unique => true
-  add_index "article_followers", ["person_id"], :name => "index_article_followers_on_person_id"
-
   create_table "article_privacy_exceptions", :id => false, :force => true do |t|
     t.integer "article_id"
     t.integer "person_id"
@@ -87,8 +75,8 @@ ActiveRecord::Schema.define(:version => 20150617222204) do
     t.integer  "comments_count"
     t.boolean  "advertise",            :default => true
     t.boolean  "published",            :default => true
-    t.datetime "start_date"
-    t.datetime "end_date"
+    t.date     "start_date"
+    t.date     "end_date"
     t.integer  "children_count",       :default => 0
     t.boolean  "accept_comments",      :default => true
     t.integer  "reference_article_id"
@@ -139,8 +127,8 @@ ActiveRecord::Schema.define(:version => 20150617222204) do
     t.integer  "comments_count",       :default => 0
     t.boolean  "advertise",            :default => true
     t.boolean  "published",            :default => true
-    t.datetime "start_date"
-    t.datetime "end_date"
+    t.date     "start_date"
+    t.date     "end_date"
     t.integer  "children_count",       :default => 0
     t.boolean  "accept_comments",      :default => true
     t.integer  "reference_article_id"
@@ -163,8 +151,6 @@ ActiveRecord::Schema.define(:version => 20150617222204) do
     t.integer  "author_id"
     t.integer  "created_by_id"
     t.boolean  "show_to_followers",    :default => true
-    t.integer  "sash_id"
-    t.integer  "level",                :default => 0
   end
 
   add_index "articles", ["comments_count"], :name => "index_articles_on_comments_count"
@@ -190,17 +176,6 @@ ActiveRecord::Schema.define(:version => 20150617222204) do
 
   add_index "articles_categories", ["article_id"], :name => "index_articles_categories_on_article_id"
   add_index "articles_categories", ["category_id"], :name => "index_articles_categories_on_category_id"
-
-  create_table "badges_sashes", :force => true do |t|
-    t.integer  "badge_id"
-    t.integer  "sash_id"
-    t.boolean  "notified_user", :default => false
-    t.datetime "created_at"
-  end
-
-  add_index "badges_sashes", ["badge_id", "sash_id"], :name => "index_badges_sashes_on_badge_id_and_sash_id"
-  add_index "badges_sashes", ["badge_id"], :name => "index_badges_sashes_on_badge_id"
-  add_index "badges_sashes", ["sash_id"], :name => "index_badges_sashes_on_sash_id"
 
   create_table "blocks", :force => true do |t|
     t.string   "title"
@@ -297,10 +272,8 @@ ActiveRecord::Schema.define(:version => 20150617222204) do
     t.string   "referrer"
     t.text     "settings"
     t.integer  "paragraph_id"
-    t.string   "paragraph_uuid"
   end
 
-  add_index "comments", ["paragraph_uuid"], :name => "index_comments_on_paragraph_uuid"
   add_index "comments", ["source_id", "spam"], :name => "index_comments_on_source_id_and_spam"
 
   create_table "contact_lists", :force => true do |t|
@@ -340,17 +313,6 @@ ActiveRecord::Schema.define(:version => 20150617222204) do
   add_index "domains", ["owner_id", "owner_type", "is_default"], :name => "index_domains_on_owner_id_and_owner_type_and_is_default"
   add_index "domains", ["owner_id", "owner_type"], :name => "index_domains_on_owner_id_and_owner_type"
 
-  create_table "email_templates", :force => true do |t|
-    t.string   "name"
-    t.string   "template_type"
-    t.string   "subject"
-    t.text     "body"
-    t.integer  "owner_id"
-    t.string   "owner_type"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
-  end
-
   create_table "environments", :force => true do |t|
     t.string   "name"
     t.string   "contact_email"
@@ -370,7 +332,6 @@ ActiveRecord::Schema.define(:version => 20150617222204) do
     t.string   "default_language"
     t.string   "noreply_email"
     t.string   "redirection_after_signup",     :default => "keep_on_same_page"
-    t.text     "send_email_plugin_allow_to"
     t.string   "date_format",                  :default => "month_name_with_year"
   end
 
@@ -406,17 +367,6 @@ ActiveRecord::Schema.define(:version => 20150617222204) do
   add_index "friendships", ["friend_id"], :name => "index_friendships_on_friend_id"
   add_index "friendships", ["person_id", "friend_id"], :name => "index_friendships_on_person_id_and_friend_id"
   add_index "friendships", ["person_id"], :name => "index_friendships_on_person_id"
-
-  create_table "gamification_plugin_badges", :force => true do |t|
-    t.string   "name"
-    t.integer  "level"
-    t.string   "description"
-    t.string   "custom_fields"
-    t.integer  "owner_id"
-    t.string   "owner_type"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
-  end
 
   create_table "images", :force => true do |t|
     t.integer "parent_id"
@@ -474,46 +424,6 @@ ActiveRecord::Schema.define(:version => 20150617222204) do
     t.datetime "updated_at"
   end
 
-  create_table "mark_comment_as_read_plugin", :force => true do |t|
-    t.integer "comment_id"
-    t.integer "person_id"
-  end
-
-  add_index "mark_comment_as_read_plugin", ["comment_id", "person_id"], :name => "index_mark_comment_as_read_plugin_on_comment_id_and_person_id", :unique => true
-
-  create_table "merit_actions", :force => true do |t|
-    t.integer  "user_id"
-    t.string   "action_method"
-    t.integer  "action_value"
-    t.boolean  "had_errors",    :default => false
-    t.string   "target_model"
-    t.integer  "target_id"
-    t.text     "target_data"
-    t.boolean  "processed",     :default => false
-    t.datetime "created_at",                       :null => false
-    t.datetime "updated_at",                       :null => false
-  end
-
-  create_table "merit_activity_logs", :force => true do |t|
-    t.integer  "action_id"
-    t.string   "related_change_type"
-    t.integer  "related_change_id"
-    t.string   "description"
-    t.datetime "created_at"
-  end
-
-  create_table "merit_score_points", :force => true do |t|
-    t.integer  "score_id"
-    t.integer  "num_points", :default => 0
-    t.string   "log"
-    t.datetime "created_at"
-  end
-
-  create_table "merit_scores", :force => true do |t|
-    t.integer "sash_id"
-    t.string  "category", :default => "default"
-  end
-
   create_table "national_region_types", :force => true do |t|
     t.string "name"
   end
@@ -529,15 +439,6 @@ ActiveRecord::Schema.define(:version => 20150617222204) do
 
   add_index "national_regions", ["name"], :name => "name_index"
   add_index "national_regions", ["national_region_code"], :name => "code_index"
-
-  create_table "pairwise_plugin_choices_related", :force => true do |t|
-    t.integer  "choice_id"
-    t.integer  "parent_choice_id"
-    t.integer  "question_id"
-    t.integer  "user_id"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
-  end
 
   create_table "price_details", :force => true do |t|
     t.decimal  "price",              :default => 0.0
@@ -646,21 +547,15 @@ ActiveRecord::Schema.define(:version => 20150617222204) do
     t.boolean  "allow_members_to_invite",               :default => true
     t.boolean  "invite_friends_only",                   :default => false
     t.boolean  "secret",                                :default => false
-    t.integer  "sash_id"
-    t.integer  "level",                                 :default => 0
   end
 
   add_index "profiles", ["activities_count"], :name => "index_profiles_on_activities_count"
   add_index "profiles", ["created_at"], :name => "index_profiles_on_created_at"
-  add_index "profiles", ["enabled"], :name => "index_profiles_on_enabled"
   add_index "profiles", ["environment_id"], :name => "index_profiles_on_environment_id"
   add_index "profiles", ["friends_count"], :name => "index_profiles_on_friends_count"
   add_index "profiles", ["identifier"], :name => "index_profiles_on_identifier"
   add_index "profiles", ["members_count"], :name => "index_profiles_on_members_count"
   add_index "profiles", ["region_id"], :name => "index_profiles_on_region_id"
-  add_index "profiles", ["type"], :name => "index_profiles_on_type"
-  add_index "profiles", ["validated"], :name => "index_profiles_on_validated"
-  add_index "profiles", ["visible"], :name => "index_profiles_on_visible"
 
   create_table "qualifier_certifiers", :force => true do |t|
     t.integer "qualifier_id"
@@ -702,12 +597,6 @@ ActiveRecord::Schema.define(:version => 20150617222204) do
     t.boolean "is_global"
   end
 
-  add_index "role_assignments", ["accessor_id", "accessor_type", "resource_id", "resource_type"], :name => "index_on_role_assigments_accessor_resource_role"
-  add_index "role_assignments", ["accessor_id", "accessor_type", "role_id"], :name => "index_on_role_assigments_accessor_role"
-  add_index "role_assignments", ["accessor_id", "accessor_type"], :name => "index_role_assignments_on_accessor_id_and_accessor_type"
-  add_index "role_assignments", ["resource_id", "resource_type", "role_id"], :name => "index_on_role_assigments_resource_role"
-  add_index "role_assignments", ["resource_id", "resource_type"], :name => "index_role_assignments_on_resource_id_and_resource_type"
-
   create_table "roles", :force => true do |t|
     t.string  "name"
     t.string  "key"
@@ -715,11 +604,6 @@ ActiveRecord::Schema.define(:version => 20150617222204) do
     t.text    "permissions"
     t.integer "environment_id"
     t.integer "profile_id"
-  end
-
-  create_table "sashes", :force => true do |t|
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
   end
 
   create_table "scraps", :force => true do |t|
