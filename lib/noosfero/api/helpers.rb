@@ -390,9 +390,6 @@
         request = Net::HTTP::Post.new(uri.path)
         verify_string = "#{client_id}&#{token}&#{captcha_text}"
         request.body = verify_string
-<<<<<<< HEAD
-        body = http.request(request).body
-=======
         begin
           body = http.request(request).body
         rescue Exception => e
@@ -401,7 +398,6 @@
         end
         return _("Wrong captcha text, please try again") if body == 0
         return _("Token not found") if body == 2
->>>>>>> serpro_api
         body == '1' ? true : body
       end
 
