@@ -52,6 +52,16 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
+  def test_should_require_unique_email
+    user1 = create_user('new_user', :email => 'new_user1@example.com', :password => 'test', :password_confirmation => 'test')
+    assert !user1.errors[:login].present?
+    user1.save!
+    user2 = new_user(:login => 'other_user', :email => 'new_user1@example.com')
+    assert user2.errors[:email].present?
+    expected = ["has already been taken"]
+    assert_equal expected, user2.errors[:email]
+  end
+
   def test_email_format
     assert_no_difference 'User.count' do
       u = new_user(:email => 'test.email')
