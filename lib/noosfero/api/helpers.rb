@@ -7,6 +7,10 @@
 
       include SanitizeParams
 
+      def set_locale
+        I18n.locale = (params[:lang] || request.env['HTTP_ACCEPT_LANGUAGE'] || 'en')
+      end
+      
       def current_user
         private_token = (params[PRIVATE_TOKEN_PARAM] || headers['Private-Token']).to_s
         @current_user ||= User.find_by_private_token(private_token)
@@ -343,7 +347,13 @@
         https.use_ssl = true
         request = Net::HTTP::Post.new(uri.path)
         request.set_form_data(verify_hash)
-        body = https.request(request).body
+        begin
+          body = https.request(request).body
+        rescue Exception => e
+          logger.error e
+          return _("Google recaptcha error: #{e.message}")
+        end
+        body = JSON.parse(body)
         body == "true\nsuccess" ? true : body
       end
 
@@ -362,20 +372,32 @@
         https.use_ssl = true
         request = Net::HTTP::Post.new(uri.path)
         request.set_form_data(verify_hash)
-        captcha_result = JSON.parse(https.request(request).body)
+        begin
+          body = https.request(request).body
+        rescue Exception => e
+          logger.error e
+          return _("Google recaptcha error: #{e.message}")
+        end
+        captcha_result = JSON.parse(body)
         captcha_result["success"] ? true : captcha_result
       end
 
       def verify_serpro_captcha(client_id, token, captcha_text, verify_uri)
-        if token == nil || captcha_text == nil
-          return _('Missing captcha data')
-        end
+        return _('Missing Serpro Captcha token') if token == nil
+        return _('Captcha text has not been filled') if captcha_text == nil
         uri = URI(verify_uri)
         http = Net::HTTP.new(uri.host, uri.port)
         request = Net::HTTP::Post.new(uri.path)
         verify_string = "#{client_id}&#{token}&#{captcha_text}"
         request.body = verify_string
-        body = http.request(request).body
+        begin
+          body = http.request(request).body
+        rescue Exception => e
+          logger.error e
+          return _("Serpro captcha error: #{e.message}")
+        end
+        return _("Wrong captcha text, please try again") if body == 0
+        return _("Token not found") if body == 2
         body == '1' ? true : body
       end
 
