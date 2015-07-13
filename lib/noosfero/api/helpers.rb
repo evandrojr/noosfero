@@ -7,6 +7,10 @@
 
       include SanitizeParams
 
+      def set_locale
+        I18n.locale = (params[:lang] || request.env['HTTP_ACCEPT_LANGUAGE'] || 'en')
+      end
+      
       def current_user
         private_token = (params[PRIVATE_TOKEN_PARAM] || headers['Private-Token']).to_s
         @current_user ||= User.find_by_private_token(private_token)
