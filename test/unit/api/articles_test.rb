@@ -91,8 +91,8 @@ class ArticlesTest < ActiveSupport::TestCase
   profile_kinds.each do |kind|
     should "return article by #{kind}" do
       profile = fast_create(kind.camelcase.constantize)
-      article = fast_create(Article, :profile_id => profile.id, :name => "Some thing")
-      get "/api/v1/#{kind.pluralize}/#{profile.id}/articles/#{article.id}?#{params.to_query}"
+      article = fast_create(Article, :profile_id => person.id, :name => "Some thing")
+      get "/api/v1/#{kind.pluralize}/#{person.id}/articles/#{article.id}?#{params.to_query}"
       json = JSON.parse(last_response.body)
       assert_equal article.id, json["article"]["id"]
     end
