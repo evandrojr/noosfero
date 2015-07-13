@@ -9,7 +9,7 @@ class ActiveSupport::TestCase
   end
 
   def login_api
-    @environment = fast_create(Environment, :is_default => true)
+    @environment = Environment.default
     @user = User.create!(:login => 'testapi', :password => 'testapi', :password_confirmation => 'testapi', :email => 'test@test.org', :environment => @environment)
     @user.activate
     @person = @user.person
