@@ -3,6 +3,7 @@ require File.dirname(__FILE__) + '/test_helper'
 class ArticlesTest < ActiveSupport::TestCase
 
   def setup
+    Environment.destroy_all
     login_api
   end
 
