@@ -498,6 +498,9 @@ class Profile < ActiveRecord::Base
     self.custom_footer = template[:custom_footer]
     self.custom_header = template[:custom_header]
     self.public_profile = template.public_profile
+
+    # flush
+    self.save(:validate => false)
   end
 
   def apply_type_specific_template(template)
