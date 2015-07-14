@@ -321,6 +321,7 @@
         begin
           body = https.request(request).body
         rescue Exception => e
+          logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
           logger.error e
           return _("Google recaptcha error: #{e.message}")
         end
@@ -346,6 +347,7 @@
         begin
           body = https.request(request).body
         rescue Exception => e
+          logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
           logger.error e
           return _("Google recaptcha error: #{e.message}")
         end
@@ -364,6 +366,7 @@
         begin
           body = http.request(request).body
         rescue Exception => e
+          logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
           logger.error e
           return _("Serpro captcha error: #{e.message}")
         end
