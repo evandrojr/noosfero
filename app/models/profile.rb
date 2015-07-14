@@ -432,7 +432,7 @@ class Profile < ActiveRecord::Base
   end
 
   # registar callback for creating boxes after the object is created.
-  before_create :create_default_set_of_boxes
+  after_create :create_default_set_of_boxes
 
   # creates the initial set of boxes when the profile is created. Can be
   # overriden for each subclass to create a custom set of boxes for its
