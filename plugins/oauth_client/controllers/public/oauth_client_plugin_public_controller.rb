@@ -42,7 +42,7 @@ class OauthClientPluginPublicController < PublicController
     else
       session[:notice] = _("Can't login with #{provider.name}")
     end
-    session[:oauth_client_popup] = true if request.env["omniauth.params"]['oauth_client_popup']
+    session[:oauth_client_popup] = true if request.env.fetch("omniauth.params", {})['oauth_client_popup']
     session[:return_to] = url_for(:controller => :oauth_client_plugin_public, :action => :finish)
 
     redirect_to :controller => :account, :action => :login
@@ -51,7 +51,7 @@ class OauthClientPluginPublicController < PublicController
   def signup(auth)
     login = auth.info.email.split('@').first
     session[:oauth_data] = auth
-    session[:oauth_client_popup] = true if request.env["omniauth.params"]['oauth_client_popup']
+    session[:oauth_client_popup] = true if request.env.fetch("omniauth.params", {})['oauth_client_popup']
     session[:return_to] = url_for(:controller => :oauth_client_plugin_public, :action => :finish)
     name = auth.info.name
     name ||= auth.extra && auth.extra.raw_info ? auth.extra.raw_info.name : ''
