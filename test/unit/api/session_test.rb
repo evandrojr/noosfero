@@ -38,7 +38,6 @@ class SessionTest < ActiveSupport::TestCase
     post "/api/v1/register?#{params.to_query}"
     assert_equal 400, last_response.status
     json = JSON.parse(last_response.body)
-    print "JSon: #{json}\n"
   end
 
 end
