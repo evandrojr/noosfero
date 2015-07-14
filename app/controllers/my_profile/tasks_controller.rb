@@ -116,9 +116,9 @@ class TasksController < MyProfileController
   end
 
   def search_tasks
-
-    params[:filter_type] = params[:filter_type].blank? ? nil : params[:filter_type]
-    result = Task.pending_all(profile,params)
+    filter_type = params[:filter_type].presence
+    filter_text = params[:filter_text].presence
+    result = Task.pending_all(profile,filter_type, filter_text)
 
     render :json => result.map { |task| {:label => task.data[:name], :value => task.data[:name]} }
   end
