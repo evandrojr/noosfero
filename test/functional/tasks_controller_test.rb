@@ -149,7 +149,7 @@ class TasksControllerTest < ActionController::TestCase
     p = create_user('member').person
 
     @controller.stubs(:profile).returns(c)
-    c.affiliate(profile, Profile::Roles.all_roles(profile.environment.id))
+    c.affiliate(person, Profile::Roles.all_roles(person.environment.id))
 
     t = AddMember.create!(:person => p, :organization => c)
 
@@ -691,9 +691,9 @@ class TasksControllerTest < ActionController::TestCase
   end 
 
   should 'store the person who closes a task' do
-    t = profile.tasks.build; t.save!
+    t = person.tasks.build; t.save!
     post :close, :tasks => {t.id => {:decision => 'finish', :task => {}}}
-    assert_equal profile, t.reload.closed_by
+    assert_equal person, t.reload.closed_by
   end
 
   should 'save task tags' do
@@ -753,7 +753,7 @@ class TasksControllerTest < ActionController::TestCase
     created_date = DateTime.now
     processed_date = DateTime.now
 
-    task_params = {:status => Task::Status::FINISHED, :requestor => requestor, :target => profile, :created_at => created_date, :end_date => processed_date, :closed_by => closed_by, :data => {:field => 'some data field'}}
+    task_params = {:status => Task::Status::FINISHED, :requestor => requestor, :target => person, :created_at => created_date, :end_date => processed_date, :closed_by => closed_by, :data => {:field => 'some data field'}}
 
     task = create(AnotherTask, task_params)
     create(Task, task_params)
