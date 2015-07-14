@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150513213939) do
+ActiveRecord::Schema.define(:version => 20150603182105) do
 
   create_table "abuse_reports", :force => true do |t|
     t.integer  "reporter_id"
@@ -183,10 +183,13 @@ ActiveRecord::Schema.define(:version => 20150513213939) do
     t.string   "type"
     t.text     "settings"
     t.integer  "position"
-    t.boolean  "enabled",    :default => true
+    t.boolean  "enabled",         :default => true
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "fetched_at"
+    t.boolean  "mirror",          :default => false
+    t.integer  "mirror_block_id"
+    t.integer  "observers_id"
   end
 
   add_index "blocks", ["box_id"], :name => "index_blocks_on_box_id"
@@ -242,12 +245,16 @@ ActiveRecord::Schema.define(:version => 20150513213939) do
   end
 
   create_table "chat_messages", :force => true do |t|
-    t.integer  "to_id"
-    t.integer  "from_id"
-    t.string   "body"
+    t.integer  "from_id",    :null => false
+    t.integer  "to_id",      :null => false
+    t.text     "body"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
+
+  add_index "chat_messages", ["created_at"], :name => "index_chat_messages_on_created_at"
+  add_index "chat_messages", ["from_id"], :name => "index_chat_messages_on_from_id"
+  add_index "chat_messages", ["to_id"], :name => "index_chat_messages_on_to_id"
 
   create_table "comments", :force => true do |t|
     t.string   "title"
@@ -313,17 +320,18 @@ ActiveRecord::Schema.define(:version => 20150513213939) do
     t.text     "design_data"
     t.text     "custom_header"
     t.text     "custom_footer"
-    t.string   "theme",                        :default => "default",           :null => false
+    t.string   "theme",                        :default => "default",              :null => false
     t.text     "terms_of_use_acceptance_text"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "reports_lower_bound",          :default => 0,                   :null => false
+    t.integer  "reports_lower_bound",          :default => 0,                      :null => false
     t.string   "redirection_after_login",      :default => "keep_on_same_page"
     t.text     "signup_welcome_text"
     t.string   "languages"
     t.string   "default_language"
     t.string   "noreply_email"
     t.string   "redirection_after_signup",     :default => "keep_on_same_page"
+    t.string   "date_format",                  :default => "month_name_with_year"
   end
 
   create_table "external_feeds", :force => true do |t|
@@ -368,6 +376,7 @@ ActiveRecord::Schema.define(:version => 20150513213939) do
     t.integer "width"
     t.integer "height"
     t.boolean "thumbnails_processed", :default => false
+    t.string  "label",                :default => ""
   end
 
   add_index "images", ["parent_id"], :name => "index_images_on_parent_id"
@@ -677,12 +686,14 @@ ActiveRecord::Schema.define(:version => 20150513213939) do
     t.date     "end_date"
     t.integer  "requestor_id"
     t.integer  "target_id"
-    t.string   "code",         :limit => 40
+    t.string   "code",           :limit => 40
     t.string   "type"
     t.datetime "created_at"
     t.string   "target_type"
     t.integer  "image_id"
-    t.boolean  "spam",                       :default => false
+    t.boolean  "spam",                         :default => false
+    t.integer  "responsible_id"
+    t.integer  "closed_by_id"
   end
 
   add_index "tasks", ["requestor_id"], :name => "index_tasks_on_requestor_id"

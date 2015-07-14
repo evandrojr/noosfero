@@ -28,7 +28,7 @@ class Article < ActiveRecord::Base
   def initialize(*params)
     super
 
-    if !params.blank? && params.first.has_key?(:profile)
+    if !params.blank? && params.first.has_key?(:profile) && !params.first[:profile].blank?
       profile = params.first[:profile]
       self.published = false unless profile.public?
     end
@@ -96,6 +96,8 @@ class Article < ActiveRecord::Base
   belongs_to :translation_of, :class_name => 'Article', :foreign_key => :translation_of_id
   before_destroy :rotate_translations
 
+  acts_as_voteable
+
   before_create do |article|
     article.published_at ||= Time.now
     if article.reference_article && !article.parent
@@ -129,7 +131,7 @@ class Article < ActiveRecord::Base
 
   scope :by_range, lambda { |range| {
     :conditions => [
-      'published_at BETWEEN :start_date AND :end_date', { :start_date => range.first, :end_date => range.last }
+      'articles.published_at BETWEEN :start_date AND :end_date', { :start_date => range.first, :end_date => range.last }
     ]
   }}
 
@@ -577,25 +579,24 @@ class Article < ActiveRecord::Base
     profile.visible? && profile.public? && published?
   end
 
-
-  def copy(options = {})
+  def copy_without_save(options = {})
     attrs = attributes.reject! { |key, value| ATTRIBUTES_NOT_COPIED.include?(key.to_sym) }
     attrs.merge!(options)
     object = self.class.new
     attrs.each do |key, value|
       object.send(key.to_s+'=', value)
     end
+    object
+  end
+
+  def copy(options = {})
+    object = copy_without_save(options)
     object.save
     object
   end
 
   def copy!(options = {})
-    attrs = attributes.reject! { |key, value| ATTRIBUTES_NOT_COPIED.include?(key.to_sym) }
-    attrs.merge!(options)
-    object = self.class.new
-    attrs.each do |key, value|
-      object.send(key.to_s+'=', value)
-    end
+    object = copy_without_save(options)
     object.save!
     object
   end
@@ -723,8 +724,9 @@ class Article < ActiveRecord::Base
     paragraphs.empty? ? '' : paragraphs.first.to_html
   end
 
-  def lead
-    abstract.blank? ? first_paragraph.html_safe : abstract.html_safe
+  def lead(length = nil)
+    content = abstract.blank? ? first_paragraph.html_safe : abstract.html_safe
+    length.present? ? content.truncate(length) : content
   end
 
   def short_lead
