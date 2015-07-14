@@ -41,8 +41,9 @@ module Noosfero
         attrs = attributes_for_keys [:email, :login, :password, :password_confirmation] + environment.signup_person_fields
         remote_ip = (request.respond_to?(:remote_ip) && request.remote_ip) || (env && env['REMOTE_ADDR'])
 
-        unless test_captcha(remote_ip, params, environment) == true
-          render_api_error!(_('Please solve the test in order to register.'), 401)
+        result = test_captcha(remote_ip, params, environment)
+        unless result == true
+          render_api_error!(result, 401)
           return
         end
 
