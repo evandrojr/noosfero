@@ -629,7 +629,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
   should 'display email template link for organizations in control panel' do
     profile = fast_create(Organization)
     get :index, :profile => profile.identifier
-    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/email_templates" }
+    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/profile_email_templates" }
   end
 
   should 'not display email template link in control panel for person' do

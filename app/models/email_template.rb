@@ -31,6 +31,10 @@ class EmailTemplate < ActiveRecord::Base
     HashWithIndifferentAccess.new EmailTemplate.available_types.select {|k, v| owner.kind_of?(v[:owner_type])}
   end
 
+  def type_description
+    available_types.fetch(template_type, {})[:description]
+  end
+
   def unique_by_type?
     available_types.fetch(template_type, {})[:unique]
   end
