@@ -1,7 +1,7 @@
 <script>
   window.addEventListener("message", function(ev) {
     if (ev.data.message === "requestOauthClientPluginResult") {
-      ev.source.postMessage({ message: "oauthClientPluginResult", logged_in: <%= logged_in? %>, private_token: '<%= private_token %>', user: <%= {:login => current_user.login, :person => {:identifier => current_user.person.identifier, :name => current_user.person.name}}.to_json %> }, "*");
+      ev.source.postMessage({ message: "oauthClientPluginResult", logged_in: <%= logged_in? %>, private_token: '<%= private_token %>', user: <%= (logged_in? ? {:login => current_user.login, :person => {:identifier => current_user.person.identifier, :name => current_user.person.name}} : {}).to_json %> }, "*");
     }
   });
 </script>
