@@ -22,7 +22,7 @@ class EmailTemplatesController < MyProfileController
   end
 
   def new
-    @email_template = profile.email_templates.build
+    @email_template = profile.email_templates.build(:owner => profile)
   end
 
   def edit

@@ -20,24 +20,34 @@ class EmailTemplateTest < ActiveSupport::TestCase
   end
 
   should 'not create template with the same name of other' do
-    template1 = EmailTemplate.new(:template_type => :type1, :name => 'template')
-    template2 = EmailTemplate.new(:template_type => :type1, :name => 'template')
+    template1 = EmailTemplate.new(:template_type => :type1, :name => 'template', :owner => Environment.default)
+    template2 = EmailTemplate.new(:template_type => :type1, :name => 'template', :owner => Environment.default)
     assert template1.save
     assert !template2.save
   end
 
   should 'not create duplicated template when template type is unique' do
-    template1 = EmailTemplate.new(:template_type => :user_activation, :name => 'template1')
-    template2 = EmailTemplate.new(:template_type => :user_activation, :name => 'template2')
+    template1 = EmailTemplate.new(:template_type => :user_activation, :name => 'template1', :owner => Environment.default)
+    template2 = EmailTemplate.new(:template_type => :user_activation, :name => 'template2', :owner => Environment.default)
     assert template1.save
     assert !template2.save
   end
 
   should 'create duplicated template when template type is not unique' do
-    template1 = EmailTemplate.new(:template_type => :task_rejection, :name => 'template1')
-    template2 = EmailTemplate.new(:template_type => :task_rejection, :name => 'template2')
+    template1 = EmailTemplate.new(:template_type => :task_rejection, :name => 'template1', :owner => Environment.default)
+    template2 = EmailTemplate.new(:template_type => :task_rejection, :name => 'template2', :owner => Environment.default)
     assert template1.save
     assert template2.save
+  end
+
+  should 'return available types when the owner is an environment' do
+    template = EmailTemplate.new(:owner => Environment.default)
+    assert_equal [:user_activation], template.available_types.symbolize_keys.keys
+  end
+
+  should 'return available types when the owner is a profile' do
+    template = EmailTemplate.new(:owner => Profile.new)
+    assert_equal [:task_rejection, :task_acceptance, :organization_members], template.available_types.symbolize_keys.keys
   end
 
 end

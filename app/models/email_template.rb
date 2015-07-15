@@ -18,13 +18,17 @@ class EmailTemplate < ActiveRecord::Base
     @parsed_subject ||= parse(subject, params)
   end
 
+  def self.available_types
+    {
+      :task_rejection => {:description => _('Task Rejection'), :owner_type => Profile},
+      :task_acceptance => {:description => _('Task Acceptance'), :owner_type => Profile},
+      :organization_members => {:description => _('Organization Members'), :owner_type => Profile},
+      :user_activation => {:description => _('User Activation'), :unique => true, :owner_type => Environment}
+    }
+  end
+
   def available_types
-    HashWithIndifferentAccess.new ({
-      :task_rejection => {:description => _('Task Rejection')},
-      :task_acceptance => {:description => _('Task Acceptance')},
-      :organization_members => {:description => _('Organization Members')},
-      :user_activation => {:description => _('User Activation'), :unique => true}
-    })
+    HashWithIndifferentAccess.new EmailTemplate.available_types.select {|k, v| owner.kind_of?(v[:owner_type])}
   end
 
   def unique_by_type?
