@@ -53,8 +53,9 @@ class OauthClientPluginPublicController < PublicController
 
     # reading provider from session and writing to cache to read when
     # api calls register to confirm signup
-    provider = OauthClientPlugin::Provider.find(session[:provider_id])
-    OauthClientPlugin.write_cache(auth.info.email, provider.id, auth.uid)
+    auth_cach_hash = auth.to_hash
+    auth_cach_hash[:provider_id] = session[:provider_id]
+    signup_token = OauthClientPlugin::SignupDataStore.store_oauth_data(auth.info.email, auth_cach_hash)
 
     session[:oauth_data] = auth
     session[:oauth_client_popup] = true if request.env.fetch("omniauth.params", {})['oauth_client_popup']
@@ -63,7 +64,16 @@ class OauthClientPluginPublicController < PublicController
     name ||= auth.extra && auth.extra.raw_info ? auth.extra.raw_info.name : ''
 
     if session[:oauth_client_popup]
-      redirect_to :controller => :oauth_client_plugin_public, :action => :finish, :user => {:login => login, :email => auth.info.email, :oauth_providers => [session[:provider_id]]}, :profile_data => {:name => name}, :oauth_client_popup => session[:oauth_client_popup]
+      redirect_to :controller => :oauth_client_plugin_public,
+                  :action => :finish,
+                  :user => {
+                    :signup_token => signup_token,
+                    :login => login,
+                    :email => auth.info.email,
+                    :oauth_providers => [session[:provider_id]]
+                  },
+                  :profile_data => {:name => name},
+                  :oauth_client_popup => session[:oauth_client_popup]
     else
       redirect_to :controller => :account, :action => :signup, :user => {:login => login, :email => auth.info.email}, :profile_data => {:name => name}
     end

@@ -11,9 +11,11 @@ module Noosfero
       logger.formatter = GrapeLogging::Formatters::Default.new
       use GrapeLogging::Middleware::RequestLogger, { logger: logger }
 
-      #rescue_from :all do |e|
-      #  logger.error e
-      #end
+      rescue_from :all do |e|
+        #puts e.inspect
+        #puts e.backtrace.inspect
+        #logger.error e
+      end
 
       @@NOOSFERO_CONF = nil
       def self.NOOSFERO_CONF

@@ -37,6 +37,11 @@ class UserTest < ActiveSupport::TestCase
     assert user.activation_code
   end
 
+  should 'not send activation email when created with oauth' do
+    UserMailer.expects(:activation_code).never
+    user = User.create!(:email => 'testoauth@example.com', :login => 'testoauth', :oauth_providers => [provider])
+  end
+
   should 'save oauth token when create with oauth' do
 
   end
