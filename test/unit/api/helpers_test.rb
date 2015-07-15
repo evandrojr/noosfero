@@ -247,9 +247,8 @@ class APIHelpersTest < ActiveSupport::TestCase
     params = {}
     params[:txtToken_captcha_serpro_gov_br] = '4324343'
     params[:captcha_text] = '4324343'
-    logger = Logger.new(File.join(Rails.root, 'log', 'test_api.log'))
-    stubs(:logger).returns(logger)
-    assert_equal test_captcha('127.0.0.1', params, environment), 'Serpro captcha error: getaddrinfo: Name or service not known'
+    r = test_captcha('127.0.0.1', params, environment)
+    assert_equal 'Serpro captcha error: getaddrinfo: Name or service not known', JSON.parse(r)['console_message']
   end
 
 

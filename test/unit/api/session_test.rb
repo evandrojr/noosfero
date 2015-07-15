@@ -39,7 +39,7 @@ class SessionTest < ActiveSupport::TestCase
     assert_equal 400, last_response.status
   end
 
-  should 'detected error, Name or service not known, for Serpro Captcha communication' do
+  should 'detected error, Name or service not known, for Serpro captcha communication' do
     environment = Environment.default
     environment.api_captcha_settings = {
         enabled: true,
@@ -51,7 +51,8 @@ class SessionTest < ActiveSupport::TestCase
     params = {:login => "newuserapi", :password => "newuserapi", :password_confirmation => "newuserapi", :email => "newuserapi@email.com",
               :txtToken_captcha_serpro_gov_br => '4324343', :captcha_text => '4030320'}
     post "/api/v1/register?#{params.to_query}"
-    assert_equal "Serpro captcha error: getaddrinfo: Name or service not known", JSON.parse(last_response.body)["message"]
+    message = JSON.parse(last_response.body)['message']
+    assert_equal "Serpro captcha error: getaddrinfo: Name or service not known", JSON.parse(message)['console_message']
   end
 
 

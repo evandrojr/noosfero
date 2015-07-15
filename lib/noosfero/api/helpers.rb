@@ -1,3 +1,5 @@
+require 'grape'
+
   module Noosfero;
 
     module API
@@ -296,7 +298,12 @@
           end
         end
         if d[:provider] == 'serpro'
-          raise ArgumentError, "Environment api_captcha_settings verify_uri not defined" if d[:verify_uri].nil?
+          #raise ArgumentError, "Environment api_captcha_settings verify_uri not defined" if d[:verify_uri].nil?
+          if d[:verify_uri].nil?
+            msg="Environment api_captcha_settings verify_uri not defined"
+            log msg
+            return client_message(_('Captcha validation error'), msg)
+          end
           return verify_serpro_captcha(d[:serpro_client_id], params[:txtToken_captcha_serpro_gov_br], params[:captcha_text], d[:verify_uri])
         end
         raise ArgumentError, "Environment api_captcha_settings provider not defined"
@@ -366,13 +373,35 @@
         begin
           body = http.request(request).body
         rescue Exception => e
-          logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
-          logger.error e
-          return _("Serpro captcha error: #{e.message}")
+          log_exception(e)
+          return client_message(_('Internal captcha validation error'),"Serpro captcha error: #{e.message}")
         end
         return _("Wrong captcha text, please try again") if body == 0
         return _("Token not found") if body == 2
         body == '1' ? true : body
+      end
+
+
+      # custom_message[:prepend2log] -> Prepend2log gives more details to the application log
+      def log_exception(e, prepend_message2log=nil)
+        logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
+        logger.formatter = GrapeLogging::Formatters::Default.new
+        e.message = "#{prepend_message2log} e.message" if prepend_message2log.present?
+        puts e.message
+        logger.error e
+      end
+
+      # message[:user_message] -> Displays the message directly to user
+      # message[:console_message] -> Displays the message to the javascript console
+      def client_message(user_message, console_message)
+        message = {single_message: true, user_message: user_message, console_message: console_message}
+        message.to_json if message.present?
+      end
+
+      def log(message)
+        logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
+        logger.formatter = GrapeLogging::Formatters::Default.new
+        logger.error message
       end
 
     end
