@@ -7,7 +7,7 @@ class EmailTemplateHelperTest < ActionView::TestCase
     template.expects(:parsed_body).returns('parsed body')
     template.expects(:parsed_subject).returns('parsed subject')
     params = {:subject => 'subject', :body => 'body', :email_template => template}
-    expects(:mail).with({:subject => 'parsed subject', :body => 'parsed body'})
+    expects(:mail).with({:subject => 'parsed subject', :body => 'parsed body', :content_type => 'text/html'})
     mail_with_template(params)
   end
 
