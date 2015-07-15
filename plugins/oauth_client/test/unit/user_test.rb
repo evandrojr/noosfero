@@ -42,12 +42,37 @@ class UserTest < ActiveSupport::TestCase
     user = User.create!(:email => 'testoauth@example.com', :login => 'testoauth', :oauth_providers => [provider])
   end
 
-  should 'save oauth token when create with oauth' do
-
+  should 'save oauth data when create with oauth' do
+    OauthClientPlugin::SignupDataStore.stubs(:get_oauth_data).returns({
+      :provider_id => provider.id,
+      :credentials => {
+        token: 'abcdef',
+        any_field: 'abx'
+      }
+    })
+    user = User.create!(:email => 'testoauth@example.com', :login => 'testoauth', :oauth_providers => [], :oauth_signup_token => 'token')
+    user.oauth_signup_token = 'token'
+    assert user.oauth_user_providers.first.oauth_data.present?
   end
 
-  should 'note save oauth token when create with oauth' do
+  should 'save oauth  as a hash when creating user with oauth' do
+    OauthClientPlugin::SignupDataStore.stubs(:get_oauth_data)
+    .returns(
+        {
+          :provider_id => provider.id,
+          :credentials => {
+            token: 'abcdef',
+            any_field: 'abx'
+          }
+        }
+      )
+    user = User.create!(:email => 'testoauth@example.com', :login => 'testoauth', :oauth_providers => [], :oauth_signup_token => 'token')
+    assert user.oauth_user_providers.first.oauth_data.is_a? Hash
+  end
 
+  should 'note save oauth user provider when user is not originated from oauth' do
+    user = User.create!(:email => 'testoauth@example.com', :login => 'testoauth', :password => 'test', :password_confirmation => 'test')
+    assert user.oauth_user_providers.count.eql? 0
   end
 
 end
