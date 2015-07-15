@@ -30,11 +30,6 @@ class User
   # user creation through api does not set oauth_providers
   # so it is being shared through a distributed cache
   def check_providers
-    if @call_count
-      @call_count +=1
-    else
-      @call_count = 0
-    end
     if oauth_providers.empty? && oauth_signup_token.present?
       #check if is oauth user, reading oauth_data recorded at cache store
       @oauth_data = OauthClientPlugin::SignupDataStore.get_oauth_data(self.email, self.oauth_signup_token)
