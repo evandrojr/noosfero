@@ -133,19 +133,11 @@ class Article < ActiveRecord::Base
     {:include => 'categories_including_virtual', :conditions => { 'categories.id' => category.id }}
   }
 
-  #FIXME make this test
-  scope :newer_than, lambda { |reference_id|
-    {:conditions => ["articles.id > #{reference_id}"]}
-  }
-
-  #FIXME make this test
-  scope :older_than, lambda { |reference_id|
-    {:conditions => ["articles.id < #{reference_id}"]}
-  }
+  include TimeScopes
 
   scope :by_range, lambda { |range| {
     :conditions => [
-      'published_at BETWEEN :start_date AND :end_date', { :start_date => range.first, :end_date => range.last }
+      'articles.published_at BETWEEN :start_date AND :end_date', { :start_date => range.first, :end_date => range.last }
     ]
   }}
 
@@ -748,8 +740,9 @@ class Article < ActiveRecord::Base
     paragraphs.empty? ? '' : paragraphs.first.to_html
   end
 
-  def lead
-    abstract.blank? ? first_paragraph.html_safe : abstract.html_safe
+  def lead(length = nil)
+    content = abstract.blank? ? first_paragraph.html_safe : abstract.html_safe
+    length.present? ? content.truncate(length) : content
   end
 
   def short_lead
@@ -818,6 +811,10 @@ class Article < ActiveRecord::Base
 
   def view_page
     "content_viewer/view_page"
+  end
+
+  def to_liquid
+    HashWithIndifferentAccess.new :name => name, :abstract => abstract, :body => body, :id => id, :parent_id => parent_id, :author => author
   end
 
   private

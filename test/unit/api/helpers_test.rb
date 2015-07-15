@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + '/test_helper'
+require File.dirname(__FILE__) + '/test_helper';
+
 require File.expand_path(File.dirname(__FILE__) + "/../../../lib/noosfero/api/helpers")
 
 class APIHelpersTest < ActiveSupport::TestCase
@@ -54,35 +55,35 @@ class APIHelpersTest < ActiveSupport::TestCase
   should 'limit be defined as the params limit value' do
     local_limit = 30
     self.params= {:limit => local_limit}
-    assert_equal local_limit, limit 
+    assert_equal local_limit, limit
   end
 
   should 'return default limit if the limit parameter is minor than zero' do
     self.params= {:limit => -1}
-    assert_equal 20, limit 
+    assert_equal 20, limit
   end
 
   should 'the default limit be 20' do
-    assert_equal 20, limit 
+    assert_equal 20, limit
   end
 
   should 'the beginning of the period be the first existent date if no from date is passsed as parameter' do
     assert_equal Time.at(0).to_datetime, period(nil, nil).to_a[0]
-  end 
+  end
 
   should 'the beginning of the period be from date passsed as parameter' do
     from = DateTime.now
     assert_equal from, period(from, nil).min
-  end 
+  end
 
   should 'the end of the period be now if no until date is passsed as parameter' do
     assert_in_delta DateTime.now, period(nil, nil).max
-  end 
+  end
 
   should 'the end of the period be until date passsed as parameter' do
     until_date = DateTime.now
     assert_equal until_date, period(nil, until_date).max
-  end 
+  end
 
   should 'parse_content_type return nil if its blank' do
     assert_nil parse_content_type("")
@@ -96,23 +97,23 @@ class APIHelpersTest < ActiveSupport::TestCase
     assert_equivalent ['TextArticle','TinyMceArticle'], parse_content_type("TextArticle,TinyMceArticle")
   end
 
-  should 'find_article return article by id in list passed for user with permission' do 
+  should 'find_article return article by id in list passed for user with permission' do
     user = create_user('someuser')
     a = fast_create(Article, :profile_id => user.person.id)
     fast_create(Article, :profile_id => user.person.id)
     fast_create(Article, :profile_id => user.person.id)
- 
+
     user.generate_private_token!
     User.expects(:find_by_private_token).returns(user)
     assert_equal a, find_article(user.person.articles, a.id)
   end
 
-  should 'find_article return forbidden when a user try to access an article without permission' do 
+  should 'find_article return forbidden when a user try to access an article without permission' do
     user = create_user('someuser')
     p = fast_create(Profile)
     a = fast_create(Article, :published => false, :profile_id => p.id)
     fast_create(Article, :profile_id => p.id)
- 
+
     user.generate_private_token!
     User.expects(:find_by_private_token).returns(user)
     assert_equal 403, find_article(p.articles, a.id).last
@@ -160,6 +161,97 @@ class APIHelpersTest < ActiveSupport::TestCase
   should 'make_conditions_with_parameter return no type parameter if it was not defined any content type' do
     assert_nil make_conditions_with_parameter[:type]
   end
+
+  should 'do not test captcha when there are no settings' do
+    environment = Environment.new
+    assert test_captcha("127.0.0.1", {}, environment)
+  end
+
+  should 'do not test captcha when captcha is disabled on settings' do
+    environment = Environment.new
+    environment.api_captcha_settings = {
+        enabled: false,
+    }
+    assert test_captcha("127.0.0.1", {}, environment)
+  end
+
+  should 'fail display recaptcha v1' do
+    environment = Environment.new
+    environment.api_captcha_settings = {
+        enabled: true,
+        provider: 'google',
+        version:  1,
+        private_key:  '6LdsWAcTAAAAAB6maB_HalVyCc4asDAxPxloIMvY',
+        public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
+        verify_uri:   'https://www.google.com/recaptcha/api/verify',
+    }
+    assert_equal test_captcha("127.0.0.1", {}, environment), "Missing captcha data"
+  end
+
+  should 'fail display recaptcha v2' do
+    environment = Environment.new
+    environment.api_captcha_settings = {
+        enabled: true,
+        provider: 'google',
+        version:  2,
+        private_key:  '6LdsWAcTAAAAAB6maB_HalVyCc4asDAxPxloIMvY',
+        public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
+        verify_uri:   'https://www.google.com/recaptcha/api/siteverify',
+    }
+    assert_equal test_captcha("127.0.0.1", {}, environment), "Missing captcha data"
+  end
+
+  should 'fail display Serpro captcha' do
+    environment = Environment.new
+    environment.api_captcha_settings = {
+        enabled: true,
+        provider: 'serpro',
+        serpro_client_id:  '0000000000000000',
+        verify_uri:   'http://localhost/api/verify',
+    }
+    params = {}
+    params[:txtToken_captcha_serpro_gov_br] = '4324343'
+    assert_equal test_captcha("127.0.0.1", params, environment), _('Captcha text has not been filled')
+  end
+
+  should 'render not_found if endpoint is unavailable' do
+    Noosfero::API::API.stubs(:endpoint_unavailable?).returns(true)
+    self.expects(:not_found!)
+
+    filter_disabled_plugins_endpoints
+  end
+
+  should 'find all published articles on environment' do
+    #user = create_user('someuser')
+    #p = fast_create(Profile)
+    #a = fast_create(Article, :published => false, :profile_id => p.id)
+    #fast_create(Article, :profile_id => p.id)
+
+    #user.generate_private_token!
+    #User.expects(:find_by_private_token).returns(user)
+    #assert_equal 403, find_article(p.articles, a.id).last
+
+    #assert_equals [article1, article2], present_articles
+
+
+  end
+
+  should 'captcha serpro say Name or service not known' do
+    environment = Environment.new
+    environment.api_captcha_settings = {
+        enabled: true,
+        provider: 'serpro',
+        serpro_client_id:  '0000000000000000',
+        verify_uri:  'http://someserverthatdoesnotexist.mycompanythatdoesnotexist.com/validate',
+    }
+    params = {}
+    params[:txtToken_captcha_serpro_gov_br] = '4324343'
+    params[:captcha_text] = '4324343'
+    logger = Logger.new(File.join(Rails.root, 'log', 'test_api.log'))
+    stubs(:logger).returns(logger)
+    assert_equal test_captcha('127.0.0.1', params, environment), 'Serpro captcha error: getaddrinfo: Name or service not known'
+  end
+
 
   protected
 

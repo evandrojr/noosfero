@@ -44,6 +44,8 @@ module ApplicationHelper
 
   include PluginsHelper
 
+  include TaskHelper
+
   def locale
     (@page && !@page.language.blank?) ? @page.language : FastGettext.locale
   end
@@ -606,24 +608,14 @@ module ApplicationHelper
         trigger_class = 'enterprise-trigger'
       end
     end
-
-    extra_info_tag = ''
-    img_class = 'profile-image'
-
-    if extra_info.is_a? Hash
-      extra_info_tag = content_tag( 'span', extra_info[:value], :class => 'extra_info '+extra_info[:class])
-      img_class +=' '+extra_info[:class]
-    else
-      extra_info_tag = content_tag( 'span', extra_info, :class => 'extra_info' )
-    end
-    #extra_info = extra_info.nil? ? '' : content_tag( 'span', extra_info, :class => 'extra_info' )
+    extra_info = extra_info.nil? ? '' : content_tag( 'span', extra_info, :class => 'extra_info' )
     links = links_for_balloon(profile)
     content_tag('div', content_tag(tag,
                                    (environment.enabled?(:show_balloon_with_profile_links_when_clicked) ? popover_menu(_('Profile links'),profile.short_name,links,{:class => trigger_class, :url => url}) : "") +
     link_to(
-      content_tag( 'span', profile_image( profile, size ), :class => img_class ) +
+      content_tag( 'span', profile_image( profile, size ), :class => 'profile-image' ) +
       content_tag( 'span', h(name), :class => ( profile.class == Person ? 'fn' : 'org' ) ) +
-      extra_info_tag + profile_sex_icon( profile ) + profile_cat_icons( profile ),
+      extra_info + profile_sex_icon( profile ) + profile_cat_icons( profile ),
       profile.url,
       :class => 'profile_link url',
       :help => _('Click on this icon to go to the <b>%s</b>\'s home page') % profile.name,
@@ -1195,7 +1187,7 @@ module ApplicationHelper
       pending_tasks_count = link_to("<i class=\"icon-menu-tasks\"></i><span class=\"task-count\">#{count}</span>", user.tasks_url, :id => 'pending-tasks-count', :title => _("Manage your pending tasks"))
     end
 
-    (_("<span class='welcome'>Welcome,</span> %s") % link_to("<i style='background-image:url(#{user.profile_custom_icon(gravatar_default)})'></i><strong>#{user.identifier}</strong>", user.public_profile_url, :id => "homepage-link", :title => _('Go to your homepage'))) +
+    (_("<span class='welcome'>Welcome,</span> %s") % link_to("<i style='background-image:url(#{user.profile_custom_icon(gravatar_default)})'></i><strong>#{user.identifier}</strong>", user.url, :id => "homepage-link", :title => _('Go to your homepage'))) +
     render_environment_features(:usermenu) +
     admin_link +
     manage_enterprises +
@@ -1244,7 +1236,7 @@ module ApplicationHelper
 
   def task_information(task)
     values = {}
-    values.merge!({:requestor => link_to(task.requestor.name, task.requestor.public_profile_url)}) if task.requestor
+    values.merge!({:requestor => link_to(task.requestor.name, task.requestor.url)}) if task.requestor
     values.merge!({:subject => content_tag('span', task.subject, :class=>'task_target')}) if task.subject
     values.merge!({:linked_subject => link_to(content_tag('span', task.linked_subject[:text], :class => 'task_target'), task.linked_subject[:url])}) if task.linked_subject
     values.merge!(task.information[:variables]) if task.information[:variables]

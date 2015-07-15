@@ -70,12 +70,26 @@ class Task < ActiveRecord::Base
       begin
         target_msg = task.target_notification_message
         if target_msg && task.target && !task.target.notification_emails.empty?
-          TaskMailer.target_notification(task, target_msg).deliver
+          if target_profile_accepts_notification?(task)
+            TaskMailer.target_notification(task, target_msg).deliver
+          end
         end
-      rescue NotImplementedError => ex
+      rescue Exception => ex
         Rails.logger.info ex.to_s
       end
     end
+  end
+
+  def target_profile_accepts_notification?(task)
+    if target_is_profile?(task)
+      return task.target.administrator_mail_notification
+    else
+      true
+    end
+  end
+
+  def target_is_profile?(task)
+    task.target.kind_of? Profile
   end
 
   # this method finished the task. It calls #perform, which must be overriden
@@ -116,6 +130,51 @@ class Task < ActiveRecord::Base
       rescue NotImplementedError => ex
         Rails.logger.info ex.to_s
       end
+    end
+  end
+
+  class KindOfValidator < ActiveModel::EachValidator
+    def validate_each(record, attribute, value)
+      environment = record.environment || Environment.default
+      klass = options[:kind]
+      group = klass.to_s.downcase.pluralize
+      id = attribute.to_s + "_id"
+      if environment.respond_to?(group)
+        attrb = value || environment.send(group).find_by_id(record.send(id))
+      else
+        attrb = value || klass.find_by_id(record.send(id))
+      end
+      if attrb.respond_to?(klass.to_s.downcase + "?")
+        unless attrb.send(klass.to_s.downcase + "?")
+          record.errors[attribute] << (options[:message] || "should be "+ klass.to_s.downcase)
+        end
+      else
+        unless attrb.class == klass
+          record.errors[attribute] << (options[:message] || "should be "+ klass.to_s.downcase)
+        end
+      end
+    end
+  end
+
+  def requestor_is_of_kind(klass, message = nil)
+    error_message = message ||= _('Task requestor must be '+klass.to_s.downcase)
+    group = klass.to_s.downcase.pluralize
+    if environment.respond_to?(group) and requestor_id
+      requestor = requestor ||= environment.send(klass.to_s.downcase.pluralize).find_by_id(requestor_id)
+    end
+    unless requestor.class == klass
+      errors.add(error_message)
+    end
+  end
+
+  def target_is_of_kind(klass, message = nil)
+    error_message = message ||= _('Task target must be '+klass.to_s.downcase)
+    group = klass.to_s.downcase.pluralize
+    if environment.respond_to?(group) and target_id
+      target = target ||= environment.send(klass.to_s.downcase.pluralize).find_by_id(target_id)
+    end
+    unless target.class == klass
+      errors.add(error_message)
     end
   end
 
@@ -256,7 +315,7 @@ class Task < ActiveRecord::Base
   scope :canceled, :conditions => { :status =>  Task::Status::CANCELLED }
   scope :closed, :conditions => { :status =>  [Task::Status::CANCELLED, Task::Status::FINISHED] }
   scope :opened, :conditions => { :status =>  [Task::Status::ACTIVE, Task::Status::HIDDEN] }
-  scope :of, lambda { |type| conditions = type ? "type LIKE '#{type}'" : "1=1"; {:conditions =>  [conditions]} }
+  scope :of, lambda { |type| conditions = type ? "tasks.type LIKE '#{type}'" : "1=1"; {:conditions =>  [conditions]} }
   scope :order_by, lambda { |attribute, ord| {:order => "#{attribute} #{ord}"} }
   scope :like, lambda { |field, value| where("LOWER(#{field}) LIKE ?", "%#{value.downcase}%") if value}
   scope :pending_all, lambda { |profile, filter_type, filter_text|
@@ -276,6 +335,10 @@ class Task < ActiveRecord::Base
 
   def self.pending_types_for(profile)
     Task.to(profile).pending.select('distinct type').map { |t| [t.class.name, t.title] }
+  end
+
+  def self.closed_types_for(profile)
+    Task.to(profile).closed.select('distinct type').map { |t| [t.class.name, t.title] }
   end
 
   def opened?

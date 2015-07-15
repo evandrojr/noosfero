@@ -9,7 +9,8 @@ class ActiveSupport::TestCase
   end
 
   def login_api
-    @user = User.create!(:login => 'testapi', :password => 'testapi', :password_confirmation => 'testapi', :email => 'test@test.org', :environment => Environment.default)
+    @environment = Environment.default
+    @user = User.create!(:login => 'testapi', :password => 'testapi', :password_confirmation => 'testapi', :email => 'test@test.org', :environment => @environment)
     @user.activate
     @person = @user.person
 
@@ -18,6 +19,13 @@ class ActiveSupport::TestCase
     @private_token = json["private_token"]
     @params = {:private_token => @private_token}
   end
-  attr_accessor :private_token, :user, :person, :params
+  attr_accessor :private_token, :user, :person, :params, :environment
+
+  private
+
+  def json_response_ids(kind)
+    json = JSON.parse(last_response.body)
+    json[kind.to_s].map {|c| c['id']}
+  end
 
 end

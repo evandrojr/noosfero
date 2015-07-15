@@ -34,6 +34,14 @@ class User < ActiveRecord::Base
     alias_method_chain :human_attribute_name, :customization
   end
 
+  def self.build(user_data, person_data, environment)
+    user = User.new(user_data)
+    user.terms_of_use = environment.terms_of_use
+    user.environment = environment
+    user.person_data = person_data
+    user
+  end
+
   before_create do |user|
     if user.environment.nil?
       user.environment = Environment.default
@@ -68,7 +76,8 @@ class User < ActiveRecord::Base
 
   attr_writer :person_data
   def person_data
-    @person_data || {}
+    @person_data = {} if @person_data.nil?
+    @person_data
   end
 
   def email_domain
@@ -93,18 +102,20 @@ class User < ActiveRecord::Base
   # Virtual attribute for the unencrypted password
   attr_accessor :password, :name
 
-  validates_presence_of     :login, :email
-  validates_format_of       :login, :with => Profile::IDENTIFIER_FORMAT, :if => (lambda {|user| !user.login.blank?})
+  validates_presence_of     :login
+  validates_presence_of     :email
+  validates_format_of       :login, :message => _('incorrect format'), :with => Profile::IDENTIFIER_FORMAT, :if => (lambda {|user| !user.login.blank?})
   validates_presence_of     :password,                   :if => :password_required?
   validates_presence_of     :password_confirmation,      :if => :password_required?
-  validates_length_of       :password, :within => 4..40, :if => :password_required?
+  validates_length_of       :password, :message => _('length must be within 4 to 40 characters'), :within => 4..40, :if => :password_required?
   validates_confirmation_of :password,                   :if => :password_required?
-  validates_length_of       :login,    :within => 2..40, :if => (lambda {|user| !user.login.blank?})
-  validates_length_of       :email,    :within => 3..100, :if => (lambda {|user| !user.email.blank?})
-  validates_uniqueness_of   :login, :email, :case_sensitive => false, :scope => :environment_id
+  validates_length_of       :login, :message => _('length must be within 2 to 40 characters'), :within => 2..40, :if => (lambda {|user| !user.login.blank?})
+  validates_length_of       :email, :message => _('length must be within 3 to 100 characters'),:within => 3..100, :if => (lambda {|user| !user.email.blank?})
+  validates_uniqueness_of   :login, :case_sensitive => false, :scope => :environment_id
+  validates_uniqueness_of   :email, :case_sensitive => false, :scope => :environment_id
   before_save :encrypt_password
   before_save :normalize_email, if: proc{ |u| u.email.present? }
-  validates_format_of :email, :with => Noosfero::Constants::EMAIL_FORMAT, :if => (lambda {|user| !user.email.blank?})
+  validates_format_of :email, :message => _('incorrect format'), :with => Noosfero::Constants::EMAIL_FORMAT, :if => (lambda {|user| !user.email.blank?})
 
   validates_inclusion_of :terms_accepted, :in => [ '1' ], :if => lambda { |u| ! u.terms_of_use.blank? }, :message => N_('{fn} must be checked in order to signup.').fix_i18n
 
@@ -120,16 +131,15 @@ class User < ActiveRecord::Base
     self.update_attribute :last_login_at, Time.now
   end
 
-  #FIXME make this test
   def generate_private_token!
     self.private_token = SecureRandom.hex
     self.private_token_generated_at = DateTime.now
     save(:validate => false)
   end
 
-  #FIXME make this test
+  TOKEN_VALIDITY = 2.weeks
   def private_token_expired?
-    self.generate_private_token! if self.private_token.nil? || (self.private_token_generated_at + 2.weeks < DateTime.now)
+    self.private_token.nil? || (self.private_token_generated_at + TOKEN_VALIDITY < DateTime.now)
   end
 
   # Activates the user in the database.
@@ -333,6 +343,8 @@ class User < ActiveRecord::Base
 
     {
       'login' => self.login,
+      'name' => self.person.name,
+      'email' => self.email,
       'avatar' => self.person.profile_custom_icon(gravatar_default),
       'is_admin' => self.person.is_admin?,
       'since_month' => self.person.created_at.month,
@@ -353,19 +365,6 @@ class User < ActiveRecord::Base
   def not_require_password!
     @is_password_required = false
   end
-
-  #FIXME make this test
-  def generate_private_token!
-    self.private_token = SecureRandom.hex
-    self.private_token_generated_at = DateTime.now
-    save(:validate => false)
-  end
-
-  #FIXME make this test
-  def private_token_expired?
-    self.generate_private_token! if self.private_token.nil? || (self.private_token_generated_at + 2.weeks < DateTime.now)
-  end
-
 
   protected
 

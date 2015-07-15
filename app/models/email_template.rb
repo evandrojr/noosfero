@@ -17,6 +17,7 @@ class EmailTemplate < ActiveRecord::Base
   def available_types
     HashWithIndifferentAccess.new ({
       :task_rejection => {:description => _('Task Rejection')},
+      :task_acceptance => {:description => _('Task Acceptance')},
       :organization_members => {:description => _('Organization Members')}
     })
   end
