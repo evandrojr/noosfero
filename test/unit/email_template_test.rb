@@ -19,4 +19,25 @@ class EmailTemplateTest < ActiveSupport::TestCase
     assert_equal 'Hi John', template.parsed_subject({:person => 'John'})
   end
 
+  should 'not create template with the same name of other' do
+    template1 = EmailTemplate.new(:template_type => :type1, :name => 'template')
+    template2 = EmailTemplate.new(:template_type => :type1, :name => 'template')
+    assert template1.save
+    assert !template2.save
+  end
+
+  should 'not create duplicated template when template type is unique' do
+    template1 = EmailTemplate.new(:template_type => :user_activation, :name => 'template1')
+    template2 = EmailTemplate.new(:template_type => :user_activation, :name => 'template2')
+    assert template1.save
+    assert !template2.save
+  end
+
+  should 'create duplicated template when template type is not unique' do
+    template1 = EmailTemplate.new(:template_type => :task_rejection, :name => 'template1')
+    template2 = EmailTemplate.new(:template_type => :task_rejection, :name => 'template2')
+    assert template1.save
+    assert template2.save
+  end
+
 end

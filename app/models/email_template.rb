@@ -6,6 +6,10 @@ class EmailTemplate < ActiveRecord::Base
 
   validates_presence_of :name
 
+  validates :name, uniqueness: { scope: [:owner_type, :owner_id] }
+
+  validates :template_type, uniqueness: { scope: [:owner_type, :owner_id] }, if: :unique_by_type?
+
   def parsed_body(params)
     @parsed_body ||= parse(body, params)
   end
@@ -18,8 +22,13 @@ class EmailTemplate < ActiveRecord::Base
     HashWithIndifferentAccess.new ({
       :task_rejection => {:description => _('Task Rejection')},
       :task_acceptance => {:description => _('Task Acceptance')},
-      :organization_members => {:description => _('Organization Members')}
+      :organization_members => {:description => _('Organization Members')},
+      :user_activation => {:description => _('User Activation'), :unique => true}
     })
+  end
+
+  def unique_by_type?
+    available_types.fetch(template_type, {})[:unique]
   end
 
   protected
