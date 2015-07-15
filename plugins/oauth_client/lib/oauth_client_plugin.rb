@@ -10,6 +10,35 @@ class OauthClientPlugin < Noosfero::Plugin
     _("Login with Oauth.")
   end
 
+  def self.cache_prefix
+    'CACHE_OAUTH_CLIENT_AUTH'
+  end
+
+  def self.cache_name_for email
+    "#{cache_prefix}_#{email}"
+  end
+
+  def self.read_cache_for email
+    if cache_value = Rails.cache.fetch(cache_name_for(email))
+      if cache_value.include?('-')
+        cache_arr = cache_value.split('-')
+        return {
+          provider: cache_arr[0],
+          uid: cache_arr[1]
+        }
+      end
+    end
+  end
+
+  def self.write_cache email, provider, uid
+    Rails.cache.write(cache_name_for(email), "#{provider}-#{uid}" , :expires_in => 300)
+  end
+
+  def self.delete_cache_for email
+    Rails.cache.delete(cache_name_for(email))
+  end
+
+
   def login_extra_contents
     plugin = self
     proc do

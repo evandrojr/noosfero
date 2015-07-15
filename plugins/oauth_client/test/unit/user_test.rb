@@ -37,4 +37,12 @@ class UserTest < ActiveSupport::TestCase
     assert user.activation_code
   end
 
+  should 'save oauth token when create with oauth' do
+
+  end
+
+  should 'note save oauth token when create with oauth' do
+
+  end
+
 end

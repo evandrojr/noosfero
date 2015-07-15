@@ -14,6 +14,16 @@ class User
   after_create :activate_oauth_user
 
   def activate_oauth_user
+    # user creation through api does not set oauth_providers
+    if oauth_providers.empty?
+      #check if is oauth user, reading oauth_data recorded at cache store
+      oauth_data = OauthClientPlugin.read_cache_for(self.email)
+      if oauth_data
+        oauth_providers = [OauthClientPlugin::Provider.find(oauth_data[:provider])]
+        OauthClientPlugin.delete_cache_for(self.email)
+      end
+    end
+
     unless oauth_providers.empty?
       activate
       oauth_providers.each do |provider|

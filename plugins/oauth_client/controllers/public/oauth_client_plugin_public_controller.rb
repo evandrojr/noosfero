@@ -50,6 +50,12 @@ class OauthClientPluginPublicController < PublicController
 
   def signup(auth)
     login = auth.info.email.split('@').first
+
+    # reading provider from session and writing to cache to read when
+    # api calls register to confirm signup
+    provider = OauthClientPlugin::Provider.find(session[:provider_id])
+    OauthClientPlugin.write_cache(auth.info.email, provider.id, auth.uid)
+
     session[:oauth_data] = auth
     session[:oauth_client_popup] = true if request.env["omniauth.params"]['oauth_client_popup']
     session[:return_to] = url_for(:controller => :oauth_client_plugin_public, :action => :finish)
