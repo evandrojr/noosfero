@@ -43,7 +43,16 @@ class OauthClientPluginPublicController < PublicController
       session[:notice] = _("Can't login with #{provider.name}")
     end
     session[:oauth_client_popup] = true if request.env.fetch("omniauth.params", {})['oauth_client_popup']
-    session[:return_to] = url_for(:controller => :oauth_client_plugin_public, :action => :finish)
+    session[:return_to] = url_for(
+                            :controller => :oauth_client_plugin_public,
+                            :action => :finish,
+                            :user =>  {
+                                        :login => current_user.login,
+                                        :person => {:identifier => current_user.person.identifier, :name => current_user.person.name}
+                                      } ,
+                            :profile_data => {:name => current_user.person.name},
+                            :oauth_client_popup => session[:oauth_client_popup]
+                            )
 
     redirect_to :controller => :account, :action => :login
   end
