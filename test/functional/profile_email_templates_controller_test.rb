@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class EmailTemplatesControllerTest < ActionController::TestCase
+class ProfileEmailTemplatesControllerTest < ActionController::TestCase
 
   setup do
     @profile = fast_create(Community)
