@@ -23,7 +23,8 @@ class EmailTemplate < ActiveRecord::Base
       :task_rejection => {:description => _('Task Rejection'), :owner_type => Profile},
       :task_acceptance => {:description => _('Task Acceptance'), :owner_type => Profile},
       :organization_members => {:description => _('Organization Members'), :owner_type => Profile},
-      :user_activation => {:description => _('User Activation'), :unique => true, :owner_type => Environment}
+      :user_activation => {:description => _('User Activation'), :unique => true, :owner_type => Environment},
+      :user_change_password => {:description => _('Change User Password'), :unique => true, :owner_type => Environment}
     }
   end
 

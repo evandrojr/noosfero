@@ -245,7 +245,8 @@ class Task < ActiveRecord::Base
   def to_liquid
     HashWithIndifferentAccess.new({
       :requestor => requestor,
-      :reject_explanation => reject_explanation
+      :reject_explanation => reject_explanation,
+      :code => code
     })
   end
 

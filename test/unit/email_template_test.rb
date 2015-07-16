@@ -42,7 +42,7 @@ class EmailTemplateTest < ActiveSupport::TestCase
 
   should 'return available types when the owner is an environment' do
     template = EmailTemplate.new(:owner => Environment.default)
-    assert_equal [:user_activation], template.available_types.symbolize_keys.keys
+    assert_equal [:user_activation, :user_change_password], template.available_types.symbolize_keys.keys
   end
 
   should 'return available types when the owner is a profile' do
