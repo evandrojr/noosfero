@@ -54,5 +54,54 @@ class SessionTest < ActiveSupport::TestCase
     assert_equal "Serpro captcha error: getaddrinfo: Name or service not known", JSON.parse(last_response.body)["message"]
   end
 
+  # TODO: Add another test cases to check register situations
+  should 'activate a user' do
+    params = {
+      :login => "newuserapi",
+      :password => "newuserapi",
+      :password_confirmation => "newuserapi",
+      :email => "newuserapi@email.com"
+    }
+    user = User.new(params)
+    user.save!
+
+    params = { activation_code: user.activation_code}
+    patch "/api/v1/activate?#{params.to_query}"
+    assert_equal 200, last_response.status
+  end
+
+  should 'do not activate a user if admin must approve him' do
+    params = {
+      :login => "newuserapi",
+      :password => "newuserapi",
+      :password_confirmation => "newuserapi",
+      :email => "newuserapi@email.com",
+      :environment => Environment.default
+    }
+    user = User.new(params)
+    user.environment.enable('admin_must_approve_new_users')
+    user.save!
+
+    params = { activation_code: user.activation_code}
+    patch "/api/v1/activate?#{params.to_query}"
+    assert_equal 202, last_response.status
+    assert_equal 'Waiting for admin moderate user registration', JSON.parse(last_response.body)["message"]
+  end
+
+  should 'do not activate a user if the token is invalid' do
+    params = {
+      :login => "newuserapi",
+      :password => "newuserapi",
+      :password_confirmation => "newuserapi",
+      :email => "newuserapi@email.com",
+      :environment => Environment.default
+    }
+    user = User.new(params)
+    user.save!
+
+    params = { activation_code: '70250abe20cc6a67ef9399cf3286cb998b96aeaf'}
+    patch "/api/v1/activate?#{params.to_query}"
+    assert_equal 412, last_response.status
+  end
 
 end
