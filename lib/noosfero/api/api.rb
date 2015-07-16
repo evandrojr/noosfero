@@ -12,8 +12,8 @@ module Noosfero
       use GrapeLogging::Middleware::RequestLogger, { logger: logger }
 
       rescue_from :all do |e|
-        #puts e.inspect
-        #puts e.backtrace.inspect
+        puts e.inspect
+        puts e.backtrace.inspect
         #logger.error e
       end
 
