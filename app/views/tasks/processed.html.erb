@@ -40,29 +40,7 @@
   <ul class="task-list">
     <% @tasks.each do |item| %>
       <li class="task status-<%= item.status%>">
-        <div class="title">
-          <%= task_information(item) %>
-        </div>
-        <div class="status">
-          <%= _(Task::Status.names[item.status]) %>
-        </div>
-        <div class="dates">
-          <span class="created">
-            <span class="label"><%= _('Created:') %></span>
-            <span class="value"><%= show_date(item.created_at) %></span>
-          </span>
-          &nbsp; &#151; &nbsp;
-          <span class="processed">
-            <span class="label"><%= _('Processed:') %></span>
-            <span class="value"><%= show_date(item.end_date) %></span>
-          </span>
-        </div>
-        <% if item.closed_by.present? %>
-          <div class="closed-by">
-            <span class="label"><%= _('Closed by:') %></span>
-            <span class="value"><%= link_to(item.closed_by.name, item.closed_by.url) %></span>
-          </div>
-        <% end %>
+        <%= render :partial => partial_for_class(item.class, nil, 'processed'), :locals => {:task => item} %>
       </li>
     <% end %>
   </ul>
