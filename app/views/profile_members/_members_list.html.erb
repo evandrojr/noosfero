@@ -20,6 +20,7 @@
                 :loading => "jQuery('#members-list').addClass('loading')",
                 :success => "jQuery('#tr-#{m.identifier}').show()",
                 :complete => "jQuery('#members-list').removeClass('loading')",
+                :confirm => _('Are you sure you want to remove this user?'),
                 :url => { :id => m }.merge(remove_action)) if m != user %>
         </div>
       </td>
