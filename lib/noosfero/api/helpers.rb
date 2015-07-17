@@ -97,6 +97,7 @@
         if params[:categories_ids]
           articles = articles.joins(:categories).where('category_id in (?)', params[:categories_ids])
         end
+        articles
       end
 
       def find_task(tasks, id)
