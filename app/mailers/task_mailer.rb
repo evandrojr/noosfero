@@ -1,5 +1,7 @@
 class TaskMailer < ActionMailer::Base
 
+  include EmailTemplateHelper
+
   def target_notification(task, message)
     @message = extract_message(message)
     @target = task.target.name
@@ -33,15 +35,13 @@ class TaskMailer < ActionMailer::Base
     @requestor = task.requestor.name
     @environment = task.requestor.environment.name
     @url = url_for(:host => task.requestor.environment.default_hostname, :controller => 'home')
-    @email_template = task.email_template
-    template_params = {:environment => task.requestor.environment, :task => task}
 
-    mail(
+    mail_with_template(
       to: task.requestor.notification_emails,
       from: self.class.generate_from(task),
-      subject: @email_template.present? ? @email_template.parsed_subject(template_params) : '[%s] %s' % [task.requestor.environment.name, task.target_notification_description],
-      body: @email_template.present? ? @email_template.parsed_body(template_params) : nil,
-      content_type: @email_template.present? ? "text/html" : nil
+      subject: '[%s] %s' % [task.requestor.environment.name, task.target_notification_description],
+      email_template: task.email_template,
+      template_params: {:environment => task.requestor.environment, :task => task, :message => @message, :url => @url, :requestor => task.requestor}
     )
   end
 

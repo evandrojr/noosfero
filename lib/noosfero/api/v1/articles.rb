@@ -96,7 +96,7 @@ module Noosfero
             #TODO make tests for this situation
             votes_order = params.delete(:order) if params[:order]=='votes_score'
             articles = select_filtered_collection_of(article, 'children', params)
-            articles = articles.display_filter(current_person, nil)
+            articles = articles.display_filter(current_person, article.profile)
 
 
             #TODO make tests for this situation

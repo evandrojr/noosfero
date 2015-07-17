@@ -40,8 +40,9 @@ module Noosfero
         attrs = attributes_for_keys [:email, :login, :password, :password_confirmation] + environment.signup_person_fields
         remote_ip = (request.respond_to?(:remote_ip) && request.remote_ip) || (env && env['REMOTE_ADDR'])
 
-        unless test_captcha(remote_ip, params, environment) == true
-          render_api_error!(_('Please solve the test in order to register.'), 401)
+        result = test_captcha(remote_ip, params, environment)
+        unless result == true
+          render_api_error!(result, 401)
           return
         end
 
@@ -52,6 +53,42 @@ module Noosfero
         else
           message = user.errors.to_json
           render_api_error!(message, 400)
+        end
+      end
+
+      params do
+        requires :activation_code, type: String, desc: _("Activation token")
+      end
+
+      # Activate a user.
+      #
+      # Parameter:
+      #   activation_code (required)                  - Activation token
+      # Example Request:
+      #   PATCH /activate?activation_code=28259abd12cc6a64ef9399cf3286cb998b96aeaf
+      patch "/activate" do
+        user = User.find_by_activation_code(params[:activation_code])
+        if user
+          unless user.environment.enabled?('admin_must_approve_new_users')
+            if user.activate
+                user.generate_private_token!
+                present user, :with => Entities::UserLogin
+            end
+          else
+            if user.create_moderate_task
+              user.activation_code = nil
+              user.save!
+
+              # Waiting for admin moderate user registration
+              status 202
+              body({
+                :message => 'Waiting for admin moderate user registration'
+              })
+            end
+          end
+        else
+          # Token not found in database
+          render_api_error!(_('Token is invalid'), 412)
         end
       end
     end

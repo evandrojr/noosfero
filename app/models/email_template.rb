@@ -6,6 +6,10 @@ class EmailTemplate < ActiveRecord::Base
 
   validates_presence_of :name
 
+  validates :name, uniqueness: { scope: [:owner_type, :owner_id] }
+
+  validates :template_type, uniqueness: { scope: [:owner_type, :owner_id] }, if: :unique_by_type?
+
   def parsed_body(params)
     @parsed_body ||= parse(body, params)
   end
@@ -14,12 +18,26 @@ class EmailTemplate < ActiveRecord::Base
     @parsed_subject ||= parse(subject, params)
   end
 
+  def self.available_types
+    {
+      :task_rejection => {:description => _('Task Rejection'), :owner_type => Profile},
+      :task_acceptance => {:description => _('Task Acceptance'), :owner_type => Profile},
+      :organization_members => {:description => _('Organization Members'), :owner_type => Profile},
+      :user_activation => {:description => _('User Activation'), :unique => true, :owner_type => Environment},
+      :user_change_password => {:description => _('Change User Password'), :unique => true, :owner_type => Environment}
+    }
+  end
+
   def available_types
-    HashWithIndifferentAccess.new ({
-      :task_rejection => {:description => _('Task Rejection')},
-      :task_acceptance => {:description => _('Task Acceptance')},
-      :organization_members => {:description => _('Organization Members')}
-    })
+    HashWithIndifferentAccess.new EmailTemplate.available_types.select {|k, v| owner.kind_of?(v[:owner_type])}
+  end
+
+  def type_description
+    available_types.fetch(template_type, {})[:description]
+  end
+
+  def unique_by_type?
+    available_types.fetch(template_type, {})[:unique]
   end
 
   protected
