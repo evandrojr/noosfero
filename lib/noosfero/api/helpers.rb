@@ -56,7 +56,7 @@
 
       def find_article(articles, id)
         article = articles.find(id)
-        article.display_to?(current_user.person) ? article : forbidden!
+        article.display_to?(current_person) ? article : forbidden!
       end
 
       def post_article(asset, params)
