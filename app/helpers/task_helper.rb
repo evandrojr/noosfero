@@ -11,7 +11,6 @@ module TaskHelper
   end
 
   def task_action action
-    require 'debugger'; debugger
     base_url = { action: action }
     url_for(base_url.merge(filter_params))
   end
