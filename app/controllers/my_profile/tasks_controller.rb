@@ -58,7 +58,8 @@ class TasksController < MyProfileController
       end
     end
 
-    url = { :action => 'index' }
+    url = task_action(:index)
+
     if failed.blank?
       session[:notice] = _("All decisions were applied successfully.")
     else
