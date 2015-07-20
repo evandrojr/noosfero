@@ -21,9 +21,22 @@ class SessionTest < ActiveSupport::TestCase
   end
 
   should 'register a user' do
+    Environment.default.enable('skip_new_user_email_confirmation')
     params = {:login => "newuserapi", :password => "newuserapi", :password_confirmation => "newuserapi", :email => "newuserapi@email.com" }
     post "/api/v1/register?#{params.to_query}"
     assert_equal 201, last_response.status
+    json = JSON.parse(last_response.body)
+    assert json['activated']
+    assert json['private_token'].present?
+  end
+
+  should 'register an inactive user' do
+    params = {:login => "newuserapi", :password => "newuserapi", :password_confirmation => "newuserapi", :email => "newuserapi@email.com" }
+    post "/api/v1/register?#{params.to_query}"
+    assert_equal 201, last_response.status
+    json = JSON.parse(last_response.body)
+    assert !json['activated']
+    assert json['private_token'].blank?
   end
 
   should 'do not register a user without email' do
