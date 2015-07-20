@@ -48,9 +48,8 @@ module Noosfero
         end
 
         user = User.new(attrs)
-        if  user.save
-          user.activate
-          user.generate_private_token!
+        if user.save
+          user.generate_private_token! if user.activated?
           present user, :with => Entities::UserLogin
         else
           message = user.errors.to_json

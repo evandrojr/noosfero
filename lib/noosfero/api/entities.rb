@@ -113,6 +113,7 @@ module Noosfero
         expose :id
         expose :login
         expose :person, :using => Profile
+        expose :activated?, as: :activated
         expose :permissions do |user, options|
           output = {}
           user.person.role_assignments.map do |role_assigment|
