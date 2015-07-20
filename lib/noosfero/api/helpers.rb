@@ -216,8 +216,13 @@ require 'grape'
         render_api_error!(_('Method Not Allowed'), 405)
       end
 
-      def render_api_error!(message, status)
-        error!({'message' => message, :code => status}, status)
+      # Message will be logged and shown to user
+      # javascript_console_message is supposed to be executed as console.log()
+      def render_api_error!(user_message, _status, log_message = nil, javascript_console_message = nil)
+        message_hash = {'message' => user_message, :code => status}
+        message_hash[:javascript_console_message] = javascript_console_message if javascript_console_message.present?
+        status(_status || namespace_inheritable(:default_error_status))
+        throw :error, message: "#{user_message} #{log_message}", status: _status, headers: headers
       end
 
       def render_api_errors!(messages)
@@ -284,10 +289,15 @@ require 'grape'
       def test_captcha(remote_ip, params, environment)
         d = environment.api_captcha_settings
         return true unless d[:enabled] == true
+        msg_cve = _('Captcha validation error')
+        msg_eacs = 'Environment api_captcha_settings'
 
         if d[:provider] == 'google'
-          raise ArgumentError, "Environment api_captcha_settings private_key not defined" if d[:private_key].nil?
-          raise ArgumentError, "Environment api_captcha_settings version not defined" unless d[:version] == 1 || d[:version] == 2
+          render_api_error!(msg_cve, status, javascript_console_message = nil)
+
+
+          return log_ret_error_msg(msg_cve,"#{msg_eacs} private_key not defined") if d[:private_key].nil?
+          return log_ret_error_msg(msg_cve,"#{msg_eacs} version not defined") unless d[:version] == 1 || d[:version] == 2
           if d[:version]  == 1
             d[:verify_uri] ||= 'https://www.google.com/recaptcha/api/verify'
             return verify_recaptcha_v1(remote_ip, d[:private_key], d[:verify_uri], params[:recaptcha_challenge_field], params[:recaptcha_response_field])
@@ -298,20 +308,15 @@ require 'grape'
           end
         end
         if d[:provider] == 'serpro'
-          #raise ArgumentError, "Environment api_captcha_settings verify_uri not defined" if d[:verify_uri].nil?
-          if d[:verify_uri].nil?
-            msg="Environment api_captcha_settings verify_uri not defined"
-            log msg
-            return client_message(_('Captcha validation error'), msg)
-          end
+          return log_ret_error_msg(msg_cve,"#{msg_eacs} verify_uri not defined") if d[:verify_uri].nil?
           return verify_serpro_captcha(d[:serpro_client_id], params[:txtToken_captcha_serpro_gov_br], params[:captcha_text], d[:verify_uri])
         end
-        raise ArgumentError, "Environment api_captcha_settings provider not defined"
+        return log_ret_error_msg(msg_cve,"#{msg_eacs} provider not defined") 
       end
 
       def verify_recaptcha_v1(remote_ip, private_key, api_recaptcha_verify_uri, recaptcha_challenge_field, recaptcha_response_field)
         if recaptcha_challenge_field == nil || recaptcha_response_field == nil
-          return _('Missing captcha data')
+          return log_ret_error_msg(_('Captcha validation error'), _('Missing captcha data'))
         end
 
         verify_hash = {
@@ -374,13 +379,12 @@ require 'grape'
           body = http.request(request).body
         rescue Exception => e
           log_exception(e)
-          return client_message(_('Internal captcha validation error'),"Serpro captcha error: #{e.message}")
+          return error_message(_('Internal captcha validation error'),"Serpro captcha error: #{e.message}")
         end
         return _("Wrong captcha text, please try again") if body == 0
         return _("Token not found") if body == 2
         body == '1' ? true : body
       end
-
 
       # custom_message[:prepend2log] -> Prepend2log gives more details to the application log
       def log_exception(e, prepend_message2log=nil)
@@ -389,13 +393,6 @@ require 'grape'
         e.message = "#{prepend_message2log} e.message" if prepend_message2log.present?
         puts e.message
         logger.error e
-      end
-
-      # message[:user_message] -> Displays the message directly to user
-      # message[:console_message] -> Displays the message to the javascript console
-      def client_message(user_message, console_message)
-        message = {single_message: true, user_message: user_message, console_message: console_message}
-        message.to_json if message.present?
       end
 
       def log(message)

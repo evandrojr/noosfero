@@ -55,5 +55,9 @@ class SessionTest < ActiveSupport::TestCase
     assert_equal "Serpro captcha error: getaddrinfo: Name or service not known", JSON.parse(message)['console_message']
   end
 
+  should 'show erro' do
+    puts (post("/api/v1/error")).inspect
+  end
+
 
 end

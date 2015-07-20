@@ -252,6 +252,20 @@ class APIHelpersTest < ActiveSupport::TestCase
   end
 
 
+  # def render_api_error!(user_message, status, log_message = nil, javascript_console_message = nil)
+  #   message_hash = {'message' => user_message, :code => status}
+  #   message_hash[:javascript_console_message] = javascript_console_message if javascript_console_message.present?
+  #   self.status(status || namespace_inheritable(:default_error_status))
+  #   throw :error, message: message_hash, status: self.status, headers: headers
+  # end
+
+
+  should 'display user message' do
+    r=render_api_error!('Error to the user', '403', 'detailed log_message', 'show this on user\'s javascript console')
+    puts r.inspect
+    tsil
+  end
+
   protected
 
   def error!(info, status)
