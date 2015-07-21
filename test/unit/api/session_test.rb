@@ -117,4 +117,47 @@ class SessionTest < ActiveSupport::TestCase
     assert_equal 412, last_response.status
   end
 
+  should 'create task to change password by user login' do
+    user = create_user
+    params = {:value => user.login}
+    assert_difference 'ChangePassword.count' do
+      post "/api/v1/forgot_password?#{params.to_query}"
+    end
+  end
+
+  should 'not create task to change password when user is not found' do
+    params = {:value => 'wronglogin'}
+    assert_no_difference 'ChangePassword.count' do
+      post "/api/v1/forgot_password?#{params.to_query}"
+    end
+    assert_equal 404, last_response.status
+  end
+
+  should 'change user password and close task' do
+    user = create_user
+    task = ChangePassword.create!(:requestor => user.person)
+    params = {:code => task.code, :password => 'secret', :password_confirmation => 'secret'}
+    patch "/api/v1/new_password?#{params.to_query}"
+    assert_equal Task::Status::FINISHED, task.reload.status
+    assert user.reload.authenticated?('secret')
+    json = JSON.parse(last_response.body)
+    assert_equal user.id, json['id']
+  end
+
+  should 'do not change user password when password confirmation is wrong' do
+    user = create_user
+    task = ChangePassword.create!(:requestor => user.person)
+    params = {:code => task.code, :password => 'secret', :password_confirmation => 's3cret'}
+    patch "/api/v1/new_password?#{params.to_query}"
+    assert_equal Task::Status::ACTIVE, task.reload.status
+    assert !user.reload.authenticated?('secret')
+    assert_equal 400, last_response.status
+  end
+
+  should 'render not found when provide a wrong code on password change' do
+    params = {:code => "wrongcode", :password => 'secret', :password_confirmation => 'secret'}
+    patch "/api/v1/new_password?#{params.to_query}"
+    assert_equal 404, last_response.status
+  end
+
 end
