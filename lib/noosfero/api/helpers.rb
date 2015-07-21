@@ -6,11 +6,18 @@
       DEFAULT_ALLOWED_PARAMETERS = [:parent_id, :from, :until, :content_type]
 
       include SanitizeParams
+      include Noosfero::Plugin::HotSpot
+      include ForgotPasswordHelper
 
       def set_locale
         I18n.locale = (params[:lang] || request.env['HTTP_ACCEPT_LANGUAGE'] || 'en')
       end
-      
+
+      # FIXME this filter just loads @plugins
+      def init_noosfero_plugins
+        plugins
+      end
+
       def current_user
         private_token = (params[PRIVATE_TOKEN_PARAM] || headers['Private-Token']).to_s
         @current_user ||= User.find_by_private_token(private_token)
@@ -57,7 +64,7 @@
 
       def find_article(articles, id)
         article = articles.find(id)
-        article.display_to?(current_user.person) ? article : forbidden!
+        article.display_to?(current_person) ? article : forbidden!
       end
 
       def post_article(asset, params)
@@ -350,6 +357,7 @@
         begin
           body = https.request(request).body
         rescue Exception => e
+          logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
           logger.error e
           return _("Google recaptcha error: #{e.message}")
         end
@@ -375,6 +383,7 @@
         begin
           body = https.request(request).body
         rescue Exception => e
+          logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
           logger.error e
           return _("Google recaptcha error: #{e.message}")
         end
@@ -393,6 +402,7 @@
         begin
           body = http.request(request).body
         rescue Exception => e
+          logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
           logger.error e
           return _("Serpro captcha error: #{e.message}")
         end

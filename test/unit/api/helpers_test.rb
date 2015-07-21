@@ -236,7 +236,7 @@ class APIHelpersTest < ActiveSupport::TestCase
 
   end
 
-  should 'captcha serpro say Name or service not known' do
+  should 'captcha serpro say name or service not known' do
     environment = Environment.new
     environment.api_captcha_settings = {
         enabled: true,

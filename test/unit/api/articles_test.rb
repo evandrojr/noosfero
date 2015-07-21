@@ -48,6 +48,15 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equivalent [child1.id, child2.id], json["articles"].map { |a| a["id"] }
   end
 
+  should 'list public article children for not logged in access' do
+    article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
+    child1 = fast_create(Article, :parent_id => article.id, :profile_id => user.person.id, :name => "Some thing")
+    child2 = fast_create(Article, :parent_id => article.id, :profile_id => user.person.id, :name => "Some thing")
+    get "/api/v1/articles/#{article.id}/children"
+    json = JSON.parse(last_response.body)
+    assert_equivalent [child1.id, child2.id], json["articles"].map { |a| a["id"] }
+  end
+
   should 'not list children of forbidden article' do
     person = fast_create(Person, :environment_id => environment.id)
     article = fast_create(Article, :profile_id => person.id, :name => "Some thing", :published => false)
