@@ -19,16 +19,15 @@ gem 'gettext',                  '~> 2.2.1', :require => false
 gem 'locale',                   '~> 2.0.5'
 gem 'whenever', :require => false
 gem 'eita-jrails', '~> 0.9.5', require: 'jrails'
-gem 'grape',                    '~> 0.11.0'
+
+# API dependencies
+gem 'grape',                    '~> 0.12'
 gem 'grape-entity'
-gem 'grape-swagger'
-gem 'grape_logging'
-gem 'api-pagination',           '~> 4.1.1'
+#FIXME Get the Grape Loggin from master yo solve this issue https://github.com/intridea/grape/issues/1059
+#We have to remove this commit referenve code when update the next release of grape_logging. Actualy we are using (1.1.2)
+gem 'grape_logging', :git => 'https://github.com/aceunreal/grape_logging.git', :ref => '100091b'
 gem 'rack-cors'
 gem 'rack-contrib'
-
-# FIXME list here all actual dependencies (i.e. the ones in debian/control),
-# with their GEM names (not the Debian package names)
 
 # asset pipeline
 gem 'uglifier', '>= 1.0.3'
