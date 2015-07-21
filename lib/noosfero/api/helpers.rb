@@ -6,9 +6,16 @@
       DEFAULT_ALLOWED_PARAMETERS = [:parent_id, :from, :until, :content_type]
 
       include SanitizeParams
+      include Noosfero::Plugin::HotSpot
+      include ForgotPasswordHelper
 
       def set_locale
         I18n.locale = (params[:lang] || request.env['HTTP_ACCEPT_LANGUAGE'] || 'en')
+      end
+
+      # FIXME this filter just loads @plugins
+      def init_noosfero_plugins
+        plugins
       end
 
       def current_user

@@ -91,6 +91,45 @@ module Noosfero
           render_api_error!(_('Token is invalid'), 412)
         end
       end
+
+      # Request a new password.
+      #
+      # Parameters:
+      #   value (required)                  - Email or login
+      # Example Request:
+      #   POST /forgot_password?value=some@mail.com
+      post "/forgot_password" do
+        requestors = fetch_requestors(params[:value])
+        not_found! if requestors.blank?
+
+        requestors.each do |requestor|
+          ChangePassword.create!(:requestor => requestor)
+        end
+      end
+
+      params do
+        requires :code, type: String, desc: _("Forgot password code")
+      end
+      # Change password
+      #
+      # Parameters:
+      #   code (required)                  - Change password code
+      #   password (required)
+      #   password_confirmation (required)
+      # Example Request:
+      #   PATCH /new_password?code=xxxx&password=secret&password_confirmation=secret
+      patch "/new_password" do
+        change_password = ChangePassword.find_by_code(params[:code])
+        not_found! if change_password.nil?
+
+        if change_password.update_attributes(:password => params[:password], :password_confirmation => params[:password_confirmation])
+          change_password.finish
+          present change_password.requestor.user, :with => Entities::UserLogin
+        else
+          something_wrong!
+        end
+      end
+
     end
   end
 end
