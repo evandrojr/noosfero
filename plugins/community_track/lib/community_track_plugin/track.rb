@@ -84,7 +84,8 @@ class CommunityTrackPlugin::Track < Folder
 
   def category_name
     category = categories.first
-    category ? (category.top_ancestor.nil? ? '' : category.top_ancestor.name) : ''
+    category = category.top_ancestor unless category.nil?
+    category.nil? ? '' : category.name
   end
 
   def to_html(options = {})
