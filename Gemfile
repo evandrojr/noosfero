@@ -29,6 +29,8 @@ gem 'grape_logging', :git => 'https://github.com/aceunreal/grape_logging.git', :
 gem 'rack-cors'
 gem 'rack-contrib'
 
+gem 'api-pagination',           '~> 4.1.1'
+
 # asset pipeline
 gem 'uglifier', '>= 1.0.3'
 gem 'sass-rails'
