@@ -18,7 +18,6 @@ gem 'exception_notification',   '~> 4.0.1'
 gem 'gettext',                  '~> 2.2.1', :require => false
 gem 'locale',                   '~> 2.0.5'
 gem 'whenever', :require => false
-gem 'eita-jrails', '= 0.9.5', :require => 'jrails'
 gem 'grape',                    '~> 0.11.0'
 gem 'grape-entity'
 gem 'grape-swagger'
@@ -30,6 +29,7 @@ gem 'rack-contrib'
 
 # FIXME list here all actual dependencies (i.e. the ones in debian/control),
 # with their GEM names (not the Debian package names)
+gem 'eita-jrails', '~> 0.9.5', require: 'jrails'
 
 # asset pipeline
 gem 'uglifier', '>= 1.0.3'
