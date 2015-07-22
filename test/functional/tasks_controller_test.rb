@@ -145,15 +145,23 @@ class TasksControllerTest < ActionController::TestCase
   end
 
   should 'affiliate roles to user after finish add member task' do
-    community = fast_create(Community)
-    community.add_member(person)
-    another_person = fast_create(Person)
-    t = AddMember.create!(:person => another_person, :organization => community)
-    count = community.members.size
-    @controller.stubs(:profile).returns(community)
+    c = fast_create(Community)
+    p = create_user('member').person
+
+    @controller.stubs(:profile).returns(c)
+    c.affiliate(profile, Profile::Roles.all_roles(profile.environment.id))
+
+    t = AddMember.create!(:person => p, :organization => c)
+
+    count = c.members.size
+
     post :close, :tasks => {t.id => {:decision => 'finish', :task => {}}}
-    community = Profile.find(community.id)
-    assert_equal count + 1, community.members.size
+    t.reload
+    
+    ok('task should be finished') { t.status == Task::Status::FINISHED }
+
+    c.reload
+    assert_equal count + 1, c.members.size
   end
 
   should 'display a create ticket form' do
@@ -269,6 +277,7 @@ class TasksControllerTest < ActionController::TestCase
     @controller.stubs(:profile).returns(c)
     c.affiliate(person, Profile::Roles.all_roles(c.environment))
     person = create_user('test_user').person
+    c.add_member(person)
     p_blog = Blog.create!(:profile => person, :name => 'Blog')
     c_blog1 = Blog.create!(:profile => c, :name => 'Blog')
     c_blog2 = Blog.new(:profile => c); c_blog2.name = 'blog2'; c_blog2.save!

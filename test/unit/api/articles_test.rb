@@ -31,7 +31,7 @@ class ArticlesTest < ActiveSupport::TestCase
   end
 
   should 'not return article if user has no permission to view it' do
-    person = fast_create(Person)
+    person = fast_create(Person, :environment_id => environment.id)
     article = fast_create(Article, :profile_id => person.id, :name => "Some thing", :published => false)
     assert !article.published?
 
@@ -48,8 +48,17 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equivalent [child1.id, child2.id], json["articles"].map { |a| a["id"] }
   end
 
+  should 'list public article children for not logged in access' do
+    article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
+    child1 = fast_create(Article, :parent_id => article.id, :profile_id => user.person.id, :name => "Some thing")
+    child2 = fast_create(Article, :parent_id => article.id, :profile_id => user.person.id, :name => "Some thing")
+    get "/api/v1/articles/#{article.id}/children"
+    json = JSON.parse(last_response.body)
+    assert_equivalent [child1.id, child2.id], json["articles"].map { |a| a["id"] }
+  end
+
   should 'not list children of forbidden article' do
-    person = fast_create(Person)
+    person = fast_create(Person, :environment_id => environment.id)
     article = fast_create(Article, :profile_id => person.id, :name => "Some thing", :published => false)
     child1 = fast_create(Article, :parent_id => article.id, :profile_id => person.id, :name => "Some thing")
     child2 = fast_create(Article, :parent_id => article.id, :profile_id => person.id, :name => "Some thing")
@@ -58,7 +67,7 @@ class ArticlesTest < ActiveSupport::TestCase
   end
 
   should 'not return child of forbidden article' do
-    person = fast_create(Person)
+    person = fast_create(Person, :environment_id => environment.id)
     article = fast_create(Article, :profile_id => person.id, :name => "Some thing", :published => false)
     child = fast_create(Article, :parent_id => article.id, :profile_id => person.id, :name => "Some thing")
     get "/api/v1/articles/#{article.id}/children/#{child.id}?#{params.to_query}"
@@ -66,7 +75,7 @@ class ArticlesTest < ActiveSupport::TestCase
   end
 
   should 'not return private child' do
-    person = fast_create(Person)
+    person = fast_create(Person, :environment_id => environment.id)
     article = fast_create(Article, :profile_id => person.id, :name => "Some thing")
     child = fast_create(Article, :parent_id => article.id, :profile_id => person.id, :name => "Some thing", :published => false)
     get "/api/v1/articles/#{article.id}/children/#{child.id}?#{params.to_query}"
@@ -74,7 +83,7 @@ class ArticlesTest < ActiveSupport::TestCase
   end
 
   should 'not list private child' do
-    person = fast_create(Person)
+    person = fast_create(Person, :environment_id => environment.id)
     article = fast_create(Article, :profile_id => person.id, :name => "Some thing")
     child = fast_create(Article, :parent_id => article.id, :profile_id => person.id, :name => "Some thing", :published => false)
     get "/api/v1/articles/#{article.id}/children?#{params.to_query}"
@@ -89,7 +98,7 @@ class ArticlesTest < ActiveSupport::TestCase
   profile_kinds = %w(community person enterprise)
   profile_kinds.each do |kind|
     should "return article by #{kind}" do
-      profile = fast_create(kind.camelcase.constantize)
+      profile = fast_create(kind.camelcase.constantize, :environment_id => environment.id)
       article = fast_create(Article, :profile_id => profile.id, :name => "Some thing")
       get "/api/v1/#{kind.pluralize}/#{profile.id}/articles/#{article.id}?#{params.to_query}"
       json = JSON.parse(last_response.body)
@@ -97,7 +106,7 @@ class ArticlesTest < ActiveSupport::TestCase
     end
 
     should "not return article by #{kind} if user has no permission to view it" do
-      profile = fast_create(kind.camelcase.constantize)
+      profile = fast_create(kind.camelcase.constantize, :environment_id => environment.id)
       article = fast_create(Article, :profile_id => profile.id, :name => "Some thing", :published => false)
       assert !article.published?
 
@@ -106,7 +115,7 @@ class ArticlesTest < ActiveSupport::TestCase
     end
 
     should "not list forbidden article when listing articles by #{kind}" do
-      profile = fast_create(kind.camelcase.constantize)
+      profile = fast_create(kind.camelcase.constantize, :environment_id => environment.id)
       article = fast_create(Article, :profile_id => profile.id, :name => "Some thing", :published => false)
       assert !article.published?
 
@@ -123,7 +132,7 @@ class ArticlesTest < ActiveSupport::TestCase
   group_kinds = %w(community enterprise)
   group_kinds.each do |kind|
     should "#{kind}: create article" do
-      profile = fast_create(kind.camelcase.constantize)
+      profile = fast_create(kind.camelcase.constantize, :environment_id => environment.id)
       give_permission(user.person, 'post_content', profile)
       params[:article] = {:name => "Title"}
       post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
@@ -132,16 +141,16 @@ class ArticlesTest < ActiveSupport::TestCase
     end
 
     should "#{kind}: do not create article if user has no permission to post content" do
-      profile = fast_create(kind.camelcase.constantize)
+      profile = fast_create(kind.camelcase.constantize, :environment_id => environment.id)
       give_permission(user.person, 'invite_members', profile)
       params[:article] = {:name => "Title"}
       post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
       assert_equal 403, last_response.status
     end
 
-    should "#{kind}: create article with parent" do
-      profile = fast_create(kind.camelcase.constantize)
-      profile.add_member(user.person)
+    should "#{kind} create article with parent" do
+      profile = fast_create(kind.camelcase.constantize, :environment_id => environment.id)
+      Person.any_instance.stubs(:can_post_content?).with(profile).returns(true)
       article = fast_create(Article)
 
       params[:article] = {:name => "Title", :parent_id => article.id}
@@ -150,9 +159,9 @@ class ArticlesTest < ActiveSupport::TestCase
       assert_equal article.id, json["article"]["parent"]["id"]
     end
 
-    should "#{kind}: create article with content type passed as parameter" do
-      profile = fast_create(kind.camelcase.constantize)
-      profile.add_member(user.person)
+    should "#{kind} create article with content type passed as parameter" do
+      profile = fast_create(kind.camelcase.constantize, :environment_id => environment.id)
+      Person.any_instance.stubs(:can_post_content?).with(profile).returns(true)
 
       Article.delete_all
       params[:article] = {:name => "Title"}
@@ -164,8 +173,8 @@ class ArticlesTest < ActiveSupport::TestCase
     end
 
     should "#{kind}: create article of TinyMceArticle type if no content type is passed as parameter" do
-      profile = fast_create(kind.camelcase.constantize)
-      profile.add_member(user.person)
+      profile = fast_create(kind.camelcase.constantize, :environment_id => environment.id)
+      Person.any_instance.stubs(:can_post_content?).with(profile).returns(true)
 
       params[:article] = {:name => "Title"}
       post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
@@ -175,7 +184,7 @@ class ArticlesTest < ActiveSupport::TestCase
     end
 
     should "#{kind}: not create article with invalid article content type" do
-      profile = fast_create(kind.camelcase.constantize)
+      profile = fast_create(kind.camelcase.constantize, :environment_id => environment.id)
       profile.add_member(user.person)
 
       params[:article] = {:name => "Title"}
@@ -186,20 +195,20 @@ class ArticlesTest < ActiveSupport::TestCase
       assert_equal 403, last_response.status
     end
 
-    should "#{kind}: create article defining the correct profile" do
-      profile = fast_create(kind.camelcase.constantize)
-      profile.add_member(user.person)
+    should "#{kind} create article defining the correct profile" do
+      profile = fast_create(kind.camelcase.constantize, :environment_id => environment.id)
+      Person.any_instance.stubs(:can_post_content?).with(profile).returns(true)
 
       params[:article] = {:name => "Title"}
       post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
       json = JSON.parse(last_response.body)
 
-      assert_equal profile, Article.last.profile
+      assert_equal profile.id, json['article']['profile']['id']
     end
 
     should "#{kind}: create article defining the created_by" do
-      profile = fast_create(kind.camelcase.constantize)
-      profile.add_member(user.person)
+      profile = fast_create(kind.camelcase.constantize, :environment_id => environment.id)
+      Person.any_instance.stubs(:can_post_content?).with(profile).returns(true)
 
       params[:article] = {:name => "Title"}
       post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
@@ -209,8 +218,8 @@ class ArticlesTest < ActiveSupport::TestCase
     end
 
     should "#{kind}: create article defining the last_changed_by" do
-      profile = fast_create(kind.camelcase.constantize)
-      profile.add_member(user.person)
+      profile = fast_create(kind.camelcase.constantize, :environment_id => environment.id)
+      Person.any_instance.stubs(:can_post_content?).with(profile).returns(true)
 
       params[:article] = {:name => "Title"}
       post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
@@ -232,7 +241,7 @@ class ArticlesTest < ActiveSupport::TestCase
   end
 
   should 'person do not create article if user has no permission to post content' do
-    person = fast_create(Person)
+    person = fast_create(Person, :environment_id => environment.id)
     params[:article] = {:name => "Title"}
     post "/api/v1/people/#{person.id}/articles?#{params.to_query}"
     assert_equal 403, last_response.status
@@ -337,6 +346,77 @@ class ArticlesTest < ActiveSupport::TestCase
     json = JSON.parse(last_response.body)
     assert_equal [1, 1], json['articles'].map { |a| a['hits']}
     assert_equal [0, 1, 1], [a1.reload.hits, a2.reload.hits, a3.reload.hits]
+  end
+
+
+  should 'list all events of a community in a given category' do
+    co = Community.create(identifier: 'my-community', name: 'name-my-community')
+    c1 = Category.create(environment: Environment.default, name: 'my-category')
+    c2 = Category.create(environment: Environment.default, name: 'dont-show-me-this-category')
+    e1 = fast_create(Event, :profile_id => co.id)
+    e2 = fast_create(Event, :profile_id => co.id)
+    e1.categories << c1
+    e2.categories << c2
+    e1.save!
+    e2.save!
+    params['content_type']='Event'
+    get "api/v1/communities/#{co.id}/articles?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal json['articles'].count, 2
+  end
+
+  should 'list a event of a community in a given category' do
+    co = Community.create(identifier: 'my-community', name: 'name-my-community')
+    c1 = Category.create(environment: Environment.default, name: 'my-category')
+    c2 = Category.create(environment: Environment.default, name: 'dont-show-me-this-category')
+    e1 = fast_create(Event, :profile_id => co.id)
+    e2 = fast_create(Event, :profile_id => co.id)
+    e1.categories << c1
+    e2.categories << c2
+    e1.save!
+    e2.save!
+    params['categories_ids[]']=c1.id
+    params['content_type']='Event'
+    get "api/v1/communities/#{co.id}/articles?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    #should show only one article, since the other not in the same category
+    assert_equal 1, json['articles'].count
+    assert_equal e1.id, json['articles'][0]['id']
+  end
+
+  should 'list events of a community in a given 2 categories' do
+    co = Community.create(identifier: 'my-community', name: 'name-my-community')
+    c1 = Category.create(environment: Environment.default, name: 'my-category')
+    c2 = Category.create(environment: Environment.default, name: 'dont-show-me-this-category')
+    e1 = fast_create(Event, :profile_id => co.id)
+    e2 = fast_create(Event, :profile_id => co.id)
+    e1.categories << c1
+    e2.categories << c2
+    e1.save!
+    e2.save!
+    params['content_type']='Event'
+    params['categories_ids'] = [c1.id, c2.id]
+    get "api/v1/communities/#{co.id}/articles?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal json['articles'].count, 2
+  end
+
+  should 'Show 2 events since it uses an IN operator for category instead of an OR' do
+    co = Community.create(identifier: 'my-community', name: 'name-my-community')
+    c1 = Category.create(environment: Environment.default, name: 'my-category')
+    c2 = Category.create(environment: Environment.default, name: 'dont-show-me-this-category')
+    c3 = Category.create(environment: Environment.default, name: 'extra-category')
+    e1 = fast_create(Event, :profile_id => co.id)
+    e2 = fast_create(Event, :profile_id => co.id)
+    e1.categories << c1
+    e2.categories << c2
+    e1.save!
+    e2.save!
+    params['content_type']='Event'
+    params['categories_ids'] = [c1.id, c2.id, c3.id]
+    get "api/v1/communities/#{co.id}/articles?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal json['articles'].count, 2
   end
 
 end

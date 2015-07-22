@@ -913,6 +913,7 @@ class ArticleTest < ActiveSupport::TestCase
   should 'not doubly escape quotes in the name' do
     person = fast_create(Person)
     community = fast_create(Community)
+    community.add_member(profile)
     article = fast_create(Article, :name => 'article name', :profile_id => person.id)
     a = create(ApproveArticle, :article => article, :target => community, :requestor => profile)
     a.finish
@@ -1969,6 +1970,19 @@ class ArticleTest < ActiveSupport::TestCase
     fast_create(Article, :published => false, :show_to_followers => false, :profile_id => p.id)
     assert_equal [a], Article.display_filter(user, p)
   end
+
+  should 'display_filter show person private content to friends when no profile is passed as parameter' do
+    user = create_user('someuser').person
+    p = fast_create(Person)
+    user.add_friend(p)
+    user.stubs(:has_permission?).with(:view_private_content, p).returns(false)
+    Article.delete_all
+    a = fast_create(Article, :published => false, :show_to_followers => true, :profile_id => p.id)
+    fast_create(Article, :published => false, :show_to_followers => false, :profile_id => p.id)
+    fast_create(Article, :published => false, :show_to_followers => false, :profile_id => p.id)
+    assert_equal [a], Article.display_filter(user, nil)
+  end
+
 
   should 'display_filter show community private content to members' do
     user = create_user('someuser').person

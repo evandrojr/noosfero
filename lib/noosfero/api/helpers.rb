@@ -8,11 +8,18 @@ require 'grape'
       DEFAULT_ALLOWED_PARAMETERS = [:parent_id, :from, :until, :content_type]
 
       include SanitizeParams
+      include Noosfero::Plugin::HotSpot
+      include ForgotPasswordHelper
 
       def set_locale
         I18n.locale = (params[:lang] || request.env['HTTP_ACCEPT_LANGUAGE'] || 'en')
       end
-      
+
+      # FIXME this filter just loads @plugins
+      def init_noosfero_plugins
+        plugins
+      end
+
       def current_user
         private_token = (params[PRIVATE_TOKEN_PARAM] || headers['Private-Token']).to_s
         @current_user ||= User.find_by_private_token(private_token)
@@ -54,11 +61,12 @@ require 'grape'
         end
       end
 
-      ARTICLE_TYPES = Article.descendants.map{|a| a.to_s}
+      ARTICLE_TYPES = ['Article'] + Article.descendants.map{|a| a.to_s}
+      TASK_TYPES = ['Task'] + Task.descendants.map{|a| a.to_s}
 
       def find_article(articles, id)
         article = articles.find(id)
-        article.display_to?(current_user.person) ? article : forbidden!
+        article.display_to?(current_person) ? article : forbidden!
       end
 
       def post_article(asset, params)
@@ -99,11 +107,39 @@ require 'grape'
         if params[:categories_ids]
           articles = articles.joins(:categories).where('category_id in (?)', params[:categories_ids])
         end
+        articles
       end
 
-      def find_task(tasks, id)
-        task = tasks.find(id)
-        task.display_to?(current_user.person) ? task : forbidden!
+      def find_task(asset, id)
+        task = asset.tasks.find(id)
+        current_person.has_permission?(task.permission, asset) ? task : forbidden!
+      end
+
+      def post_task(asset, params)
+        klass_type= params[:content_type].nil? ? 'Task' : params[:content_type]
+        return forbidden! unless TASK_TYPES.include?(klass_type)
+
+        task = klass_type.constantize.new(params[:task])
+        task.requestor_id = current_person.id
+        task.target_id = asset.id
+        task.target_type = 'Profile'
+
+        if !task.save
+          render_api_errors!(task.errors.full_messages)
+        end
+        present task, :with => Entities::Task, :fields => params[:fields]
+      end
+
+      def present_task(asset)
+        task = find_task(asset, params[:id])
+        present task, :with => Entities::Task, :fields => params[:fields]
+      end
+
+      def present_tasks(asset)
+        tasks = select_filtered_collection_of(asset, 'tasks', params)
+        tasks = tasks.select {|t| current_person.has_permission?(t.permission, asset)}
+        return forbidden! if tasks.empty? && !current_person.has_permission?(:perform_task, asset)
+        present tasks, :with => Entities::Task, :fields => params[:fields]
       end
 
       def make_conditions_with_parameter(params = {})
@@ -125,12 +161,13 @@ require 'grape'
       end
 
       def by_reference(scope, params)
-        if params[:reference_id]
-          created_at = scope.find(params[:reference_id]).created_at
-          scope.send("#{params.key?(:oldest) ? 'older_than' : 'younger_than'}", created_at)
-        else
+        reference_id = params[:reference_id].to_i == 0 ? nil : params[:reference_id].to_i
+        if reference_id.nil?
           scope
-        end
+        else
+          created_at = scope.find(reference_id).created_at
+          scope.send("#{params.key?(:oldest) ? 'older_than' : 'younger_than'}", created_at)
+         end
       end
 
       def select_filtered_collection_of(object, method, params)
@@ -216,13 +253,17 @@ require 'grape'
         render_api_error!(_('Method Not Allowed'), 405)
       end
 
-      # Message will be logged and shown to user
       # javascript_console_message is supposed to be executed as console.log()
-      def render_api_error!(user_message, _status, log_message = nil, javascript_console_message = nil)
+      def render_api_error!(user_message, status, log_message = nil, javascript_console_message = nil)
+        status = status(status || namespace_inheritable(:default_error_status))
         message_hash = {'message' => user_message, :code => status}
         message_hash[:javascript_console_message] = javascript_console_message if javascript_console_message.present?
-        status(_status || namespace_inheritable(:default_error_status))
-        throw :error, message: "#{user_message} #{log_message}", status: _status, headers: headers
+        log_msg = "#{status}, User message: #{user_message}"
+        log_msg = "#{log_message}, #{log_msg}" if log_message.present?
+        log_msg = "#{log_msg}, Javascript Console Message: #{javascript_console_message}" if javascript_console_message.present?
+        #Since throw :error is not logging the errors I had to manually add log it!
+        log(log_msg)
+        throw :error, message: message_hash, status: status, headers: headers
       end
 
       def render_api_errors!(messages)
@@ -289,15 +330,13 @@ require 'grape'
       def test_captcha(remote_ip, params, environment)
         d = environment.api_captcha_settings
         return true unless d[:enabled] == true
-        msg_cve = _('Captcha validation error')
+        msg_icve = _('Internal captcha validation error')
         msg_eacs = 'Environment api_captcha_settings'
+        s = 503
 
         if d[:provider] == 'google'
-          render_api_error!(msg_cve, status, javascript_console_message = nil)
-
-
-          return log_ret_error_msg(msg_cve,"#{msg_eacs} private_key not defined") if d[:private_key].nil?
-          return log_ret_error_msg(msg_cve,"#{msg_eacs} version not defined") unless d[:version] == 1 || d[:version] == 2
+          render_api_error!(msg_icve, s, nil, "#{msg_eacs} private_key not defined") if d[:private_key].nil?
+          render_api_error!(msg_icve, s, nil, "#{msg_eacs} version not defined") unless d[:version] == 1 || d[:version] == 2
           if d[:version]  == 1
             d[:verify_uri] ||= 'https://www.google.com/recaptcha/api/verify'
             return verify_recaptcha_v1(remote_ip, d[:private_key], d[:verify_uri], params[:recaptcha_challenge_field], params[:recaptcha_response_field])
@@ -308,15 +347,15 @@ require 'grape'
           end
         end
         if d[:provider] == 'serpro'
-          return log_ret_error_msg(msg_cve,"#{msg_eacs} verify_uri not defined") if d[:verify_uri].nil?
+          render_api_error!(msg_icve, s, nil, "#{msg_eacs} verify_uri not defined") if d[:verify_uri].nil?
           return verify_serpro_captcha(d[:serpro_client_id], params[:txtToken_captcha_serpro_gov_br], params[:captcha_text], d[:verify_uri])
         end
-        return log_ret_error_msg(msg_cve,"#{msg_eacs} provider not defined") 
+        render_api_error!(msg_icve, s, nil, "#{msg_eacs} provider not defined")
       end
 
       def verify_recaptcha_v1(remote_ip, private_key, api_recaptcha_verify_uri, recaptcha_challenge_field, recaptcha_response_field)
         if recaptcha_challenge_field == nil || recaptcha_response_field == nil
-          return log_ret_error_msg(_('Captcha validation error'), _('Missing captcha data'))
+          render_api_error!(_('Captcha validation error'), 503, nil, _('Missing captcha data'))
         end
 
         verify_hash = {
@@ -335,17 +374,14 @@ require 'grape'
         rescue Exception => e
           logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
           logger.error e
-          return _("Google recaptcha error: #{e.message}")
+          render_api_error!(_('Internal captcha validation error'), 503, nil, "recaptcha error: #{e.message}")
         end
         body = JSON.parse(body)
         body == "true\nsuccess" ? true : body
       end
 
       def verify_recaptcha_v2(remote_ip, private_key, api_recaptcha_verify_uri, g_recaptcha_response)
-        if g_recaptcha_response == nil
-          return _('Missing captcha data')
-        end
-
+        render_api_error!(_('Captcha validation error'), 503, nil, _('Missing captcha data')) if g_recaptcha_response == nil
         verify_hash = {
             "secret"    => private_key,
             "remoteip"  => remote_ip,
@@ -359,9 +395,7 @@ require 'grape'
         begin
           body = https.request(request).body
         rescue Exception => e
-          logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
-          logger.error e
-          return _("Google recaptcha error: #{e.message}")
+          render_api_error!(_('Internal captcha validation error'), 503, nil, "recaptcha error: #{e.message}")
         end
         captcha_result = JSON.parse(body)
         captcha_result["success"] ? true : captcha_result
@@ -378,11 +412,10 @@ require 'grape'
         begin
           body = http.request(request).body
         rescue Exception => e
-          log_exception(e)
-          return error_message(_('Internal captcha validation error'),"Serpro captcha error: #{e.message}")
+          render_api_error!(_('Internal captcha validation error'), 503, nil, "Serpro captcha error: #{e.message}")
         end
-        return _("Wrong captcha text, please try again") if body == 0
-        return _("Token not found") if body == 2
+        render_api_error!("Wrong captcha text, please try again") if body == 0
+        render_api_error!("Token not found") if body == 2
         body == '1' ? true : body
       end
 

@@ -29,6 +29,7 @@ module Noosfero
       before { setup_multitenancy }
       before { detect_stuff_by_domain }
       before { filter_disabled_plugins_endpoints }
+      before { init_noosfero_plugins }
       after { set_session_cookie }
 
       version 'v1'
