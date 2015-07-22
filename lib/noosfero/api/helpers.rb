@@ -6,9 +6,16 @@
       DEFAULT_ALLOWED_PARAMETERS = [:parent_id, :from, :until, :content_type]
 
       include SanitizeParams
+      include Noosfero::Plugin::HotSpot
+      include ForgotPasswordHelper
 
       def set_locale
         I18n.locale = (params[:lang] || request.env['HTTP_ACCEPT_LANGUAGE'] || 'en')
+      end
+
+      # FIXME this filter just loads @plugins
+      def init_noosfero_plugins
+        plugins
       end
 
       def current_user
@@ -152,12 +159,13 @@
       end
 
       def by_reference(scope, params)
-        if params[:reference_id]
-          created_at = scope.find(params[:reference_id]).created_at
-          scope.send("#{params.key?(:oldest) ? 'older_than' : 'younger_than'}", created_at)
-        else
+        reference_id = params[:reference_id].to_i == 0 ? nil : params[:reference_id].to_i
+        if reference_id.nil?
           scope
-        end
+        else
+          created_at = scope.find(reference_id).created_at
+          scope.send("#{params.key?(:oldest) ? 'older_than' : 'younger_than'}", created_at)
+         end
       end
 
       def select_filtered_collection_of(object, method, params)
