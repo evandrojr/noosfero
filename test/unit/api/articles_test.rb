@@ -348,4 +348,75 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equal [0, 1, 1], [a1.reload.hits, a2.reload.hits, a3.reload.hits]
   end
 
+
+  should 'list all events of a community in a given category' do
+    co = Community.create(identifier: 'my-community', name: 'name-my-community')
+    c1 = Category.create(environment: Environment.default, name: 'my-category')
+    c2 = Category.create(environment: Environment.default, name: 'dont-show-me-this-category')
+    e1 = fast_create(Event, :profile_id => co.id)
+    e2 = fast_create(Event, :profile_id => co.id)
+    e1.categories << c1
+    e2.categories << c2
+    e1.save!
+    e2.save!
+    params['content_type']='Event'
+    get "api/v1/communities/#{co.id}/articles?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal json['articles'].count, 2
+  end
+
+  should 'list a event of a community in a given category' do
+    co = Community.create(identifier: 'my-community', name: 'name-my-community')
+    c1 = Category.create(environment: Environment.default, name: 'my-category')
+    c2 = Category.create(environment: Environment.default, name: 'dont-show-me-this-category')
+    e1 = fast_create(Event, :profile_id => co.id)
+    e2 = fast_create(Event, :profile_id => co.id)
+    e1.categories << c1
+    e2.categories << c2
+    e1.save!
+    e2.save!
+    params['categories_ids[]']=c1.id
+    params['content_type']='Event'
+    get "api/v1/communities/#{co.id}/articles?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    #should show only one article, since the other not in the same category
+    assert_equal 1, json['articles'].count
+    assert_equal e1.id, json['articles'][0]['id']
+  end
+
+  should 'list events of a community in a given 2 categories' do
+    co = Community.create(identifier: 'my-community', name: 'name-my-community')
+    c1 = Category.create(environment: Environment.default, name: 'my-category')
+    c2 = Category.create(environment: Environment.default, name: 'dont-show-me-this-category')
+    e1 = fast_create(Event, :profile_id => co.id)
+    e2 = fast_create(Event, :profile_id => co.id)
+    e1.categories << c1
+    e2.categories << c2
+    e1.save!
+    e2.save!
+    params['content_type']='Event'
+    params['categories_ids'] = [c1.id, c2.id]
+    get "api/v1/communities/#{co.id}/articles?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal json['articles'].count, 2
+  end
+
+  should 'Show 2 events since it uses an IN operator for category instead of an OR' do
+    co = Community.create(identifier: 'my-community', name: 'name-my-community')
+    c1 = Category.create(environment: Environment.default, name: 'my-category')
+    c2 = Category.create(environment: Environment.default, name: 'dont-show-me-this-category')
+    c3 = Category.create(environment: Environment.default, name: 'extra-category')
+    e1 = fast_create(Event, :profile_id => co.id)
+    e2 = fast_create(Event, :profile_id => co.id)
+    e1.categories << c1
+    e2.categories << c2
+    e1.save!
+    e2.save!
+    params['content_type']='Event'
+    params['categories_ids'] = [c1.id, c2.id, c3.id]
+    get "api/v1/communities/#{co.id}/articles?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal json['articles'].count, 2
+  end
+
 end

@@ -159,12 +159,13 @@
       end
 
       def by_reference(scope, params)
-        if params[:reference_id]
-          created_at = scope.find(params[:reference_id]).created_at
-          scope.send("#{params.key?(:oldest) ? 'older_than' : 'younger_than'}", created_at)
-        else
+        reference_id = params[:reference_id].to_i == 0 ? nil : params[:reference_id].to_i
+        if reference_id.nil?
           scope
-        end
+        else
+          created_at = scope.find(reference_id).created_at
+          scope.send("#{params.key?(:oldest) ? 'older_than' : 'younger_than'}", created_at)
+         end
       end
 
       def select_filtered_collection_of(object, method, params)
