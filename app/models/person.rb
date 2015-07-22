@@ -282,7 +282,7 @@ roles] }
   end
 
   after_update do |person|
-    person.user.save!
+    person.user.save! unless person.user.changes.blank?
   end
 
   def is_admin?(environment = nil)

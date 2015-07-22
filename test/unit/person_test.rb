@@ -1767,4 +1767,11 @@ class PersonTest < ActiveSupport::TestCase
     assert person.voted_against?(article)
   end
 
+  should 'not save user after an update on person and user is not touched' do
+    user = create_user('testuser')
+    person = user.person
+    person.user.expects(:save!).never
+    person.save!
+  end
+
 end
