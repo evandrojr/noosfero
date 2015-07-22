@@ -59,7 +59,8 @@
         end
       end
 
-      ARTICLE_TYPES = Article.descendants.map{|a| a.to_s}
+      ARTICLE_TYPES = ['Article'] + Article.descendants.map{|a| a.to_s}
+      TASK_TYPES = ['Task'] + Task.descendants.map{|a| a.to_s}
 
       def find_article(articles, id)
         article = articles.find(id)
@@ -107,9 +108,36 @@
         articles
       end
 
-      def find_task(tasks, id)
-        task = tasks.find(id)
-        task.display_to?(current_user.person) ? task : forbidden!
+      def find_task(asset, id)
+        task = asset.tasks.find(id)
+        current_person.has_permission?(task.permission, asset) ? task : forbidden!
+      end
+
+      def post_task(asset, params)
+        klass_type= params[:content_type].nil? ? 'Task' : params[:content_type]
+        return forbidden! unless TASK_TYPES.include?(klass_type)
+
+        task = klass_type.constantize.new(params[:task])
+        task.requestor_id = current_person.id
+        task.target_id = asset.id
+        task.target_type = 'Profile'
+
+        if !task.save
+          render_api_errors!(task.errors.full_messages)
+        end
+        present task, :with => Entities::Task, :fields => params[:fields]
+      end
+
+      def present_task(asset)
+        task = find_task(asset, params[:id])
+        present task, :with => Entities::Task, :fields => params[:fields]
+      end
+
+      def present_tasks(asset)
+        tasks = select_filtered_collection_of(asset, 'tasks', params)
+        tasks = tasks.select {|t| current_person.has_permission?(t.permission, asset)}
+        return forbidden! if tasks.empty? && !current_person.has_permission?(:perform_task, asset)
+        present tasks, :with => Entities::Task, :fields => params[:fields]
       end
 
       def make_conditions_with_parameter(params = {})
@@ -131,12 +159,13 @@
       end
 
       def by_reference(scope, params)
-        if params[:reference_id]
-          created_at = scope.find(params[:reference_id]).created_at
-          scope.send("#{params.key?(:oldest) ? 'older_than' : 'younger_than'}", created_at)
-        else
+        reference_id = params[:reference_id].to_i == 0 ? nil : params[:reference_id].to_i
+        if reference_id.nil?
           scope
-        end
+        else
+          created_at = scope.find(reference_id).created_at
+          scope.send("#{params.key?(:oldest) ? 'older_than' : 'younger_than'}", created_at)
+         end
       end
 
       def select_filtered_collection_of(object, method, params)
