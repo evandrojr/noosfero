@@ -242,9 +242,34 @@ class Task < ActiveRecord::Base
   scope :canceled, :conditions => { :status =>  Task::Status::CANCELLED }
   scope :closed, :conditions => { :status =>  [Task::Status::CANCELLED, Task::Status::FINISHED] }
   scope :opened, :conditions => { :status =>  [Task::Status::ACTIVE, Task::Status::HIDDEN] }
-  scope :of, lambda { |type| conditions = type ? "type LIKE '#{type}'" : "1=1"; {:conditions =>  [conditions]} }
-  scope :order_by, lambda { |attribute, ord| {:order => "#{attribute} #{ord}"} }
-  scope :like, lambda { |field, value| where("LOWER(#{field}) LIKE ?", "%#{value.downcase}%") if value}
+
+  # updated scope method to avoid sql injection vunerabillity (http://brakemanscanner.org/docs/warning_types/sql_injection/)
+  def self.of type
+    if type
+      where  "type LIKE ?", type
+    else
+      all
+    end
+  end
+
+  # updated scope method to avoid sql injection vunerabillity (http://brakemanscanner.org/docs/warning_types/sql_injection/)
+  def self.order_by attribute_name, sort_order
+    if Task.column_names.include? attribute_name
+      # TODO  future versions of rails accepts a hash as param to order method
+      # which helps to prevent sql injection in an shorter way
+      sort_order_filtered = ("ASC".eql? "#{sort_order}".upcase) ? 'asc' : 'desc'
+      sort_expression = Task.column_names.collect {|column_name| "#{column_name} #{sort_order_filtered}" if column_name.eql? attribute_name}
+      order(sort_expression.join) unless sort_expression.join.empty?
+    end
+  end
+
+  # updated scope method to avoid sql injection vunerabillity (http://brakemanscanner.org/docs/warning_types/sql_injection/)
+  def self.like field, value
+    if value and Tasks.column_names.include? field
+      where("LOWER(?) LIKE ?", "#{field}", "%#{value.downcase}%")
+    end
+  end
+
   scope :pending_all, lambda { |profile, filter_type, filter_text|
     self.to(profile).without_spam.pending.of(filter_type).like('data', filter_text)
   }
