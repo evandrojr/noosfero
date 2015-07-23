@@ -3970,23 +3970,23 @@ msgstr "Termos aceitos"
 
 #: app/models/user.rb:107
 msgid "incorrect login format"
-msgstr ""
+msgstr "formato do login inválido. O mesmo só pode ser composto por letras minúsculas, números, '_' e '-'. Adicionalmente não é permitido usar acentuação nem começar com '_' ou '-'"
 
 #: app/models/user.rb:110
 msgid "length must be within 4 to 40 characters"
-msgstr ""
+msgstr "o tamanho do campo deve ser entre 4 e 40 caracteres"
 
 #: app/models/user.rb:112
 msgid "length must be within 2 to 40 characters"
-msgstr ""
+msgstr "o tamanho do campo deve ser entre 2 e 40 caracteres"
 
 #: app/models/user.rb:113
 msgid "length must be within 3 to 100 characters"
-msgstr ""
+msgstr "o tamanho do campo deve ser entre 3 e 100 caracteres"
 
 #: app/models/user.rb:118
 msgid "incorrect email format"
-msgstr ""
+msgstr "formato do email inválido. O mesmo só pode ser composto por letras minúsculas, números, '_' e '-'. Adicionalmente não é permitido usar acentuação nem começar com '_' ou '-'"
 
 #: app/models/user.rb:120
 msgid "{fn} must be checked in order to signup."
@@ -8130,8 +8130,7 @@ msgstr "Referencia para linguagem do modelo"
 
 #: app/views/email_templates/_form.html.erb:16
 msgid "The following parameters may be used in subject and body:"
-msgstr ""
-"Os seguintes parâmetros podem ser usados no assunto e no corpo da mensagem"
+msgstr "Os seguintes parâmetros podem ser usados no assunto e no corpo da mensagem"
 
 #: app/views/email_templates/index.html.erb:2
 #: app/views/profile_editor/index.html.erb:75
@@ -10428,5 +10427,3 @@ msgstr ""
 #~ msgid "Invite your friends"
 #~ msgstr "Convide seus amigos"
 
-#~ msgid "Invite my friends!"
-#~ msgstr "Convidar meus amigos!"
