@@ -1,7 +1,10 @@
 # A person is the profile of an user holding all relationships with the rest of the system
 class Person < Profile
 
-  attr_accessible :organization, :contact_information, :sex, :birth_date, :cell_phone, :comercial_phone, :jabber_id, :personal_website, :nationality, :address_reference, :district, :schooling, :schooling_status, :formation, :custom_formation, :area_of_study, :custom_area_of_study, :professional_activity, :organization_website
+  attr_accessible :organization, :contact_information, :sex, :birth_date, :cell_phone,
+    :comercial_phone, :jabber_id, :personal_website, :nationality, :address_reference,
+    :district, :schooling, :schooling_status, :formation, :custom_formation, :area_of_study,
+    :custom_area_of_study, :professional_activity, :organization_website, :following_articiles
 
   SEARCH_FILTERS = {
     :order => %w[more_recent more_popular more_active],
@@ -16,10 +19,12 @@ class Person < Profile
   acts_as_trackable :after_add => Proc.new {|p,t| notify_activity(t)}
   acts_as_accessor
 
-  scope :members_of, lambda { |resources|
+  scope :members_of, lambda { |resources, extra_joins = nil|
     resources = [resources] if !resources.kind_of?(Array)
     conditions = resources.map {|resource| "role_assignments.resource_type = '#{resource.class.base_class.name}' AND role_assignments.resource_id = #{resource.id || -1}"}.join(' OR ')
-    { :select => 'DISTINCT profiles.*', :joins => :role_assignments, :conditions => [conditions] }
+    joins = [:role_assignments]
+    joins += extra_joins if extra_joins.is_a? Array
+    { :select => 'DISTINCT profiles.*', :joins => joins, :conditions => [conditions] }
   }
 
   scope :not_members_of, lambda { |resources|
@@ -28,15 +33,28 @@ class Person < Profile
     { :select => 'DISTINCT profiles.*', :conditions => ['"profiles"."id" NOT IN (SELECT DISTINCT profiles.id FROM "profiles" INNER JOIN "role_assignments" ON "role_assignments"."accessor_id" = "profiles"."id" AND "role_assignments"."accessor_type" = (\'Profile\') WHERE "profiles"."type" IN (\'Person\') AND (%s))' % conditions] }
   }
 
-  scope :by_role, lambda { |roles|
+  scope :by_role, lambda { |roles, extra_joins = nil|
     roles = [roles] unless roles.kind_of?(Array)
-    { :select => 'DISTINCT profiles.*', :joins => :role_assignments, :conditions => ['role_assignments.role_id IN (?)',
-roles] }
+    joins = [:role_assignments]
+    joins += extra_joins if extra_joins.is_a? Array
+    { :select => 'DISTINCT profiles.*', :joins => joins, :conditions => ['role_assignments.role_id IN (?)',roles] }
   }
 
   scope :not_friends_of, lambda { |resources|
     resources = Array(resources)
     { :select => 'DISTINCT profiles.*', :conditions => ['"profiles"."id" NOT IN (SELECT DISTINCT profiles.id FROM "profiles" INNER JOIN "friendships" ON "friendships"."person_id" = "profiles"."id" WHERE "friendships"."friend_id" IN (%s))' % resources.map(&:id)] }
+  }
+
+  scope :visible_for_person, lambda { |person|
+   joins('LEFT JOIN "role_assignments" ON
+         "role_assignments"."resource_id" = "profiles"."environment_id" AND
+         "role_assignments"."resource_type" = \'Environment\'')
+   .joins('LEFT JOIN "roles" ON "role_assignments"."role_id" = "roles"."id"')
+   .joins('LEFT JOIN "friendships" ON "friendships"."friend_id" = "profiles"."id"')
+   .where(
+     ['( roles.key = ? AND role_assignments.accessor_type = ? AND role_assignments.accessor_id = ? ) OR (
+       ( ( friendships.person_id = ? ) OR (profiles.public_profile = ?)) AND (profiles.visible = ?) )', 'environment_administrator', Profile.name, person.id, person.id,  true, true]
+   ).uniq
   }
 
   def has_permission_with_admin?(permission, resource)
@@ -67,6 +85,10 @@ roles] }
   def memberships_by_role(role)
     memberships.where('role_assignments.role_id = ?', role.id)
   end
+
+  #Article followers relation
+  has_many :article_followers, :dependent => :destroy
+  has_many :following_articiles, :class_name => 'Article', :through => :article_followers, :source => :article
 
   has_many :friendships, :dependent => :destroy
   has_many :friends, :class_name => 'Person', :through => :friendships
@@ -123,6 +145,11 @@ roles] }
 
   def can_control_activity?(activity)
     self.tracked_notifications.exists?(activity)
+  end
+
+  def can_post_content?(profile, parent=nil)
+    (!parent.nil? && (parent.allow_create?(self))) ||
+      (self.has_permission?('post_content', profile) || self.has_permission?('publish_content', profile))
   end
 
   # Sets the identifier for this person. Raises an exception when called on a
@@ -187,8 +214,10 @@ roles] }
   organization
   organization_website
   contact_phone
-  contact_information
+  contact_informatioin
   ]
+
+  xss_terminate :only => [ :custom_footer, :custom_header, :description, :preferred_domain, :nickname, :sex, :nationality, :country, :state, :city, :district, :zip_code, :address, :address_reference, :cell_phone, :comercial_phone, :personal_website, :jabber_id, :schooling, :formation, :custom_formation, :area_of_study, :custom_area_of_study, :professional_activity, :organization, :organization_website, :contact_phone, :contact_information ], :with => 'white_list'
 
   validates_multiparameter_assignments
 

@@ -3,7 +3,7 @@
 # which by default is the one returned by Environment:default.
 class Profile < ActiveRecord::Base
 
-  attr_accessible :name, :identifier, :public_profile, :nickname, :custom_footer, :custom_header, :address, :zip_code, :contact_phone, :image_builder, :description, :closed, :template_id, :environment, :lat, :lng, :is_template, :fields_privacy, :preferred_domain_id, :category_ids, :country, :city, :state, :national_region_code, :email, :contact_email, :redirect_l10n, :notification_time, :redirection_after_login, :email_suggestions, :allow_members_to_invite, :invite_friends_only, :secret
+  attr_accessible :name, :identifier, :public_profile, :nickname, :custom_footer, :custom_header, :address, :zip_code, :contact_phone, :image_builder, :description, :closed, :template_id, :environment, :lat, :lng, :is_template, :fields_privacy, :preferred_domain_id, :category_ids, :country, :city, :state, :national_region_code, :email, :contact_email, :redirect_l10n, :notification_time, :redirection_after_login, :email_suggestions, :allow_members_to_invite, :invite_friends_only, :secret, :custom_fields, :administrator_mail_notification, :region
 
   # use for internationalizable human type names in search facets
   # reimplement on subclasses
@@ -21,6 +21,34 @@ class Profile < ActiveRecord::Base
     :order => %w[more_recent],
     :display => %w[compact]
   }
+
+  settings_items :custom_fields, :default => {}
+
+  def custom_field_value(field)
+    if !self.custom_fields.blank?
+      self.custom_fields[field][:value]
+    else
+      ''
+    end
+  end
+
+  def custom_field_title(field)
+    if !self.custom_fields.blank?
+      self.custom_fields[field][:title]
+    else
+      ''
+    end
+  end
+
+  def custom_fields_template
+    fields = {}
+    fields = self.template.custom_fields unless self.template.blank?
+    fields
+  end
+
+  def custom_fields_template_title(field)
+    self.template.custom_fields[field][:title]
+  end
 
   NUMBER_OF_BOXES = 4
 
@@ -79,6 +107,7 @@ class Profile < ActiveRecord::Base
     'invite_members'       => N_('Invite members'),
     'send_mail_to_members' => N_('Send e-Mail to members'),
     'manage_custom_roles'  => N_('Manage custom roles'),
+    'manage_email_templates' => N_('Manage Email Templates'),
   }
 
   acts_as_accessible
@@ -100,6 +129,50 @@ class Profile < ActiveRecord::Base
   }
   scope :no_templates, {:conditions => {:is_template => false}}
 
+  # Returns a scoped object to select profiles in a given location or in a radius
+  # distance from the given location center.
+  # The parameter can be the `request.params` with the keys:
+  # * `country`: Country code string.
+  # * `state`: Second-level administrative country subdivisions.
+  # * `city`: City full name for center definition, or as set by users.
+  # * `lat`: The latitude to define the center of georef search.
+  # * `lng`: The longitude to define the center of georef search.
+  # * `distance`: Define the search radius in kilometers.
+  # NOTE: This method may return an exception object, to inform filter error.
+  # When chaining scopes, is hardly recommended you to add this as the last one,
+  # if you can't be sure about the provided parameters.
+  def self.by_location(params)
+    params = params.with_indifferent_access
+    if params[:distance].blank?
+      where_code = []
+      [ :city, :state, :country ].each do |place|
+        unless params[place].blank?
+          # ... So we must to find on this named location
+          # TODO: convert location attrs to a table collumn
+          where_code << "(profiles.data like '%#{place}: #{params[place]}%')"
+        end
+      end
+      self.where where_code.join(' AND ')
+    else # Filter in a georef circle
+      unless params[:lat].blank? && params[:lng].blank?
+        lat, lng = [ params[:lat].to_f, params[:lng].to_f ]
+      end
+      if !lat
+        location = [ params[:city], params[:state], params[:country] ].compact.join(', ')
+        if location.blank?
+          return Exception.new (
+            _('You must to provide `lat` and `lng`, or `city` and `country` to define the center of the search circle, defined by `distance`.')
+          )
+        end
+        lat, lng = Noosfero::GeoRef.location_to_georef location
+      end
+      dist = params[:distance].to_f
+      self.where "#{Noosfero::GeoRef.sql_dist lat, lng} <= #{dist}"
+    end
+  end
+
+  include TimeScopes
+
   def members
     scopes = plugins.dispatch_scopes(:organization_members, self)
     scopes << Person.members_of(self)
@@ -119,8 +192,8 @@ class Profile < ActiveRecord::Base
     alias_method_chain :count, :distinct
   end
 
-  def members_by_role(roles)
-    Person.members_of(self).by_role(roles)
+  def members_by_role(roles, with_entities = nil)
+    Person.members_of(self, with_entities).by_role(roles, with_entities)
   end
 
   acts_as_having_boxes
@@ -151,6 +224,8 @@ class Profile < ActiveRecord::Base
 
   has_many :comments_received, :class_name => 'Comment', :through => :articles, :source => :comments
 
+  has_many :email_templates, :foreign_key => :owner_id
+
   # Although this should be a has_one relation, there are no non-silly names for
   # a foreign key on article to reference the template to which it is
   # welcome_page... =P
@@ -178,6 +253,7 @@ class Profile < ActiveRecord::Base
   settings_items :description
   settings_items :fields_privacy, :type => :hash, :default => {}
   settings_items :email_suggestions, :type => :boolean, :default => false
+  settings_items :administrator_mail_notification, :type => :boolean, :default => true
 
   validates_length_of :description, :maximum => 550, :allow_nil => true
 
@@ -471,6 +547,10 @@ class Profile < ActiveRecord::Base
     self.articles.find(:all, options)
   end
 
+  def to_liquid
+    HashWithIndifferentAccess.new :name => name, :identifier => identifier
+  end
+
   class << self
 
     # finds a profile by its identifier. This method is a shortcut to
@@ -613,15 +693,15 @@ private :generate_url, :url_options
   after_create :insert_default_article_set
   def insert_default_article_set
     if template
-      copy_articles_from template
+      self.save! if copy_articles_from template
     else
       default_set_of_articles.each do |article|
         article.profile = self
         article.advertise = false
         article.save!
       end
+      self.save!
     end
-    self.save!
   end
 
   # Override this method in subclasses of Profile to create a default article
@@ -642,10 +722,12 @@ private :generate_url, :url_options
   end
 
   def copy_articles_from other
+    return false if other.top_level_articles.empty?
     other.top_level_articles.each do |a|
       copy_article_tree a
     end
     self.articles.reload
+    true
   end
 
   def copy_article_tree(article, parent=nil)
@@ -687,6 +769,29 @@ private :generate_url, :url_options
       remove_from_suggestion_list person
     else
       raise _("%s can't have members") % self.class.name
+    end
+  end
+
+  # Adds many people to profile by id's
+  def add_members_by_id(people_ids)
+
+    unless people_ids.nil? && people_ids.empty?
+
+      people = Person.where(id: people_ids)
+      people.each do |person|
+
+        add_member(person) unless person.is_member_of?(self)
+      end
+    end
+  end
+
+  # Adds many people to profile by email's
+  def add_members_by_email(people_emails)
+
+    people = User.where(email: people_emails)
+    people.each do |user|
+
+      add_member(user.person) unless user.person.is_member_of?(self)
     end
   end
 
@@ -821,11 +926,11 @@ private :generate_url, :url_options
     self.forums.count.nonzero?
   end
 
-  def admins
+  def admins(with_entities = nil)
     return [] if environment.blank?
     admin_role = Profile::Roles.admin(environment.id)
     return [] if admin_role.blank?
-    self.members_by_role(admin_role)
+    self.members_by_role(admin_role, with_entities)
   end
 
   def enable_contact?
@@ -934,6 +1039,13 @@ private :generate_url, :url_options
 
   def profile_custom_icon(gravatar_default=nil)
     image.public_filename(:icon) if image.present?
+  end
+
+  #FIXME make this test
+  def profile_custom_image(size = :icon)
+    image_path = profile_custom_icon if size == :icon
+    image_path ||= image.public_filename(size) if image.present?
+    image_path
   end
 
   def jid(options = {})
