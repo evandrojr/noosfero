@@ -206,7 +206,8 @@ class ManageProductsController < ApplicationController
   end
 
   def certifiers_for_selection
-    @qualifier = Qualifier.exists?(params[:id]) ? Qualifier.find(params[:id]) : nil
+    # updated to use hash as argument to exists? to avoid sql injection vunerabillity (http://brakemanscanner.org/docs/warning_types/sql_injection/)
+    @qualifier = Qualifier.exists?(:id => params[:id]) ? Qualifier.find(params[:id]) : nil
     render :update do |page|
       page.replace_html params[:certifier_area], :partial => 'certifiers_for_selection'
     end
