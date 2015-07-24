@@ -19,12 +19,13 @@ class Person < Profile
   acts_as_trackable :after_add => Proc.new {|p,t| notify_activity(t)}
   acts_as_accessor
 
-  acts_as_tagger
 
-  scope :members_of, lambda { |resources|
+  scope :members_of, lambda { |resources, extra_joins = nil|
     resources = [resources] if !resources.kind_of?(Array)
     conditions = resources.map {|resource| "role_assignments.resource_type = '#{resource.class.base_class.name}' AND role_assignments.resource_id = #{resource.id || -1}"}.join(' OR ')
-    { :select => 'DISTINCT profiles.*', :joins => :role_assignments, :conditions => [conditions] }
+    joins = [:role_assignments]
+    joins += extra_joins if extra_joins.is_a? Array
+    { :select => 'DISTINCT profiles.*', :joins => joins, :conditions => [conditions] }
   }
 
   scope :not_members_of, lambda { |resources|
@@ -33,10 +34,11 @@ class Person < Profile
     { :select => 'DISTINCT profiles.*', :conditions => ['"profiles"."id" NOT IN (SELECT DISTINCT profiles.id FROM "profiles" INNER JOIN "role_assignments" ON "role_assignments"."accessor_id" = "profiles"."id" AND "role_assignments"."accessor_type" = (\'Profile\') WHERE "profiles"."type" IN (\'Person\') AND (%s))' % conditions] }
   }
 
-  scope :by_role, lambda { |roles|
+  scope :by_role, lambda { |roles, extra_joins = nil|
     roles = [roles] unless roles.kind_of?(Array)
-    { :select => 'DISTINCT profiles.*', :joins => :role_assignments, :conditions => ['role_assignments.role_id IN (?)',
-roles] }
+    joins = [:role_assignments]
+    joins += extra_joins if extra_joins.is_a? Array
+    { :select => 'DISTINCT profiles.*', :joins => joins, :conditions => ['role_assignments.role_id IN (?)',roles] }
   }
 
   scope :not_friends_of, lambda { |resources|

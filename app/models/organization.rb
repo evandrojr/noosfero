@@ -178,7 +178,8 @@ class Organization < Profile
   end
 
   def notification_emails
-    emails = [contact_email].select(&:present?) + admins.map(&:email)
+    # TODO: Add performance improvement here!
+    emails = [contact_email].select(&:present?) + admins([:user]).pluck(:email)
     if emails.empty?
       emails << environment.contact_email
     end
