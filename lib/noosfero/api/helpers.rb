@@ -204,20 +204,6 @@ require 'grape'
         attrs
       end
 
-      def verify_recaptcha_v2(remote_ip, g_recaptcha_response, private_key, api_recaptcha_verify_uri)
-        verify_hash = {
-          "secret"    => private_key,
-          "remoteip"  => remote_ip,
-          "response"  => g_recaptcha_response
-        }
-        uri = URI(api_recaptcha_verify_uri)
-        https = Net::HTTP.new(uri.host, uri.port)
-        https.use_ssl = true
-        request = Net::HTTP::Post.new(uri.path)
-        request.set_form_data(verify_hash)
-        JSON.parse(https.request(request).body)
-      end
-
       ##########################################
       #              error helpers             #
       ##########################################
@@ -255,14 +241,14 @@ require 'grape'
 
       # javascript_console_message is supposed to be executed as console.log()
       def render_api_error!(user_message, status, log_message = nil, javascript_console_message = nil)
-        status = status(status || namespace_inheritable(:default_error_status))
+        status||= 400
         message_hash = {'message' => user_message, :code => status}
         message_hash[:javascript_console_message] = javascript_console_message if javascript_console_message.present?
         log_msg = "#{status}, User message: #{user_message}"
         log_msg = "#{log_message}, #{log_msg}" if log_message.present?
         log_msg = "#{log_msg}, Javascript Console Message: #{javascript_console_message}" if javascript_console_message.present?
-        #Since throw :error is not logging the errors I had to manually add log it!
-        log(log_msg)
+        #Since throw :error is not logging the errors I had to manually log it!
+        #log(log_msg)
         throw :error, message: message_hash, status: status, headers: headers
       end
 

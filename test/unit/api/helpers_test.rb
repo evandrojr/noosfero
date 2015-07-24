@@ -247,8 +247,11 @@ class APIHelpersTest < ActiveSupport::TestCase
     params = {}
     params[:txtToken_captcha_serpro_gov_br] = '4324343'
     params[:captcha_text] = '4324343'
-    r = test_captcha('127.0.0.1', params, environment)
-    assert_equal 'Serpro captcha error: getaddrinfo: Name or service not known', JSON.parse(r)['console_message']
+    assert_throws :error do
+      r =      test_captcha('127.0.0.1', params, environment)
+      puts r.inspect
+    end
+    # assert_equal 'Serpro captcha error: getaddrinfo: Name or service not known', JSON.parse(r)['console_message']
   end
 
 
@@ -260,11 +263,11 @@ class APIHelpersTest < ActiveSupport::TestCase
   # end
 
 
-  should 'display user message' do
-    r=render_api_error!('Error to the user', '403', 'detailed log_message', 'show this on user\'s javascript console')
-    puts r.inspect
-    tsil
-  end
+  # should 'display user message' do
+  #   r=render_api_error!('Error to the user', '403', 'detailed log_message', 'show this on user\'s javascript console')
+  #   puts r.inspect
+  #   tsil
+  # end
 
   protected
 
