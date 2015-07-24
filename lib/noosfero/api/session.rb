@@ -124,9 +124,9 @@ module Noosfero
         end
       end
 
-      # post "/error" do
-      #   render_api_error!("show on screen", 400, "this is the log message", "go to JS")
-      # end
+      get "/stop" do
+        stop!("show on screen", 400, "this is the log message", "go to JS")
+       end
 
     end
   end

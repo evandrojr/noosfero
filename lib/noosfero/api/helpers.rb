@@ -39,6 +39,10 @@ require 'grape'
         @environment
       end
 
+      def logger
+        Noosfero::API::API.logger
+      end
+
       def limit
         limit = params[:limit].to_i
         limit = default_limit if limit <= 0
@@ -239,6 +243,10 @@ require 'grape'
         render_api_error!(_('Method Not Allowed'), 405)
       end
 
+      # render_api_error!(message, status)
+      #   error!({'message' => message, :code => status}, status)
+      # end
+
       # javascript_console_message is supposed to be executed as console.log()
       def render_api_error!(user_message, status, log_message = nil, javascript_console_message = nil)
         status||= 400
@@ -247,9 +255,14 @@ require 'grape'
         log_msg = "#{status}, User message: #{user_message}"
         log_msg = "#{log_message}, #{log_msg}" if log_message.present?
         log_msg = "#{log_msg}, Javascript Console Message: #{javascript_console_message}" if javascript_console_message.present?
+#        headers = { Grape::Http::Headers::CONTENT_TYPE => content_type }.merge(headers)
+#        rack_response(format_message(message, backtrace), status, headers)
+#        raise log_msg
         #Since throw :error is not logging the errors I had to manually log it!
         #log(log_msg)
-        throw :error, message: message_hash, status: status, headers: headers
+        logger.error log_msg
+        error!(message_hash, status)
+#        throw :error, message: message_hash, status: status, headers: headers
       end
 
       def render_api_errors!(messages)

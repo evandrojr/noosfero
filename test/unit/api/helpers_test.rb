@@ -185,7 +185,8 @@ class APIHelpersTest < ActiveSupport::TestCase
         public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
         verify_uri:   'https://www.google.com/recaptcha/api/verify',
     }
-    assert_equal test_captcha("127.0.0.1", {}, environment), "Missing captcha data"
+    r = test_captcha('127.0.0.1', params, environment)
+    assert_equal 'Missing captcha data', JSON.parse(r)['console_message']
   end
 
   should 'fail display recaptcha v2' do
@@ -198,8 +199,11 @@ class APIHelpersTest < ActiveSupport::TestCase
         public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
         verify_uri:   'https://www.google.com/recaptcha/api/siteverify',
     }
-    assert_equal test_captcha("127.0.0.1", {}, environment), "Missing captcha data"
+    r = test_captcha('127.0.0.1', params, environment)
+    assert_equal 'Missing captcha data', JSON.parse(r)['console_message']
   end
+
+
 
   should 'fail display Serpro captcha' do
     environment = Environment.new
@@ -232,8 +236,6 @@ class APIHelpersTest < ActiveSupport::TestCase
     #assert_equal 403, find_article(p.articles, a.id).last
 
     #assert_equals [article1, article2], present_articles
-
-
   end
 
   should 'captcha serpro say name or service not known' do
@@ -247,11 +249,10 @@ class APIHelpersTest < ActiveSupport::TestCase
     params = {}
     params[:txtToken_captcha_serpro_gov_br] = '4324343'
     params[:captcha_text] = '4324343'
-    assert_throws :error do
-      r =      test_captcha('127.0.0.1', params, environment)
-      puts r.inspect
-    end
-    # assert_equal 'Serpro captcha error: getaddrinfo: Name or service not known', JSON.parse(r)['console_message']
+    binding.pry
+    expects(:render_api_error!).with(_('Internal captcha validation error'), 503, nil, "recaptcha error: #{e.message}")
+#    r = test_captcha('127.0.0.1', params, environment)
+#    assert_equal 'Serpro captcha error: getaddrinfo: Name or service not known', JSON.parse(r)['console_message']
   end
 
 
@@ -260,13 +261,6 @@ class APIHelpersTest < ActiveSupport::TestCase
   #   message_hash[:javascript_console_message] = javascript_console_message if javascript_console_message.present?
   #   self.status(status || namespace_inheritable(:default_error_status))
   #   throw :error, message: message_hash, status: self.status, headers: headers
-  # end
-
-
-  # should 'display user message' do
-  #   r=render_api_error!('Error to the user', '403', 'detailed log_message', 'show this on user\'s javascript console')
-  #   puts r.inspect
-  #   tsil
   # end
 
   protected
@@ -282,5 +276,14 @@ class APIHelpersTest < ActiveSupport::TestCase
   def params= value
     @params = value
   end
+
+  def render_api_error!(user_message, status, log_message = nil, javascript_console_message = nil)
+    status||= 400
+    log_msg = "#{status}, User message: #{user_message}"
+    log_msg = "#{log_message}, #{log_msg}" if log_message.present?
+    log_msg = "#{log_msg}, Javascript Console Message: #{javascript_console_message}" if javascript_console_message.present?
+    return log_msg
+  end
+
 
 end
