@@ -243,26 +243,19 @@ require 'grape'
         render_api_error!(_('Method Not Allowed'), 405)
       end
 
-      # render_api_error!(message, status)
-      #   error!({'message' => message, :code => status}, status)
-      # end
-
       # javascript_console_message is supposed to be executed as console.log()
       def render_api_error!(user_message, status, log_message = nil, javascript_console_message = nil)
-        status||= 400
         message_hash = {'message' => user_message, :code => status}
         message_hash[:javascript_console_message] = javascript_console_message if javascript_console_message.present?
         log_msg = "#{status}, User message: #{user_message}"
         log_msg = "#{log_message}, #{log_msg}" if log_message.present?
         log_msg = "#{log_msg}, Javascript Console Message: #{javascript_console_message}" if javascript_console_message.present?
-#        headers = { Grape::Http::Headers::CONTENT_TYPE => content_type }.merge(headers)
-#        rack_response(format_message(message, backtrace), status, headers)
-#        raise log_msg
-        #Since throw :error is not logging the errors I had to manually log it!
-        #log(log_msg)
         logger.error log_msg
-        error!(message_hash, status)
-#        throw :error, message: message_hash, status: status, headers: headers
+        if javascript_console_message.present?
+          error!(message_hash, status)
+        else
+          error!(user_message, status)
+        end
       end
 
       def render_api_errors!(messages)
@@ -331,11 +324,11 @@ require 'grape'
         return true unless d[:enabled] == true
         msg_icve = _('Internal captcha validation error')
         msg_eacs = 'Environment api_captcha_settings'
-        s = 503
+        s = 500
 
         if d[:provider] == 'google'
-          render_api_error!(msg_icve, s, nil, "#{msg_eacs} private_key not defined") if d[:private_key].nil?
-          render_api_error!(msg_icve, s, nil, "#{msg_eacs} version not defined") unless d[:version] == 1 || d[:version] == 2
+          return render_api_error!(msg_icve, s, nil, "#{msg_eacs} private_key not defined") if d[:private_key].nil?
+          return render_api_error!(msg_icve, s, nil, "#{msg_eacs} version not defined") unless d[:version] == 1 || d[:version] == 2
           if d[:version]  == 1
             d[:verify_uri] ||= 'https://www.google.com/recaptcha/api/verify'
             return verify_recaptcha_v1(remote_ip, d[:private_key], d[:verify_uri], params[:recaptcha_challenge_field], params[:recaptcha_response_field])
@@ -346,15 +339,15 @@ require 'grape'
           end
         end
         if d[:provider] == 'serpro'
-          render_api_error!(msg_icve, s, nil, "#{msg_eacs} verify_uri not defined") if d[:verify_uri].nil?
+          return render_api_error!(msg_icve, s, nil, "#{msg_eacs} verify_uri not defined") if d[:verify_uri].nil?
           return verify_serpro_captcha(d[:serpro_client_id], params[:txtToken_captcha_serpro_gov_br], params[:captcha_text], d[:verify_uri])
         end
-        render_api_error!(msg_icve, s, nil, "#{msg_eacs} provider not defined")
+        return render_api_error!(msg_icve, s, nil, "#{msg_eacs} provider not defined")
       end
 
       def verify_recaptcha_v1(remote_ip, private_key, api_recaptcha_verify_uri, recaptcha_challenge_field, recaptcha_response_field)
         if recaptcha_challenge_field == nil || recaptcha_response_field == nil
-          render_api_error!(_('Captcha validation error'), 503, nil, _('Missing captcha data'))
+          return render_api_error!(_('Captcha validation error'), 500, nil, _('Missing captcha data'))
         end
 
         verify_hash = {
@@ -371,16 +364,14 @@ require 'grape'
         begin
           body = https.request(request).body
         rescue Exception => e
-          logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
-          logger.error e
-          render_api_error!(_('Internal captcha validation error'), 503, nil, "recaptcha error: #{e.message}")
+          return render_api_error!(_('Internal captcha validation error'), 500, nil, "recaptcha error: #{e.message}")
         end
         body = JSON.parse(body)
         body == "true\nsuccess" ? true : body
       end
 
       def verify_recaptcha_v2(remote_ip, private_key, api_recaptcha_verify_uri, g_recaptcha_response)
-        render_api_error!(_('Captcha validation error'), 503, nil, _('Missing captcha data')) if g_recaptcha_response == nil
+        return render_api_error!(_('Captcha validation error'), 500, nil, _('Missing captcha data')) if g_recaptcha_response == nil
         verify_hash = {
             "secret"    => private_key,
             "remoteip"  => remote_ip,
@@ -394,15 +385,15 @@ require 'grape'
         begin
           body = https.request(request).body
         rescue Exception => e
-          render_api_error!(_('Internal captcha validation error'), 503, nil, "recaptcha error: #{e.message}")
+          return render_api_error!(_('Internal captcha validation error'), 500, nil, "recaptcha error: #{e.message}")
         end
         captcha_result = JSON.parse(body)
         captcha_result["success"] ? true : captcha_result
       end
 
       def verify_serpro_captcha(client_id, token, captcha_text, verify_uri)
-        return _('Missing Serpro Captcha token') if token == nil
-        return _('Captcha text has not been filled') if captcha_text == nil
+        return render_api_error!(_("Error processing token validation"), 500, nil, _("Missing Serpro's Captcha token")) unless token
+        return render_api_error!(_('Captcha text has not been filled'), 403) unless captcha_text
         uri = URI(verify_uri)
         http = Net::HTTP.new(uri.host, uri.port)
         request = Net::HTTP::Post.new(uri.path)
@@ -411,26 +402,12 @@ require 'grape'
         begin
           body = http.request(request).body
         rescue Exception => e
-          render_api_error!(_('Internal captcha validation error'), 503, nil, "Serpro captcha error: #{e.message}")
+          return render_api_error!(_('Internal captcha validation error'), 500, nil, "Serpro captcha error: #{e.message}")
         end
-        render_api_error!("Wrong captcha text, please try again") if body == 0
-        render_api_error!("Token not found") if body == 2
+        return render_api_error!(_("Wrong captcha text, please try again"), 403) if body == 0
+        return render_api_error!(_("Token not found"), 500) if body == 2
+        return render_api_error!(_("No data sent to validation server or other serious problem"), 500) if body == -1
         body == '1' ? true : body
-      end
-
-      # custom_message[:prepend2log] -> Prepend2log gives more details to the application log
-      def log_exception(e, prepend_message2log=nil)
-        logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
-        logger.formatter = GrapeLogging::Formatters::Default.new
-        e.message = "#{prepend_message2log} e.message" if prepend_message2log.present?
-        puts e.message
-        logger.error e
-      end
-
-      def log(message)
-        logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
-        logger.formatter = GrapeLogging::Formatters::Default.new
-        logger.error message
       end
 
     end

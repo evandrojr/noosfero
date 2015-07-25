@@ -113,7 +113,6 @@ class APIHelpersTest < ActiveSupport::TestCase
     p = fast_create(Profile)
     a = fast_create(Article, :published => false, :profile_id => p.id)
     fast_create(Article, :profile_id => p.id)
-
     user.generate_private_token!
     User.expects(:find_by_private_token).returns(user)
     assert_equal 403, find_article(p.articles, a.id).last
@@ -162,61 +161,6 @@ class APIHelpersTest < ActiveSupport::TestCase
     assert_nil make_conditions_with_parameter[:type]
   end
 
-  should 'do not test captcha when there are no settings' do
-    environment = Environment.new
-    assert test_captcha("127.0.0.1", {}, environment)
-  end
-
-  should 'do not test captcha when captcha is disabled on settings' do
-    environment = Environment.new
-    environment.api_captcha_settings = {
-        enabled: false,
-    }
-    assert test_captcha("127.0.0.1", {}, environment)
-  end
-
-  should 'fail display recaptcha v1' do
-    environment = Environment.new
-    environment.api_captcha_settings = {
-        enabled: true,
-        provider: 'google',
-        version:  1,
-        private_key:  '6LdsWAcTAAAAAB6maB_HalVyCc4asDAxPxloIMvY',
-        public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
-        verify_uri:   'https://www.google.com/recaptcha/api/verify',
-    }
-    r = test_captcha('127.0.0.1', params, environment)
-    assert_equal 'Missing captcha data', JSON.parse(r)['console_message']
-  end
-
-  should 'fail display recaptcha v2' do
-    environment = Environment.new
-    environment.api_captcha_settings = {
-        enabled: true,
-        provider: 'google',
-        version:  2,
-        private_key:  '6LdsWAcTAAAAAB6maB_HalVyCc4asDAxPxloIMvY',
-        public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
-        verify_uri:   'https://www.google.com/recaptcha/api/siteverify',
-    }
-    r = test_captcha('127.0.0.1', params, environment)
-    assert_equal 'Missing captcha data', JSON.parse(r)['console_message']
-  end
-
-
-
-  should 'fail display Serpro captcha' do
-    environment = Environment.new
-    environment.api_captcha_settings = {
-        enabled: true,
-        provider: 'serpro',
-        serpro_client_id:  '0000000000000000',
-        verify_uri:   'http://localhost/api/verify',
-    }
-    params = {}
-    params[:txtToken_captcha_serpro_gov_br] = '4324343'
-    assert_equal test_captcha("127.0.0.1", params, environment), _('Captcha text has not been filled')
-  end
 
   should 'render not_found if endpoint is unavailable' do
     Noosfero::API::API.stubs(:endpoint_unavailable?).returns(true)
@@ -238,7 +182,77 @@ class APIHelpersTest < ActiveSupport::TestCase
     #assert_equals [article1, article2], present_articles
   end
 
-  should 'captcha serpro say name or service not known' do
+###### Captcha tests ######
+
+should 'do not test captcha when there are no settings' do
+  environment = Environment.new
+  assert test_captcha("127.0.0.1", {}, environment)
+end
+
+should 'do not test captcha when captcha is disabled on settings' do
+  environment = Environment.new
+  environment.api_captcha_settings = {
+      enabled: false,
+  }
+  assert test_captcha("127.0.0.1", {}, environment)
+end
+
+should 'fail display recaptcha v1' do
+  environment = Environment.new
+  environment.api_captcha_settings = {
+      enabled: true,
+      provider: 'google',
+      version:  1,
+      private_key:  '6LdsWAcTAAAAAB6maB_HalVyCc4asDAxPxloIMvY',
+      public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
+      verify_uri:   'https://www.google.com/recaptcha/api/verify',
+  }
+  r = test_captcha('127.0.0.1', params, environment)
+  assert_equal(_("Missing captcha data"), r[0][:javascript_console_message])
+end
+
+should 'fail display recaptcha v2' do
+  environment = Environment.new
+  environment.api_captcha_settings = {
+      enabled: true,
+      provider: 'google',
+      version:  2,
+      private_key:  '6LdsWAcTAAAAAB6maB_HalVyCc4asDAxPxloIMvY',
+      public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
+      verify_uri:   'https://www.google.com/recaptcha/api/siteverify',
+  }
+  r = test_captcha('127.0.0.1', params, environment)
+  assert_equal(_("Missing captcha data"), r[0][:javascript_console_message])
+end
+
+should 'verify if user filled Serpro\' captcha text' do
+  environment = Environment.new
+  environment.api_captcha_settings = {
+      enabled: true,
+      provider: 'serpro',
+      serpro_client_id:  '0000000000000000',
+      verify_uri:   'http://localhost/api/verify',
+  }
+  params = {}
+  params[:txtToken_captcha_serpro_gov_br] = '4324343'
+  assert_equal(_('Captcha text has not been filled'), test_captcha('127.0.0.1', params, environment)[0])
+end
+
+should 'verify if Serpro\' captcha token has been sent' do
+  environment = Environment.new
+  environment.api_captcha_settings = {
+      enabled: true,
+      provider: 'serpro',
+      serpro_client_id:  '0000000000000000',
+      verify_uri:   'http://localhost/api/verify',
+  }
+  params = {}
+  params[:captcha_text] = '4324343'
+  r = test_captcha('127.0.0.1', params, environment)
+  assert_equal(_("Missing Serpro's Captcha token"), r[0][:javascript_console_message])
+end
+
+should 'captcha serpro say name or service not known' do
     environment = Environment.new
     environment.api_captcha_settings = {
         enabled: true,
@@ -249,19 +263,11 @@ class APIHelpersTest < ActiveSupport::TestCase
     params = {}
     params[:txtToken_captcha_serpro_gov_br] = '4324343'
     params[:captcha_text] = '4324343'
-    binding.pry
-    expects(:render_api_error!).with(_('Internal captcha validation error'), 503, nil, "recaptcha error: #{e.message}")
-#    r = test_captcha('127.0.0.1', params, environment)
-#    assert_equal 'Serpro captcha error: getaddrinfo: Name or service not known', JSON.parse(r)['console_message']
-  end
+    r = test_captcha('127.0.0.1', params, environment)
+    assert_equal(_("Serpro captcha error: getaddrinfo: Name or service not known"), r[0][:javascript_console_message])
+end
 
-
-  # def render_api_error!(user_message, status, log_message = nil, javascript_console_message = nil)
-  #   message_hash = {'message' => user_message, :code => status}
-  #   message_hash[:javascript_console_message] = javascript_console_message if javascript_console_message.present?
-  #   self.status(status || namespace_inheritable(:default_error_status))
-  #   throw :error, message: message_hash, status: self.status, headers: headers
-  # end
+###### END Captcha tests ######
 
   protected
 
@@ -276,14 +282,5 @@ class APIHelpersTest < ActiveSupport::TestCase
   def params= value
     @params = value
   end
-
-  def render_api_error!(user_message, status, log_message = nil, javascript_console_message = nil)
-    status||= 400
-    log_msg = "#{status}, User message: #{user_message}"
-    log_msg = "#{log_message}, #{log_msg}" if log_message.present?
-    log_msg = "#{log_msg}, Javascript Console Message: #{javascript_console_message}" if javascript_console_message.present?
-    return log_msg
-  end
-
 
 end
