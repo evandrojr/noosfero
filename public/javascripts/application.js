@@ -28,7 +28,6 @@
 *= require catalog.js
 *= require autogrow.js
 *= require slick.js
-*= require select-or-die/_src/selectordie.js
 *= require block-store.js
 *= require jquery.typewatch.js
 *= require require_login.js

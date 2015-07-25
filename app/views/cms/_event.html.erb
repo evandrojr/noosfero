@@ -8,9 +8,7 @@
 <%= render :partial => 'general_fields' %>
 <%= render :partial => 'translatable' %>
 
-<%= labelled_form_field(_('Start date and time'), datetime_select(:article, :start_date)) %>
-
-<%= labelled_form_field(_('End date and time'), datetime_select(:article, :end_date)) %>
+<%= date_range_field('article[start_date]', 'article[end_date]', @article.start_date, @article.end_date, _('%Y-%m-%d %H:%M'), {:time => true}, {:id => 'article_start_date'} ) %>
 
 <%= labelled_form_field(_('Presenter:'), text_field(:article, :presenter)) %>
 
