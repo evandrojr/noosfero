@@ -370,7 +370,8 @@ class TaskTest < ActiveSupport::TestCase
     assert_not_includes Task.of(type), t3
     assert_includes Task.of(nil), t3
   end
-#  should 'filter tasks by tags with named scope' do
+
+  should 'filter tasks by tags with named scope' do
 
     requestor = fast_create(Person)
     target = fast_create(Person)
