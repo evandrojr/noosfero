@@ -370,26 +370,21 @@ class TaskTest < ActiveSupport::TestCase
     assert_not_includes Task.of(type), t3
     assert_includes Task.of(nil), t3
   end
-
-#FIXME This tests are not working
 #  should 'filter tasks by tags with named scope' do
-#
-#    requestor = fast_create(Person)
-#    target = fast_create(Person)
-#    profile = sample_user
-#
-#    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'})
-#    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'})
-#
-#    profile.tag(task_one, with: 'noosfero,test', on: :tags)
-#    profile.tag(task_two, with: 'test', on: :tags)
-#
-#    data = Task.tagged_with('noosfero', any: true)
-#
-#    assert_includes data, task_one
-#    assert_not_includes data, task_two
-#
-#  end
+
+    requestor = fast_create(Person)
+    target = fast_create(Person)
+    profile = sample_user
+
+    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'}, :tag_list => 'noosfero,test')
+    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'}, :tag_list => 'test')
+
+    data = Task.tagged_with('noosfero', any: true)
+
+    assert_includes data, task_one
+    assert_not_includes data, task_two
+
+  end
 
   should 'order tasks by some attribute correctly' do
     Task.destroy_all
@@ -497,22 +492,19 @@ class TaskTest < ActiveSupport::TestCase
     task.save!
     assert_equal person, task.responsible
   end
-#FIXME this tests are not working
-#  should 'save tasks tags' do
-#
-#    requestor = fast_create(Person)
-#    target = fast_create(Person)
-#    profile = sample_user
-#
-#    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'})
-#    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'})
-#
-#    profile.tag(task_one, with: 'noosfero,test', on: :tags)
-#    profile.tag(task_two, with: 'test', on: :tags)
-#
-#    assert_includes task_one.tags_from(nil), 'test'
-#    assert_not_includes task_two.tags_from(nil), 'noosfero'
-#  end
+
+  should 'save tasks tags' do
+
+    requestor = fast_create(Person)
+    target = fast_create(Person)
+    profile = sample_user
+
+    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'}, :tag_list => 'noosfero,test')
+    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'}, :tag_list => 'test')
+
+    assert_includes task_one.tags_from(nil), 'test'
+    assert_not_includes task_two.tags_from(nil), 'noosfero'
+  end
 
   should 'store who finish the task' do
     t = Task.create

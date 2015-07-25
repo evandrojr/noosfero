@@ -464,11 +464,8 @@ class TasksControllerTest < ActionController::TestCase
 
     requestor = fast_create(Person)
 
-    task_one = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Task Test'})
-    task_two = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Another Task'})
-
-    person.tag(task_one, with: 'noosfero,test', on: :tags)
-    person.tag(task_two, with: 'test', on: :tags)
+    task_one = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Task Test'}, :tag_list => 'noosfero, test')
+    task_two = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Another Task'}, :tag_list => 'test')
 
     get :index, :filter_tags => 'noosfero'
 
@@ -730,9 +727,6 @@ class TasksControllerTest < ActionController::TestCase
 
     assert_not_includes task_one.tags_from(nil), 'test'
   end
-#region_validators_controller_test.rb:    give_permission('ze', 'manage_environment_validators', environment)
-#profile_editor_controller_test.rb:    user2.stubs(:has_permission?).with('edit_profile', anything).returns(true)
-#profile_editor_controller_test.rb:    user2.expects(:has_permission?).with(:manage_friends, anything).returns(true)
 
   should 'not tag task with permission but another user' do
     requestor = fast_create(Person)

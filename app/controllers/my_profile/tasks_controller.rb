@@ -84,7 +84,7 @@ class TasksController < MyProfileController
       end
     end
 
-    url = task_action(:index)
+    url = { :action => 'index' }
 
     if failed.blank?
       session[:notice] = _("All decisions were applied successfully.")
@@ -133,10 +133,9 @@ class TasksController < MyProfileController
 
       ActsAsTaggableOn.remove_unused_tags = true
 
-      task = Task.to(profile).find_by_id params[:task_id]
-      save = user.tag(task, with: params[:tag_list], on: :tags)
-
-      if save
+      task = profile.tasks.find_by_id(params[:task_id])
+      
+      if task && task.update_attributes(:tag_list => params[:tag_list])
         result[:success] = true
       end
     end
