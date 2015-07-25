@@ -39,7 +39,9 @@ module Noosfero
         unique_attributes! User, [:email, :login]
         attrs = attributes_for_keys [:email, :login, :password, :password_confirmation] + environment.signup_person_fields
         remote_ip = (request.respond_to?(:remote_ip) && request.remote_ip) || (env && env['REMOTE_ADDR'])
-        test_captcha(remote_ip, params, environment)
+        # test_captcha will render_api_error! and exit in case of some problem
+        # this return is only improve the clarity of the execution path 
+        return unless test_captcha(remote_ip, params, environment)
         user = User.new(attrs)
         if user.save
           user.generate_private_token! if user.activated?
@@ -123,10 +125,6 @@ module Noosfero
           something_wrong!
         end
       end
-
-      get "/stop" do
-        stop!("show on screen", 400, "this is the log message", "go to JS")
-       end
 
     end
   end

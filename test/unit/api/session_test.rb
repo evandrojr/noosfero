@@ -64,8 +64,8 @@ class SessionTest < ActiveSupport::TestCase
     params = {:login => "newuserapi", :password => "newuserapi", :password_confirmation => "newuserapi", :email => "newuserapi@email.com",
               :txtToken_captcha_serpro_gov_br => '4324343', :captcha_text => '4030320'}
     post "/api/v1/register?#{params.to_query}"
-    message = JSON.parse(last_response.body)['message']
-    assert_equal "Serpro captcha error: getaddrinfo: Name or service not known", JSON.parse(message)['javascript_console_message']
+    message = JSON.parse(last_response.body)['javascript_console_message']
+    assert_equal "Serpro captcha error: getaddrinfo: Name or service not known", message
   end
 
   # TODO: Add another test cases to check register situations
@@ -159,11 +159,6 @@ class SessionTest < ActiveSupport::TestCase
     params = {:code => "wrongcode", :password => 'secret', :password_confirmation => 'secret'}
     patch "/api/v1/new_password?#{params.to_query}"
     assert_equal 404, last_response.status
-  end
-
-  should 'show erro' do
-    post "/api/v1/error"
-    puts last_response.inspect
   end
 
 end
