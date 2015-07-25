@@ -14,7 +14,7 @@ module Noosfero
       rescue_from :all do |e|
         puts e.inspect
         puts e.backtrace.inspect
-        #logger.error e
+        logger.error e
       end
 
       @@NOOSFERO_CONF = nil
