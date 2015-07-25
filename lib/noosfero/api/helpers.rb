@@ -392,7 +392,7 @@ require 'grape'
       end
 
       def verify_serpro_captcha(client_id, token, captcha_text, verify_uri)
-        return render_api_error!(_("Error processing token validation"), 500, nil, _("Missing Serpro's Captcha token")) unless token
+        return render_api_error!(_("Error processing token validation"), 500, nil, "Missing Serpro's Captcha token") unless token
         return render_api_error!(_('Captcha text has not been filled'), 403) unless captcha_text
         uri = URI(verify_uri)
         http = Net::HTTP.new(uri.host, uri.port)
@@ -404,10 +404,13 @@ require 'grape'
         rescue Exception => e
           return render_api_error!(_('Internal captcha validation error'), 500, nil, "Serpro captcha error: #{e.message}")
         end
+        return true if body == '1'
+        return render_api_error!(_("Internal captcha validation error"), 500, body, "Unable to reach Serpro's Captcha validation service") if body == "Activity timed out"
         return render_api_error!(_("Wrong captcha text, please try again"), 403) if body == 0
-        return render_api_error!(_("Token not found"), 500) if body == 2
+        return render_api_error!(_("Serpro's captcha token not found"), 500) if body == 2
         return render_api_error!(_("No data sent to validation server or other serious problem"), 500) if body == -1
-        body == '1' ? true : body
+        #Catches all errors at the end
+        return render_api_error!(_("Internal captcha validation error"), 500, nil, "Error validating Serpro's captcha #{body}")
       end
 
     end
