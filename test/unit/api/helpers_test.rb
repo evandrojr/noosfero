@@ -161,6 +161,27 @@ class APIHelpersTest < ActiveSupport::TestCase
     assert_nil make_conditions_with_parameter[:type]
   end
 
+  #test_should_make_order_with_parameters_return_order_if attribute_is_found_at_object_association
+  should 'make_order_with_parameters return order if attribute is found at object association' do
+    environment = Environment.new
+    params = {:order => "name ASC"}
+    assert_equal "name ASC", make_order_with_parameters(environment, "articles", params)
+  end
+
+  # test added to check for eventual sql injection vunerabillity
+  #test_should_make_order_with_parameters_return_default_order_if_attributes_not_exists
+  should 'make_order_with_parameters return default order if attributes not exists' do
+    environment = Environment.new
+    params = {:order => "CRAZY_FIELD ASC"} # quote used to check sql injection vunerabillity
+    assert_equal "created_at DESC", make_order_with_parameters(environment, "articles", params)
+  end
+
+  should 'make_order_with_parameters return default order if sql injection detected' do
+    environment = Environment.new
+    params = {:order => "name' ASC"} # quote used to check sql injection vunerabillity
+    assert_equal "created_at DESC", make_order_with_parameters(environment, "articles", params)
+  end
+
 
   should 'render not_found if endpoint is unavailable' do
     Noosfero::API::API.stubs(:endpoint_unavailable?).returns(true)
