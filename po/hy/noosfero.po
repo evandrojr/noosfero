@@ -4985,21 +4985,21 @@ msgstr "Մեկ համայնք"
 msgid "[%s] You received a scrap!"
 msgstr ""
 
-#: app/mailers/user_mailer.rb:13
+#: app/mailers/user_mailer.rb:16
 msgid "[%{environment}] Welcome to %{environment} mail!"
 msgstr ""
 
-#: app/mailers/user_mailer.rb:28
+#: app/mailers/user_mailer.rb:31
 #, fuzzy
 msgid "[%s] Activate your account"
 msgstr "Ձեր կազմակերպությունները ցուցադրող բաժին"
 
-#: app/mailers/user_mailer.rb:39
+#: app/mailers/user_mailer.rb:44
 #, fuzzy
 msgid "Welcome to environment %s"
 msgstr "Փակ %s"
 
-#: app/mailers/user_mailer.rb:57
+#: app/mailers/user_mailer.rb:62
 msgid "[%s] What about grow up your network?"
 msgstr ""
 
@@ -10260,6 +10260,31 @@ msgstr "Գին %s"
 #, fuzzy
 msgid "Feed"
 msgstr "RSS հոսք"
+
+#: lib/noosfero/api/helpers.rb:363 lib/noosfero/api/helpers.rb:389
+msgid "\"Google recaptcha error: #{e.message}\""
+msgstr ""
+
+#: lib/noosfero/api/helpers.rb:396
+msgid "Missing Serpro Captcha token"
+msgstr ""
+
+#: lib/noosfero/api/helpers.rb:397
+msgid "Captcha text has not been filled"
+msgstr ""
+
+#: lib/noosfero/api/helpers.rb:408
+msgid "\"Serpro captcha error: #{e.message}\""
+msgstr ""
+
+#: lib/noosfero/api/helpers.rb:410
+msgid "Wrong captcha text, please try again"
+msgstr ""
+
+#: lib/noosfero/api/helpers.rb:411
+#, fuzzy
+msgid "Token not found"
+msgstr "Ներկայիս կատեգորիա"
 
 #: config/initializers/action_tracker.rb:5
 msgid "sent a message to %{receiver}: <br /> \"%{message}\""
