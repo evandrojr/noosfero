@@ -267,7 +267,7 @@ should 'verify if user filled Serpro\' captcha text' do
   }
   params = {}
   params[:txtToken_captcha_serpro_gov_br] = '4324343'
-  assert_equal(_('Captcha text has not been filled'), test_captcha('127.0.0.1', params, environment)[0])
+  assert_equal(_('Captcha text has not been filled'), test_captcha('127.0.0.1', params, environment)[0]['message'])
 end
 
 should 'verify if Serpro\' captcha token has been sent' do
