@@ -263,7 +263,7 @@ require 'grape'
         log_msg = "#{status}, User message: #{user_message}"
         log_msg = "#{log_message}, #{log_msg}" if log_message.present?
         log_msg = "#{log_msg}, Javascript Console Message: #{javascript_console_message}" if javascript_console_message.present?
-        logger.error log_msg
+        logger.error log_msg unless Rails.env.test?
         if javascript_console_message.present?
           error!(message_hash, status)
         else
