@@ -1,3 +1,5 @@
+require 'grape'
+
   module Noosfero;
 
     module API
@@ -35,6 +37,10 @@
 
       def environment
         @environment
+      end
+
+      def logger
+        Noosfero::API::API.logger
       end
 
       def limit
@@ -202,20 +208,6 @@
         attrs
       end
 
-      def verify_recaptcha_v2(remote_ip, g_recaptcha_response, private_key, api_recaptcha_verify_uri)
-        verify_hash = {
-          "secret"    => private_key,
-          "remoteip"  => remote_ip,
-          "response"  => g_recaptcha_response
-        }
-        uri = URI(api_recaptcha_verify_uri)
-        https = Net::HTTP.new(uri.host, uri.port)
-        https.use_ssl = true
-        request = Net::HTTP::Post.new(uri.path)
-        request.set_form_data(verify_hash)
-        JSON.parse(https.request(request).body)
-      end
-
       ##########################################
       #              error helpers             #
       ##########################################
@@ -251,8 +243,19 @@
         render_api_error!(_('Method Not Allowed'), 405)
       end
 
-      def render_api_error!(message, status)
-        error!({'message' => message, :code => status}, status)
+      # javascript_console_message is supposed to be executed as console.log()
+      def render_api_error!(user_message, status, log_message = nil, javascript_console_message = nil)
+        message_hash = {'message' => user_message, :code => status}
+        message_hash[:javascript_console_message] = javascript_console_message if javascript_console_message.present?
+        log_msg = "#{status}, User message: #{user_message}"
+        log_msg = "#{log_message}, #{log_msg}" if log_message.present?
+        log_msg = "#{log_msg}, Javascript Console Message: #{javascript_console_message}" if javascript_console_message.present?
+        logger.error log_msg
+        if javascript_console_message.present?
+          error!(message_hash, status)
+        else
+          error!(user_message, status)
+        end
       end
 
       def render_api_errors!(messages)
@@ -319,10 +322,13 @@
       def test_captcha(remote_ip, params, environment)
         d = environment.api_captcha_settings
         return true unless d[:enabled] == true
+        msg_icve = _('Internal captcha validation error')
+        msg_eacs = 'Environment api_captcha_settings'
+        s = 500
 
         if d[:provider] == 'google'
-          raise ArgumentError, "Environment api_captcha_settings private_key not defined" if d[:private_key].nil?
-          raise ArgumentError, "Environment api_captcha_settings version not defined" unless d[:version] == 1 || d[:version] == 2
+          return render_api_error!(msg_icve, s, nil, "#{msg_eacs} private_key not defined") if d[:private_key].nil?
+          return render_api_error!(msg_icve, s, nil, "#{msg_eacs} version not defined") unless d[:version] == 1 || d[:version] == 2
           if d[:version]  == 1
             d[:verify_uri] ||= 'https://www.google.com/recaptcha/api/verify'
             return verify_recaptcha_v1(remote_ip, d[:private_key], d[:verify_uri], params[:recaptcha_challenge_field], params[:recaptcha_response_field])
@@ -333,15 +339,15 @@
           end
         end
         if d[:provider] == 'serpro'
-          raise ArgumentError, "Environment api_captcha_settings verify_uri not defined" if d[:verify_uri].nil?
+          return render_api_error!(msg_icve, s, nil, "#{msg_eacs} verify_uri not defined") if d[:verify_uri].nil?
           return verify_serpro_captcha(d[:serpro_client_id], params[:txtToken_captcha_serpro_gov_br], params[:captcha_text], d[:verify_uri])
         end
-        raise ArgumentError, "Environment api_captcha_settings provider not defined"
+        return render_api_error!(msg_icve, s, nil, "#{msg_eacs} provider not defined")
       end
 
       def verify_recaptcha_v1(remote_ip, private_key, api_recaptcha_verify_uri, recaptcha_challenge_field, recaptcha_response_field)
         if recaptcha_challenge_field == nil || recaptcha_response_field == nil
-          return _('Missing captcha data')
+          return render_api_error!(_('Captcha validation error'), 500, nil, _('Missing captcha data'))
         end
 
         verify_hash = {
@@ -358,19 +364,14 @@
         begin
           body = https.request(request).body
         rescue Exception => e
-          logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
-          logger.error e
-          return _("Google recaptcha error: #{e.message}")
+          return render_api_error!(_('Internal captcha validation error'), 500, nil, "recaptcha error: #{e.message}")
         end
         body = JSON.parse(body)
         body == "true\nsuccess" ? true : body
       end
 
       def verify_recaptcha_v2(remote_ip, private_key, api_recaptcha_verify_uri, g_recaptcha_response)
-        if g_recaptcha_response == nil
-          return _('Missing captcha data')
-        end
-
+        return render_api_error!(_('Captcha validation error'), 500, nil, _('Missing captcha data')) if g_recaptcha_response == nil
         verify_hash = {
             "secret"    => private_key,
             "remoteip"  => remote_ip,
@@ -384,17 +385,15 @@
         begin
           body = https.request(request).body
         rescue Exception => e
-          logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
-          logger.error e
-          return _("Google recaptcha error: #{e.message}")
+          return render_api_error!(_('Internal captcha validation error'), 500, nil, "recaptcha error: #{e.message}")
         end
         captcha_result = JSON.parse(body)
         captcha_result["success"] ? true : captcha_result
       end
 
       def verify_serpro_captcha(client_id, token, captcha_text, verify_uri)
-        return _('Missing Serpro Captcha token') if token == nil
-        return _('Captcha text has not been filled') if captcha_text == nil
+        return render_api_error!(_("Error processing token validation"), 500, nil, "Missing Serpro's Captcha token") unless token
+        return render_api_error!(_('Captcha text has not been filled'), 403) unless captcha_text
         uri = URI(verify_uri)
         http = Net::HTTP.new(uri.host, uri.port)
         request = Net::HTTP::Post.new(uri.path)
@@ -403,13 +402,15 @@
         begin
           body = http.request(request).body
         rescue Exception => e
-          logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
-          logger.error e
-          return _("Serpro captcha error: #{e.message}")
+          return render_api_error!(_('Internal captcha validation error'), 500, nil, "Serpro captcha error: #{e.message}")
         end
-        return _("Wrong captcha text, please try again") if body == 0
-        return _("Token not found") if body == 2
-        body == '1' ? true : body
+        return true if body == '1'
+        return render_api_error!(_("Internal captcha validation error"), 500, body, "Unable to reach Serpro's Captcha validation service") if body == "Activity timed out"
+        return render_api_error!(_("Wrong captcha text, please try again"), 403) if body == 0
+        return render_api_error!(_("Serpro's captcha token not found"), 500) if body == 2
+        return render_api_error!(_("No data sent to validation server or other serious problem"), 500) if body == -1
+        #Catches all errors at the end
+        return render_api_error!(_("Internal captcha validation error"), 500, nil, "Error validating Serpro's captcha #{body}")
       end
 
     end

@@ -2,7 +2,6 @@ require "uri"
 
 module Noosfero
   module API
-
     class Session < Grape::API
 
       # Login to get token
@@ -40,13 +39,9 @@ module Noosfero
         unique_attributes! User, [:email, :login]
         attrs = attributes_for_keys [:email, :login, :password, :password_confirmation] + environment.signup_person_fields
         remote_ip = (request.respond_to?(:remote_ip) && request.remote_ip) || (env && env['REMOTE_ADDR'])
-
-        result = test_captcha(remote_ip, params, environment)
-        unless result == true
-          render_api_error!(result, 401)
-          return
-        end
-
+        # test_captcha will render_api_error! and exit in case of some problem
+        # this return is only improve the clarity of the execution path
+        return unless test_captcha(remote_ip, params, environment)
         user = User.new(attrs)
         if user.save
           user.generate_private_token! if user.activated?
