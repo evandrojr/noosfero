@@ -273,7 +273,7 @@ require 'grape'
         if javascript_console_message.present?
           error!(message_hash, status)
         else
-          error!(user_message, status)
+          error!({'message' => user_message, :code => status}, status)
         end
       end
 
