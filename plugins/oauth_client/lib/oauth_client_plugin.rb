@@ -84,8 +84,11 @@ class OauthClientPlugin < Noosfero::Plugin
 
         if auth.present? && params[:user].present?
           params[:user][:oauth_providers] = [OauthClientPlugin::Provider.find(session[:provider_id])]
+
           if request.post? && auth.info.email != params[:user][:email]
-            raise "Wrong email for oauth signup"
+            unless params[:user][:email].blank?
+              raise "Wrong email for oauth signup. EMAIL: #{params[:user][:email]}"
+            end
           end
         end
       }

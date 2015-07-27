@@ -3,7 +3,7 @@
 # which by default is the one returned by Environment:default.
 class Profile < ActiveRecord::Base
 
-  attr_accessible :name, :identifier, :public_profile, :nickname, :custom_footer, :custom_header, :address, :zip_code, :contact_phone, :image_builder, :description, :closed, :template_id, :environment, :lat, :lng, :is_template, :fields_privacy, :preferred_domain_id, :category_ids, :country, :city, :state, :national_region_code, :email, :contact_email, :redirect_l10n, :notification_time, :redirection_after_login, :email_suggestions, :allow_members_to_invite, :invite_friends_only, :secret, :custom_fields
+  attr_accessible :name, :identifier, :public_profile, :nickname, :custom_footer, :custom_header, :address, :zip_code, :contact_phone, :image_builder, :description, :closed, :template_id, :environment, :lat, :lng, :is_template, :fields_privacy, :preferred_domain_id, :category_ids, :country, :city, :state, :national_region_code, :email, :contact_email, :redirect_l10n, :notification_time, :redirection_after_login, :email_suggestions, :allow_members_to_invite, :invite_friends_only, :secret, :custom_fields, :administrator_mail_notification, :region
 
   # use for internationalizable human type names in search facets
   # reimplement on subclasses
@@ -107,6 +107,7 @@ class Profile < ActiveRecord::Base
     'invite_members'       => N_('Invite members'),
     'send_mail_to_members' => N_('Send e-Mail to members'),
     'manage_custom_roles'  => N_('Manage custom roles'),
+    'manage_email_templates' => N_('Manage Email Templates'),
   }
 
   acts_as_accessible
@@ -191,8 +192,8 @@ class Profile < ActiveRecord::Base
     alias_method_chain :count, :distinct
   end
 
-  def members_by_role(roles)
-    Person.members_of(self).by_role(roles)
+  def members_by_role(roles, with_entities = nil)
+    Person.members_of(self, with_entities).by_role(roles, with_entities)
   end
 
   acts_as_having_boxes
@@ -223,6 +224,8 @@ class Profile < ActiveRecord::Base
 
   has_many :comments_received, :class_name => 'Comment', :through => :articles, :source => :comments
 
+  has_many :email_templates, :foreign_key => :owner_id
+
   # Although this should be a has_one relation, there are no non-silly names for
   # a foreign key on article to reference the template to which it is
   # welcome_page... =P
@@ -250,6 +253,7 @@ class Profile < ActiveRecord::Base
   settings_items :description
   settings_items :fields_privacy, :type => :hash, :default => {}
   settings_items :email_suggestions, :type => :boolean, :default => false
+  settings_items :administrator_mail_notification, :type => :boolean, :default => true
 
   validates_length_of :description, :maximum => 550, :allow_nil => true
 
@@ -543,6 +547,10 @@ class Profile < ActiveRecord::Base
     self.articles.find(:all, options)
   end
 
+  def to_liquid
+    HashWithIndifferentAccess.new :name => name, :identifier => identifier
+  end
+
   class << self
 
     # finds a profile by its identifier. This method is a shortcut to
@@ -685,15 +693,15 @@ private :generate_url, :url_options
   after_create :insert_default_article_set
   def insert_default_article_set
     if template
-      copy_articles_from template
+      self.save! if copy_articles_from template
     else
       default_set_of_articles.each do |article|
         article.profile = self
         article.advertise = false
         article.save!
       end
+      self.save!
     end
-    self.save!
   end
 
   # Override this method in subclasses of Profile to create a default article
@@ -714,10 +722,12 @@ private :generate_url, :url_options
   end
 
   def copy_articles_from other
+    return false if other.top_level_articles.empty?
     other.top_level_articles.each do |a|
       copy_article_tree a
     end
     self.articles.reload
+    true
   end
 
   def copy_article_tree(article, parent=nil)
@@ -759,6 +769,29 @@ private :generate_url, :url_options
       remove_from_suggestion_list person
     else
       raise _("%s can't have members") % self.class.name
+    end
+  end
+
+  # Adds many people to profile by id's
+  def add_members_by_id(people_ids)
+
+    unless people_ids.nil? && people_ids.empty?
+
+      people = Person.where(id: people_ids)
+      people.each do |person|
+
+        add_member(person) unless person.is_member_of?(self)
+      end
+    end
+  end
+
+  # Adds many people to profile by email's
+  def add_members_by_email(people_emails)
+
+    people = User.where(email: people_emails)
+    people.each do |user|
+
+      add_member(user.person) unless user.person.is_member_of?(self)
     end
   end
 
@@ -893,11 +926,11 @@ private :generate_url, :url_options
     self.forums.count.nonzero?
   end
 
-  def admins
+  def admins(with_entities = nil)
     return [] if environment.blank?
     admin_role = Profile::Roles.admin(environment.id)
     return [] if admin_role.blank?
-    self.members_by_role(admin_role)
+    self.members_by_role(admin_role, with_entities)
   end
 
   def enable_contact?

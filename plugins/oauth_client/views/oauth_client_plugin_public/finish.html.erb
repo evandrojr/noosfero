@@ -1,7 +1,18 @@
+<%#
+# The Application caller, in general a noosfero api client,
+# sends periodically messages events with the payload
+# message requestOauthClientPluginResult to the Popup Window
+# and gets notified when the oauth authentication is confirmed
+#%>
 <script>
   window.addEventListener("message", function(ev) {
     if (ev.data.message === "requestOauthClientPluginResult") {
-      ev.source.postMessage({ message: "oauthClientPluginResult", logged_in: <%= logged_in? %>, private_token: '<%= private_token %>', user: <%= user.to_json %> }, "*");
+      ev.source.postMessage(
+        {
+          message: "oauthClientPluginResult",
+          logged_in: <%= logged_in? %>,
+          private_token: '<%= private_token %>',
+          user: <%= params[:user].to_json %> }, "*");
     }
   });
 </script>

@@ -21,6 +21,7 @@ class Environment < ActiveRecord::Base
 
   has_many :tasks, :dependent => :destroy, :as => 'target'
   has_many :search_terms, :as => :context
+  has_many :email_templates, :foreign_key => :owner_id
 
   IDENTIFY_SCRIPTS = /(php[0-9s]?|[sp]htm[l]?|pl|py|cgi|rb)/
 
@@ -50,6 +51,7 @@ class Environment < ActiveRecord::Base
     'manage_environment_licenses' => N_('Manage environment licenses'),
     'manage_environment_trusted_sites' => N_('Manage environment trusted sites'),
     'edit_appearance'      => N_('Edit appearance'),
+    'manage_email_templates' => N_('Manage Email Templates'),
   }
 
   module Roles
@@ -983,6 +985,10 @@ class Environment < ActiveRecord::Base
 
   def has_license?
     self.licenses.any?
+  end
+
+  def to_liquid
+    HashWithIndifferentAccess.new :name => name
   end
 
   private

@@ -27,6 +27,8 @@ class UserTest < ActiveSupport::TestCase
     user1.save!
     user2 = new_user(:login => 'new_user')
     assert user2.errors[:login].present?
+    expected = ["has already been taken"]
+    assert_equal expected, user2.errors[:login]
   end
 
   def test_should_require_password
@@ -48,6 +50,16 @@ class UserTest < ActiveSupport::TestCase
       u = new_user(:email => nil)
       assert u.errors[:email].present?
     end
+  end
+
+  def test_should_require_unique_email
+    user1 = create_user('new_user', :email => 'new_user1@example.com', :password => 'test', :password_confirmation => 'test')
+    assert !user1.errors[:login].present?
+    user1.save!
+    user2 = new_user(:login => 'other_user', :email => 'new_user1@example.com')
+    assert user2.errors[:email].present?
+    expected = ["has already been taken"]
+    assert_equal expected, user2.errors[:email]
   end
 
   def test_email_format
@@ -516,6 +528,7 @@ class UserTest < ActiveSupport::TestCase
   should 'deliver e-mail with activation code after creation' do
     assert_difference 'ActionMailer::Base.deliveries.size', 1 do
       new_user :email => 'pending@activation.com'
+      process_delayed_job_queue
     end
     assert_equal 'pending@activation.com', ActionMailer::Base.deliveries.last['to'].to_s
   end
@@ -644,6 +657,7 @@ class UserTest < ActiveSupport::TestCase
     env.save
 
     user = new_user :email => 'pending@activation.com'
+    process_delayed_job_queue
     assert_difference 'ActionMailer::Base.deliveries.size', 1 do
       user.activate
       process_delayed_job_queue
@@ -664,6 +678,7 @@ class UserTest < ActiveSupport::TestCase
     env.save
 
     user = new_user :email => 'pending@activation.com'
+    process_delayed_job_queue
     assert_difference 'ActionMailer::Base.deliveries.size', 1 do
       user.activate
       process_delayed_job_queue
@@ -683,6 +698,7 @@ class UserTest < ActiveSupport::TestCase
     env.save
 
     user = new_user :name => 'John Doe', :email => 'pending@activation.com'
+    process_delayed_job_queue
     assert_difference 'ActionMailer::Base.deliveries.size', 1 do
       user.activate
       process_delayed_job_queue

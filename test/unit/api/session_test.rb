@@ -45,11 +45,12 @@ class SessionTest < ActiveSupport::TestCase
     assert_equal 400, last_response.status
   end
 
-  should 'do not register a duplicated user' do
+  should 'not register a duplicated user' do
     params = {:login => "newuserapi", :password => "newuserapi", :password_confirmation => "newuserapi", :email => "newuserapi@email.com" }
     post "/api/v1/register?#{params.to_query}"
     post "/api/v1/register?#{params.to_query}"
     assert_equal 400, last_response.status
+    json = JSON.parse(last_response.body)
   end
 
   should 'detected error, Name or service not known, for Serpro captcha communication' do

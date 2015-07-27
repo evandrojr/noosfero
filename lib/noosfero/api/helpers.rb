@@ -160,8 +160,27 @@ require 'grape'
         conditions
       end
 
-      def make_order_with_parameters(params)
-        params[:order] || "created_at DESC"
+      # changing make_order_with_parameters to avoid sql injection
+      def make_order_with_parameters(object, method, params)
+        order = "created_at DESC"
+        unless params[:order].blank?
+          if params[:order].include? '\'' or params[:order].include? '"'
+            order = "created_at DESC"
+          elsif ['RANDOM()', 'RANDOM'].include? params[:order].upcase
+            order = 'RANDOM()'
+          else
+            field_name, direction = params[:order].split(' ')
+            assoc = object.class.reflect_on_association(method.to_sym)
+            if !field_name.blank? and assoc
+              if assoc.klass.attribute_names.include? field_name
+                if direction.present? and ['ASC','DESC'].include? direction.upcase
+                  order = "#{field_name} #{direction.upcase}"
+                end
+              end
+            end
+          end
+        end
+        return order
       end
 
       def by_reference(scope, params)
@@ -176,7 +195,7 @@ require 'grape'
 
       def select_filtered_collection_of(object, method, params)
         conditions = make_conditions_with_parameter(params)
-        order = make_order_with_parameters(params)
+        order = make_order_with_parameters(object,method,params)
 
         objects = object.send(method)
         objects = by_reference(objects, params)

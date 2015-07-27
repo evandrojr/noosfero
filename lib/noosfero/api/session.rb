@@ -32,11 +32,10 @@ module Noosfero
       params do
         requires :email, type: String, desc: _("Email")
         requires :login, type: String, desc: _("Login")
-        requires :password, type: String, desc: _("Password")
-        requires :password_confirmation, type: String, desc: _("Password confirmation")
+        #requires :password, type: String, desc: _("Password")
+        #requires :password_confirmation, type: String, desc: _("Password confirmation")
       end
       post "/register" do
-        unique_attributes! User, [:email, :login]
         attrs = attributes_for_keys [:email, :login, :password, :password_confirmation] + environment.signup_person_fields
         remote_ip = (request.respond_to?(:remote_ip) && request.remote_ip) || (env && env['REMOTE_ADDR'])
         # test_captcha will render_api_error! and exit in case of any problem

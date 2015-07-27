@@ -140,11 +140,6 @@ class VideoPlugin::Video < Article
     self.video_height = vid['height']
     self.video_thumbnail_width = vid['thumbnail_width']
     self.video_thumbnail_height = vid['thumbnail_height']
-    url = "http://gdata.youtube.com/feeds/api/videos/#{self.video_id}?alt=json";
-    resp = Net::HTTP.get_response(URI.parse(url))
-    buffer = resp.body
-    vid = JSON.parse(buffer)
-    self.video_duration = vid['entry']['media$group']['media$content'][0]['duration']
   end
 
   def fill_vimeo_video_properties

@@ -28,6 +28,11 @@ gem 'grape-entity'
 gem 'grape_logging', :git => 'https://github.com/aceunreal/grape_logging.git', :ref => '100091b'
 gem 'rack-cors'
 gem 'rack-contrib'
+gem 'liquid',                    '~> 3.0.3'
+#gem 'grape-swagger-rails'
+
+# FIXME list here all actual dependencies (i.e. the ones in debian/control),
+# with their GEM names (not the Debian package names)
 
 gem 'api-pagination',           '~> 4.1.1'
 

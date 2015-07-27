@@ -178,7 +178,11 @@ class Organization < Profile
   end
 
   def notification_emails
+    # TODO: Add performance improvement here!
+    #emails = [contact_email].select(&:present?) + admins([:user]).pluck(:email)
+    # Revert change to make the tests pass
     emails = [contact_email].select(&:present?) + admins.map(&:email)
+
     if emails.empty?
       emails << environment.contact_email
     end

@@ -77,7 +77,7 @@ class TasksControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_template 'processed'
-    assert_kind_of Array, assigns(:tasks)
+    assert !assigns(:tasks).nil?
   end
 
   should 'display task created_at' do
@@ -149,7 +149,7 @@ class TasksControllerTest < ActionController::TestCase
     p = create_user('member').person
 
     @controller.stubs(:profile).returns(c)
-    c.affiliate(profile, Profile::Roles.all_roles(profile.environment.id))
+    c.affiliate(person, Profile::Roles.all_roles(person.environment.id))
 
     t = AddMember.create!(:person => p, :organization => c)
 
@@ -464,11 +464,8 @@ class TasksControllerTest < ActionController::TestCase
 
     requestor = fast_create(Person)
 
-    task_one = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Task Test'})
-    task_two = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Another Task'})
-
-    person.tag(task_one, with: 'noosfero,test', on: :tags)
-    person.tag(task_two, with: 'test', on: :tags)
+    task_one = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Task Test'}, :tag_list => 'noosfero, test')
+    task_two = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Another Task'}, :tag_list => 'test')
 
     get :index, :filter_tags => 'noosfero'
 
@@ -691,9 +688,9 @@ class TasksControllerTest < ActionController::TestCase
   end 
 
   should 'store the person who closes a task' do
-    t = profile.tasks.build; t.save!
+    t = person.tasks.build; t.save!
     post :close, :tasks => {t.id => {:decision => 'finish', :task => {}}}
-    assert_equal profile, t.reload.closed_by
+    assert_equal person, t.reload.closed_by
   end
 
   should 'save task tags' do
@@ -730,9 +727,6 @@ class TasksControllerTest < ActionController::TestCase
 
     assert_not_includes task_one.tags_from(nil), 'test'
   end
-#region_validators_controller_test.rb:    give_permission('ze', 'manage_environment_validators', environment)
-#profile_editor_controller_test.rb:    user2.stubs(:has_permission?).with('edit_profile', anything).returns(true)
-#profile_editor_controller_test.rb:    user2.expects(:has_permission?).with(:manage_friends, anything).returns(true)
 
   should 'not tag task with permission but another user' do
     requestor = fast_create(Person)
@@ -743,6 +737,58 @@ class TasksControllerTest < ActionController::TestCase
     post :save_tags, :task_id => task_one.id, :tag_list => 'test'
 
     assert_not_includes task_one.tags_from(nil), 'test'
+  end
+
+  should 'filter processed tasks by all filters' do
+    requestor = fast_create(Person)
+    closed_by = fast_create(Person)
+    class AnotherTask < Task; end
+
+    created_date = DateTime.now
+    processed_date = DateTime.now
+
+    task_params = {:status => Task::Status::FINISHED, :requestor => requestor, :target => person, :created_at => created_date, :end_date => processed_date, :closed_by => closed_by, :data => {:field => 'some data field'}}
+
+    task = create(AnotherTask, task_params)
+    create(Task, task_params)
+    create(AnotherTask, task_params.clone.merge(:status => Task::Status::CANCELLED))
+    create(AnotherTask, task_params.clone.merge(:created_at => created_date - 1.day))
+    create(AnotherTask, task_params.clone.merge(:created_at => created_date + 1.day))
+    create(AnotherTask, task_params.clone.merge(:end_date => processed_date - 1.day))
+    create(AnotherTask, task_params.clone.merge(:end_date => processed_date + 1.day))
+    create(AnotherTask, task_params.clone.merge(:requestor => fast_create(Person, :name => 'another-requestor')))
+    create(AnotherTask, task_params.clone.merge(:closed_by => fast_create(Person, :name => 'another-closer')))
+    create(AnotherTask, task_params.clone.merge(:data => {:field => 'other data field'}))
+
+    get :processed, :filter => {:type => AnotherTask, :status => Task::Status::FINISHED, :created_from => created_date, :created_until => created_date, :closed_from => processed_date, :closed_until => processed_date, :requestor => requestor.name, :closed_by => closed_by.name, :text => 'some data field'}
+    assert_response :success
+    assert_equal [task], assigns(:tasks)
+  end
+
+  should "display email template selection when accept a task" do
+    community = fast_create(Community)
+    @controller.stubs(:profile).returns(community)
+    person = create_user_with_permission('taskviewer', 'view_tasks', community)
+    login_as person.user.login
+
+    email_template = EmailTemplate.create!(:name => 'template', :owner => community, :template_type => :task_acceptance)
+    task = ApproveArticle.create!(:requestor => person, :target => community, :responsible => person)
+    get :index
+    assert_select "#on-accept-information-#{task.id} .template-selection"
+    assert_equal [email_template], assigns(:acceptance_email_templates)
+  end
+
+  should "display email template selection when reject a task" do
+    community = fast_create(Community)
+    @controller.stubs(:profile).returns(community)
+    person = create_user_with_permission('taskviewer', 'view_tasks', community)
+    login_as person.user.login
+
+    email_template = EmailTemplate.create!(:name => 'template', :owner => community, :template_type => :task_rejection)
+    task = ApproveArticle.create!(:requestor => person, :target => community, :responsible => person)
+    get :index
+    assert_select "#on-reject-information-#{task.id} .template-selection"
+    assert_equal [email_template], assigns(:rejection_email_templates)
   end
 
 end

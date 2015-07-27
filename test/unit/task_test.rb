@@ -192,6 +192,32 @@ class TaskTest < ActiveSupport::TestCase
     task.save!
   end
 
+  should 'not send notification to target if notification is disabled in profile' do
+    task = Task.new
+    target = fast_create(Profile)
+    target.stubs(:notification_emails).returns(['adm@example.com'])
+    target.stubs(:administrator_mail_notification).returns(false)
+    task.target = target
+    task.stubs(:target_notification_message).returns('some non nil message to be sent to target')
+    TaskMailer.expects(:target_notification).never
+    task.save!
+  end
+
+  should 'send notification to target if notification is enabled in profile' do
+    task = Task.new
+    target = fast_create(Profile)
+    target.stubs(:notification_emails).returns(['adm@example.com'])
+    target.stubs(:administrator_mail_notification).returns(true)
+    task.target = target
+    task.stubs(:target_notification_message).returns('some non nil message to be sent to target')
+
+    
+    mailer = mock
+    mailer.expects(:deliver).once
+    TaskMailer.expects(:target_notification).returns(mailer).once
+    task.save!
+  end
+
   should 'be able to list pending tasks' do
     Task.delete_all
     t1 = Task.create!
@@ -351,11 +377,8 @@ class TaskTest < ActiveSupport::TestCase
     target = fast_create(Person)
     profile = sample_user
 
-    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'})
-    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'})
-
-    profile.tag(task_one, with: 'noosfero,test', on: :tags)
-    profile.tag(task_two, with: 'test', on: :tags)
+    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'}, :tag_list => 'noosfero,test')
+    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'}, :tag_list => 'test')
 
     data = Task.tagged_with('noosfero', any: true)
 
@@ -477,11 +500,8 @@ class TaskTest < ActiveSupport::TestCase
     target = fast_create(Person)
     profile = sample_user
 
-    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'})
-    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'})
-
-    profile.tag(task_one, with: 'noosfero,test', on: :tags)
-    profile.tag(task_two, with: 'test', on: :tags)
+    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'}, :tag_list => 'noosfero,test')
+    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'}, :tag_list => 'test')
 
     assert_includes task_one.tags_from(nil), 'test'
     assert_not_includes task_two.tags_from(nil), 'noosfero'

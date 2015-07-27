@@ -42,6 +42,8 @@ class Task < ActiveRecord::Base
 
   attr_protected :status
 
+  settings_items :email_template_id, :type => :integer
+
   def initialize(*args)
     super
     self.status = (args.first ? args.first[:status] : nil) || Task::Status::ACTIVE
@@ -68,12 +70,26 @@ class Task < ActiveRecord::Base
       begin
         target_msg = task.target_notification_message
         if target_msg && task.target && !task.target.notification_emails.empty?
-          TaskMailer.target_notification(task, target_msg).deliver
+          if target_profile_accepts_notification?(task)
+            TaskMailer.target_notification(task, target_msg).deliver
+          end
         end
-      rescue NotImplementedError => ex
+      rescue Exception => ex
         Rails.logger.info ex.to_s
       end
     end
+  end
+
+  def target_profile_accepts_notification?(task)
+    if target_is_profile?(task)
+      return task.target.administrator_mail_notification
+    else
+      true
+    end
+  end
+
+  def target_is_profile?(task)
+    task.target.kind_of? Profile
   end
 
   # this method finished the task. It calls #perform, which must be overriden
@@ -282,15 +298,56 @@ class Task < ActiveRecord::Base
     end
   end
 
+  def email_template
+    @email_template ||= email_template_id.present? ? EmailTemplate.find_by_id(email_template_id) : nil
+  end
+
+  def to_liquid
+    HashWithIndifferentAccess.new({
+      :requestor => requestor,
+      :reject_explanation => reject_explanation,
+      :code => code
+    })
+  end
+
   scope :pending, :conditions => { :status =>  Task::Status::ACTIVE }
   scope :hidden, :conditions => { :status =>  Task::Status::HIDDEN }
   scope :finished, :conditions => { :status =>  Task::Status::FINISHED }
   scope :canceled, :conditions => { :status =>  Task::Status::CANCELLED }
   scope :closed, :conditions => { :status =>  [Task::Status::CANCELLED, Task::Status::FINISHED] }
   scope :opened, :conditions => { :status =>  [Task::Status::ACTIVE, Task::Status::HIDDEN] }
-  scope :of, lambda { |type| conditions = type ? "type LIKE '#{type}'" : "1=1"; {:conditions =>  [conditions]} }
+
+  # # updated scope method to avoid sql injection vunerabillity (http://brakemanscanner.org/docs/warning_types/sql_injection/)
+  # def self.of type
+  #   if type
+  #     where  "type LIKE ?", type
+  #   else
+  #     all
+  #   end
+  # end
+  #
+  # # updated scope method to avoid sql injection vunerabillity (http://brakemanscanner.org/docs/warning_types/sql_injection/)
+  # def self.order_by attribute_name, sort_order
+  #   if Task.column_names.include? attribute_name
+  #     # TODO  future versions of rails accepts a hash as param to order method
+  #     # which helps to prevent sql injection in an shorter way
+  #     sort_order_filtered = ("ASC".eql? "#{sort_order}".upcase) ? 'asc' : 'desc'
+  #     sort_expression = Task.column_names.collect {|column_name| "#{column_name} #{sort_order_filtered}" if column_name.eql? attribute_name}
+  #     order(sort_expression.join) unless sort_expression.join.empty?
+  #   end
+  # end
+  #
+  # # updated scope method to avoid sql injection vunerabillity (http://brakemanscanner.org/docs/warning_types/sql_injection/)
+  # def self.like field, value
+  #   if value and Tasks.column_names.include? field
+  #     where("LOWER(?) LIKE ?", "#{field}", "%#{value.downcase}%")
+  #   end
+  # end
+
+  scope :of, lambda { |type| conditions = type ? "tasks.type LIKE '#{type}'" : "1=1"; {:conditions =>  [conditions]} }
   scope :order_by, lambda { |attribute, ord| {:order => "#{attribute} #{ord}"} }
   scope :like, lambda { |field, value| where("LOWER(#{field}) LIKE ?", "%#{value.downcase}%") if value}
+
   scope :pending_all, lambda { |profile, filter_type, filter_text|
     self.to(profile).without_spam.pending.of(filter_type).like('data', filter_text)
   }
@@ -308,6 +365,10 @@ class Task < ActiveRecord::Base
 
   def self.pending_types_for(profile)
     Task.to(profile).pending.select('distinct type').map { |t| [t.class.name, t.title] }
+  end
+
+  def self.closed_types_for(profile)
+    Task.to(profile).closed.select('distinct type').map { |t| [t.class.name, t.title] }
   end
 
   def opened?

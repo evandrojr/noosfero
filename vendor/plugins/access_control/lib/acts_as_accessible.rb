@@ -21,7 +21,7 @@ module ActsAsAccessible
 
   def affiliate(accessor, roles)
     roles = [roles] unless roles.kind_of?(Array)
-    roles.map {|role| accessor.add_role(role, self)}.any? 
+    roles.map {|role| accessor.add_role(role, self)}.any?
   end
 
   def disaffiliate(accessor, roles)

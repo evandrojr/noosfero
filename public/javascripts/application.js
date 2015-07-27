@@ -14,7 +14,6 @@
 *= require jquery.ba-bbq.min.js
 *= require jquery.tokeninput.js
 *= require jquery-timepicker-addon/dist/jquery-ui-timepicker-addon.js
-*= require select-or-die/_src/selectordie
 *= require inputosaurus.js
 *= require reflection.js
 *= require rails.js
@@ -29,10 +28,10 @@
 *= require catalog.js
 *= require autogrow.js
 *= require slick.js
-*= require select-or-die/_src/selectordie.js
 *= require block-store.js
 *= require jquery.typewatch.js
 *= require require_login.js
+*= require email_templates.js
 */
 
 // scope for noosfero stuff

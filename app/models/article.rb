@@ -645,6 +645,14 @@ class Article < ActiveRecord::Base
     can_display_hits? && display_hits
   end
 
+  def display_media_panel?
+    can_display_media_panel? && environment.enabled?('media_panel')
+  end
+
+  def can_display_media_panel?
+    false
+  end
+
   def image?
     false
   end
@@ -811,6 +819,10 @@ class Article < ActiveRecord::Base
 
   def view_page
     "content_viewer/view_page"
+  end
+
+  def to_liquid
+    HashWithIndifferentAccess.new :name => name, :abstract => abstract, :body => body, :id => id, :parent_id => parent_id, :author => author
   end
 
   private
