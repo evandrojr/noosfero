@@ -113,7 +113,6 @@ class APIHelpersTest < ActiveSupport::TestCase
     p = fast_create(Profile)
     a = fast_create(Article, :published => false, :profile_id => p.id)
     fast_create(Article, :profile_id => p.id)
-
     user.generate_private_token!
     User.expects(:find_by_private_token).returns(user)
     assert_equal 403, find_article(p.articles, a.id).last
@@ -162,56 +161,37 @@ class APIHelpersTest < ActiveSupport::TestCase
     assert_nil make_conditions_with_parameter[:type]
   end
 
-  should 'do not test captcha when there are no settings' do
+  #test_should_make_order_with_parameters_return_order_if attribute_is_found_at_object_association
+  should 'make_order_with_parameters return order if attribute is found at object association' do
     environment = Environment.new
-    assert test_captcha("127.0.0.1", {}, environment)
+    params = {:order => "name ASC"}
+    assert_equal "name ASC", make_order_with_parameters(environment, "articles", params)
   end
 
-  should 'do not test captcha when captcha is disabled on settings' do
+  # test added to check for eventual sql injection vunerabillity
+  #test_should_make_order_with_parameters_return_default_order_if_attributes_not_exists
+  should 'make_order_with_parameters return default order if attributes not exists' do
     environment = Environment.new
-    environment.api_captcha_settings = {
-        enabled: false,
-    }
-    assert test_captcha("127.0.0.1", {}, environment)
+    params = {:order => "CRAZY_FIELD ASC"} # quote used to check sql injection vunerabillity
+    assert_equal "created_at DESC", make_order_with_parameters(environment, "articles", params)
   end
 
-  should 'fail display recaptcha v1' do
+  should 'make_order_with_parameters return default order if sql injection detected' do
     environment = Environment.new
-    environment.api_captcha_settings = {
-        enabled: true,
-        provider: 'google',
-        version:  1,
-        private_key:  '6LdsWAcTAAAAAB6maB_HalVyCc4asDAxPxloIMvY',
-        public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
-        verify_uri:   'https://www.google.com/recaptcha/api/verify',
-    }
-    assert_equal test_captcha("127.0.0.1", {}, environment), "Missing captcha data"
+    params = {:order => "name' ASC"} # quote used to check sql injection vunerabillity
+    assert_equal "created_at DESC", make_order_with_parameters(environment, "articles", params)
   end
 
-  should 'fail display recaptcha v2' do
+  should 'make_order_with_parameters return RANDOM() if random is passed' do
     environment = Environment.new
-    environment.api_captcha_settings = {
-        enabled: true,
-        provider: 'google',
-        version:  2,
-        private_key:  '6LdsWAcTAAAAAB6maB_HalVyCc4asDAxPxloIMvY',
-        public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
-        verify_uri:   'https://www.google.com/recaptcha/api/siteverify',
-    }
-    assert_equal test_captcha("127.0.0.1", {}, environment), "Missing captcha data"
+    params = {:order => "random"} # quote used to check sql injection vunerabillity
+    assert_equal "RANDOM()", make_order_with_parameters(environment, "articles", params)
   end
 
-  should 'fail display Serpro captcha' do
+  should 'make_order_with_parameters return RANDOM() if random function is passed' do
     environment = Environment.new
-    environment.api_captcha_settings = {
-        enabled: true,
-        provider: 'serpro',
-        serpro_client_id:  '0000000000000000',
-        verify_uri:   'http://localhost/api/verify',
-    }
-    params = {}
-    params[:txtToken_captcha_serpro_gov_br] = '4324343'
-    assert_equal test_captcha("127.0.0.1", params, environment), _('Captcha text has not been filled')
+    params = {:order => "random()"} # quote used to check sql injection vunerabillity
+    assert_equal "RANDOM()", make_order_with_parameters(environment, "articles", params)
   end
 
   should 'render not_found if endpoint is unavailable' do
@@ -232,11 +212,79 @@ class APIHelpersTest < ActiveSupport::TestCase
     #assert_equal 403, find_article(p.articles, a.id).last
 
     #assert_equals [article1, article2], present_articles
-
-
   end
 
-  should 'captcha serpro say name or service not known' do
+###### Captcha tests ######
+
+should 'do not test captcha when there are no settings' do
+  environment = Environment.new
+  assert test_captcha("127.0.0.1", {}, environment)
+end
+
+should 'do not test captcha when captcha is disabled on settings' do
+  environment = Environment.new
+  environment.api_captcha_settings = {
+      enabled: false,
+  }
+  assert test_captcha("127.0.0.1", {}, environment)
+end
+
+should 'fail display recaptcha v1' do
+  environment = Environment.new
+  environment.api_captcha_settings = {
+      enabled: true,
+      provider: 'google',
+      version:  1,
+      private_key:  '6LdsWAcTAAAAAB6maB_HalVyCc4asDAxPxloIMvY',
+      public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
+      verify_uri:   'https://www.google.com/recaptcha/api/verify',
+  }
+  r = test_captcha('127.0.0.1', params, environment)
+  assert_equal(_("Missing captcha data"), r[0][:javascript_console_message])
+end
+
+should 'fail display recaptcha v2' do
+  environment = Environment.new
+  environment.api_captcha_settings = {
+      enabled: true,
+      provider: 'google',
+      version:  2,
+      private_key:  '6LdsWAcTAAAAAB6maB_HalVyCc4asDAxPxloIMvY',
+      public_key:   '6LdsWAcTAAAAAChTUUD6yu9fCDhdIZzNd7F53zf-',
+      verify_uri:   'https://www.google.com/recaptcha/api/siteverify',
+  }
+  r = test_captcha('127.0.0.1', params, environment)
+  assert_equal(_("Missing captcha data"), r[0][:javascript_console_message])
+end
+
+should 'verify if user filled Serpro\' captcha text' do
+  environment = Environment.new
+  environment.api_captcha_settings = {
+      enabled: true,
+      provider: 'serpro',
+      serpro_client_id:  '0000000000000000',
+      verify_uri:   'http://localhost/api/verify',
+  }
+  params = {}
+  params[:txtToken_captcha_serpro_gov_br] = '4324343'
+  assert_equal(_('Captcha text has not been filled'), test_captcha('127.0.0.1', params, environment)[0])
+end
+
+should 'verify if Serpro\' captcha token has been sent' do
+  environment = Environment.new
+  environment.api_captcha_settings = {
+      enabled: true,
+      provider: 'serpro',
+      serpro_client_id:  '0000000000000000',
+      verify_uri:   'http://localhost/api/verify',
+  }
+  params = {}
+  params[:captcha_text] = '4324343'
+  r = test_captcha('127.0.0.1', params, environment)
+  assert_equal(_("Missing Serpro's Captcha token"), r[0][:javascript_console_message])
+end
+
+should 'captcha serpro say name or service not known' do
     environment = Environment.new
     environment.api_captcha_settings = {
         enabled: true,
@@ -247,11 +295,11 @@ class APIHelpersTest < ActiveSupport::TestCase
     params = {}
     params[:txtToken_captcha_serpro_gov_br] = '4324343'
     params[:captcha_text] = '4324343'
-    logger = Logger.new(File.join(Rails.root, 'log', 'test_api.log'))
-    stubs(:logger).returns(logger)
-    assert_equal test_captcha('127.0.0.1', params, environment), 'Serpro captcha error: getaddrinfo: Name or service not known'
-  end
+    r = test_captcha('127.0.0.1', params, environment)
+    assert_equal(_("Serpro captcha error: getaddrinfo: Name or service not known"), r[0][:javascript_console_message])
+end
 
+###### END Captcha tests ######
 
   protected
 

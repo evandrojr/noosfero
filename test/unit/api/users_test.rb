@@ -29,7 +29,7 @@ class UsersTest < ActiveSupport::TestCase
     params[:user] = {:login => 'some', :password => '123456', :password_confirmation => '123456', :email => 'some@some.com'}
     post "/api/v1/users?#{params.to_query}"
     json = JSON.parse(last_response.body)
-    assert_equal 'Username / Email já está em uso,e-Mail já está em uso', json['message']
+    assert_equal 'Username / Email já está em uso,e-Mail já está em uso', json['error']
   end
 
   should 'return 400 status for invalid user creation' do

@@ -192,8 +192,8 @@ class Profile < ActiveRecord::Base
     alias_method_chain :count, :distinct
   end
 
-  def members_by_role(roles)
-    Person.members_of(self).by_role(roles)
+  def members_by_role(roles, with_entities = nil)
+    Person.members_of(self, with_entities).by_role(roles, with_entities)
   end
 
   acts_as_having_boxes
@@ -926,11 +926,11 @@ private :generate_url, :url_options
     self.forums.count.nonzero?
   end
 
-  def admins
+  def admins(with_entities = nil)
     return [] if environment.blank?
     admin_role = Profile::Roles.admin(environment.id)
     return [] if admin_role.blank?
-    self.members_by_role(admin_role)
+    self.members_by_role(admin_role, with_entities)
   end
 
   def enable_contact?

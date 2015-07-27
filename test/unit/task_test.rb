@@ -377,11 +377,8 @@ class TaskTest < ActiveSupport::TestCase
     target = fast_create(Person)
     profile = sample_user
 
-    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'})
-    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'})
-
-    profile.tag(task_one, with: 'noosfero,test', on: :tags)
-    profile.tag(task_two, with: 'test', on: :tags)
+    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'}, :tag_list => 'noosfero,test')
+    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'}, :tag_list => 'test')
 
     data = Task.tagged_with('noosfero', any: true)
 
@@ -503,11 +500,8 @@ class TaskTest < ActiveSupport::TestCase
     target = fast_create(Person)
     profile = sample_user
 
-    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'})
-    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'})
-
-    profile.tag(task_one, with: 'noosfero,test', on: :tags)
-    profile.tag(task_two, with: 'test', on: :tags)
+    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'}, :tag_list => 'noosfero,test')
+    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'}, :tag_list => 'test')
 
     assert_includes task_one.tags_from(nil), 'test'
     assert_not_includes task_two.tags_from(nil), 'noosfero'

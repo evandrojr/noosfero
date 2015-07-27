@@ -528,6 +528,7 @@ class UserTest < ActiveSupport::TestCase
   should 'deliver e-mail with activation code after creation' do
     assert_difference 'ActionMailer::Base.deliveries.size', 1 do
       new_user :email => 'pending@activation.com'
+      process_delayed_job_queue
     end
     assert_equal 'pending@activation.com', ActionMailer::Base.deliveries.last['to'].to_s
   end
@@ -656,6 +657,7 @@ class UserTest < ActiveSupport::TestCase
     env.save
 
     user = new_user :email => 'pending@activation.com'
+    process_delayed_job_queue
     assert_difference 'ActionMailer::Base.deliveries.size', 1 do
       user.activate
       process_delayed_job_queue
@@ -676,6 +678,7 @@ class UserTest < ActiveSupport::TestCase
     env.save
 
     user = new_user :email => 'pending@activation.com'
+    process_delayed_job_queue
     assert_difference 'ActionMailer::Base.deliveries.size', 1 do
       user.activate
       process_delayed_job_queue
@@ -695,6 +698,7 @@ class UserTest < ActiveSupport::TestCase
     env.save
 
     user = new_user :name => 'John Doe', :email => 'pending@activation.com'
+    process_delayed_job_queue
     assert_difference 'ActionMailer::Base.deliveries.size', 1 do
       user.activate
       process_delayed_job_queue
