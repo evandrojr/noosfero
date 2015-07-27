@@ -104,18 +104,18 @@ class User < ActiveRecord::Base
 
   validates_presence_of     :login
   validates_presence_of     :email
-  validates_format_of       :login, :message => _('incorrect login format'), :with => Profile::IDENTIFIER_FORMAT, :if => (lambda {|user| !user.login.blank?})
+  validates_format_of       :login, :message => :login_format, :with => Profile::IDENTIFIER_FORMAT, :if => (lambda {|user| !user.login.blank?})
   validates_presence_of     :password,                   :if => :password_required?
   validates_presence_of     :password_confirmation,      :if => :password_required?
-  validates_length_of       :password, :message => _('length must be within 4 to 40 characters'), :within => 4..40, :if => :password_required?
+  validates_length_of       :password, :within => 4..40, :if => :password_required?
   validates_confirmation_of :password,                   :if => :password_required?
-  validates_length_of       :login, :message => _('length must be within 2 to 40 characters'), :within => 2..40, :if => (lambda {|user| !user.login.blank?})
-  validates_length_of       :email, :message => _('length must be within 3 to 100 characters'),:within => 3..100, :if => (lambda {|user| !user.email.blank?})
+  validates_length_of       :login, :within => 2..40, :if => (lambda {|user| !user.login.blank?})
+  validates_length_of       :email, :within => 3..100, :if => (lambda {|user| !user.email.blank?})
   validates_uniqueness_of   :login, :case_sensitive => false, :scope => :environment_id
   validates_uniqueness_of   :email, :case_sensitive => false, :scope => :environment_id
   before_save :encrypt_password
   before_save :normalize_email, if: proc{ |u| u.email.present? }
-  validates_format_of :email, :message => _('incorrect email format'), :with => Noosfero::Constants::EMAIL_FORMAT, :if => (lambda {|user| !user.email.blank?})
+  validates_format_of :email, :with => Noosfero::Constants::EMAIL_FORMAT, :if => (lambda {|user| !user.email.blank?})
 
   validates_inclusion_of :terms_accepted, :in => [ '1' ], :if => lambda { |u| ! u.terms_of_use.blank? }, :message => N_('{fn} must be checked in order to signup.').fix_i18n
 

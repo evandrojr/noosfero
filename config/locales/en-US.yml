@@ -221,6 +221,9 @@
         <<: *errors_template
       full_messages:
         format: "%{attribute} %{message}"
+      models:
+        user:
+          login_format: "with invalid format. It must contain only lowercase letters, digits, '_' and '-', and must begin with a letter or a digit."
 
 en:
   <<: *en-US

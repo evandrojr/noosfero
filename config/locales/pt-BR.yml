@@ -229,9 +229,11 @@
         <<: *errors_messages
       template:
         <<: *errors_template
-
       full_messages:
         format: "%{attribute} %{message}"
+      models:
+        user:
+          login_format: "com formato inválido. Só pode conter letras minúsculas não acentudadas, dígitos, '_' e '-', e deve iniciar com uma letra ou um dígito."
 
 pt:
   <<: *pt-BR
