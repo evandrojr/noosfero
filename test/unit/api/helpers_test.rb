@@ -182,6 +182,17 @@ class APIHelpersTest < ActiveSupport::TestCase
     assert_equal "created_at DESC", make_order_with_parameters(environment, "articles", params)
   end
 
+  should 'make_order_with_parameters return RANDOM() if random is passed' do
+    environment = Environment.new
+    params = {:order => "random"} # quote used to check sql injection vunerabillity
+    assert_equal "RANDOM()", make_order_with_parameters(environment, "articles", params)
+  end
+
+  should 'make_order_with_parameters return RANDOM() if random function is passed' do
+    environment = Environment.new
+    params = {:order => "random()"} # quote used to check sql injection vunerabillity
+    assert_equal "RANDOM()", make_order_with_parameters(environment, "articles", params)
+  end
 
   should 'render not_found if endpoint is unavailable' do
     Noosfero::API::API.stubs(:endpoint_unavailable?).returns(true)
