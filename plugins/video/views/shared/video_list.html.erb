@@ -14,7 +14,7 @@
       <div class="video-gallery-right-column-big">
         <div class="video-title-big"><%= first_video.title %></div>
         <div class="video-author-big">
-          <%= _("by")  %> <%= first_video.author_name %> <%= _("updated at") %>  <%= time_ago_as_sentence(first_video.updated_at)  %>
+          <%= _("by")  %> <%= first_video.author_name %> <%= _("updated at") %>  <%= time_ago_in_words(first_video.updated_at)  %>
         </div>
       </div>
     </div>
@@ -29,7 +29,7 @@
         </div>
         <div class="video-gallery-botton-box">
             <div class="video-author">
-              <%= _("by")  %> <%= content.author_name %> <%= _("updated at") %>  <%= time_ago_as_sentence(content.updated_at)  %>
+              <%= _("by")  %> <%= content.author_name %> <%= _("updated at") %>  <%= time_ago_in_words(content.updated_at)  %>
             </div>
             <div class="video-title"><%= content.title %></div>
         </div>
