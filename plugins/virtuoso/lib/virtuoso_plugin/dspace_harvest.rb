@@ -60,14 +60,14 @@ class VirtuosoPlugin::DspaceHarvest
         raise ex
       end
     end
+    save_harvest_time_settings(harvest_time)
     puts "ending harvest #{harvest_time}"
   end
 
   def save_harvest_time_settings(harvest_time)
-    dspace_settings = {"dspace_uri" => dspace_uri, "last_harvest" => last_harvest}
     settings.dspace_servers.each do |s|
       if s["dspace_uri"] == dspace_uri
-        settings.dspace_servers.delete(dspace_settings)
+        settings.dspace_servers.delete(s)
       end
     end
     @dspace_settings = {"dspace_uri" => dspace_uri, "last_harvest" => harvest_time}
@@ -102,8 +102,8 @@ class VirtuosoPlugin::DspaceHarvest
 
   class Job < Struct.new(:environment_id, :dspace_uri)
     def perform
-      environment = Environment.find(environment_id, dspace_uri)
-      harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri" => dspace_uri, "last_harvest" => last_harvest})
+      environment = Environment.find(environment_id)
+      harvest = VirtuosoPlugin::DspaceHarvest.new(environment, {"dspace_uri" => dspace_uri})
       harvest.run
     end
   end
