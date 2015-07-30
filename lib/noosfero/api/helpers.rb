@@ -40,7 +40,9 @@ require 'grape'
       end
 
       def logger
-        Noosfero::API::API.logger
+        logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
+        logger.formatter = GrapeLogging::Formatters::Default.new
+        logger
       end
 
       def limit
