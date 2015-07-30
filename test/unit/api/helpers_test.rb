@@ -264,7 +264,7 @@ should 'captcha serpro say name or service not known' do
     params[:txtToken_captcha_serpro_gov_br] = '4324343'
     params[:captcha_text] = '4324343'
     r = test_captcha('127.0.0.1', params, environment)
-    assert_equal(_("Serpro captcha error: getaddrinfo: Name or service not known"), r[0][:javascript_console_message])
+    assert (r[0][:javascript_console_message]).starts_with?("Serpro captcha error: getaddrinfo")
 end
 
 ###### END Captcha tests ######
