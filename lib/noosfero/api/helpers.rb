@@ -40,7 +40,9 @@ require 'grape'
       end
 
       def logger
-        Noosfero::API::API.logger
+        logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
+        logger.formatter = GrapeLogging::Formatters::Default.new
+        logger
       end
 
       def limit
@@ -270,11 +272,7 @@ require 'grape'
         log_msg = "#{log_message}, #{log_msg}" if log_message.present?
         log_msg = "#{log_msg}, Javascript Console Message: #{javascript_console_message}" if javascript_console_message.present?
         logger.error log_msg unless Rails.env.test?
-        if javascript_console_message.present?
-          error!(message_hash, status)
-        else
-          error!({'message' => user_message, :code => status}, status)
-        end
+        error!(message_hash, status)
       end
 
       def render_api_errors!(messages)
