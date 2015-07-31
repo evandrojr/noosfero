@@ -379,12 +379,14 @@ require 'grape'
         request = Net::HTTP::Post.new(uri.path)
         request.set_form_data(verify_hash)
         begin
-          body = https.request(request).body
+          result = https.request(request).body.split("\n")
         rescue Exception => e
-          return render_api_error!(_('Internal captcha validation error'), 500, nil, "recaptcha error: #{e.message}")
+          return render_api_error!(_('Internal captcha validation error'), 500, nil, "Error validating Googles' recaptcha version 1: #{e.message}")
         end
-        body = JSON.parse(body)
-        body == "true\nsuccess" ? true : body
+        return true if result[0] == "true"
+        return render_api_error!(_("Wrong captcha text, please try again"), 403, nil, "Error validating Googles' recaptcha version 1: #{result[1]}") if result[1] == "incorrect-captcha-sol"
+        #Catches all errors at the end
+        return render_api_error!(_("Internal recaptcha validation error"), 500, nil, "Error validating Googles' recaptcha version 1: #{result[1]}")
       end
 
       def verify_recaptcha_v2(remote_ip, private_key, api_recaptcha_verify_uri, g_recaptcha_response)
