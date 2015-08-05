@@ -348,6 +348,13 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equal [0, 1, 1], [a1.reload.hits, a2.reload.hits, a3.reload.hits]
   end
 
+  should 'update hit attribute of article specific children' do
+    a1 = fast_create(Article, :profile_id => user.person.id)
+    a2 = fast_create(Article, :parent_id => a1.id, :profile_id => user.person.id)
+    get "/api/v1/articles/#{a1.id}/children/#{a2.id}?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal 1, json['article']['hits']
+  end
 
   should 'list all events of a community in a given category' do
     co = Community.create(identifier: 'my-community', name: 'name-my-community')
