@@ -25,7 +25,7 @@ gem 'grape',                    '~> 0.12'
 gem 'grape-entity'
 #FIXME Get the Grape Loggin from master yo solve this issue https://github.com/intridea/grape/issues/1059
 #We have to remove this commit referenve code when update the next release of grape_logging. Actualy we are using (1.1.2)
-gem 'grape_logging', :git => 'https://github.com/aceunreal/grape_logging.git', :ref => '100091b'
+gem 'grape_logging', :git => 'https://github.com/aceunreal/grape_logging.git', :ref => 'f1755ae'
 gem 'rack-cors'
 gem 'rack-contrib'
 
