@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+require File.dirname(__FILE__) + '/../config/environment'
+require 'net/smtp'
+
+puts 'Iniciando script'
+
+file = File.open('event.csv', 'w+')
+
+events = Event.all
+events.map do |event|
+  file.write(event.name+ "\n")
+  header = "'Nome';'Email'\n"
+  file.write(header)
+  count = 0
+  event.person_followers.map do |person|
+    count += 1
+    puts "%s de %s: adicionando evento: %s" % [count, event.person_followers.count, event.id ]
+    info = []
+    info.push(person.name)
+    info.push(person.email)
+    file.write(info.map{|i| "'" + i.to_s + "'"}.join(";"))
+    file.write("\n")
+  end
+end
+
+file.close
+
