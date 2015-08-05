@@ -42,14 +42,21 @@ file.close
 
 
 message = <<MESSAGE_END
-From: Relatorio Dialoga <relatorio@dialoga.gov.br>
-To: Leandro <leandronunes@gmail.com>
-Subject: Relatorio do Dialoga
 
 Segue em anexo o relatorio do Dialoga.
 MESSAGE_END
 
-Net::SMTP.start('localhost') do |smtp|
-  smtp.send_message message, 'leandronunes@gmail.com', 
-                             'leandro.santos@serpro.gov.br'
+#Net::SMTP.start('localhost') do |smtp|
+#  smtp.send_message message, 'leandronunes@gmail.com', 
+#                             'leandro.santos@serpro.gov.br'
+#end
+
+
+ActionMailer::Base.logger = Logger.new(STDOUT)
+class Sender < ActionMailer::Base                                                                                                     
+  def test(to, from)
+    mail to: to, from: from,
+      subject: "Relatorio do Dialoga", body: message
+  end
 end
+Sender.test(['leandro.santos@serpro.gov.br', 'leandronunes@gmail.com'], 'dialoga@dialoga.gov.br').deliver 
