@@ -110,7 +110,9 @@ module Noosfero
 
           get ':id/children/:child_id' do
             article = find_article(environment.articles, params[:id])
-            present find_article(article.children, params[:child_id]), :with => Entities::Article, :fields => params[:fields]
+            child = find_article(article.children, params[:child_id])
+            child.hit
+            present child, :with => Entities::Article, :fields => params[:fields]
           end
 
           post ':id/children/suggest' do
