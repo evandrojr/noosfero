@@ -40,17 +40,15 @@ end
 
 file.close
 
-message = <<MESSAGE_END
-
-Segue em anexo o relatorio do Dialoga.
-MESSAGE_END
-
-
 ActionMailer::Base.logger = Logger.new(STDOUT)
-class Sender < ActionMailer::Base                                                                                                     
-  def test(to, from)
+class Sender < ActionMailer::Base             
+  def send_report(to, from)
+    attachments["eventos.csv"] = File.read("#{Rails.root}/event.csv")
+    attachments["propostas.csv"] = File.read("#{Rails.root}/data.csv")
     mail to: to, from: from,
-      subject: "Relatorio do Dialoga", body: message
+      subject: "Relatorio do Dialoga", body: "Segue em anexo os relatorios do Dialoga"
   end
+
 end
-Sender.test(emails, 'dialoga@dialoga.gov.br').deliver 
+
+Sender.send_report(emails, 'dialoga@dialoga.gov.br').deliver
