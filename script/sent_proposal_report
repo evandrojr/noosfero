@@ -8,7 +8,7 @@ emails.uniq!
 
 puts 'Iniciando script'
 
-file = File.open('data.csv', 'w+')
+file = File.open(File.join(Rails.root,'data.csv'), 'w+')
 
 tasks = ProposalsDiscussionPlugin::ProposalTask.all
 count = 0
