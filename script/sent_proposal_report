@@ -2,7 +2,7 @@
 require File.dirname(__FILE__) + '/../config/environment'
 require 'net/smtp'
 
-mails = ['leandronunes@gmail.com', 'leandro.santos@serpro.gov.br']
+emails = ['leandronunes@gmail.com', 'leandro.santos@serpro.gov.br']
 
 puts 'Iniciando script'
 
@@ -39,17 +39,10 @@ end
 
 file.close
 
-
-
 message = <<MESSAGE_END
 
 Segue em anexo o relatorio do Dialoga.
 MESSAGE_END
-
-#Net::SMTP.start('localhost') do |smtp|
-#  smtp.send_message message, 'leandronunes@gmail.com', 
-#                             'leandro.santos@serpro.gov.br'
-#end
 
 
 ActionMailer::Base.logger = Logger.new(STDOUT)
@@ -59,4 +52,4 @@ class Sender < ActionMailer::Base
       subject: "Relatorio do Dialoga", body: message
   end
 end
-Sender.test(['leandro.santos@serpro.gov.br', 'leandronunes@gmail.com'], 'dialoga@dialoga.gov.br').deliver 
+Sender.test(emails, 'dialoga@dialoga.gov.br').deliver 
