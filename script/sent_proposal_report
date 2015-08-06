@@ -2,13 +2,14 @@
 require File.dirname(__FILE__) + '/../config/environment'
 require 'net/smtp'
 
-emails = ['leandronunes@gmail.com', 'leandro.santos@serpro.gov.br']
+
+emails = ['leandronunes@gmail.com', 'leandro.santos@serpro.gov.br'] + ARGV
+emails.uniq!
 
 puts 'Iniciando script'
 
 file = File.open('data.csv', 'w+')
 
-#articles = ProposalsDiscussionPlugin::Proposal.all
 tasks = ProposalsDiscussionPlugin::ProposalTask.all
 count = 0
 header = "'Origem';'Status';'Criada em';'Moderado por';'Data de Moderado';'Validado por';'Data de Validado';'Autor';'Proposta'\n"
