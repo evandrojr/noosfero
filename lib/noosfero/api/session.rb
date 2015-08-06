@@ -42,12 +42,27 @@ module Noosfero
         # this return is just to improve the clarity of the execution path
         return unless test_captcha(remote_ip, params, environment)
         user = User.new(attrs)
-        if user.save
-          user.generate_private_token! if user.activated?
-          present user, :with => Entities::UserLogin
+        if params[:name].present?
+          #adds user and person
+          person = Person.new(name: params[:name], identifier: user.login)
+          user.person = person
+          if user.signup
+              user.generate_private_token! if user.activated?
+              present user, :with => Entities::UserLogin
+          else
+            user.destroy
+            message = user.errors.as_json.merge(person.errors.as_json).to_json
+            render_api_error!(message, 400)
+          end
         else
-          message = user.errors.to_json
-          render_api_error!(message, 400)
+          #adds user only
+          if user.save
+              user.generate_private_token! if user.activated?
+              present user, :with => Entities::UserLogin
+          else
+            message = user.errors.to_json
+            render_api_error!(message, 400)
+          end
         end
       end
 

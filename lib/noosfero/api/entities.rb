@@ -112,6 +112,7 @@ module Noosfero
         root 'users', 'user'
         expose :id
         expose :login
+        expose :email
         expose :person, :using => Profile
         expose :activated?, as: :activated
         expose :permissions do |user, options|

@@ -30,6 +30,17 @@ class SessionTest < ActiveSupport::TestCase
     assert json['private_token'].present?
   end
 
+  should 'register a user with name' do
+    Environment.default.enable('skip_new_user_email_confirmation')
+    params = {:login => "newuserapi", :password => "newuserapi", :password_confirmation => "newuserapi", :email => "newuserapi@email.com", :name => "Little John" }
+    post "/api/v1/register?#{params.to_query}"
+    assert_equal 201, last_response.status
+    json = JSON.parse(last_response.body)
+    ap json
+    assert json['activated']
+    assert json['private_token'].present?
+  end
+
   should 'register an inactive user' do
     params = {:login => "newuserapi", :password => "newuserapi", :password_confirmation => "newuserapi", :email => "newuserapi@email.com" }
     post "/api/v1/register?#{params.to_query}"
