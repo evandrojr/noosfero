@@ -103,8 +103,8 @@ require 'grape'
         present articles, :with => Entities::Article, :fields => params[:fields]
       end
 
-      def find_articles(asset)
-        articles = select_filtered_collection_of(asset, 'articles', params)
+      def find_articles(asset, method = 'articles')
+        articles = select_filtered_collection_of(asset, method, params)
         if current_person.present?
           articles = articles.display_filter(current_person, nil)
         else

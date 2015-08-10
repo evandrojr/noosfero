@@ -95,9 +95,8 @@ module Noosfero
 
             #TODO make tests for this situation
             votes_order = params.delete(:order) if params[:order]=='votes_score'
-            articles = select_filtered_collection_of(article, 'children', params)
-            articles = articles.display_filter(current_person, article.profile)
 
+            articles = find_articles(article, 'children')
 
             #TODO make tests for this situation
             if votes_order

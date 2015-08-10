@@ -30,10 +30,30 @@ module Noosfero
         end
       end
 
+      class CategoryBase < Entity
+        root 'categories', 'category'
+        expose :name, :id, :slug
+      end
+
+      class Category < CategoryBase
+        root 'categories', 'category'
+        expose :full_name do |category, options|
+          category.full_name
+        end
+        expose :parent, :using => CategoryBase, if: { parent: true }
+        expose :children, :using => CategoryBase, if: { children: true }
+        expose :image, :using => Image
+      end
+
+      class Region < Category
+        root 'regions', 'region'
+      end
+
       class Profile < Entity
         expose :identifier, :name, :id
         expose :created_at, :format_with => :timestamp
         expose :image, :using => Image
+        expose :region, :using => Region
       end
 
       class UserBasic < Entity
@@ -53,21 +73,6 @@ module Noosfero
       class Community < Profile
         root 'communities', 'community'
         expose :description
-      end
-
-      class CategoryBase < Entity
-        root 'categories', 'category'
-        expose :name, :id, :slug
-      end
-
-      class Category < CategoryBase
-        root 'categories', 'category'
-        expose :full_name do |category, options|
-          category.full_name
-        end
-        expose :parent, :using => CategoryBase, if: { parent: true }
-        expose :children, :using => CategoryBase, if: { children: true }
-        expose :image, :using => Image
       end
 
       class ArticleBase < Entity

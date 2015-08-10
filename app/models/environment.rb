@@ -474,7 +474,8 @@ class Environment < ActiveRecord::Base
   end
 
   def custom_person_fields
-    self.settings[:custom_person_fields].nil? ? {} : self.settings[:custom_person_fields]
+    self.settings[:custom_person_fields] = {} if self.settings[:custom_person_fields].nil?
+    self.settings[:custom_person_fields]
   end
 
   def custom_person_fields=(values)
