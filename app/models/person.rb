@@ -4,7 +4,7 @@ class Person < Profile
   attr_accessible :organization, :contact_information, :sex, :birth_date, :cell_phone,
     :comercial_phone, :jabber_id, :personal_website, :nationality, :address_reference,
     :district, :schooling, :schooling_status, :formation, :custom_formation, :area_of_study,
-    :custom_area_of_study, :professional_activity, :organization_website, :following_articiles
+    :custom_area_of_study, :professional_activity, :organization_website, :following_articles
 
   SEARCH_FILTERS = {
     :order => %w[more_recent more_popular more_active],
@@ -89,7 +89,7 @@ class Person < Profile
 
   #Article followers relation
   has_many :article_followers, :dependent => :destroy
-  has_many :following_articiles, :class_name => 'Article', :through => :article_followers, :source => :article
+  has_many :following_articles, :class_name => 'Article', :through => :article_followers, :source => :article
 
   has_many :friendships, :dependent => :destroy
   has_many :friends, :class_name => 'Person', :through => :friendships

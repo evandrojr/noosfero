@@ -97,8 +97,8 @@ require 'grape'
         present article, :with => Entities::Article, :fields => params[:fields]
       end
 
-      def present_articles(asset)
-        articles = find_articles(asset)
+      def present_articles(asset, method = 'articles')
+        articles = find_articles(asset, method)
         articles = paginate articles
         present articles, :with => Entities::Article, :fields => params[:fields]
       end
