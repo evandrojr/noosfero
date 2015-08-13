@@ -199,9 +199,9 @@ class EnvironmentDesignControllerTest < ActionController::TestCase
 
     Noosfero::Plugin::Manager.any_instance.stubs(:enabled_plugins).returns([TestBlockPlugin.new])
     assert @controller.available_blocks.include?(CustomBlock1)
-    assert !@controller.available_blocks.include?(CustomBlock2)
-    assert !@controller.available_blocks.include?(CustomBlock3)
-    assert !@controller.available_blocks.include?(CustomBlock4)
+    refute @controller.available_blocks.include?(CustomBlock2)
+    refute @controller.available_blocks.include?(CustomBlock3)
+    refute @controller.available_blocks.include?(CustomBlock4)
   end
 
   should 'a block plugin add new blocks' do
@@ -233,10 +233,61 @@ class EnvironmentDesignControllerTest < ActionController::TestCase
 
     Noosfero::Plugin::Manager.any_instance.stubs(:enabled_plugins).returns([TestBlockPlugin.new])
     login_as(create_admin_user(Environment.default))
-    get :index
+    get :add_block
+
+    assert_response :success
+    assert @controller.instance_variable_get('@center_block_types').include?(CustomBlock1)
+    assert @controller.instance_variable_get('@center_block_types').include?(CustomBlock2)
+    assert @controller.instance_variable_get('@center_block_types').include?(CustomBlock3)
+    refute @controller.instance_variable_get('@center_block_types').include?(CustomBlock4)
+    refute @controller.instance_variable_get('@center_block_types').include?(CustomBlock5)
+    refute @controller.instance_variable_get('@center_block_types').include?(CustomBlock6)
+    refute @controller.instance_variable_get('@center_block_types').include?(CustomBlock7)
+    refute @controller.instance_variable_get('@center_block_types').include?(CustomBlock8)
+    refute @controller.instance_variable_get('@center_block_types').include?(CustomBlock9)
+  end
+
+  should 'a block plugin with side position add new blocks only in this position' do
+    class CustomBlock1 < Block; end;
+    class CustomBlock2 < Block; end;
+    class CustomBlock3 < Block; end;
+    class CustomBlock4 < Block; end;
+    class CustomBlock5 < Block; end;
+    class CustomBlock6 < Block; end;
+    class CustomBlock7 < Block; end;
+    class CustomBlock8 < Block; end;
+    class CustomBlock9 < Block; end;
+
+    class TestBlockPlugin < Noosfero::Plugin
+      def self.extra_blocks
+        {
+          CustomBlock1 => {:type => Environment, :position => [1]},
+          CustomBlock2 => {:type => Environment, :position => 1},
+          CustomBlock3 => {:type => Environment, :position => '1'},
+          CustomBlock4 => {:type => Environment, :position => [2]},
+          CustomBlock5 => {:type => Environment, :position => 2},
+          CustomBlock6 => {:type => Environment, :position => '2'},
+          CustomBlock7 => {:type => Environment, :position => [3]},
+          CustomBlock8 => {:type => Environment, :position => 3},
+          CustomBlock9 => {:type => Environment, :position => '3'},
+        }
+      end
+    end
+
+    Noosfero::Plugin::Manager.any_instance.stubs(:enabled_plugins).returns([TestBlockPlugin.new])
+    login_as(create_admin_user(Environment.default))
+    get :add_block
     assert_response :success
 
-    (1..9).each {|i| assert_tag :tag => 'div', :attributes => { 'data-block-type' => "EnvironmentDesignControllerTest::CustomBlock#{i}" }}
+    refute @controller.instance_variable_get('@side_block_types').include?(CustomBlock1)
+    refute @controller.instance_variable_get('@side_block_types').include?(CustomBlock2)
+    refute @controller.instance_variable_get('@side_block_types').include?(CustomBlock3)
+    assert @controller.instance_variable_get('@side_block_types').include?(CustomBlock4)
+    assert @controller.instance_variable_get('@side_block_types').include?(CustomBlock5)
+    assert @controller.instance_variable_get('@side_block_types').include?(CustomBlock6)
+    assert @controller.instance_variable_get('@side_block_types').include?(CustomBlock7)
+    assert @controller.instance_variable_get('@side_block_types').include?(CustomBlock8)
+    assert @controller.instance_variable_get('@side_block_types').include?(CustomBlock9)
   end
 
   should 'a block plugin cannot be listed for unspecified types' do
@@ -269,8 +320,14 @@ class EnvironmentDesignControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    [4, 8].each {|i| assert_tag :tag => 'div', :attributes => { 'data-block-type' => "EnvironmentDesignControllerTest::CustomBlock#{i}" }}
-    [1, 2, 3, 5, 6, 7].each {|i| assert_no_tag :tag => 'div', :attributes => { 'data-block-type' => "EnvironmentDesignControllerTest::CustomBlock#{i}" }}
+    refute @controller.instance_variable_get('@center_block_types').include?(CustomBlock1)
+    refute @controller.instance_variable_get('@center_block_types').include?(CustomBlock2)
+    refute @controller.instance_variable_get('@center_block_types').include?(CustomBlock3)
+    assert @controller.instance_variable_get('@center_block_types').include?(CustomBlock4)
+    refute @controller.instance_variable_get('@side_block_types').include?(CustomBlock5)
+    refute @controller.instance_variable_get('@side_block_types').include?(CustomBlock6)
+    refute @controller.instance_variable_get('@side_block_types').include?(CustomBlock7)
+    assert @controller.instance_variable_get('@side_block_types').include?(CustomBlock8)
   end
 
   should 'clone a block' do

@@ -5,8 +5,8 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.45.0-6097-g490300c\n"
-"POT-Creation-Date: 2015-07-23 16:25-0300\n"
+"Project-Id-Version: 1.2~rc2-23-g29aba34\n"
+"POT-Creation-Date: 2015-08-06 18:47-0300\n"
 "PO-Revision-Date: 2015-01-30 00:18-0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,17 +15,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-
-#: plugins/event/lib/event_plugin.rb:4
-msgid "Event Extras"
-msgstr "Extras para Eventos"
-
-#: plugins/event/lib/event_plugin.rb:8
-msgid ""
-"Include a new block to show the environment's or profiles' events information"
-msgstr ""
-"Adiciona um novo bloco para apresentar as informações de eventos do ambiente "
-"ou dos perfis"
 
 #: plugins/event/lib/event_plugin/event_block.rb:12
 msgid "Events"
@@ -62,6 +51,17 @@ msgid "One month left to start"
 msgid_plural "%d months left to start"
 msgstr[0] "Um mês para iniciar"
 msgstr[1] "%d meses para iniciar"
+
+#: plugins/event/lib/event_plugin.rb:4
+msgid "Event Extras"
+msgstr "Extras para Eventos"
+
+#: plugins/event/lib/event_plugin.rb:8
+msgid ""
+"Include a new block to show the environment's or profiles' events information"
+msgstr ""
+"Adiciona um novo bloco para apresentar as informações de eventos do ambiente "
+"ou dos perfis"
 
 #: plugins/event/views/event_plugin/event_block_item.html.erb:6
 msgid "Duration: 1 day"

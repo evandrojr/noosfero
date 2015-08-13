@@ -11,8 +11,8 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.45.0-6097-g490300c\n"
-"POT-Creation-Date: 2015-07-23 16:25-0300\n"
+"Project-Id-Version: 1.2~rc2-23-g29aba34\n"
+"POT-Creation-Date: 2015-08-06 18:47-0300\n"
 "PO-Revision-Date: 2014-12-18 18:40-0200\n"
 "Last-Translator: Luciano Prestes Cavalcanti <lucianopcbr@gmail.com>\n"
 "Language-Team: Portuguese <https://hosted.weblate.org/projects/noosfero/"
@@ -29,28 +29,14 @@ msgid "A plugin that add a block to display breadcrumbs."
 msgstr "Um plugin que adiciona um bloco que mostra caminhos de pão."
 
 #: plugins/breadcrumbs/lib/breadcrumbs_plugin/content_breadcrumbs_block.rb:10
-msgid ""
-"<p>Display a breadcrumb of the current content navigation.</p><p>You could "
-"choose if the breadcrumb is going to appear in the cms editing or not.</p> "
-"<p>There is either the option of display the profile location in the "
-"breadcrumb path.</p>"
-msgstr ""
+msgid "Content Breadcrumbs"
+msgstr "Conteúdo de Caminho de Pão"
 
 #: plugins/breadcrumbs/lib/breadcrumbs_plugin/content_breadcrumbs_block.rb:14
-#, fuzzy
-msgid "Breadcrumb"
-msgstr "Conteúdo de Caminho de Pão"
-
-#: plugins/breadcrumbs/lib/breadcrumbs_plugin/content_breadcrumbs_block.rb:18
-#, fuzzy
-msgid "Breadcrumbs Block"
-msgstr "Conteúdo de Caminho de Pão"
-
-#: plugins/breadcrumbs/lib/breadcrumbs_plugin/content_breadcrumbs_block.rb:22
 msgid "This block displays breadcrumb trail."
 msgstr "Esse bloco mostra o rastro de caminho de pão."
 
-#: plugins/breadcrumbs/lib/breadcrumbs_plugin/content_breadcrumbs_block.rb:76
+#: plugins/breadcrumbs/lib/breadcrumbs_plugin/content_breadcrumbs_block.rb:68
 msgid "Upload Files"
 msgstr "Enviar Arquivos"
 

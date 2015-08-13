@@ -5,8 +5,8 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.45.0-6097-g490300c\n"
-"POT-Creation-Date: 2015-07-23 16:26-0300\n"
+"Project-Id-Version: 1.2~rc2-23-g29aba34\n"
+"POT-Creation-Date: 2015-08-06 18:47-0300\n"
 "PO-Revision-Date: 2009-10-26 16:20-0300\n"
 "Last-Translator: Anahit Minassian <anahit.minassian@cooperation.net>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,20 +17,119 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 1.1.0\n"
 
-#: plugins/bsc/controllers/bsc_plugin_admin_controller.rb:11
+#: plugins/bsc/lib/bsc_plugin.rb:10
 #, fuzzy
-msgid "Your Bsc was created."
-msgstr "%s վերացված է"
+msgid "Adds the Bsc feature"
+msgstr "Այլ առանձնահատկություն"
 
-#: plugins/bsc/controllers/bsc_plugin_admin_controller.rb:21
+#: plugins/bsc/lib/bsc_plugin.rb:14
 #, fuzzy
-msgid "Enterprises validated."
-msgstr "Ձեռնարկությունների վավերացում"
+msgid "Create Bsc"
+msgstr "Ստեղծել"
 
-#: plugins/bsc/controllers/bsc_plugin_admin_controller.rb:24
+#: plugins/bsc/lib/bsc_plugin.rb:15
 #, fuzzy
-msgid "Enterprise validations couldn't be saved."
-msgstr "Ձեռնարկությունների վավերացում"
+msgid "Validate Enterprises"
+msgstr "Վավերացնել ձեռնարկությունը"
+
+#: plugins/bsc/lib/bsc_plugin.rb:20
+#: plugins/bsc/views/bsc_plugin_myprofile/manage_associated_enterprises.html.erb:1
+#, fuzzy
+msgid "Manage associated enterprises"
+msgstr "Մեկ ձեռնարկություն"
+
+#: plugins/bsc/lib/bsc_plugin.rb:21 plugins/bsc/lib/bsc_plugin.rb:27
+msgid "Transfer ownership"
+msgstr ""
+
+#: plugins/bsc/lib/bsc_plugin.rb:22
+#: plugins/bsc/views/bsc_plugin_myprofile/manage_contracts.html.erb:1
+#, fuzzy
+msgid "Manage contracts"
+msgstr "Կառավարել բովանդակությունը:"
+
+#: plugins/bsc/lib/bsc_plugin.rb:98
+msgid "Bsc"
+msgstr ""
+
+#: plugins/bsc/lib/bsc_plugin.rb:109
+#: plugins/bsc/views/shared/_fields.html.erb:53
+msgid "Contact"
+msgstr ""
+
+#: plugins/bsc/lib/bsc_plugin/bsc.rb:28
+#, fuzzy
+msgid "Bsc info and settings"
+msgstr "Անհանատական էջի տվյալների բաժին"
+
+#: plugins/bsc/lib/bsc_plugin/associate_enterprise.rb:10
+#, fuzzy
+msgid "BSC association"
+msgstr "Էլ. հասցե"
+
+#: plugins/bsc/lib/bsc_plugin/associate_enterprise.rb:18
+#, fuzzy
+msgid "%{requestor} wants to associate this enterprise with %{linked_subject}."
+msgstr "%s-ը ցանկանում է %s-ի անդամ դառնալ:"
+
+#: plugins/bsc/lib/bsc_plugin/associate_enterprise.rb:35
+msgid "%{enterprise} accepted your request to associate it with %{bsc}."
+msgstr ""
+
+#: plugins/bsc/lib/bsc_plugin/associate_enterprise.rb:39
+msgid "%{enterprise} rejected your request to associate it with %{bsc}."
+msgstr ""
+
+#: plugins/bsc/lib/bsc_plugin/associate_enterprise.rb:41
+msgid ""
+"Here is the reject explanation left by the administrator:\n"
+"\n"
+"%{reject_explanation}"
+msgstr ""
+
+#: plugins/bsc/lib/bsc_plugin/associate_enterprise.rb:46
+#, fuzzy
+msgid "%{requestor} wants assoaciate %{bsc} as your BSC."
+msgstr "%s ցանկանում է Ձեր ընկերը դառնալ"
+
+#: plugins/bsc/lib/bsc_plugin/mailer.rb:7
+msgid "[%s] Bsc management transferred to you."
+msgstr ""
+
+#: plugins/bsc/lib/bsc_plugin/contract.rb:33
+#, fuzzy
+msgid "Opened"
+msgstr "բացել"
+
+#: plugins/bsc/lib/bsc_plugin/contract.rb:33
+#, fuzzy
+msgid "Negotiating"
+msgstr "Պարամետրեր"
+
+#: plugins/bsc/lib/bsc_plugin/contract.rb:33
+#, fuzzy
+msgid "Executing"
+msgstr "Փոփոխում"
+
+#: plugins/bsc/lib/bsc_plugin/contract.rb:33
+#, fuzzy
+msgid "Closed"
+msgstr "Փակել"
+
+#: plugins/bsc/lib/bsc_plugin/contract.rb:46
+#, fuzzy
+msgid "Federal"
+msgstr "Ընդհանուր առաջադրանք"
+
+#: plugins/bsc/lib/bsc_plugin/contract.rb:59
+#, fuzzy
+msgid "ProjectA"
+msgstr "Արտադրանք"
+
+#: plugins/bsc/lib/bsc_plugin/contract.rb:59
+#, fuzzy
+msgid "ProjectB"
+msgstr "Արտադրանք"
 
 #: plugins/bsc/controllers/bsc_plugin_myprofile_controller.rb:38
 #, fuzzy
@@ -90,144 +189,97 @@ msgstr "Բուն հոդված"
 msgid "Contract could not be removed. Sorry! ^^"
 msgstr "Անհանատական էջի տվյալների բաժին"
 
-#: plugins/bsc/lib/bsc_plugin.rb:10
+#: plugins/bsc/controllers/bsc_plugin_admin_controller.rb:11
 #, fuzzy
-msgid "Adds the Bsc feature"
-msgstr "Այլ առանձնահատկություն"
+msgid "Your Bsc was created."
+msgstr "%s վերացված է"
 
-#: plugins/bsc/lib/bsc_plugin.rb:14
+#: plugins/bsc/controllers/bsc_plugin_admin_controller.rb:21
 #, fuzzy
-msgid "Create Bsc"
-msgstr "Ստեղծել"
+msgid "Enterprises validated."
+msgstr "Ձեռնարկությունների վավերացում"
 
-#: plugins/bsc/lib/bsc_plugin.rb:15
+#: plugins/bsc/controllers/bsc_plugin_admin_controller.rb:24
 #, fuzzy
-msgid "Validate Enterprises"
-msgstr "Վավերացնել ձեռնարկությունը"
+msgid "Enterprise validations couldn't be saved."
+msgstr "Ձեռնարկությունների վավերացում"
 
-#: plugins/bsc/lib/bsc_plugin.rb:20
-#: plugins/bsc/views/bsc_plugin_myprofile/manage_associated_enterprises.html.erb:1
+#: plugins/bsc/views/bsc_plugin_myprofile/manage_associated_enterprises.html.erb:4
+msgid "Associations awaiting approval:"
+msgstr ""
+
+#: plugins/bsc/views/bsc_plugin_myprofile/manage_associated_enterprises.html.erb:16
+#: plugins/bsc/views/bsc_plugin_admin/validate_enterprises.html.erb:5
 #, fuzzy
-msgid "Manage associated enterprises"
+msgid "Type in a search term for enterprise"
+msgstr "Դիզակտիվացնել ձեռնարկությունների որոնումը"
+
+#: plugins/bsc/views/bsc_plugin_myprofile/manage_associated_enterprises.html.erb:19
+#, fuzzy
+msgid "Add new enterprise"
 msgstr "Մեկ ձեռնարկություն"
 
-#: plugins/bsc/lib/bsc_plugin.rb:21 plugins/bsc/lib/bsc_plugin.rb:27
-msgid "Transfer ownership"
+#: plugins/bsc/views/bsc_plugin_myprofile/new_contract.html.erb:1
+#: plugins/bsc/views/bsc_plugin_myprofile/edit_contract.html.erb:1
+#, fuzzy
+msgid "New contract"
+msgstr "Ամբողջ բովանդակությունը"
+
+#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:6
+#: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:7
+#, fuzzy
+msgid "Client type"
+msgstr "Բովանդակության տեսակ"
+
+#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:7
+#: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:8
+#, fuzzy
+msgid "Business type"
+msgstr "Սեփականատիրոջ տեսակ"
+
+#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:10
+#: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:11
+#: plugins/bsc/views/bsc_plugin_myprofile/manage_contracts.html.erb:5
+msgid "Status"
+msgstr "Կարգավիճակ"
+
+#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:18
+#, fuzzy
+msgid "Type in search term for enterprise"
+msgstr "Դիզակտիվացնել ձեռնարկությունների որոնումը"
+
+#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:23
+#: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:27
+#, fuzzy
+msgid "Quantity"
+msgstr "Որակ"
+
+#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:24
+#: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:28
+#, fuzzy
+msgid "Unit price"
+msgstr "Հեռավորություն"
+
+#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:27
+#: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:38
+msgid "Total"
 msgstr ""
 
-#: plugins/bsc/lib/bsc_plugin.rb:22
-#: plugins/bsc/views/bsc_plugin_myprofile/manage_contracts.html.erb:1
+#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:31
 #, fuzzy
-msgid "Manage contracts"
-msgstr "Կառավարել բովանդակությունը:"
+msgid "Add new product"
+msgstr "Կառավարել արտադրանքը"
 
-#: plugins/bsc/lib/bsc_plugin.rb:98
-msgid "Bsc"
-msgstr ""
-
-#: plugins/bsc/lib/bsc_plugin.rb:109
-#: plugins/bsc/views/shared/_fields.html.erb:53
-msgid "Contact"
-msgstr ""
-
-#: plugins/bsc/lib/bsc_plugin/contract.rb:33
+#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:35
+#: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:13
 #, fuzzy
-msgid "Opened"
-msgstr "բացել"
+msgid "Supply period"
+msgstr "Առաքիչ %s"
 
-#: plugins/bsc/lib/bsc_plugin/contract.rb:33
+#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:57
 #, fuzzy
-msgid "Negotiating"
-msgstr "Պարամետրեր"
-
-#: plugins/bsc/lib/bsc_plugin/contract.rb:33
-#, fuzzy
-msgid "Executing"
-msgstr "Փոփոխում"
-
-#: plugins/bsc/lib/bsc_plugin/contract.rb:33
-#, fuzzy
-msgid "Closed"
-msgstr "Փակել"
-
-#: plugins/bsc/lib/bsc_plugin/contract.rb:46
-#, fuzzy
-msgid "Federal"
-msgstr "Ընդհանուր առաջադրանք"
-
-#: plugins/bsc/lib/bsc_plugin/contract.rb:59
-#, fuzzy
-msgid "ProjectA"
-msgstr "Արտադրանք"
-
-#: plugins/bsc/lib/bsc_plugin/contract.rb:59
-#, fuzzy
-msgid "ProjectB"
-msgstr "Արտադրանք"
-
-#: plugins/bsc/lib/bsc_plugin/associate_enterprise.rb:10
-#, fuzzy
-msgid "BSC association"
-msgstr "Էլ. հասցե"
-
-#: plugins/bsc/lib/bsc_plugin/associate_enterprise.rb:18
-#, fuzzy
-msgid "%{requestor} wants to associate this enterprise with %{linked_subject}."
-msgstr "%s-ը ցանկանում է %s-ի անդամ դառնալ:"
-
-#: plugins/bsc/lib/bsc_plugin/associate_enterprise.rb:31
-msgid "%{enterprise} accepted your request to associate it with %{bsc}."
-msgstr ""
-
-#: plugins/bsc/lib/bsc_plugin/associate_enterprise.rb:35
-msgid "%{enterprise} rejected your request to associate it with %{bsc}."
-msgstr ""
-
-#: plugins/bsc/lib/bsc_plugin/associate_enterprise.rb:37
-msgid ""
-"Here is the reject explanation left by the administrator:\n"
-"\n"
-"%{reject_explanation}"
-msgstr ""
-
-#: plugins/bsc/lib/bsc_plugin/associate_enterprise.rb:42
-#, fuzzy
-msgid "%{requestor} wants assoaciate %{bsc} as your BSC."
-msgstr "%s ցանկանում է Ձեր ընկերը դառնալ"
-
-#: plugins/bsc/lib/bsc_plugin/bsc.rb:28
-#, fuzzy
-msgid "Bsc info and settings"
-msgstr "Անհանատական էջի տվյալների բաժին"
-
-#: plugins/bsc/lib/bsc_plugin/mailer.rb:7
-msgid "[%s] Bsc management transferred to you."
-msgstr ""
-
-#: plugins/bsc/views/bsc_plugin_myprofile/transfer_ownership.html.erb:1
-msgid "Transfer Ownership"
-msgstr ""
-
-#: plugins/bsc/views/bsc_plugin_myprofile/transfer_ownership.html.erb:4
-msgid ""
-"This option allows you to transfer this enterprise's management to another "
-"user. This action will remove all the current administrators. Be careful "
-"when confirming this procedure."
-msgstr ""
-
-#: plugins/bsc/views/bsc_plugin_myprofile/transfer_ownership.html.erb:8
-#, fuzzy
-msgid "Current administrators:"
-msgstr "Անդամներ"
-
-#: plugins/bsc/views/bsc_plugin_myprofile/transfer_ownership.html.erb:19
-#, fuzzy
-msgid "Administrator:"
-msgstr "Կառավարման վահանակ"
-
-#: plugins/bsc/views/bsc_plugin_myprofile/transfer_ownership.html.erb:22
-msgid "Type in a search term for the new administrator"
-msgstr ""
+msgid "Type in a search term for product"
+msgstr "Դիզակտիվացնել ձեռնարկությունների որոնումը"
 
 #: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:5
 #: plugins/bsc/views/shared/_fields.html.erb:5
@@ -235,51 +287,10 @@ msgstr ""
 msgid "Basic information"
 msgstr "Էլ. հասցե"
 
-#: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:7
-#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:6
-#, fuzzy
-msgid "Client type"
-msgstr "Բովանդակության տեսակ"
-
-#: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:8
-#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:7
-#, fuzzy
-msgid "Business type"
-msgstr "Սեփականատիրոջ տեսակ"
-
-#: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:11
-#: plugins/bsc/views/bsc_plugin_myprofile/manage_contracts.html.erb:5
-#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:10
-msgid "Status"
-msgstr "Կարգավիճակ"
-
 #: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:12
 #, fuzzy
 msgid "Number of producers"
 msgstr "Արտադրանք չկա"
-
-#: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:13
-#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:35
-#, fuzzy
-msgid "Supply period"
-msgstr "Առաքիչ %s"
-
-#: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:27
-#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:23
-#, fuzzy
-msgid "Quantity"
-msgstr "Որակ"
-
-#: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:28
-#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:24
-#, fuzzy
-msgid "Unit price"
-msgstr "Հեռավորություն"
-
-#: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:38
-#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:27
-msgid "Total"
-msgstr ""
 
 #: plugins/bsc/views/bsc_plugin_myprofile/view_contract.html.erb:48
 #, fuzzy
@@ -337,56 +348,39 @@ msgstr ""
 msgid "Associate"
 msgstr "Ակտիվացնել"
 
-#: plugins/bsc/views/bsc_plugin_myprofile/manage_associated_enterprises.html.erb:4
-msgid "Associations awaiting approval:"
+#: plugins/bsc/views/bsc_plugin_myprofile/transfer_ownership.html.erb:1
+msgid "Transfer Ownership"
 msgstr ""
 
-#: plugins/bsc/views/bsc_plugin_myprofile/manage_associated_enterprises.html.erb:16
-#: plugins/bsc/views/bsc_plugin_admin/validate_enterprises.html.erb:5
-#, fuzzy
-msgid "Type in a search term for enterprise"
-msgstr "Դիզակտիվացնել ձեռնարկությունների որոնումը"
+#: plugins/bsc/views/bsc_plugin_myprofile/transfer_ownership.html.erb:4
+msgid ""
+"This option allows you to transfer this enterprise's management to another "
+"user. This action will remove all the current administrators. Be careful "
+"when confirming this procedure."
+msgstr ""
 
-#: plugins/bsc/views/bsc_plugin_myprofile/manage_associated_enterprises.html.erb:19
+#: plugins/bsc/views/bsc_plugin_myprofile/transfer_ownership.html.erb:8
 #, fuzzy
-msgid "Add new enterprise"
-msgstr "Մեկ ձեռնարկություն"
+msgid "Current administrators:"
+msgstr "Անդամներ"
 
-#: plugins/bsc/views/bsc_plugin_myprofile/new_contract.html.erb:1
-#: plugins/bsc/views/bsc_plugin_myprofile/edit_contract.html.erb:1
+#: plugins/bsc/views/bsc_plugin_myprofile/transfer_ownership.html.erb:19
 #, fuzzy
-msgid "New contract"
-msgstr "Ամբողջ բովանդակությունը"
+msgid "Administrator:"
+msgstr "Կառավարման վահանակ"
 
-#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:18
-#, fuzzy
-msgid "Type in search term for enterprise"
-msgstr "Դիզակտիվացնել ձեռնարկությունների որոնումը"
-
-#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:31
-#, fuzzy
-msgid "Add new product"
-msgstr "Կառավարել արտադրանքը"
-
-#: plugins/bsc/views/bsc_plugin_myprofile/_contract_form.html.erb:57
-#, fuzzy
-msgid "Type in a search term for product"
-msgstr "Դիզակտիվացնել ձեռնարկությունների որոնումը"
-
-#: plugins/bsc/views/bsc_plugin_admin/new.html.erb:2
-#, fuzzy
-msgid "BSC registration"
-msgstr "Ձեռնարկության գրանցում «%s»"
-
-#: plugins/bsc/views/bsc_plugin_admin/validate_enterprises.html.erb:1
-#, fuzzy
-msgid "Validate enterprises"
-msgstr "Վավերացնել ձեռնարկությունը"
+#: plugins/bsc/views/bsc_plugin_myprofile/transfer_ownership.html.erb:22
+msgid "Type in a search term for the new administrator"
+msgstr ""
 
 #: plugins/bsc/views/shared/_fields.html.erb:39
 msgid ""
 "You are about to change the address, and this will break external links to "
 "this bsc or to posts inside it. Do you really want to change?"
+msgstr ""
+
+#: plugins/bsc/views/bsc_plugin/mailer/admin_notification.html.erb:1
+msgid "The management of %{bsc} was transferred to you."
 msgstr ""
 
 #: plugins/bsc/views/profile/_profile_tab.html.erb:2
@@ -399,6 +393,12 @@ msgstr "Հեռախոս"
 msgid "Email: "
 msgstr "Էլ. հասցե"
 
-#: plugins/bsc/views/bsc_plugin/mailer/admin_notification.html.erb:1
-msgid "The management of %{bsc} was transferred to you."
-msgstr ""
+#: plugins/bsc/views/bsc_plugin_admin/new.html.erb:2
+#, fuzzy
+msgid "BSC registration"
+msgstr "Ձեռնարկության գրանցում «%s»"
+
+#: plugins/bsc/views/bsc_plugin_admin/validate_enterprises.html.erb:1
+#, fuzzy
+msgid "Validate enterprises"
+msgstr "Վավերացնել ձեռնարկությունը"

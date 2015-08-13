@@ -28,8 +28,8 @@
 [submodule "public/proposal-app"]
 	path = public/proposal-app
 	url = https://gitlab.com/participa/proposal-app.git
-[submodule "plugins/gravatar-provider"]
-	path = plugins/gravatar-provider
+[submodule "plugins/gravatar_provider"]
+	path = plugins/gravatar_provider
 	url = https://gitlab.com/noosfero-plugins/gravatar-provider.git
 [submodule "plugins/juventude"]
 	path = plugins/juventude

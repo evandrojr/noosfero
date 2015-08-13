@@ -670,7 +670,7 @@ class ProfileDesignControllerTest < ActionController::TestCase
     end
 
     Noosfero::Plugin::Manager.any_instance.stubs(:enabled_plugins).returns([TestBlockPlugin.new])
-    assert !@controller.available_blocks.include?(CustomBlock1)
+    refute @controller.available_blocks.include?(CustomBlock1)
   end
 
   should 'clone a block' do

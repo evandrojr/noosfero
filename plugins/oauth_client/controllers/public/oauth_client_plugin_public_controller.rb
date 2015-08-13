@@ -40,7 +40,7 @@ class OauthClientPluginPublicController < PublicController
     if user_provider.enabled?# && provider.enabled?
       session[:user] = user.id
     else
-      session[:notice] = _("Can't login with #{provider.name}")
+      session[:notice] = _("Can't login with %s") % provider.name
     end
     session[:oauth_client_popup] = true if request.env.fetch("omniauth.params", {})['oauth_client_popup']
     session[:return_to] = url_for(

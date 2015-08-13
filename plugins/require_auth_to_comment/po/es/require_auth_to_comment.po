@@ -5,8 +5,8 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.45.0-6097-g490300c\n"
-"POT-Creation-Date: 2015-07-23 16:25-0300\n"
+"Project-Id-Version: 1.2~rc2-23-g29aba34\n"
+"POT-Creation-Date: 2015-08-06 18:47-0300\n"
 "PO-Revision-Date: 2014-11-03 15:52+0200\n"
 "Last-Translator: Michal Čihař <michal@cihar.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/noosfero/"
@@ -23,14 +23,6 @@ msgid "Requires users to authenticate in order to post comments."
 msgstr ""
 "Se requiere que el usuario se autentique para poder enviar comentarios."
 
-#: plugins/require_auth_to_comment/views/profile-editor-extras.html.erb:1
-msgid "Comments"
-msgstr "Comentarios"
-
-#: plugins/require_auth_to_comment/views/profile-editor-extras.html.erb:3
-msgid "Accept comments from unauthenticated users"
-msgstr "Aceptar comentarios de usuarios no autenticados"
-
 #: plugins/require_auth_to_comment/views/require_auth_to_comment_plugin_admin/index.html.erb:1
 msgid "Require auth to comment Settings"
 msgstr ""
@@ -46,3 +38,11 @@ msgstr ""
 #: plugins/require_auth_to_comment/views/require_auth_to_comment_plugin_admin/index.html.erb:17
 msgid "Save"
 msgstr ""
+
+#: plugins/require_auth_to_comment/views/profile-editor-extras.html.erb:1
+msgid "Comments"
+msgstr "Comentarios"
+
+#: plugins/require_auth_to_comment/views/profile-editor-extras.html.erb:3
+msgid "Accept comments from unauthenticated users"
+msgstr "Aceptar comentarios de usuarios no autenticados"
