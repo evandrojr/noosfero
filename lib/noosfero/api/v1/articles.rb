@@ -25,6 +25,11 @@ module Noosfero
             present_articles(environment)
           end
 
+          desc "Return the articles followed by me"
+          get 'followed_by_me' do
+            present_articles(current_person, 'following_articles')
+          end
+
           desc "Return the article id"
           get ':id' do
             present_article(environment)

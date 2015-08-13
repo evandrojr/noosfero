@@ -72,7 +72,7 @@ class ArticleFollowerTest < ActiveSupport::TestCase
     article_follower.person = p1
     article_follower.save!
 
-    assert_equal p1.following_articiles.size, 2
+    assert_equal p1.following_articles.size, 2
   end
 
 
