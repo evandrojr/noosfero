@@ -7,7 +7,7 @@ class Article < ActiveRecord::Base
                   :accept_comments, :feed, :published, :source, :source_name,
                   :highlighted, :notify_comments, :display_hits, :slug,
                   :external_feed_builder, :display_versions, :external_link,
-                  :author, :published_at, :person_followers
+                  :author, :published_at, :person_followers, :show_to_followers, :image_builder
 
   acts_as_having_image
 
