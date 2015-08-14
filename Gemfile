@@ -32,6 +32,9 @@ gem 'liquid',                    '~> 3.0.3'
 #gem 'grape-swagger-rails'
 gem 'rubyzip'
 
+gem 'execjs'
+gem 'therubyracer'
+
 # FIXME list here all actual dependencies (i.e. the ones in debian/control),
 # with their GEM names (not the Debian package names)
 
