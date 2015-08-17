@@ -109,6 +109,7 @@ GEM
     ice_nine (0.11.1)
     journey (1.0.4)
     json (1.8.3)
+    libv8 (3.16.14.11)
     liquid (3.0.6)
     locale (2.0.9)
     magic (0.2.9)
@@ -163,6 +164,7 @@ GEM
     rake (10.4.2)
     rdoc (3.12.2)
       json (~> 1.4)
+    ref (2.0.0)
     rest-client (1.6.9)
       mime-types (~> 1.16)
     rmagick (2.13.4)
@@ -202,6 +204,9 @@ GEM
       tilt (~> 1.1, != 1.3.0)
     term-ansicolor (1.3.2)
       tins (~> 1.0)
+    therubyracer (0.12.2)
+      libv8 (~> 3.16.14.0)
+      ref
     thin (1.3.1)
       daemons (>= 1.0.9)
       eventmachine (>= 0.12.6)
@@ -244,6 +249,7 @@ DEPENDENCIES
   database_cleaner (~> 1.2.0)
   eita-jrails (~> 0.9.5)
   exception_notification (~> 4.0.1)
+  execjs
   fast_gettext (~> 0.6.8)
   gettext (~> 2.2.1)
   grape (~> 0.12)
@@ -268,6 +274,7 @@ DEPENDENCIES
   rubyzip
   sass-rails
   selenium-webdriver (~> 2.39.0)
+  therubyracer
   thin (~> 1.3.1)
   uglifier (>= 1.0.3)
   whenever
