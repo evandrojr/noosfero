@@ -13,7 +13,11 @@ module Noosfero
       # Example Request:
       #  POST http://localhost:3000/api/v1/login?login=adminuser&password=admin
       post "/login" do
-        user ||= User.authenticate(params[:login], params[:password], environment)
+        begin
+          user ||= User.authenticate(params[:login], params[:password], environment)
+        rescue NoosferoExceptions::UserNotActivated => e
+          render_api_error!(e.message, 401)
+        end
 
         return unauthorized! unless user
         user.generate_private_token!
