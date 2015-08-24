@@ -95,6 +95,7 @@ module Noosfero
         expose :start_date
         expose :end_date
         expose :tag_list
+        expose :children_count
       end
 
       class Article < ArticleBase

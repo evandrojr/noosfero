@@ -91,6 +91,17 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_not_includes json['articles'].map {|a| a['id']}, child.id
   end
 
+  expose_attributes = %w(id body abstract created_at title author profile categories image votes_for votes_against setting position hits start_date end_date tag_list parent children children_count)
+
+  expose_attributes.each do |attr|
+    should "expose article #{attr} attribute" do
+      article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
+      get "/api/v1/articles/?#{params.to_query}"
+      json = JSON.parse(last_response.body)
+     assert json["articles"].last.has_key?(attr)
+    end
+  end
+
   #############################
   #     Profile Articles      #
   #############################
