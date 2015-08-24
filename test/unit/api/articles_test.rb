@@ -94,7 +94,7 @@ class ArticlesTest < ActiveSupport::TestCase
   expose_attributes = %w(id body abstract created_at title author profile categories image votes_for votes_against setting position hits start_date end_date tag_list parent children children_count)
 
   expose_attributes.each do |attr|
-    should "expose article #{attr} attribute" do
+    should "expose article #{attr} attribute by default" do
       article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
       get "/api/v1/articles/?#{params.to_query}"
       json = JSON.parse(last_response.body)

@@ -43,6 +43,7 @@ module Noosfero
         expose :parent, :using => CategoryBase, if: { parent: true }
         expose :children, :using => CategoryBase, if: { children: true }
         expose :image, :using => Image
+        expose :display_color
       end
 
       class Region < Category

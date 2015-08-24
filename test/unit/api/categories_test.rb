@@ -83,4 +83,15 @@ class CategoriesTest < ActiveSupport::TestCase
       json["categories"].map{ |c| c['children'].map{ |child| child['id'] }.sort  }
   end
 
+  expose_attributes = %w(id name full_name image display_color)
+
+  expose_attributes.each do |attr|
+    should "expose category #{attr} attribute by default" do
+      category = fast_create(Category, :environment_id => environment.id)
+      get "/api/v1/categories/?#{params.to_query}"
+      json = JSON.parse(last_response.body)
+     assert json["categories"].last.has_key?(attr)
+    end
+  end
+
 end
