@@ -43,3 +43,6 @@
 [submodule "public/designs/themes/serpro-theme"]
 	path = public/designs/themes/serpro-theme
 	url = https://gitlab.com/participa/serpro-theme.git
+[submodule "public/rest-clients/confjuvapp"]
+	path = public/rest-clients/confjuvapp
+	url = https://gitlab.com/participa/confjuvapp.git
