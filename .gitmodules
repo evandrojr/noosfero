@@ -37,9 +37,6 @@
 [submodule "plugins/dialoga"]
 	path = plugins/dialoga
 	url = https://gitlab.com/participa/dialoga-plugin.git
-[submodule "public/designs/themes/dialoga"]
-	path = public/designs/themes/dialoga
-	url = https://gitlab.com/participa/dialoga.git
 [submodule "public/designs/themes/serpro-theme"]
 	path = public/designs/themes/serpro-theme
 	url = https://gitlab.com/participa/serpro-theme.git
