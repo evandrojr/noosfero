@@ -46,3 +46,6 @@
 [submodule "rest-clients/confjuvapp"]
 	path = rest-clients/confjuvapp
 	url = https://gitlab.com/participa/confjuvapp.git
+[submodule "rest-clients/proposal-app"]
+	path = rest-clients/proposal-app
+	url = https://gitlab.com/participa/proposal-app.git
