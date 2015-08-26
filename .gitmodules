@@ -19,9 +19,6 @@
 [submodule "plugins/email_article"]
 	path = plugins/email_article
 	url = https://gitlab.com/noosfero-plugins/email_article.git
-[submodule "public/designs/themes/participa-theme"]
-	path = public/designs/themes/participa-theme
-	url = https://gitlab.com/participa/participa-theme.git
 [submodule "public/proposal-app"]
 	path = public/proposal-app
 	url = https://gitlab.com/participa/proposal-app.git
