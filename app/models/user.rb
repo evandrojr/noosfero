@@ -102,12 +102,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def signup
-    User.transaction do
-      self.person.save if self.save
-    end
-  end
-
   has_one :person, :dependent => :destroy
   belongs_to :environment
 

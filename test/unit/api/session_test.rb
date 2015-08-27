@@ -26,6 +26,7 @@ class SessionTest < ActiveSupport::TestCase
     post "/api/v1/register?#{params.to_query}"
     assert_equal 201, last_response.status
     json = JSON.parse(last_response.body)
+    assert User['newuserapi'].activated?
     assert json['activated']
     assert json['private_token'].present?
   end
