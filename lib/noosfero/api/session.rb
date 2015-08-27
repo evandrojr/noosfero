@@ -45,14 +45,16 @@ module Noosfero
         # test_captcha will render_api_error! and exit in case of any problem
         # this return is just to improve the clarity of the execution path
         return unless test_captcha(remote_ip, params, environment)
+
         name = params[:name].present? ? params[:name] : attrs[:email]
         user = User.new(attrs.merge(:name => name))
-        if user.signup!
+
+        begin
+          user.signup!
           user.generate_private_token! if user.activated?
           present user, :with => Entities::UserLogin
-        else
-          user.destroy
-          message = user.errors.as_json.merge(user.person.errors.as_json).to_json
+        rescue ActiveRecord::RecordInvalid
+          message = user.errors.as_json.merge((user.person.present? ? user.person.errors : {}).as_json).to_json
           render_api_error!(message, 400)
         end
       end
