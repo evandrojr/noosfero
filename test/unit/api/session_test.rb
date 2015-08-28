@@ -173,6 +173,7 @@ class SessionTest < ActiveSupport::TestCase
 
   should 'change user password and close task' do
     user = create_user
+    user.activate
     task = ChangePassword.create!(:requestor => user.person)
     params = {:code => task.code, :password => 'secret', :password_confirmation => 'secret'}
     patch "/api/v1/new_password?#{params.to_query}"
@@ -184,6 +185,7 @@ class SessionTest < ActiveSupport::TestCase
 
   should 'do not change user password when password confirmation is wrong' do
     user = create_user
+    user.activate 
     task = ChangePassword.create!(:requestor => user.person)
     params = {:code => task.code, :password => 'secret', :password_confirmation => 's3cret'}
     patch "/api/v1/new_password?#{params.to_query}"
