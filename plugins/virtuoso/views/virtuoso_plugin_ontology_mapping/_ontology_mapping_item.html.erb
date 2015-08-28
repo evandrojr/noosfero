@@ -1,0 +1,5 @@
+<tr>
+  <td><%= text_field_tag 'ontology_mapping[][source]', ontology_mapping_item[:source] %></td>
+  <td><%= text_field_tag 'ontology_mapping[][target]', ontology_mapping_item[:target], :style => 'width: 100%' %></td>
+  <td><%= button :remove, _('Remove'), '#', :class => "remove-ontology-button" %></td>
+</tr>

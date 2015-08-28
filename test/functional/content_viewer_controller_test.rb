@@ -124,6 +124,19 @@ class ContentViewerControllerTest < ActionController::TestCase
     assert_tag :tag => 'div', :attributes => { :id => 'article-tags' }, :descendant => { :content => /This article's tags:/ }
   end
 
+  should "display image label on article image" do
+    page = TinyMceArticle.create!(
+             :profile => profile,
+             :name => 'myarticle',
+             :image_builder => {
+               :uploaded_data => fixture_file_upload('/files/tux.png', 'image/png'),
+               :label => 'test-label'
+             }
+           )
+    get :view_page, page.url
+    assert_match /test-label/, @response.body
+  end
+
   should "not display current article's tags" do
     page = profile.articles.create!(:name => 'myarticle', :body => 'test article')
 
@@ -175,7 +188,7 @@ class ContentViewerControllerTest < ActionController::TestCase
     admin = fast_create(Person)
     community.add_member(admin)
 
-    folder = fast_create(Folder, :profile_id => community.id, :published => false)
+    folder = fast_create(Folder, :profile_id => community.id, :published => false, :show_to_followers => false)
     community.add_member(profile)
     login_as(profile.identifier)
 
@@ -218,6 +231,19 @@ class ContentViewerControllerTest < ActionController::TestCase
     assert_equal profile, assigns(:profile)
   end
 
+  should 'redirect to custom profile url when access a content using the environment domain' do
+    environment = Environment.default
+    environment.domains << Domain.create!(:name => 'environmentdomain.net')
+    profile = create_user('mytestuser').person
+    profile.domains << Domain.create!(:name => 'myowndomain.net')
+    profile.articles.create!(:name => 'myarticle', :body => 'test article')
+
+    ActionController::TestRequest.any_instance.expects(:host).returns('environmentdomain.net').at_least_once
+
+    get :view_page, :page => ['myarticle'], :profile => 'mytestuser'
+    assert_redirected_to 'http://myowndomain.net/myarticle'
+  end
+
   should 'give link to edit the article for owner' do
     login_as('testinguser')
     xhr :get, :view_page, :profile => 'testinguser', :page => [], :toolbar => true
@@ -257,28 +283,28 @@ class ContentViewerControllerTest < ActionController::TestCase
   end
 
   should 'not give access to private articles if logged off' do
-    profile = Profile.create!(:name => 'test profile', :identifier => 'test_profile')
+    profile = Community.create!(:name => 'test profile', :identifier => 'test_profile')
     intranet = Folder.create!(:name => 'my_intranet', :profile => profile, :published => false)
 
     get :view_page, :profile => 'test_profile', :page => [ 'my-intranet' ]
 
-    assert_template 'access_denied'
+    assert_template "shared/access_denied"
   end
 
   should 'not give access to private articles if logged in but not member' do
     login_as('testinguser')
-    profile = Profile.create!(:name => 'test profile', :identifier => 'test_profile')
+    profile = Community.create!(:name => 'test profile', :identifier => 'test_profile')
     intranet = Folder.create!(:name => 'my_intranet', :profile => profile, :published => false)
 
     get :view_page, :profile => 'test_profile', :page => [ 'my-intranet' ]
 
-    assert_template 'access_denied'
+    assert_template "profile/_private_profile"
   end
 
   should 'not give access to private articles if logged in and only member' do
     person = create_user('test_user').person
     profile = Profile.create!(:name => 'test profile', :identifier => 'test_profile')
-    intranet = Folder.create!(:name => 'my_intranet', :profile => profile, :published => false)
+    intranet = Folder.create!(:name => 'my_intranet', :profile => profile, :published => false, :show_to_followers => false)
     profile.affiliate(person, Profile::Roles.member(profile.environment.id))
     login_as('test_user')
 
@@ -1252,9 +1278,11 @@ class ContentViewerControllerTest < ActionController::TestCase
   should 'expire article actions button if any plugins says so' do
     class Plugin1 < Noosfero::Plugin
       def content_expire_edit(content); 'This button is expired.'; end
+      def content_expire_clone(content); 'This button is expired.'; end
     end
     class Plugin2 < Noosfero::Plugin
       def content_expire_edit(content); nil; end
+      def content_expire_clone(content); nil; end
     end
     Noosfero::Plugin.stubs(:all).returns([Plugin1.name, Plugin2.name])
 
@@ -1428,7 +1456,7 @@ class ContentViewerControllerTest < ActionController::TestCase
 
     article = TinyMceArticle.create(:name => 'Article to be shared with images',
                                     :body => 'This article should be shared with all social networks',
-                                    :profile => @profile,
+                                    :profile => community,
                                     :published => false,
                                     :show_to_followers => true)
     article.parent = blog
@@ -1525,12 +1553,12 @@ class ContentViewerControllerTest < ActionController::TestCase
   should 'use context method in extra toolbar actions on article from plugins' do
     class Plugin1 < Noosfero::Plugin
       def article_extra_toolbar_buttons(article)
-        if current_person.public?
+        if profile.public?
           {:title => 'some_title', :icon => 'some_icon', :url => '/someurl'}
         else
           {:title => 'another_title', :icon => 'another_icon', :url => '/anotherurl'}
         end
-      end
+       end
     end
     Noosfero::Plugin.stubs(:all).returns([Plugin1.name])
 
@@ -1545,4 +1573,31 @@ class ContentViewerControllerTest < ActionController::TestCase
     assert_tag :tag => 'div', :attributes => { :id => 'article-actions' }, :descendant => { :tag => 'a', :attributes => { :href => "/anotherurl" }}
   end
 
+  should  'show lead,image and title in compact blog visualization' do
+    community = Community.create(:name => 'test-community')
+    community.add_member(@profile)
+    community.save!
+
+    blog = community.articles.find_by_name("Blog")
+    blog.visualization_format = 'compact'
+    blog.save!
+
+    article = TinyMceArticle.create(:name => 'Article to be shared with images',
+                                    :body => 'This article should be shared with all social networks',
+                                    :profile => @profile,
+                                    :published => false,
+                                    :abstract => "teste teste teste",
+                                    :show_to_followers => true,
+                                    :image_builder => { :uploaded_data => fixture_file_upload('/files/rails.png', 'image/png')} )
+    article.parent = blog
+    article.save!
+
+    login_as(@profile.identifier)
+
+
+    get :view_page, :profile => community.identifier, "page" => 'blog'
+
+    assert_tag :tag => 'div', :attributes => { :class => 'article-compact-image' }
+    assert_tag :tag => 'div', :attributes => { :class => 'article-compact-abstract-with-image' }
+  end
 end

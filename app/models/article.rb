@@ -1,14 +1,13 @@
-
 class Article < ActiveRecord::Base
 
   attr_accessible :name, :body, :abstract, :profile, :tag_list, :parent,
                   :allow_members_to_edit, :translation_of_id, :language,
                   :license_id, :parent_id, :display_posts_in_current_language,
                   :category_ids, :posts_per_page, :moderate_comments,
-                  :accept_comments, :feed, :published, :source,
+                  :accept_comments, :feed, :published, :source, :source_name,
                   :highlighted, :notify_comments, :display_hits, :slug,
                   :external_feed_builder, :display_versions, :external_link,
-                  :image_builder, :show_to_followers
+                  :author, :published_at, :person_followers, :show_to_followers, :image_builder
 
   acts_as_having_image
 
@@ -24,6 +23,16 @@ class Article < ActiveRecord::Base
     :order => %w[more_recent more_popular more_comments],
     :display => %w[full]
   }
+
+  def initialize(*params)
+    super
+
+    if !params.blank? && params.first.has_key?(:profile) && !params.first[:profile].blank?
+      profile = params.first[:profile]
+      self.published = false unless profile.public?
+    end
+
+  end
 
   def self.default_search_display
     'full'
@@ -61,6 +70,10 @@ class Article < ActiveRecord::Base
   belongs_to :last_changed_by, :class_name => 'Person', :foreign_key => 'last_changed_by_id'
   belongs_to :created_by, :class_name => 'Person', :foreign_key => 'created_by_id'
 
+  #Article followers relation
+  has_many :article_followers, :dependent => :destroy
+  has_many :person_followers, :class_name => 'Person', :through => :article_followers, :source => :person
+
   has_many :comments, :class_name => 'Comment', :foreign_key => 'source_id', :dependent => :destroy, :order => 'created_at asc'
 
   has_many :article_categorizations, :conditions => [ 'articles_categories.virtual = ?', false ]
@@ -85,6 +98,8 @@ class Article < ActiveRecord::Base
   has_many :translations, :class_name => 'Article', :foreign_key => :translation_of_id
   belongs_to :translation_of, :class_name => 'Article', :foreign_key => :translation_of_id
   before_destroy :rotate_translations
+
+  acts_as_voteable
 
   before_create do |article|
     article.published_at ||= Time.now
@@ -117,9 +132,11 @@ class Article < ActiveRecord::Base
     {:include => 'categories_including_virtual', :conditions => { 'categories.id' => category.id }}
   }
 
+  include TimeScopes
+
   scope :by_range, lambda { |range| {
     :conditions => [
-      'published_at BETWEEN :start_date AND :end_date', { :start_date => range.first, :end_date => range.last }
+      'articles.published_at BETWEEN :start_date AND :end_date', { :start_date => range.first, :end_date => range.last }
     ]
   }}
 
@@ -248,7 +265,7 @@ class Article < ActiveRecord::Base
   }
 
   scope :public,
-    :conditions => [ "advertise = ? AND published = ? AND profiles.visible = ? AND profiles.public_profile = ?", true, true, true, true ], :joins => [:profile]
+    :conditions => [ "articles.advertise = ? AND articles.published = ? AND profiles.visible = ? AND profiles.public_profile = ?", true, true, true, true ], :joins => [:profile]
 
   scope :more_recent,
     :conditions => [ "advertise = ? AND published = ? AND profiles.visible = ? AND profiles.public_profile = ? AND
@@ -491,11 +508,11 @@ class Article < ActiveRecord::Base
     return [] if user.nil? || (profile && !profile.public? && !user.follows?(profile))
     where(
       [
-       "published = ? OR last_changed_by_id = ? OR profile_id = ? OR ? 
-        OR  (show_to_followers = ? AND ?)", true, user.id, user.id, 
+       "published = ? OR last_changed_by_id = ? OR profile_id = ? OR ?
+        OR  (show_to_followers = ? AND ? AND profile_id IN (?))", true, user.id, user.id,
         profile.nil? ?  false : user.has_permission?(:view_private_content, profile),
-        true, user.follows?(profile)
-      ] 
+        true, (profile.nil? ? true : user.follows?(profile)),  ( profile.nil? ? (user.friends.select('profiles.id')) : [profile.id])
+      ]
     )
   }
 
@@ -509,7 +526,7 @@ class Article < ActiveRecord::Base
 
   def display_to?(user = nil)
     if published?
-      profile.display_info_to?(user)
+      (profile.secret? || !profile.visible?) ? profile.display_info_to?(user) : true
     else
       if !user
         false
@@ -567,25 +584,24 @@ class Article < ActiveRecord::Base
     profile.visible? && profile.public? && published?
   end
 
-
-  def copy(options = {})
+  def copy_without_save(options = {})
     attrs = attributes.reject! { |key, value| ATTRIBUTES_NOT_COPIED.include?(key.to_sym) }
     attrs.merge!(options)
     object = self.class.new
     attrs.each do |key, value|
       object.send(key.to_s+'=', value)
     end
+    object
+  end
+
+  def copy(options = {})
+    object = copy_without_save(options)
     object.save
     object
   end
 
   def copy!(options = {})
-    attrs = attributes.reject! { |key, value| ATTRIBUTES_NOT_COPIED.include?(key.to_sym) }
-    attrs.merge!(options)
-    object = self.class.new
-    attrs.each do |key, value|
-      object.send(key.to_s+'=', value)
-    end
+    object = copy_without_save(options)
     object.save!
     object
   end
@@ -615,12 +631,25 @@ class Article < ActiveRecord::Base
     self.hits += 1
   end
 
+  def self.hit(articles)
+    Article.where(:id => articles.map(&:id)).update_all('hits = hits + 1')
+    articles.each { |a| a.hits += 1 }
+  end
+
   def can_display_hits?
     true
   end
 
   def display_hits?
     can_display_hits? && display_hits
+  end
+
+  def display_media_panel?
+    can_display_media_panel? && environment.enabled?('media_panel')
+  end
+
+  def can_display_media_panel?
+    false
   end
 
   def image?
@@ -692,6 +721,11 @@ class Article < ActiveRecord::Base
     person ? person.id : nil
   end
 
+  #FIXME make this test
+  def author_custom_image(size = :icon)
+    author ? author.profile_custom_image(size) : nil
+  end
+
   def version_license(version_number = nil)
     return license if version_number.nil?
     profile.environment.licenses.find_by_id(get_version(version_number).license_id)
@@ -713,8 +747,9 @@ class Article < ActiveRecord::Base
     paragraphs.empty? ? '' : paragraphs.first.to_html
   end
 
-  def lead
-    abstract.blank? ? first_paragraph.html_safe : abstract.html_safe
+  def lead(length = nil)
+    content = abstract.blank? ? first_paragraph.html_safe : abstract.html_safe
+    length.present? ? content.truncate(length) : content
   end
 
   def short_lead
@@ -779,6 +814,14 @@ class Article < ActiveRecord::Base
 
   def has_macro?
     true
+  end
+
+  def view_page
+    "content_viewer/view_page"
+  end
+
+  def to_liquid
+    HashWithIndifferentAccess.new :name => name, :abstract => abstract, :body => body, :id => id, :parent_id => parent_id, :author => author
   end
 
   private

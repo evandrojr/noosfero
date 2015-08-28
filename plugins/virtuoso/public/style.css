@@ -1,0 +1,38 @@
+.virtuoso-triples-template .template {
+  margin: 10px 0;
+}
+
+#virtuoso-triples-management input[type="text"],
+#virtuoso-triples-management-add-triple input[type="text"] {
+  width: 100%
+}
+
+#virtuoso-triples-management textarea {
+  width: 99%;
+}
+
+#virtuoso-triples-management ul,
+#virtuoso-triples-management-add-triple ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+#virtuoso-triples-management #triples-list {
+  border-top: 1px solid #CCC;
+  padding-top: 15px;
+}
+
+#triples-list > li + li {
+  border-top: 1px solid #CCC;
+  margin-top: 20px;
+  padding-top: 15px;
+}
+
+#virtuoso-triples-management #triples-list .triple-actions {
+  text-align: right;
+}
+
+#virtuoso-triples-management-add-triple {
+  width: 500px;
+  border: 1px solid white;
+}

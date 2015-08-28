@@ -1,0 +1,18 @@
+<div>
+  <%
+
+     value = server_list_item[:dspace_uri] if server_list_item %>
+  <%= text_field_tag 'settings[dspace_servers][][dspace_uri]', value, { :class => 'link-name', :maxlength => 60, :size=> 58 } %>
+  <%= button_without_text(:delete, _('Delete'), "#" , :class=>"delete-server-list-row") %>
+
+  <%
+  last_execution = server_list_item["last_harvest"] if server_list_item
+  if last_execution
+      %>
+    <div class="date" style="display: inline-block;">
+      <span class="label"><strong><%= _('Last execution:') %></strong></span>
+      <span class="value"><%= time_ago_in_words last_execution %></span>
+    </div>
+  <% end %>
+  <BR><BR>
+</div>

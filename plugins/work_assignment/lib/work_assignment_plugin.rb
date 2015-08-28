@@ -18,6 +18,7 @@ class WorkAssignmentPlugin < Noosfero::Plugin
   end
 
   def content_types
+    return [] if !context.kind_of?(CmsController)
     [WorkAssignmentPlugin::WorkAssignment] if context.respond_to?(:profile) && context.profile.organization?
   end
 

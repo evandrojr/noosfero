@@ -21,10 +21,10 @@ module Noosfero
     require 'noosfero/plugin'
 
     # Adds custom attributes to the Set of allowed html attributes for the #sanitize helper
-    config.action_view.sanitized_allowed_attributes = 'align', 'border', 'alt', 'vspace', 'hspace', 'width', 'heigth', 'value', 'type', 'data', 'style', 'target', 'codebase', 'archive', 'classid', 'code', 'flashvars', 'scrolling', 'frameborder', 'controls', 'autoplay', 'colspan', 'rowspan'
+    config.action_view.sanitized_allowed_attributes = 'align', 'border', 'alt', 'vspace', 'hspace', 'width', 'heigth', 'value', 'type', 'data', 'style', 'target', 'codebase', 'archive', 'classid', 'code', 'flashvars', 'scrolling', 'frameborder', 'controls', 'autoplay', 'colspan', 'rowspan', 'usemap', 'shape', 'coords'
 
     # Adds custom tags to the Set of allowed html tags for the #sanitize helper
-    config.action_view.sanitized_allowed_tags = 'object', 'embed', 'param', 'table', 'tr', 'th', 'td', 'applet', 'comment', 'iframe', 'audio', 'video', 'source'
+    config.action_view.sanitized_allowed_tags = 'object', 'embed', 'param', 'table', 'tr', 'th', 'td', 'applet', 'comment', 'iframe', 'audio', 'video', 'source', 'map', 'area'
 
     config.action_controller.include_all_helpers = false
 
@@ -62,6 +62,8 @@ module Noosfero
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
     # config.time_zone = 'Central Time (US & Canada)'
+    config.time_zone = 'Brasilia'
+
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
@@ -71,7 +73,7 @@ module Noosfero
     config.encoding = "utf-8"
 
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += [:password]
+    config.filter_parameters += [:password, :password_confirmation]
 
     # Enable escaping HTML in JSON.
     ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
@@ -126,7 +128,7 @@ module Noosfero
     # Make sure the secret is at least 30 characters and all random,
     # no regular words or you'll be exposed to dictionary attacks.
     config.secret_token = noosfero_session_secret
-    config.session_store :cookie_store, :key => '_noosfero_session'
+    config.session_store :cookie_store, key: '_noosfero_session'
 
     config.paths['db/migrate'] += Dir.glob "#{Rails.root}/{baseplugins,config/plugins}/*/db/migrate"
     config.i18n.load_path += Dir.glob "#{Rails.root}/{baseplugins,config/plugins}/*/locales/*.{rb,yml}"

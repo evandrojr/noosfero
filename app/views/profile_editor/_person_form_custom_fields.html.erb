@@ -1,0 +1,76 @@
+<% @person ||= @profile %>
+
+<% if @person.custom_fields_template != {} || @person.is_template? %>
+
+<br />
+
+<div id="custom-fields-container">
+
+  <h2><%= _('Custom fields') %></h2>
+
+  <% if @person.is_template? %>
+
+  <%= javascript_include_tag "manage-custom-fields.js" %>
+
+  <table border="0" style="display: none;">
+    <tr>
+      <th align="left"><%= _('Field name') %></th>
+      <th><%= _('Display on signup?') %></th>
+      <th>&nbsp;</th>
+    </tr>
+
+    <% @person.custom_fields.each { |field,value| %>
+        <tr>
+          <td>
+            <%= text_field_tag( "profile_data[custom_fields][#{field}][title]", value[:title], :style => "display:block", :size => 30, :maxlength => 30) %>
+          </td>
+          <td align="center">
+            <%= check_box_tag "profile_data[custom_fields][#{field}][signup]", value['signup'], value['signup'], :onclick => "signup_action('profile_data[custom_fields][#{field}][active]','profile_data[custom_fields][#{field}][required]', 'profile_data[custom_fields][#{field}][signup]')" %>
+          </td>
+          <td align="center">
+            <%= link_to content_tag(:span, _('Delete')), '#', onclick: "return remove_custom_field(this);", title: "Delete", class: "button icon-delete" %>
+          </td>
+        </tr>
+    <% } %>
+
+  </table>
+
+  <% if @person.custom_fields.length > 0 %>
+    <script>
+      jQuery('#custom-fields-container table').css('display', 'table');
+    </script>
+  <% end %>
+
+  <span>
+    <%= link_to_function(_('Add field'), "add_new_field('person');", :class => 'button icon-add with-text') %>
+  </span>
+
+  <% else %>
+
+    <% @person.custom_fields_template.each { |field,value| %>
+
+      <div class="field-with-privacy-selector">
+        <div class="formfieldline">
+
+          <span style="display: block;">
+            <%= label_tag @person.custom_fields_template_title(field) %>
+          </span>
+
+          <div class="formfield type-text" style="display: inline-block;">
+            <%= hidden_field_tag "profile_data[custom_fields][#{field}[title]", @person.custom_fields_template_title(field) %>
+            <%= text_field_tag( "profile_data[custom_fields][#{field}][value]", @person.custom_field_value(field), :size => 30) %>
+          </div>
+
+        </div>
+
+        <%= profile_field_privacy_selector @person, field %>
+
+      </div>
+
+    <% } %>
+
+  <% end %>
+
+</div>
+
+<% end %>

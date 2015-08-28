@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+require File.dirname(__FILE__) + '/../config/environment'
+
+
+communities = Community.public(:order => :created_at)
+
+file = File.open('communities.csv', 'w+')
+
+file.write("'Identifier','Nome','Data de Criacao','Qtd Artigos','Qtd Membros','Qtd Comentatios', 'Membros'\n")
+communities.map do |c|
+  line = "'#{c.identifier}','#{c.name}','#{c.created_at.strftime("%d/%m/%Y")}','#{c.articles.count}','#{c.members.count}','#{c.comments_received.count}', '#{c.members.map{|m|m.identifier}.join('#')}'\n"
+  puts line
+  file.write(line)
+
+end
+

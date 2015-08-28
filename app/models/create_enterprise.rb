@@ -27,6 +27,8 @@ class CreateEnterprise < Task
   # checks for actual attributes
   validates_presence_of :requestor_id, :target_id
 
+  validates :requestor, kind_of: {kind: Person}
+
   # checks for admins required attributes
   DATA_FIELDS.each do |attribute|
     validates_presence_of attribute, :if => lambda { |obj| obj.environment.required_enterprise_fields.include?(attribute) }
@@ -162,10 +164,6 @@ class CreateEnterprise < Task
 
   def information
     {:message => _('%{requestor} wants to create enterprise %{subject}.')}
-  end
-
-  def reject_details
-    true
   end
 
   def task_created_message

@@ -1,0 +1,12 @@
+.dspace-servers-config-box{
+  border: 1px solid gray;
+  padding: 5px;
+}
+
+#dspace-new-template{
+  display: none;
+}
+
+.virtuoso-manage-custom-queries textarea {
+  width: 90%;
+}

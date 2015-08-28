@@ -1,7 +1,8 @@
 <% unless activities.nil? %>
-  <% activities.each do |a| %>
-    <% activity = a.klass.constantize.find(a.id) %>
+  <% activities.each do |profile_activity| %>
+    <% activity = profile_activity.activity %>
     <% if activity.kind_of?(ActionTracker::Record) %>
+      <% next unless activity.target %>
       <%= render :partial => 'profile_activity', :locals => { :activity => activity, :tab_action => 'wall' } if activity.visible? %>
     <% else %>
       <%= render :partial => 'profile_scraps', :locals => { :activity => activity, :scrap => activity } %>

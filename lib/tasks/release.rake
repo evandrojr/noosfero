@@ -53,6 +53,8 @@ namespace :noosfero do
   end
 
   AUTHORS_HEADER = <<EOF
+This list is automatically generated at release time. Please do not change it.
+
 If you are not listed here, but should be, please write to the noosfero mailing
 list: http://listas.softwarelivre.org/cgi-bin/mailman/listinfo/noosfero-dev
 (this list requires subscription to post, but since you are an author of
@@ -82,7 +84,7 @@ EOF
     begin
       File.open("AUTHORS.md", 'w') do |output|
         output.puts AUTHORS_HEADER
-        output.puts `git log --no-merges --pretty=format:'%aN <%aE>' | sort | uniq`
+        output.puts `./script/authors`
         output.puts AUTHORS_FOOTER
       end
       commit_changes(['AUTHORS.md'], 'Updating authors file') if !pendencies_on_authors[:ok]
@@ -119,6 +121,10 @@ EOF
   desc "uploads the packages to the repository"
   task :upload_packages, :target do |t, args|
     target = args[:target] || 'stable'
+    source = Dir['pkg/noosfero-*.tar.gz'].first
+    sh "gpg --detach-sign #{source}"
+    sh "sha256sum #{source} > #{source}.sha256sum"
+    sh "scp #{source}* download.noosfero.org:repos/source/"
     sh "dput --unchecked noosfero-#{target} #{Dir['pkg/*.changes'].first}"
   end
 
@@ -187,6 +193,14 @@ EOF
     abort if missing
   end
 
+  task :tag do
+    sh "git tag -s -m 'Noosfero #{$version}' #{$version.gsub('~','-')}"
+  end
+
+  task :pushtag do
+    sh "git push origin #{$version.gsub('~','-')}"
+  end
+
   desc 'prepares a release tarball'
   task :release, :target do |t, args|
     target = args[:target]
@@ -218,15 +232,14 @@ EOF
     Rake::Task['noosfero:debian_packages'].invoke
 
     if confirm("Create tag for version #{$version}")
-      sh "git tag #{$version.gsub('~','-')}"
-
+      Rake::Task['noosfero:tag'].invoke
       if confirm('Push new version tag')
-        repository = ask('Repository name', 'origin')
         puts "==> Uploading tags..."
-        sh "git push #{repository} #{$version.gsub('~','-')}"
+        Rake::Task['noosfero:pushtag'].invoke
       end
     end
 
+    Rake::Task['noosfero:upload'].invoke
     if confirm('Upload the packages')
       puts "==> Uploading debian packages..."
       Rake::Task['noosfero:upload_packages'].invoke(target)
@@ -236,6 +249,9 @@ EOF
 
     rm_f "tmp/pending-release"
   end
+
+  desc "finishes the release"
+  task 'release:finish' => ['noosfero:upload_packages', 'noosfero:tag', 'noosfero:pushtag']
 
   desc 'Build Debian packages'
   task :debian_packages => :package do

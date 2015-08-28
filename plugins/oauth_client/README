@@ -1,0 +1,11 @@
+
+
+https://github.com/mkdynamic/omniauth-facebook
+https://github.com/zquestz/omniauth-google-oauth2
+
+Create Google+ application:
+  https://developers.google.com/+/web/signin/javascript-flow
+
+Create Facebook application:
+  https://developers.facebook.com/docs/facebook-login/v2.1
+  https://developers.facebook.com/docs/reference/dialogs/oauth

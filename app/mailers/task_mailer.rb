@@ -1,11 +1,13 @@
 class TaskMailer < ActionMailer::Base
 
+  include EmailTemplateHelper
+
   def target_notification(task, message)
     @message = extract_message(message)
     @target = task.target.name
     @environment = task.environment.name
     @url = generate_environment_url(task, :controller => 'home')
-    url_for_tasks_list = task.target.kind_of?(Environment) ? '' : url_for(task.target.tasks_url)
+    url_for_tasks_list = task.target.kind_of?(Environment) ? '' : url_for(task.target.tasks_url.merge(:script_name => Noosfero.root('/')))
     @tasks_url = url_for_tasks_list
 
     mail(
@@ -34,10 +36,12 @@ class TaskMailer < ActionMailer::Base
     @environment = task.requestor.environment.name
     @url = url_for(:host => task.requestor.environment.default_hostname, :controller => 'home')
 
-    mail(
+    mail_with_template(
       to: task.requestor.notification_emails,
       from: self.class.generate_from(task),
-      subject: '[%s] %s' % [task.requestor.environment.name, task.target_notification_description]
+      subject: '[%s] %s' % [task.requestor.environment.name, task.target_notification_description],
+      email_template: task.email_template,
+      template_params: {:environment => task.requestor.environment, :task => task, :message => @message, :url => @url, :requestor => task.requestor}
     )
   end
 
@@ -56,7 +60,7 @@ class TaskMailer < ActionMailer::Base
   end
 
   def generate_environment_url(task, url = {})
-    url_for(Noosfero.url_options.merge(:host => task.environment.default_hostname).merge(url))
+    url_for(Noosfero.url_options.merge(:host => task.environment.default_hostname).merge(url).merge(:script_name => Noosfero.root('/')))
   end
 
 end

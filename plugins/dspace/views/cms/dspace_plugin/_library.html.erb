@@ -1,0 +1,11 @@
+<h1><%= _('My DSpace Library') %></h1>
+
+<%= render :file => 'shared/tiny_mce' %>
+
+<%= required f.text_field(:name, :size => '64', :maxlength => 150, :onchange => "updateUrlField(this, 'article_slug')") %>
+
+<%= required f.text_field(:dspace_server_url, :size => '150', :maxlength => 150) %>
+
+<%= render :partial => 'general_fields' %>
+
+<%= labelled_form_field(_('Description:'), text_area(:article, :body, :cols => 68, :rows => 10)) %>

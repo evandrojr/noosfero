@@ -1,11 +1,22 @@
 <div id='not-found'>
     <h1><%= _('There is no such page: %s') % (content_tag('tt', @path)) %></h1>
     <p>
-    <%= _('You may have clicked an expired link or mistyped the address.') %>
-    <%= _('If you clicked a link that was in another site, or was given to you by someone else, it would be nice if you tell them that their link is not valid anymore.') %>
+    <%= _('.You may have clicked an expired link or mistyped the address.') %>
+    <%= _('.This page does not exist. Would you like to: Create a new content or locate existing content.') %>
+    <!-- <%= _('If you clicked a link that was in another site, or was given to you by someone else, it would be nice if you tell them that their link is not valid anymore.') %>  -->
     </p>
+
     <% button_bar do %>
       <%= button :back, _('Go back'), :back %>
       <%= button :home, _('Go to the home page'), '/' %>
+       <% if logged_in? %>
+          <% parent_id = ((@article && @article.allow_children?) ? @article : nil) %>
+          <%= modal_button('new', _('New content'), myprofile_path(:profile => current_person.identifier, :controller => 'cms', :action => 'new', :parent_id => parent_id)) %>
+      <% end %>
     <% end %>
+    <form action="/search">
+        <input id="searchGadget" class="searchField" type="text" accesskey="3" placeholder="Buscar no Site" title="Buscar no Site" size="18" name="query" autocomplete="off"></input>
+        <input class="searchButton" type="submit" value="Search Content"></input>
+    </form>
 </div>
+

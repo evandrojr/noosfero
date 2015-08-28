@@ -1,6 +1,7 @@
 # encoding: UTF-8
 # pt-BR translations for Ruby on Rails
-"pt-BR":
+
+"pt-BR": &pt-BR
   # formatos de data e hora
   date:
     formats:
@@ -228,6 +229,11 @@
         <<: *errors_messages
       template:
         <<: *errors_template
-
       full_messages:
         format: "%{attribute} %{message}"
+      models:
+        user:
+          login_format: "com formato inválido. Só pode conter letras minúsculas não acentudadas, dígitos, '_' e '-', e deve iniciar com uma letra ou um dígito."
+
+pt:
+  <<: *pt-BR

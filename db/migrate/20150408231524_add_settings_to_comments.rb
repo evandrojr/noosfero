@@ -1,5 +1,5 @@
 class AddSettingsToComments < ActiveRecord::Migration
   def change
-    add_column :comments, :settings, :text
+    rename_column :comments, :setting, :settings
   end
 end

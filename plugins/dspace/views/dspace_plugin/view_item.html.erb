@@ -1,0 +1,28 @@
+<% extend DspacePlugin::ItemHelper %>
+
+<div id="article-parent">
+  <%= button(:back, _('Go back to %s') % @collection.short_title, @collection.url) %>
+</div>
+
+<div id="dspace_library_item">
+
+  <div id="dspace_item_title">
+    <h1 class="title"><%= @item.name %></h1>
+  </div>
+
+  <% item_files = render :partial => 'item_file',
+               :locals => { :dspace_server_url => remove_slash_at_end_url(@collection.parent.parent.dspace_server_url) },
+               :collection => @item.files %>
+
+  <% item_files_content = content_tag('ul', item_files, :id => 'item_files_list') %>
+
+
+  <%= render :partial => 'item_section',
+             :collection => [ { :title => _('Authors:'), :content => @item.author },
+                              { :title => _('Issue date:'), :content => @item.issue_date },
+                              { :title => _('Abstract:'), :content => @item.abstract },
+                              { :title => _('Description:'), :content => @item.description },
+                              { :title => _('URI:'), :content => link_to(@item.uri, @item.uri, :target => '_blank') },
+                              { :title => _('Files in this item'), :content => item_files_content } ] %>
+
+</div>

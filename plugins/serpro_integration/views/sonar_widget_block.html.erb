@@ -1,0 +1,10 @@
+<div class='widget'>
+  <% if block.is_widget_well_formed_url? %>
+    <iframe width='<%=block.widget_width%>' height='<%=block.widget_height%>' src='<%=block.widget_url%>' frameborder="0" allowfullscreen></iframe>
+  <% else %>
+    <div class='wrong'>
+    <iframe width='<%=block.widget_width%>' height='<%=block.widget_height%>' src='<%=block.widget_url%>' frameborder="0" allowfullscreen></iframe>
+      <%= _('Something wrong happened. Please see your sonar configuration.') %>
+    </div>
+  <% end %>
+</div>

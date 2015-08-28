@@ -1,7 +1,10 @@
 # A person is the profile of an user holding all relationships with the rest of the system
 class Person < Profile
 
-  attr_accessible :organization, :contact_information, :sex, :birth_date, :cell_phone, :comercial_phone, :jabber_id, :personal_website, :nationality, :address_reference, :district, :schooling, :schooling_status, :formation, :custom_formation, :area_of_study, :custom_area_of_study, :professional_activity, :organization_website
+  attr_accessible :organization, :contact_information, :sex, :birth_date, :cell_phone,
+    :comercial_phone, :jabber_id, :personal_website, :nationality, :address_reference,
+    :district, :schooling, :schooling_status, :formation, :custom_formation, :area_of_study,
+    :custom_area_of_study, :professional_activity, :organization_website, :following_articles
 
   SEARCH_FILTERS = {
     :order => %w[more_recent more_popular more_active],
@@ -16,10 +19,13 @@ class Person < Profile
   acts_as_trackable :after_add => Proc.new {|p,t| notify_activity(t)}
   acts_as_accessor
 
-  scope :members_of, lambda { |resources|
+
+  scope :members_of, lambda { |resources, extra_joins = nil|
     resources = [resources] if !resources.kind_of?(Array)
     conditions = resources.map {|resource| "role_assignments.resource_type = '#{resource.class.base_class.name}' AND role_assignments.resource_id = #{resource.id || -1}"}.join(' OR ')
-    { :select => 'DISTINCT profiles.*', :joins => :role_assignments, :conditions => [conditions] }
+    joins = [:role_assignments]
+    joins += extra_joins if extra_joins.is_a? Array
+    { :select => 'DISTINCT profiles.*', :joins => joins, :conditions => [conditions] }
   }
 
   scope :not_members_of, lambda { |resources|
@@ -28,15 +34,28 @@ class Person < Profile
     { :select => 'DISTINCT profiles.*', :conditions => ['"profiles"."id" NOT IN (SELECT DISTINCT profiles.id FROM "profiles" INNER JOIN "role_assignments" ON "role_assignments"."accessor_id" = "profiles"."id" AND "role_assignments"."accessor_type" = (\'Profile\') WHERE "profiles"."type" IN (\'Person\') AND (%s))' % conditions] }
   }
 
-  scope :by_role, lambda { |roles|
+  scope :by_role, lambda { |roles, extra_joins = nil|
     roles = [roles] unless roles.kind_of?(Array)
-    { :select => 'DISTINCT profiles.*', :joins => :role_assignments, :conditions => ['role_assignments.role_id IN (?)',
-roles] }
+    joins = [:role_assignments]
+    joins += extra_joins if extra_joins.is_a? Array
+    { :select => 'DISTINCT profiles.*', :joins => joins, :conditions => ['role_assignments.role_id IN (?)',roles] }
   }
 
   scope :not_friends_of, lambda { |resources|
     resources = Array(resources)
     { :select => 'DISTINCT profiles.*', :conditions => ['"profiles"."id" NOT IN (SELECT DISTINCT profiles.id FROM "profiles" INNER JOIN "friendships" ON "friendships"."person_id" = "profiles"."id" WHERE "friendships"."friend_id" IN (%s))' % resources.map(&:id)] }
+  }
+
+  scope :visible_for_person, lambda { |person|
+   joins('LEFT JOIN "role_assignments" ON
+         "role_assignments"."resource_id" = "profiles"."environment_id" AND
+         "role_assignments"."resource_type" = \'Environment\'')
+   .joins('LEFT JOIN "roles" ON "role_assignments"."role_id" = "roles"."id"')
+   .joins('LEFT JOIN "friendships" ON "friendships"."friend_id" = "profiles"."id"')
+   .where(
+     ['( roles.key = ? AND role_assignments.accessor_type = ? AND role_assignments.accessor_id = ? ) OR (
+       ( ( friendships.person_id = ? ) OR (profiles.public_profile = ?)) AND (profiles.visible = ?) )', 'environment_administrator', Profile.name, person.id, person.id,  true, true]
+   ).uniq
   }
 
   def has_permission_with_admin?(permission, resource)
@@ -68,6 +87,10 @@ roles] }
     memberships.where('role_assignments.role_id = ?', role.id)
   end
 
+  #Article followers relation
+  has_many :article_followers, :dependent => :destroy
+  has_many :following_articles, :class_name => 'Article', :through => :article_followers, :source => :article
+
   has_many :friendships, :dependent => :destroy
   has_many :friends, :class_name => 'Person', :through => :friendships
 
@@ -81,12 +104,15 @@ roles] }
 
   has_many :scraps_sent, :class_name => 'Scrap', :foreign_key => :sender_id, :dependent => :destroy
 
+  has_many :favorite_enterprise_people
+  has_many :favorite_enterprises, source: :enterprise, through: :favorite_enterprise_people
+
   has_and_belongs_to_many :acepted_forums, :class_name => 'Forum', :join_table => 'terms_forum_people'
   has_and_belongs_to_many :articles_with_access, :class_name => 'Article', :join_table => 'article_privacy_exceptions'
 
-  has_many :profile_suggestions, :foreign_key => :person_id, :order => 'score DESC', :dependent => :destroy
-  has_many :suggested_people, :through => :profile_suggestions, :source => :suggestion, :conditions => ['profile_suggestions.suggestion_type = ? AND profile_suggestions.enabled = ?', 'Person', true]
-  has_many :suggested_communities, :through => :profile_suggestions, :source => :suggestion, :conditions => ['profile_suggestions.suggestion_type = ? AND profile_suggestions.enabled = ?', 'Community', true]
+  has_many :suggested_profiles, :class_name => 'ProfileSuggestion', :foreign_key => :person_id, :order => 'score DESC', :dependent => :destroy
+  has_many :suggested_people, :through => :suggested_profiles, :source => :suggestion, :conditions => ['profile_suggestions.suggestion_type = ? AND profile_suggestions.enabled = ?', 'Person', true]
+  has_many :suggested_communities, :through => :suggested_profiles, :source => :suggestion, :conditions => ['profile_suggestions.suggestion_type = ? AND profile_suggestions.enabled = ?', 'Community', true]
 
   scope :more_popular, :order => 'friends_count DESC'
 
@@ -102,6 +128,8 @@ roles] }
   end
 
   belongs_to :user, :dependent => :delete
+
+  acts_as_voter
 
   def can_change_homepage?
     !environment.enabled?('cant_change_homepage') || is_admin?
@@ -121,6 +149,11 @@ roles] }
 
   def can_control_activity?(activity)
     self.tracked_notifications.exists?(activity)
+  end
+
+  def can_post_content?(profile, parent=nil)
+    (!parent.nil? && (parent.allow_create?(self))) ||
+      (self.has_permission?('post_content', profile) || self.has_permission?('publish_content', profile))
   end
 
   # Sets the identifier for this person. Raises an exception when called on a
@@ -185,8 +218,10 @@ roles] }
   organization
   organization_website
   contact_phone
-  contact_information
+  contact_informatioin
   ]
+
+  xss_terminate :only => [ :custom_footer, :custom_header, :description, :nickname, :sex, :nationality, :country, :state, :city, :district, :zip_code, :address, :address_reference, :cell_phone, :comercial_phone, :personal_website, :jabber_id, :schooling, :formation, :custom_formation, :area_of_study, :custom_area_of_study, :professional_activity, :organization, :organization_website, :contact_phone, :contact_information ], :with => 'white_list'
 
   validates_multiparameter_assignments
 
@@ -280,7 +315,7 @@ roles] }
   end
 
   after_update do |person|
-    person.user.save!
+    person.user.save! unless person.user.changes.blank?
   end
 
   def is_admin?(environment = nil)
@@ -312,8 +347,6 @@ roles] }
       Gallery.new(:name => _('Gallery')),
     ]
   end
-
-  has_and_belongs_to_many :favorite_enterprises, :class_name => 'Enterprise', :join_table => 'favorite_enteprises_people'
 
   def email_domain
     user && user.email_domain || environment.default_hostname(true)
@@ -494,8 +527,8 @@ roles] }
     user.save!
   end
 
-  def activities
-    Scrap.find_by_sql("SELECT id, updated_at, '#{Scrap.to_s}' AS klass FROM #{Scrap.table_name} WHERE scraps.receiver_id = #{self.id} AND scraps.scrap_id IS NULL UNION SELECT id, updated_at, '#{ActionTracker::Record.to_s}' AS klass FROM #{ActionTracker::Record.table_name} WHERE action_tracker.user_id = #{self.id} and action_tracker.verb != 'leave_scrap_to_self' and action_tracker.verb != 'add_member_in_community' and action_tracker.verb != 'reply_scrap_on_self' ORDER BY updated_at DESC")
+  def exclude_verbs_on_activities
+    %w[leave_scrap_to_self add_member_in_community reply_scrap_on_self]
   end
 
   # by default, all fields are private
@@ -522,7 +555,7 @@ roles] }
   end
 
   def remove_suggestion(profile)
-    suggestion = profile_suggestions.find_by_suggestion_id profile.id
+    suggestion = suggested_profiles.find_by_suggestion_id profile.id
     suggestion.disable if suggestion
   end
 

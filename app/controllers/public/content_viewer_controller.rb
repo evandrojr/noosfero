@@ -15,9 +15,10 @@ class ContentViewerController < ApplicationController
     path = get_path(params[:page], params[:format])
 
     @version = params[:version].to_i
+    @npage = params[:npage] || '1'
 
     if path.blank?
-      @page = profile.home_page 
+      @page = profile.home_page
       return if redirected_to_profile_index
     else
       @page = profile.articles.find_by_path(path)
@@ -74,7 +75,7 @@ class ContentViewerController < ApplicationController
       render :action => 'slideshow', :layout => 'slideshow'
       return
     end
-    render :view_page, :formats => [:html]
+    render @page.view_page, :formats => [:html]
   end
 
   def versions_diff
@@ -125,21 +126,23 @@ class ContentViewerController < ApplicationController
   helper_method :pass_without_comment_captcha?
 
   def allow_access_to_page(path)
-    allowed = true
     if @page.nil? # page not found, give error
       render_not_found(path)
-      allowed = false
-    elsif !@page.display_to?(user)
-      if !profile.public?
+      return false
+    end
+
+    unless @page.display_to?(user)
+      if !profile.visible? || profile.secret? || (user && user.follows?(profile)) || user.blank?
+        render_access_denied
+      else #!profile.public?
         private_profile_partial_parameters
         render :template => 'profile/_private_profile', :status => 403, :formats => [:html]
-        allowed = false
-      else #if !profile.visible?
-        render_access_denied
-        allowed = false
       end
+
+      return false
     end
-    allowed
+
+    return true
   end
 
   def user_is_a_bot?
@@ -184,7 +187,7 @@ class ContentViewerController < ApplicationController
     if @page.forum? && @page.has_terms_of_use && terms_accepted == "true"
       @page.add_agreed_user(user)
     end
-  end 
+  end
 
   def is_a_forum_topic? (page)
     return (!@page.parent.nil? && @page.parent.forum?)

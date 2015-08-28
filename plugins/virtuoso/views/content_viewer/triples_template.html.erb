@@ -1,0 +1,9 @@
+<div class="body">
+  <%= article.body %>
+</div>
+
+<div class="results">
+  <%= article.template_content(page) %>
+</div>
+
+<%= will_paginate(article.results, :param_name => 'npage')%>

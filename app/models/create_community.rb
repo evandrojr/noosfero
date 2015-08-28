@@ -3,6 +3,9 @@ class CreateCommunity < Task
   validates_presence_of :requestor_id, :target_id
   validates_presence_of :name
 
+  validates :requestor, kind_of: {kind: Person}
+  validates :target, kind_of: {kind: Environment}
+
   alias :environment :target
   alias :environment= :target=
 
@@ -54,10 +57,6 @@ class CreateCommunity < Task
       { :message => _('%{requestor} wants to create community %{subject} with this description:<p><em>%{description}</em></p>'),
         :variables => {:description => description} }
     end
-  end
-
-  def reject_details
-    true
   end
 
   # tells if this request was rejected

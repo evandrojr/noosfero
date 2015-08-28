@@ -1,0 +1,34 @@
+<h1><%= _('Serpro Integration Settings')%></h1>
+
+<%= form_for(:settings) do |f| %>
+
+  <div class="community_settings">
+    <h2><%= _('Community Templates')%></h2>
+    <%= f.fields_for :communities, OpenStruct.new(@settings.communities) do |g| %>
+      <%= labelled_form_field _('Communities where integrations will be applied'), g.select("templates", @environment.communities.templates.map{|t| [t.name, t.id]},{}, :multiple => true) %>
+    <% end %>
+  </div>
+
+  <div class="gitlab_settings">
+    <h2><%= _('Gitlab Settings')%></h2>
+    <%= f.fields_for :gitlab, OpenStruct.new(@settings.gitlab) do |g| %>
+      <%= labelled_form_field _('Server Host'), g.text_field("host") %>
+      <%= labelled_form_field _('Private Token'), g.text_field(:private_token) %>
+    <% end %>
+  </div>
+
+  <div class="jenkins_settings">
+    <h2><%= _('Jenkins Settings')%></h2>
+    <%= f.fields_for :jenkins, OpenStruct.new(@settings.jenkins) do |g| %>
+      <%= labelled_form_field _('Server Host'), g.text_field("host") %>
+      <%= labelled_form_field _('Server User'), g.text_field(:user) %>
+      <%= labelled_form_field _('Private Token'), g.text_field(:private_token) %>
+    <% end %>
+  </div>
+
+  <% button_bar do %>
+    <%= submit_button(:save, _('Save'), :cancel => {:controller => 'plugins', :action => 'index'}) %>
+  <% end %>
+
+<% end %>
+

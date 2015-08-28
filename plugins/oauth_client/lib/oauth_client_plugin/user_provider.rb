@@ -7,4 +7,5 @@ class OauthClientPlugin::UserProvider < Noosfero::Plugin::ActiveRecord
 
    attr_accessible :user, :provider, :enabled
 
+   acts_as_having_settings :field => :oauth_data
 end

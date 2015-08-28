@@ -30,7 +30,7 @@ do_start() {
   clear_cache
   environments_loop start
   bundle exec whenever --write-crontab --set 'environment=production'
-  ruby -S bundle exec thin -C config/thin.yml start
+  RUBY_GC_MALLOC_LIMIT=250000000 RUBY_HEAP_MIN_SLOTS=800000 RUBY_FREE_MIN=32768 ruby -S bundle exec thin -C config/thin.yml start
 }
 
 do_stop() {
@@ -55,7 +55,7 @@ do_restart() {
   environments_loop start
 
   clear_cache
-  ruby -S bundle exec thin -C config/thin.yml restart --onebyone
+  RUBY_GC_MALLOC_LIMIT=250000000 RUBY_HEAP_MIN_SLOTS=800000 RUBY_FREE_MIN=32768 ruby -S bundle exec thin -C config/thin.yml restart --onebyone
 }
 
 stop_via_pid_file() {
@@ -85,7 +85,7 @@ environments_loop() {
 }
 
 do_running() {
-  pids=$(sed "s/.*/& /" tmp/pids/thin.*.pid | tr -d '\n' 2>/dev/null || true)
+  pids=$(sed "s/.*/& /" tmp/pids/thin.*.pid 2>/dev/null | tr -d '\n')
   # passes if any of $pids exist, fails otherwise
   kill -0 $pids > /dev/null 2>&1
 }

@@ -1,3 +1,31 @@
+noosfero (1.2) wheezy; urgency=low
+
+  * Noosfero 1.2
+
+ -- Antonio Terceiro <terceiro@colivre.coop.br>  Fri, 07 Aug 2015 13:39:14 -0300
+
+noosfero (1.2~rc2) wheezy; urgency=low
+
+  * Noosfero 1.2 RC2
+
+ -- Antonio Terceiro <terceiro@colivre.coop.br>  Mon, 27 Jul 2015 09:56:55 -0300
+
+noosfero (1.2~rc1) wheezy; urgency=medium
+
+  [ Joenio Costa ]
+  * Build noosfero-chat package
+
+  [ Antonio Terceiro ]
+  * Noosfero 1.2 RC1
+
+ -- Antonio Terceiro <terceiro@colivre.coop.br>  Mon, 13 Jul 2015 15:44:17 -0300
+
+noosfero (1.1) wheezy; urgency=low
+
+  * Noosfero 1.1 final release
+
+ -- Antonio Terceiro <terceiro@colivre.coop.br>  Mon, 04 May 2015 18:47:35 -0300
+
 noosfero (1.1~rc4) wheezy; urgency=medium
 
   * Fourth release candidate for Noosfero 1.1

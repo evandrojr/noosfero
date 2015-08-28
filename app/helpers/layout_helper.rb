@@ -28,7 +28,7 @@ module LayoutHelper
   end
 
   def noosfero_javascript
-    plugins_javascripts = @plugins.flat_map{ |plugin| plugin.js_files.map{ |js| plugin.class.public_path(js, true) } }.flatten
+    plugins_javascripts = @plugins.flat_map{ |plugin| Array.wrap(plugin.js_files).map{ |js| plugin.class.public_path(js, true) } }.flatten
 
     output = ''
     output += render 'layouts/javascript'
@@ -37,6 +37,8 @@ module LayoutHelper
     end
     output += theme_javascript_ng.to_s
     output += javascript_tag 'render_all_jquery_ui_widgets()'
+
+    output += templete_javascript_ng.to_s
 
     output
   end
@@ -70,24 +72,13 @@ module LayoutHelper
   end
 
   def template_stylesheet_path
-    if profile.nil?
-      "/designs/templates/#{environment.layout_template}/stylesheets/style.css"
-    else
-      "/designs/templates/#{profile.layout_template}/stylesheets/style.css"
-    end
+    File.join template_path, "/stylesheets/style.css"
   end
 
 
   def icon_theme_stylesheet_path
-    icon_themes = []
     theme_icon_themes = theme_option(:icon_theme) || []
-    for icon_theme in theme_icon_themes do
-      theme_path = "designs/icons/#{icon_theme}/style.css"
-      if File.exists?(Rails.root.join('public', theme_path))
-        icon_themes << theme_path
-      end
-    end
-    icon_themes
+    theme_icon_themes.map{ |it| "designs/icons/#{it}/style.css" }
   end
 
   def jquery_ui_theme_stylesheet_path

@@ -12,6 +12,7 @@ class HomeController < PublicController
         @area_news = environment.portal_folders
       end
     end
+    render :file => 'home/index', :formats => [:html]
   end
 
   def terms

@@ -1,0 +1,21 @@
+<div id="gitlab">
+
+<h3>
+  <%= _('Gitlab Integration') %>
+</h3>
+<ul class="gitlab">
+  <li>
+    <span class="label"><%= _('Server Host:') %><span>
+    <span class="value"><%= profile.gitlab_host %><span>
+<!-- FIXME put the force button to works
+  <%= link_to _('Force'), {:controller => 'serpro_integration_plugin_myprofile', :action => 'create_gitlab'}, {:remote => true} %>
+-->
+  </li>
+  <li>
+    <%= labelled_text_field(_('Group Name:'), 'profile_data[serpro_integration_plugin_gitlab][group]', profile.gitlab_group) %>
+  </li>
+  <li>
+    <%= labelled_text_field(_('Project Name:'), 'profile_data[serpro_integration_plugin_gitlab][project_name]', profile.gitlab_project_name ) %>
+  </li>
+</ul>
+</div>

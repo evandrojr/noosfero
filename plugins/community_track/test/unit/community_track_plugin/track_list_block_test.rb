@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../../test_helper'
+require_relative '../../test_helper'
 
 class TrackListBlockTest < ActiveSupport::TestCase
 
@@ -9,7 +9,7 @@ class TrackListBlockTest < ActiveSupport::TestCase
     @block = create(CommunityTrackPlugin::TrackListBlock, :box => box)
   end
 
-  attr_reader :profile
+  attr_reader :profile, :track
 
   should 'describe yourself' do
     assert CommunityTrackPlugin::TrackListBlock.description
@@ -20,7 +20,7 @@ class TrackListBlockTest < ActiveSupport::TestCase
   end
 
   should 'load more at another page default to false' do
-    assert !@block.more_another_page
+    refute @block.more_another_page
   end
 
   should 'list articles only of track type' do
@@ -41,7 +41,7 @@ class TrackListBlockTest < ActiveSupport::TestCase
 
   should 'do not return more link if there is no more tracks to show' do
     (@block.limit-1).times { |i| create_track("track#{i}", profile) }
-    assert !@block.footer
+    refute @block.footer
   end
 
   should 'count all tracks' do
@@ -58,7 +58,7 @@ class TrackListBlockTest < ActiveSupport::TestCase
     @block.owner.articles.destroy_all
     (@block.limit+1).times { |i| create_track("track#{i}", profile) }
     assert @block.has_page?(2)
-    assert !@block.has_page?(3)
+    refute @block.has_page?(3)
   end
 
   should 'filter tracks by category' do
@@ -95,8 +95,8 @@ class TrackListBlockTest < ActiveSupport::TestCase
 
   should 'define expiration condition' do
     condition = CommunityTrackPlugin::TrackListBlock.expire_on
-    assert !condition[:profile].empty?
-    assert !condition[:environment].empty?
+    refute condition[:profile].empty?
+    refute condition[:environment].empty?
   end
 
   should 'return track list block categories' do
@@ -109,6 +109,22 @@ class TrackListBlockTest < ActiveSupport::TestCase
   should 'return nothing if track list block has no categories' do
     @block.category_ids = []
     assert_equivalent [], @block.categories
+  end
+
+  should 'list tracks in hits order by default' do
+    track2 = create_track("track2", profile)
+    track.update_attribute(:hits, 2)
+    track2.update_attribute(:hits, 1)
+    assert_equal [track, track2], @block.tracks
+  end
+
+  should 'list tracks in newer order' do
+    @block.order = 'newer'
+    @block.save!
+    track2 = create_track("track2", profile)
+    track2.update_attribute(:created_at, Date.today)
+    track.update_attribute(:created_at, Date.today - 1.day)
+    assert_equal [track2, track], @block.tracks
   end
 
 end

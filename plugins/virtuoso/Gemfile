@@ -1,0 +1,7 @@
+source 'https://rubygems.org'
+gem 'rdf'
+gem 'rdf-virtuoso'
+gem 'oai'
+gem 'liquid',                    '~> 3.0.3'
+gem 'roadie'
+gem 'roadie-rails'

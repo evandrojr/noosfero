@@ -12,6 +12,7 @@
 class Task < ActiveRecord::Base
 
   acts_as_having_settings :field => :data
+  acts_as_ordered_taggable
 
   module Status
     # the status of tasks just created
@@ -33,11 +34,15 @@ class Task < ActiveRecord::Base
 
   belongs_to :requestor, :class_name => 'Profile', :foreign_key => :requestor_id
   belongs_to :target, :foreign_key => :target_id, :polymorphic => true
+  belongs_to :responsible, :class_name => 'Person', :foreign_key => :responsible_id
+  belongs_to :closed_by, :class_name => 'Person', :foreign_key => :closed_by_id
 
   validates_uniqueness_of :code, :on => :create
   validates_presence_of :code
 
   attr_protected :status
+
+  settings_items :email_template_id, :type => :integer
 
   def initialize(*args)
     super
@@ -65,22 +70,34 @@ class Task < ActiveRecord::Base
       begin
         target_msg = task.target_notification_message
         if target_msg && task.target && !task.target.notification_emails.empty?
-          TaskMailer.target_notification(task, target_msg).deliver
+          if target_profile_accepts_notification?(task)
+            TaskMailer.target_notification(task, target_msg).deliver
+          end
         end
-      rescue NotImplementedError => ex
+      rescue Exception => ex
         Rails.logger.info ex.to_s
       end
     end
   end
 
+  def target_profile_accepts_notification?(task)
+    if target_is_profile?(task)
+      return task.target.administrator_mail_notification
+    else
+      true
+    end
+  end
+
+  def target_is_profile?(task)
+    task.target.kind_of? Profile
+  end
+
   # this method finished the task. It calls #perform, which must be overriden
   # by subclasses. At the end a message (as returned by #finish_message) is
   # sent to the requestor with #notify_requestor.
-  def finish
+  def finish(closed_by=nil)
     transaction do
-      self.status = Task::Status::FINISHED
-      self.end_date = Time.now
-      self.save!
+      close(Task::Status::FINISHED, closed_by)
       self.perform
       begin
         send_notification(:finished)
@@ -105,17 +122,67 @@ class Task < ActiveRecord::Base
 
   # this method cancels the task. At the end a message (as returned by
   # #cancel_message) is sent to the requestor with #notify_requestor.
-  def cancel
+  def cancel(closed_by=nil)
     transaction do
-      self.status = Task::Status::CANCELLED
-      self.end_date = Time.now
-      self.save!
+      close(Task::Status::CANCELLED, closed_by)
       begin
         send_notification(:cancelled)
       rescue NotImplementedError => ex
         Rails.logger.info ex.to_s
       end
     end
+  end
+
+  class KindOfValidator < ActiveModel::EachValidator
+    def validate_each(record, attribute, value)
+      environment = record.environment || Environment.default
+      klass = options[:kind]
+      group = klass.to_s.downcase.pluralize
+      id = attribute.to_s + "_id"
+      if environment.respond_to?(group)
+        attrb = value || environment.send(group).find_by_id(record.send(id))
+      else
+        attrb = value || klass.find_by_id(record.send(id))
+      end
+      if attrb.respond_to?(klass.to_s.downcase + "?")
+        unless attrb.send(klass.to_s.downcase + "?")
+          record.errors[attribute] << (options[:message] || "should be "+ klass.to_s.downcase)
+        end
+      else
+        unless attrb.class == klass
+          record.errors[attribute] << (options[:message] || "should be "+ klass.to_s.downcase)
+        end
+      end
+    end
+  end
+
+  def requestor_is_of_kind(klass, message = nil)
+    error_message = message ||= _('Task requestor must be '+klass.to_s.downcase)
+    group = klass.to_s.downcase.pluralize
+    if environment.respond_to?(group) and requestor_id
+      requestor = requestor ||= environment.send(klass.to_s.downcase.pluralize).find_by_id(requestor_id)
+    end
+    unless requestor.class == klass
+      errors.add(error_message)
+    end
+  end
+
+  def target_is_of_kind(klass, message = nil)
+    error_message = message ||= _('Task target must be '+klass.to_s.downcase)
+    group = klass.to_s.downcase.pluralize
+    if environment.respond_to?(group) and target_id
+      target = target ||= environment.send(klass.to_s.downcase.pluralize).find_by_id(target_id)
+    end
+    unless target.class == klass
+      errors.add(error_message)
+    end
+  end
+
+  def close(status, closed_by)
+    self.status = status
+    self.end_date = Time.now
+    self.closed_by = closed_by
+    self.save!
   end
 
   # Here are the tasks customizable options.
@@ -141,7 +208,7 @@ class Task < ActiveRecord::Base
   end
 
   def reject_details
-    false
+    true
   end
 
   def icon
@@ -231,14 +298,59 @@ class Task < ActiveRecord::Base
     end
   end
 
+  def email_template
+    @email_template ||= email_template_id.present? ? EmailTemplate.find_by_id(email_template_id) : nil
+  end
+
+  def to_liquid
+    HashWithIndifferentAccess.new({
+      :requestor => requestor,
+      :reject_explanation => reject_explanation,
+      :code => code
+    })
+  end
+
   scope :pending, :conditions => { :status =>  Task::Status::ACTIVE }
   scope :hidden, :conditions => { :status =>  Task::Status::HIDDEN }
   scope :finished, :conditions => { :status =>  Task::Status::FINISHED }
   scope :canceled, :conditions => { :status =>  Task::Status::CANCELLED }
   scope :closed, :conditions => { :status =>  [Task::Status::CANCELLED, Task::Status::FINISHED] }
   scope :opened, :conditions => { :status =>  [Task::Status::ACTIVE, Task::Status::HIDDEN] }
-  scope :of, lambda { |type| conditions = type ? "type LIKE '#{type}'" : "1=1"; {:conditions =>  [conditions]} }
+
+  # # updated scope method to avoid sql injection vunerabillity (http://brakemanscanner.org/docs/warning_types/sql_injection/)
+  # def self.of type
+  #   if type
+  #     where  "type LIKE ?", type
+  #   else
+  #     all
+  #   end
+  # end
+  #
+  # # updated scope method to avoid sql injection vunerabillity (http://brakemanscanner.org/docs/warning_types/sql_injection/)
+  # def self.order_by attribute_name, sort_order
+  #   if Task.column_names.include? attribute_name
+  #     # TODO  future versions of rails accepts a hash as param to order method
+  #     # which helps to prevent sql injection in an shorter way
+  #     sort_order_filtered = ("ASC".eql? "#{sort_order}".upcase) ? 'asc' : 'desc'
+  #     sort_expression = Task.column_names.collect {|column_name| "#{column_name} #{sort_order_filtered}" if column_name.eql? attribute_name}
+  #     order(sort_expression.join) unless sort_expression.join.empty?
+  #   end
+  # end
+  #
+  # # updated scope method to avoid sql injection vunerabillity (http://brakemanscanner.org/docs/warning_types/sql_injection/)
+  # def self.like field, value
+  #   if value and Tasks.column_names.include? field
+  #     where("LOWER(?) LIKE ?", "#{field}", "%#{value.downcase}%")
+  #   end
+  # end
+
+  scope :of, lambda { |type| conditions = type ? "tasks.type LIKE '#{type}'" : "1=1"; {:conditions =>  [conditions]} }
   scope :order_by, lambda { |attribute, ord| {:order => "#{attribute} #{ord}"} }
+  scope :like, lambda { |field, value| where("LOWER(#{field}) LIKE ?", "%#{value.downcase}%") if value}
+
+  scope :pending_all, lambda { |profile, filter_type, filter_text|
+    self.to(profile).without_spam.pending.of(filter_type).like('data', filter_text)
+  }
 
   scope :to, lambda { |profile|
     environment_condition = nil
@@ -250,8 +362,13 @@ class Task < ActiveRecord::Base
     { :conditions => [environment_condition, profile_condition].compact.join(' OR ') }
   }
 
+
   def self.pending_types_for(profile)
     Task.to(profile).pending.select('distinct type').map { |t| [t.class.name, t.title] }
+  end
+
+  def self.closed_types_for(profile)
+    Task.to(profile).closed.select('distinct type').map { |t| [t.class.name, t.title] }
   end
 
   def opened?
@@ -259,6 +376,19 @@ class Task < ActiveRecord::Base
   end
 
   include Spammable
+
+  #FIXME make this test
+  def display_to?(user = nil)
+    return true if self.target == user
+    return false if !self.target.kind_of?(Environment) && self.target.person?
+
+    if self.target.kind_of?(Environment)
+      user.is_admin?(self.target)
+    else
+      self.target.members.by_role(self.target.roles.reject {|r| !r.has_permission?('perform_task')}).include?(user)
+    end
+  end
+
 
   protected
 

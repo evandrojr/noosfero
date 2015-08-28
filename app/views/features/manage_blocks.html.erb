@@ -1,0 +1,71 @@
+<h1><%= _('System blocks') %></h1>
+
+<h2><%= _('Enable/Disable blocks') %></h2>
+
+<p>
+<%= _('Here you can enable or disable blocks of your environment.') %>
+</p>
+
+<%= labelled_form_for(:environment, :url => {:action => 'update_blocks'}) do |f| %>
+
+<table id='blocks-grid' class="blocks-grid" align="center" style="width: auto">
+  <tr>
+    <th width="33%"><%= _('Block') %></th>
+    <th width="33%"><%= _('Description') %></th>
+    <th width="33%"><%= _('Enabled?') %></th>
+  </tr>
+
+  <% @blocks.each do |block| %>
+  <tr>
+    <td>
+      <%= _(block.name.humanize) %>
+    </td>
+    <td>
+      <%= _(block.description) %>
+    </td>
+    <td align="center">
+      <%= check_box_tag "environment[available_blocks][]", block, !@environment.block_disabled?(block), :id => "environment_available_blocks_#{block.name}", :onclick => "toogle_hidden_field(this, '#{block.name}');" %>
+      <% if @environment.block_disabled?(block) %>
+        <%= hidden_field_tag "environment[disabled_blocks][]", block.name %>
+      <% end %>
+    </td>
+  </tr>
+  <% end %>
+</table>
+
+<script type='text/javascript'>// <!--
+  var trs = jQuery('#blocks-grid tr');
+
+  var tr, td2;
+  for ( var i=2; tr=trs[i]; i++ ) {
+    if ( td2 = tr.getElementsByTagName('td')[1] ) {
+      td2.getElementsByTagName('input')[1].onclick();
+    }
+  }
+  // -->
+</script>
+
+<script type="text/javascript">
+  function toogle_hidden_field(element, block_name) {
+
+    var chbx = jQuery(element);
+
+    if (element.checked) {
+      var hidden = chbx.next().remove();
+    }
+    else {
+      var el = jQuery( "<input>", { id: "environment_disabled_blocks_", name: "environment[disabled_blocks][]", type: "hidden", value: block_name } )
+      chbx.after( el );
+    }
+
+  }
+</script>
+
+<div>
+  <% button_bar do %>
+    <%= submit_button('save', _('Save changes'), :id=>"save_blocks") %>
+    <%= button :back, _('Back to admin panel'), :controller => 'admin_panel', :action => 'index' %>
+  <% end %>
+</div>
+
+<% end %>

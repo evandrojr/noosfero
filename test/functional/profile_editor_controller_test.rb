@@ -333,7 +333,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
 
     post :edit, :profile => org.identifier, :profile_data => { :closed => 'false' }
     org.reload
-    assert !org.closed
+    refute org.closed
   end
 
   should 'not display option to close when it is enterprise' do
@@ -477,13 +477,13 @@ class ProfileEditorControllerTest < ActionController::TestCase
   should 'not enable enterprise without confirmation' do
     ent = fast_create(Enterprise, :enabled => false)
     post :enable, :profile => ent.identifier
-    assert !assigns(:to_enable).enabled?
+    refute assigns(:to_enable).enabled?
   end
 
   should 'disable enterprise after confirmation' do
     ent = fast_create(Enterprise, :enabled => true)
     post :disable, :profile => ent.identifier, :confirmation => 1
-    assert !assigns(:to_disable).enabled?
+    refute assigns(:to_disable).enabled?
   end
 
   should 'not disable enterprise without confirmation' do
@@ -624,6 +624,17 @@ class ProfileEditorControllerTest < ActionController::TestCase
   should 'display link to CMS' do
     get :index, :profile => profile.identifier
     assert_tag :tag => 'a', :attributes => { :href => '/myprofile/default_user/cms' }
+  end
+
+  should 'display email template link for organizations in control panel' do
+    profile = fast_create(Organization)
+    get :index, :profile => profile.identifier
+    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/profile_email_templates" }
+  end
+
+  should 'not display email template link in control panel for person' do
+    get :index, :profile => profile.identifier
+    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/email_templates" }
   end
 
   should 'offer to create blog in control panel' do
@@ -824,6 +835,38 @@ class ProfileEditorControllerTest < ActionController::TestCase
     assert_template 'destroy_profile'
   end
 
+  should 'not be able to destroy profile if forbid_destroy_profile is enabled' do
+    environment = Environment.default
+    user = create_user('user').person
+    login_as('user')
+    environment.enable('forbid_destroy_profile')
+    assert_no_difference 'Profile.count' do
+      post :destroy_profile, :profile => user.identifier
+    end
+  end
+
+  should 'display destroy_profile button' do
+    environment = Environment.default
+    user = create_user_with_permission('user', 'destroy_profile')
+    login_as('user')
+    community = fast_create(Community)
+    community.add_admin(user)
+    get :edit, :profile => community.identifier
+    assert_tag :tag => 'a', :attributes => { :href => "/myprofile/#{community.identifier}/profile_editor/destroy_profile" }
+  end
+
+  should 'not display destroy_profile button' do
+    environment = Environment.default
+    environment.enable('forbid_destroy_profile')
+    environment.save!
+    user = create_user_with_permission('user', 'destroy_profile')
+    login_as('user')
+    community = fast_create(Community)
+    community.add_admin(user)
+    get :edit, :profile => community.identifier
+    assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{community.identifier}/profile_editor/destroy_profile" }
+  end
+
   should 'be able to destroy a person' do
     person = fast_create(Person)
 
@@ -883,7 +926,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
   should 'have welcome_page only for template' do
     organization = fast_create(Organization, :is_template => false)
     @controller.stubs(:profile).returns(organization)
-    assert !@controller.send(:has_welcome_page)
+    refute @controller.send(:has_welcome_page)
 
     organization = fast_create(Organization, :is_template => true)
     @controller.stubs(:profile).returns(organization)
@@ -891,7 +934,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
 
     person = fast_create(Person, :is_template => false)
     @controller.stubs(:profile).returns(person)
-    assert !@controller.send(:has_welcome_page)
+    refute @controller.send(:has_welcome_page)
 
     person = fast_create(Person, :is_template => true)
     @controller.stubs(:profile).returns(person)
@@ -916,7 +959,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
 
   should 'create welcome_page with public false by default' do
     get :welcome_page, :profile => fast_create(Person, :is_template => true).identifier
-    assert !assigns(:welcome_page).published
+    refute assigns(:welcome_page).published
   end
 
   should 'update welcome page and redirect to index' do
@@ -941,7 +984,7 @@ class ProfileEditorControllerTest < ActionController::TestCase
 
     class TestControlPanelButtons1 < Noosfero::Plugin
       def control_panel_buttons
-        {:title => "Plugin1 button", :icon => 'plugin1_icon', :url => 'plugin1_url'}
+        {:title => "Plugin1 button", :icon => 'plugin1_icon', :url => 'plugin1_url', :html_options => { :data => {extra: true} }}
       end
     end
     class TestControlPanelButtons2 < Noosfero::Plugin
@@ -955,8 +998,8 @@ class ProfileEditorControllerTest < ActionController::TestCase
 
     get :index, :profile => profile.identifier
 
-    assert_tag :tag => 'a', :content => 'Plugin1 button', :attributes => {:class => /plugin1_icon/, :href => /plugin1_url/}
-    assert_tag :tag => 'a', :content => 'Plugin2 button', :attributes => {:class => /plugin2_icon/, :href => /plugin2_url/}
+    assert_tag :tag => 'a', :content => 'Plugin1 button', :attributes => {:class => /plugin1_icon/, :href => /plugin1_url/, :'data-extra' => true}
+    assert_tag :tag => 'a', :content => 'Plugin2 button', :attributes => {:class => /plugin2_icon/, :href => /plugin2_url/, :'data-extra' => nil}
   end
 
   should 'add extra content provided by plugins on edit' do
@@ -1151,58 +1194,5 @@ class ProfileEditorControllerTest < ActionController::TestCase
     profile.environment.disable('disable_header_and_footer')
     get :index, :profile => user.identifier
     assert_tag :tag => 'div', :descendant => { :tag => 'a', :content => 'Edit Header and Footer' }
-  end
-
-  should 'deactivate organization profile' do
-    @request.env['HTTP_REFERER'] = 'http://localhost:3000/admin/admin_panel/manage_organizations_status'
-    user = create_user('user').person
-    Environment.default.add_admin user
-    login_as('user')
-
-    community = fast_create(Community)
-    assert_equal true, community.enable
-
-    get :index, :profile => community.identifier
-    get :deactivate_profile, {:profile => community.identifier, :id => community.id}
-    assert_equal @request.session[:notice], "The profile '#{community.name}' was deactivated."
-  end
-
-  should 'activate organization profile' do
-    @request.env['HTTP_REFERER'] = 'http://localhost:3000/admin/admin_panel/manage_organizations_status'
-    user = create_user('user').person
-    Environment.default.add_admin user
-    login_as('user')
-
-    community = fast_create(Community)
-    assert_equal true, community.disable
-
-    get :index, :profile => community.identifier
-    get :activate_profile, {:profile => community.identifier, :id => community.id}
-    assert_equal @request.session[:notice], "The profile '#{community.name}' was activated."
-  end
-
-  should 'not deactivate organization profile if user is not an admin' do
-    @request.env['HTTP_REFERER'] = 'http://localhost:3000/admin/admin_panel/manage_organizations_status'
-    user = create_user('user').person
-    login_as('user')
-
-    community = fast_create(Community)
-    get :index, :profile => community.identifier
-    get :deactivate_profile, {:profile => community.identifier, :id => community.id}
-    assert_not_equal @request.session[:notice], "The profile '#{community.name}' was disabled."
-  end
-
-  should 'destroy organization profile' do
-    @request.env['HTTP_REFERER'] = 'http://localhost:3000/admin/admin_panel/manage_organizations_status'
-    user = create_user('user').person
-    Environment.default.add_admin user
-    login_as('user')
-
-    community = fast_create(Community)
-    assert_equal true, community.enable
-
-    get :index, :profile => community.identifier
-    post :destroy_profile, {:profile => community.identifier, :id => community.id}
-    assert_equal @request.session[:notice], "The profile was deleted."
   end
 end

@@ -20,6 +20,8 @@ class Comment < ActiveRecord::Base
 
   scope :without_reply, :conditions => ['reply_of_id IS NULL']
 
+  include TimeScopes
+
   # unauthenticated authors:
   validates_presence_of :name, :if => (lambda { |record| !record.email.blank? })
   validates_presence_of :email, :if => (lambda { |record| !record.name.blank? })
@@ -32,10 +34,12 @@ class Comment < ActiveRecord::Base
       rec.errors.add(:name, _('{fn} can only be informed for unauthenticated authors').fix_i18n)
     end
   end
-
+  
   acts_as_having_settings
 
   xss_terminate :only => [ :body, :title, :name ], :on => 'validation'
+
+  acts_as_voteable
 
   def comment_root
     (reply_of && reply_of.comment_root) || self
@@ -63,6 +67,11 @@ class Comment < ActiveRecord::Base
 
   def author_url
     author ? author.url : nil
+  end
+
+  #FIXME make this test
+  def author_custom_image(size = :icon)
+    author ? author.profile_custom_image(size) : nil
   end
 
   def url

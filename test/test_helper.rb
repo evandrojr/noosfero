@@ -76,18 +76,16 @@ class ActiveSupport::TestCase
 
   end
 
+  setup :global_setup
+
+  def global_setup
+    User.current = nil
+  end
+
   alias :ok :assert_block
 
   def assert_equivalent(enum1, enum2)
     assert( ((enum1 - enum2) == []) && ((enum2 - enum1) == []), "<#{enum1.inspect}> expected to be equivalent to <#{enum2.inspect}>")
-  end
-
-  def assert_includes(array, element)
-    assert(array.include?(element), "<#{array.inspect}> expected to include <#{element.inspect}>")
-  end
-
-  def assert_not_includes(array, element)
-    assert(!array.include?(element), "<#{array.inspect}> expected to NOT include <#{element.inspect}>")
   end
 
   def assert_mandatory(object, attribute, test_value = 'some random string')
@@ -103,10 +101,6 @@ class ActiveSupport::TestCase
     object.send("#{attribute}=", nil)
     object.valid?
     assert !object.errors[attribute.to_s].present?
-  end
-
-  def assert_subclass(parent, child)
-    assert_equal parent, child.superclass, "Class #{child} expected to be a subclass of #{parent}"
   end
 
   # this check only if text has html tag
@@ -262,16 +256,25 @@ module NoosferoTestHelper
     arg
   end
 
-  def show_date(date)
-    date.to_s
-  end
-
   def strip_tags(html)
     html.gsub(/<[^>]+>/, '')
   end
 
   def icon_for_article(article)
     ''
+  end
+
+  # make a string from ordered hash to simplify tests
+  def h2s(value)
+    case value
+      when Hash, HashWithIndifferentAccess
+        '{'+ value.stringify_keys.to_a.sort{|a,b|a[0]<=>b[0]}.map{ |k,v| k+':'+h2s(v) }.join(',') +'}'
+      when Array
+        '['+ value.map{|i|h2s(i)}.join(',') +']'
+      when NilClass
+        '<nil>'
+      else value.to_s
+    end
   end
 
 end

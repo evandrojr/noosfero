@@ -1,0 +1,8 @@
+<% if  profile.allow_serpro_integration?  %>
+  <div id='serpro-integration'>
+    <h2><%= _('Serpro Integration') %></h2>
+
+    <%= render :partial => 'gitlab' %>
+    <%= render :partial => 'jenkins' %>
+  </div>
+<% end %>

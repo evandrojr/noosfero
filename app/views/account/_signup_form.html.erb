@@ -109,8 +109,6 @@
 
   <%= @plugins.dispatch(:signup_extra_contents).collect { |content| instance_eval(&content) }.join("") %>
 
-  <%= template_options(:people, 'profile_data') %>
-
   <% unless @terms_of_use.blank? %>
     <div id='terms-of-use-box' class='formfieldline'>
       <%= labelled_check_box(_('I accept the %s') % link_to(_('terms of use'), {:controller => 'home', :action => 'terms'}, :target => '_blank'), 'user[terms_accepted]') %>
@@ -123,6 +121,11 @@
     <%= hidden_field_tag :terms_accepted, params[:terms_accepted] %>
     <%= hidden_field_tag :new_user, true %>
   <% end %>
+</div>
+
+<div id="signup-form-custom-fields">
+  <%= javascript_include_tag "manage-custom-fields" %>
+  <%= template_options(:people, 'profile_data') %>
 </div>
 
 <%= recaptcha_tags :ajax => true, :display => {:theme => 'clean'} if @block_bot %>

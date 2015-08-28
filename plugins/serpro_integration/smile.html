@@ -1,0 +1,142 @@
+<html>
+  <head> </head>
+  <body>
+    <canvas id="smileFace" width="60" height="60"></canvas>
+<script>
+
+function drawBaseFace() {
+  var canvas = document.getElementById("smileFace");
+  var ctx = canvas.getContext("2d");
+  
+  var x = canvas.width / 2;
+  var y = canvas.height / 2;
+  var radius = canvas.width/2 - 1;
+  var startAngle = 0;
+  var endAngle = 2 * Math.PI;
+  
+  ctx.beginPath();
+  ctx.arc(x, y, radius, startAngle, endAngle);
+  ctx.stroke();
+  ctx.fillStyle = "yellow";
+  ctx.fill();
+}
+
+function drawSmile(factor){
+  var canvas = document.getElementById("smileFace");
+  var ctx = canvas.getContext("2d");
+  var x = canvas.width / 2;
+  var y = canvas.height / 2
+  var radius = canvas.width/2 - canvas.width/4;
+
+  var startAngle = 0;
+  var endAngle = 0;
+  var delta = 0;
+
+  ctx.beginPath();
+  ctx.lineWidth = canvas.width/100 * 2;
+
+  if (factor >= 0 && factor < 5){
+    //Draw sadness mouth
+    delta = 0.5 - factor* 0.1
+    startAngle = (1.5 - delta) * Math.PI;
+    endAngle = (1.5 + delta) * Math.PI;
+    radius = radius - radius*delta;
+    y = y + (radius + radius*(1 - delta));
+    ctx.arc(x, y, radius, startAngle, endAngle);
+  } else if (factor == 5)  {
+    //Draw normal mouth
+    ctx.moveTo(x-canvas.width/8,y+canvas.width/8);
+    ctx.lineTo(x-canvas.width/8+(canvas.width/4),y+canvas.width/8);
+  } else if (factor > 5 && factor <= 10)  {
+    //Draw happiness mouth
+    delta = 1 - factor * 0.1
+    startAngle = delta * Math.PI;
+    endAngle = (1 - delta) * Math.PI;
+    radius = radius - radius*delta;
+    y = y - (radius - radius*(1-delta));
+    ctx.arc(x, y, radius, startAngle, endAngle);
+  }else{
+    //Draw scare mouth
+    radius = radius*0.4
+    y = y + radius;
+    ctx.ellipse(x,y,radius*0.4, radius,0,0,2 * Math.PI, false);
+    ctx.fill();
+  }
+  
+  
+  // line color
+  ctx.strokeStyle = 'black';
+  ctx.stroke();
+}
+
+function drawEyes(){
+  var canvas = document.getElementById("smileFace");
+  var ctx = canvas.getContext("2d");
+  var centerX = canvas.width/5;
+  var centerY = 0;
+  var radius = canvas.width * 0.05;
+  
+  // save state
+  ctx.save();
+  
+  // translate context so height is 1/3'rd from top of enclosing circle
+  ctx.translate(canvas.width / 2, canvas.height / 3);
+  
+  // scale context horizontally by 50%
+  ctx.scale(.5, 1);
+  
+  // draw circle which will be stretched into an oval
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+  
+  // restore to original state
+  ctx.restore();
+  
+  // apply styling
+  ctx.fillStyle = 'black';
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = 'black';
+  ctx.stroke();
+
+
+  //left eye
+  centerX = centerX * -1;
+  
+  // save state
+  ctx.save();
+  
+  // translate context so height is 1/3'rd from top of enclosing circle
+  ctx.translate(canvas.width / 2, canvas.height / 3);
+  
+  // scale context horizontally by 50%
+  ctx.scale(.5, 1);
+  
+  // draw circle which will be stretched into an oval
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+  
+  // restore to original state
+  ctx.restore();
+  
+  // apply styling
+  ctx.fillStyle = 'black';
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = 'black';
+  ctx.stroke(); 
+}
+                   
+
+function drawFace(factor){
+   drawBaseFace();
+   drawEyes();
+   drawSmile(factor);
+}
+
+drawFace(9);
+
+</script>
+
+  </body>
+</html>

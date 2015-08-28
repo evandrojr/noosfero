@@ -6,6 +6,7 @@ class ProfileController < PublicController
   before_filter :login_required, :only => [:add, :join, :leave, :unblock, :leave_scrap, :remove_scrap, :remove_activity, :view_more_activities, :view_more_network_activities, :report_abuse, :register_report, :leave_comment_on_activity, :send_mail]
 
   helper TagsHelper
+  helper ActionTrackerHelper
 
   protect 'send_mail_to_members', :profile, :only => [:send_mail]
 
@@ -201,7 +202,10 @@ class ProfileController < PublicController
 
   def more_comments
     profile_filter = @profile.person? ? {:user_id => @profile} : {:target_id => @profile}
-    activity = ActionTracker::Record.find(:first, :conditions => {:id => params[:activity]}.merge(profile_filter))
+    activity = ActionTracker::Record.where(:id => params[:activity])
+    activity = activity.where(profile_filter) if !logged_in? || !current_person.follows?(@profile)
+    activity = activity.first
+
     comments_count = activity.comments.count
     comment_page = (params[:comment_page] || 1).to_i
     comments_per_page = 5
@@ -353,6 +357,7 @@ class ProfileController < PublicController
 
   def send_mail
     @mailing = profile.mailings.build(params[:mailing])
+    @email_templates = profile.email_templates.find_all_by_template_type(:organization_members)
     if request.post?
       @mailing.locale = locale
       @mailing.person = user

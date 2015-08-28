@@ -29,7 +29,9 @@ class TaskTest < ActiveSupport::TestCase
   end
 
   def test_should_call_perform_in_finish
-    TaskMailer.expects(:generic_message).with('task_finished', anything)
+    mail = mock
+    mail.expects(:deliver)
+    TaskMailer.expects(:generic_message).with('task_finished', anything).returns(mail)
     t = Task.create
     t.requestor = sample_user
     t.expects(:perform)
@@ -38,7 +40,9 @@ class TaskTest < ActiveSupport::TestCase
   end
 
   def test_should_have_cancelled_status_after_cancel
-    TaskMailer.expects(:generic_message).with('task_cancelled', anything)
+    mail = mock
+    mail.expects(:deliver)
+    TaskMailer.expects(:generic_message).with('task_cancelled', anything).returns(mail)
     t = Task.create
     t.requestor = sample_user
     t.cancel
@@ -54,7 +58,9 @@ class TaskTest < ActiveSupport::TestCase
     t = Task.create
     t.requestor = sample_user
 
-    TaskMailer.expects(:generic_message).with('task_finished', t)
+    mail = mock
+    mail.expects(:deliver)
+    TaskMailer.expects(:generic_message).with('task_finished', t).returns(mail)
 
     t.finish
   end
@@ -63,7 +69,9 @@ class TaskTest < ActiveSupport::TestCase
     t = Task.create
     t.requestor = sample_user
 
-    TaskMailer.expects(:generic_message).with('task_cancelled', t)
+    mail = mock
+    mail.expects(:deliver)
+    TaskMailer.expects(:generic_message).with('task_cancelled', t).returns(mail)
 
     t.cancel
   end
@@ -93,7 +101,9 @@ class TaskTest < ActiveSupport::TestCase
     task = Task.new
     task.requestor = sample_user
 
-    TaskMailer.expects(:generic_message).with('task_created', task)
+    mail = mock
+    mail.expects(:deliver)
+    TaskMailer.expects(:generic_message).with('task_created', task).returns(mail)
     task.save!
   end
 
@@ -114,7 +124,7 @@ class TaskTest < ActiveSupport::TestCase
     task1 = Task.create!
     task2 = build(Task, :code => task1.code)
 
-    assert !task2.valid?
+    refute task2.valid?
     assert task2.errors[:code.to_s].present?
   end
 
@@ -179,6 +189,32 @@ class TaskTest < ActiveSupport::TestCase
     task.stubs(:target_notification_message).returns('some non nil message to be sent to target')
 
     TaskMailer.expects(:target_notification).never
+    task.save!
+  end
+
+  should 'not send notification to target if notification is disabled in profile' do
+    task = Task.new
+    target = fast_create(Profile)
+    target.stubs(:notification_emails).returns(['adm@example.com'])
+    target.stubs(:administrator_mail_notification).returns(false)
+    task.target = target
+    task.stubs(:target_notification_message).returns('some non nil message to be sent to target')
+    TaskMailer.expects(:target_notification).never
+    task.save!
+  end
+
+  should 'send notification to target if notification is enabled in profile' do
+    task = Task.new
+    target = fast_create(Profile)
+    target.stubs(:notification_emails).returns(['adm@example.com'])
+    target.stubs(:administrator_mail_notification).returns(true)
+    task.target = target
+    task.stubs(:target_notification_message).returns('some non nil message to be sent to target')
+
+    
+    mailer = mock
+    mailer.expects(:deliver).once
+    TaskMailer.expects(:target_notification).returns(mailer).once
     task.save!
   end
 
@@ -281,7 +317,9 @@ class TaskTest < ActiveSupport::TestCase
     task.requestor = sample_user
     task.save!
 
-    TaskMailer.expects(:generic_message).with('task_activated', task)
+    mail = mock
+    mail.expects(:deliver)
+    TaskMailer.expects(:generic_message).with('task_activated', task).returns(mail)
     task.activate
   end
 
@@ -317,7 +355,7 @@ class TaskTest < ActiveSupport::TestCase
     assert_includes Task.to(another_person), t4
   end
 
-  should 'filter tasks by type with named_scope' do
+  should 'filter tasks by type with named scope' do
     class CleanHouse < Task; end
     class FeedDog < Task; end
     requestor = fast_create(Person)
@@ -331,6 +369,22 @@ class TaskTest < ActiveSupport::TestCase
     assert_includes Task.of(type), t2
     assert_not_includes Task.of(type), t3
     assert_includes Task.of(nil), t3
+  end
+
+  should 'filter tasks by tags with named scope' do
+
+    requestor = fast_create(Person)
+    target = fast_create(Person)
+    profile = sample_user
+
+    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'}, :tag_list => 'noosfero,test')
+    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'}, :tag_list => 'test')
+
+    data = Task.tagged_with('noosfero', any: true)
+
+    assert_includes data, task_one
+    assert_not_includes data, task_two
+
   end
 
   should 'order tasks by some attribute correctly' do
@@ -391,15 +445,15 @@ class TaskTest < ActiveSupport::TestCase
     t = Task.new
     t.spam = true
     assert t.spam?
-    assert !t.ham?
+    refute t.ham?
 
     t.spam = false
     assert t.ham?
-    assert !t.spam?
+    refute t.spam?
 
     t.spam = nil
-    assert !t.spam?
-    assert !t.ham?
+    refute t.spam?
+    refute t.ham?
   end
 
   should 'be able to select non-spam tasks' do
@@ -430,6 +484,41 @@ class TaskTest < ActiveSupport::TestCase
     t1.ham!
     t1.reload
     assert t1.ham?
+  end
+
+  should 'be able to assign a responsible to a task' do
+    person = fast_create(Person)
+    task = fast_create(Task)
+    task.responsible = person
+    task.save!
+    assert_equal person, task.responsible
+  end
+
+  should 'save tasks tags' do
+
+    requestor = fast_create(Person)
+    target = fast_create(Person)
+    profile = sample_user
+
+    task_one = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Task Test'}, :tag_list => 'noosfero,test')
+    task_two = Task.create!(:requestor => requestor, :target => target, :data => {:name => 'Another Task'}, :tag_list => 'test')
+
+    assert_includes task_one.tags_from(nil), 'test'
+    assert_not_includes task_two.tags_from(nil), 'noosfero'
+  end
+
+  should 'store who finish the task' do
+    t = Task.create
+    person = fast_create(Person)
+    t.finish(person)
+    assert_equal person, t.reload.closed_by
+  end
+
+  should 'store who cancel the task' do
+    t = Task.create
+    person = fast_create(Person)
+    t.cancel(person)
+    assert_equal person, t.reload.closed_by
   end
 
   protected

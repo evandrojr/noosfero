@@ -1,0 +1,23 @@
+<h1><%= _('Manage Custom Templates') %></h1>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Enabled</th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @custom_queries.each do |custom_query| %>
+  <tr>
+    <td><%= custom_query.name %></td>
+    <td><%= custom_query.enabled %></td>
+    <td><%= link_to 'Edit', :action => :edit, :id => custom_query.id %></td>
+    <td><%= link_to 'Destroy', :action => :destroy, :id => custom_query.id, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= button :new, _('New'), :action => :new %>

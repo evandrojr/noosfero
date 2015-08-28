@@ -1,0 +1,12 @@
+<li>
+  <ul class="item_file_attributes_list">
+    <li>
+      <span><%= _('File:') %></span> <%= link_to item_file.name, dspace_server_url + item_file.retrieve_link, :target => '_blank' %></li>
+    <% unless item_file.description.blank? %>
+    <li>
+      <span><%= _('Description:') %> </span> <%= item_file.description %></li>
+    <% end %>
+    <li>
+      <span><%= _('Size:') %> </span> <%= number_to_human_size( item_file.size_bytes ) %></li>
+  </ul>
+</li>

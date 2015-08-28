@@ -16,7 +16,7 @@ class ChangePasswordTest < ActiveSupport::TestCase
     change.status = Task::Status::FINISHED
     change.password = 'right'
     change.password_confirmation = 'wrong'
-    assert !change.valid?
+    refute change.valid?
     assert change.errors[:password.to_s].present?
 
 
@@ -69,6 +69,12 @@ class ChangePasswordTest < ActiveSupport::TestCase
     task = ChangePassword.create!(:requestor => person)
     email = TaskMailer.generic_message('task_created', task)
     assert_match(/#{task.requestor.name} wants to change its password/, email.subject)
+  end
+
+  should 'set email template when it exists' do
+    template = EmailTemplate.create!(:template_type => :user_change_password, :name => 'template1', :owner => Environment.default)
+    task = ChangePassword.create!(:requestor => person)
+    assert_equal template.id, task.email_template_id
   end
 
 end

@@ -1,0 +1,9 @@
+<%= required_fields_message %>
+
+<div>
+  <%= required labelled_form_field(_('Title'), text_field(:article, 'name', :size => '64', :maxlength => 150)) %>
+
+  <%= render :partial => 'general_fields' %>
+  <%= render :partial => 'translatable' %>
+  <%= render :partial => 'shared/ckeditor_content_plugin/lead_and_body', :locals => {:ck_editor => true} %>
+</div>

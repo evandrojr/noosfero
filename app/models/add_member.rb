@@ -2,6 +2,9 @@ class AddMember < Task
 
   validates_presence_of :requestor_id, :target_id
 
+  validates :requestor, kind_of: {kind: Person}
+  validates :target, kind_of: {kind: Organization}
+
   alias :person :requestor
   alias :person= :requestor=
 
@@ -26,7 +29,8 @@ class AddMember < Task
   end
 
   def information
-    {:message => _('%{requestor} wants to be a member of this community.')}
+    {:message => _("%{requestor} wants to be a member of '%{organization}'."),
+     variables: {requestor: requestor.name, organization: organization.name}}
   end
 
   def accept_details
@@ -42,7 +46,7 @@ class AddMember < Task
   end
 
   def target_notification_description
-    _('%{requestor} wants to be a member of this community.') % {:requestor => requestor.name}
+    _("%{requestor} wants to be a member of '%{organization}'.") % {:requestor => requestor.name, :organization => organization.name}
   end
 
   def target_notification_message

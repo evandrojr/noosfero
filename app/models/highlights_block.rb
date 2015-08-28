@@ -12,6 +12,7 @@ class HighlightsBlock < Block
     block.images.each do |i|
       i[:image_id] = i[:image_id].to_i
       i[:position] = i[:position].to_i
+      i[:address] = Noosfero.root + i[:address]  unless Noosfero.root.nil?
       begin
         file = UploadedFile.find(i[:image_id])
         i[:image_src] = file.public_filename
@@ -22,12 +23,20 @@ class HighlightsBlock < Block
   end
 
   def self.description
-    _('Highlights')
+    _('Creates image slideshow')
   end
 
   def featured_images
-    block_images = images.select{|i| !i[:image_src].nil? }.sort { |x, y| x[:position] <=> y[:position] }
-    shuffle ? block_images.shuffle : block_images
+    images = get_images
+    shuffle ? images.shuffle : images
+  end
+
+  def get_images
+    images.select do |i|
+      !i[:image_src].nil?
+    end.sort do |x, y|
+      x[:position] <=> y[:position]
+    end
   end
 
   def content(args={})

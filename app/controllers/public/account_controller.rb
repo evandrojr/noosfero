@@ -16,7 +16,7 @@ class AccountController < ApplicationController
   def activate
     @user = User.find_by_activation_code(params[:activation_code]) if params[:activation_code]
     if @user
-      unless @user.environment.enabled?('admin_must_approve_new_users') 
+      unless @user.environment.enabled?('admin_must_approve_new_users')
         if @user.activate
           @message = _("Your account has been activated, now you can log in!")
           check_redirection
@@ -30,7 +30,7 @@ class AccountController < ApplicationController
           @user.activation_code = nil
           @user.save!
           redirect_to :controller => :home
-        end      
+        end
       end
     else
       session[:notice] = _("It looks like you're trying to activate an account. Perhaps have already activated this account?")
@@ -50,10 +50,12 @@ class AccountController < ApplicationController
 
     if logged_in?
       check_join_in_community(self.current_user)
+
       if params[:remember_me] == "1"
         self.current_user.remember_me
-        cookies[:auth_token] = { :value => self.current_user.remember_token , :expires => self.current_user.remember_token_expires_at }
+        cookies[:auth_token] = {value: self.current_user.remember_token, expires: self.current_user.remember_token_expires_at}
       end
+
       if redirect?
         go_to_initial_page
         session[:notice] = _("Logged in successfully")
@@ -77,6 +79,13 @@ class AccountController < ApplicationController
     render :text => { :ok=>true, :key=>key }.to_json
   end
 
+  def custom_fields_for_template
+    custom_fields ||= environment.people.templates.find(params[:template_id]).custom_fields.map { |k,v|
+      { :name => k, :title => v[:title] } if v['signup']
+    }.compact
+    render :text => {:ok => true, :custom_fields => custom_fields}.to_json
+  end
+
   # action to register an user to the application
   def signup
     if @plugins.dispatch(:allow_user_registration).include?(false)
@@ -92,6 +101,7 @@ class AccountController < ApplicationController
     @invitation_code = params[:invitation_code]
     begin
       @user = User.new(params[:user])
+      @user.session = session
       @user.terms_of_use = environment.terms_of_use
       @user.environment = environment
       @terms_of_use = environment.terms_of_use
@@ -358,11 +368,11 @@ class AccountController < ApplicationController
   end
 
   def get_signup_start_time
-    Rails.cache.read params[:signup_time_key]
+    Rails.cache.read params[:signup_time_key] if params[:signup_time_key].present?
   end
 
   def clear_signup_start_time
-    Rails.cache.delete params[:signup_time_key] if params[:signup_time_key]
+    Rails.cache.delete params[:signup_time_key] if params[:signup_time_key].present?
   end
 
   def may_be_a_bot
@@ -435,7 +445,7 @@ class AccountController < ApplicationController
   end
 
   def go_to_signup_initial_page
-    check_redirection_options(user, user.environment.redirection_after_signup, user.url)
+    check_redirection_options user, user.environment.redirection_after_signup, user.url, signup: true
   end
 
   def redirect_if_logged_in
@@ -455,8 +465,11 @@ class AccountController < ApplicationController
 
   protected
 
-  def check_redirection_options(user, condition, default)
-    case condition
+  def check_redirection_options user, condition, default, options={}
+    if options[:signup] and target = session.delete(:after_signup_redirect_to)
+      redirect_to target
+    else
+      case condition
       when 'keep_on_same_page'
         redirect_back_or_default(user.admin_url)
       when 'site_homepage'
@@ -469,8 +482,11 @@ class AccountController < ApplicationController
         redirect_to user.admin_url
       when 'welcome_page'
         redirect_to :controller => :home, :action => :welcome, :template_id => (user.template && user.template.id)
-    else
-      redirect_back_or_default(default)
+      when 'custom_url'
+        if (url = user.custom_url_redirection).present? then redirect_to url else redirect_back_or_default default end
+      else
+        redirect_back_or_default(default)
+      end
     end
   end
 

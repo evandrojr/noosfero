@@ -7,6 +7,16 @@ class CommunityTrackPlugin::Track < Folder
 
   attr_accessible :goals, :expected_results
 
+  @children_comments
+
+  def comments_count
+    if defined?(@comments_count)
+      @comments_count
+    else
+      @comments_count = update_comments_count
+    end
+  end
+
   def validate_categories
     errors.add(:categories, _('should not be blank.')) if categories.empty? && pending_categorizations.blank?
   end
@@ -49,8 +59,17 @@ class CommunityTrackPlugin::Track < Folder
     false
   end
 
-  def comments_count
-    steps_unsorted.joins(:children).sum('children_articles.comments_count')
+  def update_comments_count
+    @children_comments = 0
+    sum_children_comments self
+    @children_comments
+  end
+
+  def sum_children_comments node
+    node.children.each do |c|
+      @children_comments += c.comments_count
+      sum_children_comments c
+    end
   end
 
   def css_class_name
@@ -65,7 +84,8 @@ class CommunityTrackPlugin::Track < Folder
 
   def category_name
     category = categories.first
-    category ? category.top_ancestor.name : ''
+    category = category.top_ancestor unless category.nil?
+    category.nil? ? '' : category.name
   end
 
   def to_html(options = {})
