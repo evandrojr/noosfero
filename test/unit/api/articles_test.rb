@@ -91,6 +91,41 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_not_includes json['articles'].map {|a| a['id']}, child.id
   end
 
+  should 'follow a article identified by id' do
+    article = fast_create(Article, :profile_id => @person.id, :name => "Some thing")
+    post "/api/v1/articles/#{article.id}/follow?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+
+    assert_not_equal 401, last_response.status
+    assert_equal true, json['success']
+  end
+
+  should 'return the followers of a article identified by id' do
+    article = fast_create(Article, :profile_id => @person.id, :name => "Some thing")
+
+    article_follower = ArticleFollower.new
+    article_follower.article = article
+    article_follower.person = @person
+    article_follower.save!
+
+    get "/api/v1/articles/#{article.id}/followers?"
+    json = JSON.parse(last_response.body)
+
+    assert_equal 200, last_response.status
+    assert_equal 1, json['total_followers']
+  end
+
+  should 'perform a vote in a article identified by id' do
+    article = fast_create(Article, :profile_id => @person.id, :name => "Some thing")
+    @params[:value] = 1
+
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+
+    assert_not_equal 401, last_response.status
+    assert_equal true, json['vote']
+  end
+
   #############################
   #     Profile Articles      #
   #############################
@@ -122,6 +157,29 @@ class ArticlesTest < ActiveSupport::TestCase
       get "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
       json = JSON.parse(last_response.body)
       assert_not_includes json['articles'].map {|a| a['id']}, article.id
+    end
+
+    should "return article by #{kind} and path" do
+      profile = fast_create(kind.camelcase.constantize, :environment_id => environment.id)
+      parent_article = Folder.create!(:profile => profile, :name => "Parent Folder")
+      article = Article.create!(:profile => profile, :name => "Some thing", :parent => parent_article)
+
+      params[:path] = parent_article.slug+'/'+article.slug
+      get "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
+      json = JSON.parse(last_response.body)
+      assert_equal article.id, json["article"]["id"]
+    end
+
+    should "not return article by #{kind} and path if user has no permission to view it" do
+      profile = fast_create(kind.camelcase.constantize, :environment_id => environment.id)
+      parent_article = Folder.create!(:profile => profile, :name => "Parent Folder")
+      article = Article.create!(:profile => profile, :name => "Some thing", :parent => parent_article, :published => false)
+
+      assert !article.published?
+
+      params[:path] = parent_article.slug+'/'+article.slug
+      get "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
+      assert_equal 403, last_response.status
     end
   end
 

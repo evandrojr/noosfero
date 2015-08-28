@@ -26,10 +26,10 @@ module Noosfero
           end
 
           desc "Return the article id"
-          get ':id' do
+          get ':id', requirements: {id: /[0-9]+/} do
             present_article(environment)
           end
-
+          
           post ':id/report_abuse' do
             article = find_article(environment.articles, params[:id])
             profile = article.profile
@@ -164,7 +164,18 @@ module Noosfero
               resource :articles do
                 get do
                   profile = environment.send(kind.pluralize).find(params["#{kind}_id"])
-                  present_articles(profile)
+
+                  if params[:path].present?
+                    article = profile.articles.find_by_path(params[:path])
+                    if !article || !article.display_to?(current_person)
+                      article = forbidden!
+                    end
+
+                    present article, :with => Entities::Article, :fields => params[:fields]
+                  else
+
+                    present_articles(profile)
+                  end
                 end
 
                 get ':id' do
