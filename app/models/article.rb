@@ -7,7 +7,8 @@ class Article < ActiveRecord::Base
                   :accept_comments, :feed, :published, :source, :source_name,
                   :highlighted, :notify_comments, :display_hits, :slug,
                   :external_feed_builder, :display_versions, :external_link,
-                  :author, :published_at, :person_followers, :show_to_followers, :image_builder
+                  :author, :published_at, :person_followers, :show_to_followers, 
+                  :image_builder, :display_preview
 
   acts_as_having_image
 
@@ -652,6 +653,12 @@ class Article < ActiveRecord::Base
     false
   end
 
+  settings_items :display_preview, :type => :boolean, :default => false
+
+  def display_preview?
+    false
+  end
+
   def image?
     false
   end
@@ -765,9 +772,10 @@ class Article < ActiveRecord::Base
   end
 
   def body_images_paths
-    require 'uri'
     Nokogiri::HTML.fragment(self.body.to_s).css('img[src]').collect do |i|
-      (self.profile && self.profile.environment) ? URI.join(self.profile.environment.top_url, URI.escape(i['src'])).to_s : i['src']
+      src = i['src']
+      src = URI.escape src if self.new_record? # xss_terminate runs on save
+      (self.profile && self.profile.environment) ? URI.join(self.profile.environment.top_url, src).to_s : src
     end
   end
 
