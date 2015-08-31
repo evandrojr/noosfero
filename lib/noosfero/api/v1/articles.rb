@@ -37,7 +37,7 @@ module Noosfero
 
           post ':id' do
             article = environment.articles.find(params[:id])
-            return forbidden! if article.allow_edit?(current_person)
+            return forbidden! unless article.allow_edit?(current_person)
             article.update_attributes!(params[:article])
             present article, :with => Entities::Article, :fields => params[:fields]
           end
