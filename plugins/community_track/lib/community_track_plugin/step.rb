@@ -60,9 +60,14 @@ class CommunityTrackPlugin::Step < Folder
     accept_comments
   end
 
-  def self.enabled_tools
-    [TinyMceArticle, Forum]
-  end
+  def enabled_tools
+    tools = [TinyMceArticle, Forum]
+    tools << CommunityHubPlugin::Hub if environment.plugin_enabled?('CommunityHubPlugin')
+    tools << ProposalsDiscussionPlugin::Discussion if environment.plugin_enabled?('ProposalsDiscussionPlugin')
+    tools << PairwisePlugin::PairwiseContent if environment.plugin_enabled?('PairwisePlugin')
+    tools
+   end
+
 
   def to_html(options = {})
     step = self
