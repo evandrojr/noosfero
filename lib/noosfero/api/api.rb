@@ -51,6 +51,7 @@ module Noosfero
       mount V1::Tasks
       mount V1::Tags
       mount V1::Environments
+      mount V1::Search
 
       mount Session
 
