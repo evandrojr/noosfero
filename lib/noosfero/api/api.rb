@@ -54,6 +54,8 @@ module Noosfero
 
       mount Session
 
+      add_swagger_documentation api_version: 'v1', mount_path: '/api_docs', markdown: GrapeSwagger::Markdown::KramdownAdapter unless Rails.env.production?
+
       # hook point which allow plugins to add Grape::API extensions to API::API
       #finds for plugins which has api mount points classes defined (the class should extends Grape::API)
       @plugins = Noosfero::Plugin.all.map { |p| p.constantize }

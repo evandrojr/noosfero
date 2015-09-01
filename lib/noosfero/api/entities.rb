@@ -64,7 +64,7 @@ module Noosfero
 
       class Person < Profile
         root 'people', 'person'
-        expose :user, :using => UserBasic
+        expose :user, :using => UserBasic, documentation: {type: 'User', desc: 'The user data of a person' }
       end
 
       class Enterprise < Profile
@@ -80,11 +80,11 @@ module Noosfero
         root 'articles', 'article'
         expose :id
         expose :body
-        expose :abstract
+        expose :abstract, documentation: {type: 'String', desc: 'Teaser of the body'}
         expose :created_at, :format_with => :timestamp
         expose :title, :documentation => {:type => "String", :desc => "Title of the article"}
-        expose :created_by, :as => :author, :using => Profile
-        expose :profile, :using => Profile
+        expose :created_by, :as => :author, :using => Profile, :documentation => {type: 'Profile', desc: 'The profile author that create the article'}
+        expose :profile, :using => Profile, :documentation => {type: 'Profile', desc: 'The profile associated with the article'}
         expose :categories, :using => Category
         expose :image, :using => Image
         #TODO Apply vote stuff in core and make this test
@@ -94,7 +94,7 @@ module Noosfero
         expose :position
         expose :hits
         expose :start_date
-        expose :end_date
+        expose :end_date, :documentation => {type: 'DateTime', desc: 'The date of finish of the article'}
         expose :tag_list
         expose :children_count
       end
@@ -105,6 +105,7 @@ module Noosfero
         expose :children, using: ArticleBase do |article, options|
           article.children.limit(Noosfero::API::V1::Articles::MAX_PER_PAGE)
         end
+        expose :slug, :documentation => {:type => "String", :desc => "Trimmed and parsed name of a article"}
       end
 
       class Comment < Entity
@@ -134,7 +135,7 @@ module Noosfero
       end
 
       class UserLogin < User
-        expose :private_token
+        expose :private_token, documentation: {type: 'String', desc: 'A valid authentication code for post/delete api actions'}
       end
 
       class Task < Entity
