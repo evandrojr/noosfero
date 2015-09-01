@@ -36,6 +36,7 @@ class OauthClientPluginPublicController < PublicController
     auth ||= person.oauth_auths.create! profile: person, provider: provider, enabled: true
     if auth.enabled? && provider.enabled?
       self.current_user = person.user
+      self.current_user.generate_private_token!
     else
       session[:notice] = _("Can't login with %s") % provider.name
     end

@@ -31,6 +31,17 @@ class OauthClientPluginPublicControllerTest < ActionController::TestCase
     assert_equal user.id, session[:user]
   end
 
+  should 'generate private token when login' do
+    user = create_user
+    auth.info.stubs(:email).returns(user.email)
+    auth.info.stubs(:name).returns(user.name)
+    session[:provider_id] = provider.id
+
+    assert user.reload.private_token.nil?
+    get :callback
+    assert user.reload.private_token.present?
+  end
+
   should 'do not login when the provider is disabled' do
     user = create_user
     auth.info.stubs(:email).returns(user.email)
