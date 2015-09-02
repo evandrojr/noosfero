@@ -57,4 +57,31 @@ class SearchTest < ActiveSupport::TestCase
     json = JSON.parse(last_response.body)
     assert_equal 1, json['results'].size
   end
+
+  should 'not return more entries than page limit' do
+  	person = fast_create(Person)
+    ('1'..'5').each do |n|
+      art = create_article_with_optional_category("Article #{n}", person)
+    end
+
+    get "/api/v1/search/article?query=Article&limit=3"
+    json = JSON.parse(last_response.body)
+
+
+    assert_equal 3, json['results'].size
+  end
+
+  should 'return entries second page' do
+  	person = fast_create(Person)
+    ('1'..'5').each do |n|
+      art = create_article_with_optional_category("Article #{n}", person)
+    end
+
+    get "/api/v1/search/article?query=Article&limit=3&page=2"
+    json = JSON.parse(last_response.body)
+
+
+    assert_equal 2, json['results'].size
+  end
+
 end
