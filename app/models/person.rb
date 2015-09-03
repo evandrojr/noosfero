@@ -221,7 +221,7 @@ class Person < Profile
   contact_informatioin
   ]
 
-  xss_terminate :only => [ :custom_footer, :custom_header, :description, :nickname, :sex, :nationality, :country, :state, :city, :district, :zip_code, :address, :address_reference, :cell_phone, :comercial_phone, :personal_website, :jabber_id, :schooling, :formation, :custom_formation, :area_of_study, :custom_area_of_study, :professional_activity, :organization, :organization_website, :contact_phone, :contact_information ], :with => 'white_list'
+  xss_terminate :only => [ :custom_footer, :custom_header, :description, :nickname, :sex, :nationality, :country, :district, :zip_code, :address, :address_reference, :cell_phone, :comercial_phone, :personal_website, :jabber_id, :schooling, :formation, :custom_formation, :area_of_study, :custom_area_of_study, :professional_activity, :organization, :organization_website, :contact_phone, :contact_information ], :with => 'white_list'
 
   validates_multiparameter_assignments
 
