@@ -48,6 +48,7 @@ module Noosfero
 
       class Region < Category
         root 'regions', 'region'
+        expose :parent_id
       end
 
       class Profile < Entity
@@ -55,6 +56,8 @@ module Noosfero
         expose :created_at, :format_with => :timestamp
         expose :image, :using => Image
         expose :region, :using => Region
+        expose :city, :using => Region
+        expose :state, :using => Region
       end
 
       class UserBasic < Entity
@@ -65,6 +68,7 @@ module Noosfero
       class Person < Profile
         root 'people', 'person'
         expose :user, :using => UserBasic
+        expose :orientacao_sexual, :identidade_genero, :transgenero, :etnia
       end
 
       class Enterprise < Profile
@@ -120,7 +124,7 @@ module Noosfero
         expose :id
         expose :login
         expose :email
-        expose :person, :using => Profile
+        expose :person, :using => Person
         expose :activated?, as: :activated
         expose :permissions do |user, options|
           output = {}
