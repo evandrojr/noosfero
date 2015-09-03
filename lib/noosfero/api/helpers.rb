@@ -10,6 +10,7 @@ require 'grape'
       include SanitizeParams
       include Noosfero::Plugin::HotSpot
       include ForgotPasswordHelper
+      include SearchTermHelper
 
       def set_locale
         I18n.locale = (params[:lang] || request.env['HTTP_ACCEPT_LANGUAGE'] || 'en')
@@ -38,6 +39,24 @@ require 'grape'
       def environment
         @environment
       end
+
+      ####################################################################
+      #### SEARCH
+      ####################################################################
+      def find_by_contents(asset, context, scope, query, paginate_options={:page => 1}, options={})
+        scope = scope.with_templates(options[:template_id]) unless options[:template_id].blank?
+        search = plugins.dispatch_first(:find_by_contents, asset, scope, query, paginate_options, options)
+        register_search_term(query, scope.count, search[:results].count, context, asset)
+        search
+      end
+      def paginate_options(page = params[:page])
+        page = 1 if multiple_search?(@searches) || params[:display] == 'map'
+        { :per_page => limit, :page => page }
+      end
+      def multiple_search?(searches=nil)
+        ['index', 'category_index'].include?(params[:action]) || (searches && searches.size > 1)
+      end      
+      ####################################################################
 
       def logger
         logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
