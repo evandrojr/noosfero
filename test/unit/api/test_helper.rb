@@ -17,6 +17,11 @@ class ActiveSupport::TestCase
     post "/api/v1/login?login=testapi&password=testapi"
     json = JSON.parse(last_response.body)
     @private_token = json["private_token"]
+    unless @private_token
+      @user.generate_private_token!
+      @private_token = @user.private_token
+    end
+
     @params = {:private_token => @private_token}
   end
   attr_accessor :private_token, :user, :person, :params, :environment

@@ -23,6 +23,7 @@ Noosfero::Application.routes.draw do
 
   match 'site(/:action)', :controller => 'home'
   match 'api(/:action)', :controller => 'api'
+  match 'api_docs(/:action)', :controller => 'api_docs'
 
   match 'images(/*stuff)' => 'not_found#nothing'
   match 'stylesheets(/*stuff)' => 'not_found#nothing'

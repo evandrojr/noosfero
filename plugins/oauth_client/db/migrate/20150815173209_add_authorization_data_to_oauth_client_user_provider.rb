@@ -12,8 +12,11 @@ class AddAuthorizationDataToOauthClientUserProvider < ActiveRecord::Migration
 
     add_column :oauth_client_plugin_auths, :profile_id, :integer
     OauthClientPlugin::Auth.find_each batch_size: 50 do |auth|
-      auth.profile = User.find(auth.user_id).person
-      auth.save!
+      user = User.find_by_id(auth.user_id)
+      if user.present?
+        auth.profile = user.person
+        auth.save!
+      end
     end
     remove_column :oauth_client_plugin_auths, :user_id
 
