@@ -118,7 +118,11 @@ require 'grape'
 
       def present_articles(asset, method = 'articles')
         articles = find_articles(asset, method)
-        articles = paginate articles
+        present_articles_paginated(articles)
+      end
+
+      def present_articles_paginated(articles, per_page=nil)
+        articles = paginate(articles)
         present articles, :with => Entities::Article, :fields => params[:fields]
       end
 
