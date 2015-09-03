@@ -67,7 +67,6 @@ class SearchTest < ActiveSupport::TestCase
     get "/api/v1/search/article?query=Article&limit=3"
     json = JSON.parse(last_response.body)
 
-
     assert_equal 3, json['results'].size
   end
 
@@ -80,8 +79,20 @@ class SearchTest < ActiveSupport::TestCase
     get "/api/v1/search/article?query=Article&limit=3&page=2"
     json = JSON.parse(last_response.body)
 
-
     assert_equal 2, json['results'].size
   end
 
+  should 'search articles in profile' do
+  	person1 = fast_create(Person)
+  	person2 = fast_create(Person)
+
+  	art1 = create_article_with_optional_category("Article 1 for profile #{person1.id}", person1)
+  	art2 = create_article_with_optional_category("Article for profile #{person2.id}", person2)
+  	art3 = create_article_with_optional_category("Article 2 for profile #{person1.id}", person1)
+
+    get "/api/v1/search/article?query=Article&profile_id=#{person1.id}"
+    json = JSON.parse(last_response.body)
+    # Only for person1
+    assert_equal 2, json['results'].size
+  end
 end

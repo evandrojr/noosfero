@@ -11,11 +11,14 @@ module Noosfero
               # APIHelpers
               asset = :articles
               context = environment
-              scope = environment.articles.public
+              profile = environment.profiles.find(params[:profile_id]) if params[:profile_id]
+
+              scope = profile.articles.public || scope = environment.articles.public
 
               scope = scope.where(:type => params[:type]) if params[:type] && !(params[:type] == 'Article')
               
               category = params[:category] || ""
+
               query = params[:query] || ""             
               order = "more_recent"
 
