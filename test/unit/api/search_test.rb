@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/test_helper'
 class SearchTest < ActiveSupport::TestCase
 
   def create_article_with_optional_category(name, profile, category = nil)
-    fast_create(Article, {:name => name, :profile_id => profile.id }, :search => true, :category => category)
+    fast_create(Article, {:name => name, :profile_id => profile.id }, :search => true, :category => category, :title => name)
   end
 
   should 'not list unpublished articles' do
@@ -64,7 +64,7 @@ class SearchTest < ActiveSupport::TestCase
       art = create_article_with_optional_category("Article #{n}", person)
     end
 
-    get "/api/v1/search/article?query=Article&limit=3"
+    get "/api/v1/search/article?query=Article&per_page=3"
     json = JSON.parse(last_response.body)
 
     assert_equal 3, json['articles'].count
@@ -76,7 +76,7 @@ class SearchTest < ActiveSupport::TestCase
       art = create_article_with_optional_category("Article #{n}", person)
     end
 
-    get "/api/v1/search/article?query=Article&limit=3&page=2"
+    get "/api/v1/search/article?query=Article&per_page=3&page=2"
     json = JSON.parse(last_response.body)
 
     assert_equal 2, json['articles'].count
@@ -94,5 +94,14 @@ class SearchTest < ActiveSupport::TestCase
     json = JSON.parse(last_response.body)
     # Only for person1
     assert_equal 2, json['articles'].count
+  end
+
+  should 'search with fields' do
+	person = fast_create(Person)
+  	art = create_article_with_optional_category('an article to be found', person)
+    get "/api/v1/search/article?fields=title"
+    json = JSON.parse(last_response.body)
+    assert_not_empty json['articles']
+	assert_equal ['title'], json['articles'].first.keys
   end
 end

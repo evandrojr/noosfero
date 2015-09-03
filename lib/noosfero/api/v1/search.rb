@@ -5,6 +5,7 @@ module Noosfero
 
         resource :search do
           resource :article do
+            paginate per_page: 20, max_per_page: 200
             get do
               # Security checks
               sanitize_params_hash(params) 
@@ -25,9 +26,13 @@ module Noosfero
 
               options = {:filter => order, :template_id => params[:template_id], :category => category}            
 
-              articles = find_by_contents(asset, context, scope, query, paginate_options, options)
+              search_result = find_by_contents(asset, context, scope, query, paginate_options, options)
 
-              present articles[:results], :with => Entities::Article 
+              articles = search_result[:results]
+
+              result = present_articles_paginated(articles)
+              
+              result
             end            
           end
         end
