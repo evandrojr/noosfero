@@ -142,6 +142,7 @@ module Noosfero
             {:vote => vote.save}
           end
 
+          paginate per_page: MAX_PER_PAGE, max_per_page: MAX_PER_PAGE
           desc 'Return the children of a article identified by id' do
             detail 'Get all children articles of a specific article'
             params Noosfero::API::Entities::Article.documentation
