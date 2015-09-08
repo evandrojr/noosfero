@@ -56,8 +56,6 @@ module Noosfero
         expose :created_at, :format_with => :timestamp
         expose :image, :using => Image
         expose :region, :using => Region
-        expose :city, :using => Region
-        expose :state, :using => Region
       end
 
       class UserBasic < Entity
