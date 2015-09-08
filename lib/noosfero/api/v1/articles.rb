@@ -142,13 +142,13 @@ module Noosfero
             {:vote => vote.save}
           end
 
-          paginate per_page: MAX_PER_PAGE, max_per_page: MAX_PER_PAGE
           desc 'Return the children of a article identified by id' do
             detail 'Get all children articles of a specific article'
             params Noosfero::API::Entities::Article.documentation
             failure [[403, 'Forbidden']]
             named 'ArticleChildren'
           end
+          paginate per_page: MAX_PER_PAGE, max_per_page: MAX_PER_PAGE
           get ':id/children' do
             article = find_article(environment.articles, params[:id])
 
@@ -164,7 +164,7 @@ module Noosfero
             end
 
             Article.hit(articles)
-            present articles, :with => Entities::Article, :fields => params[:fields]
+            present_articles_paginated(articles)
           end
 
           desc 'Return one child of a article identified by id' do
