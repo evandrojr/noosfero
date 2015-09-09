@@ -100,6 +100,18 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equal true, json['success']
   end
 
+  should 'return the followers count of an article' do
+    article = fast_create(Article, :profile_id => @person.id, :name => "Some thing")
+
+    article.person_followers << @person
+
+    get "/api/v1/articles/#{article.id}"
+    json = JSON.parse(last_response.body)
+
+    assert_equal 200, last_response.status
+    assert_equal 1, json['article']['followers_count']
+  end
+
   should 'return the followers of a article identified by id' do
     article = fast_create(Article, :profile_id => @person.id, :name => "Some thing")
 
