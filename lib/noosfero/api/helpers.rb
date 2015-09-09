@@ -224,7 +224,7 @@ require 'grape'
 
         objects = object.send(method)
         objects = by_reference(objects, params)
-        objects = objects.where(conditions).limit(limit).order(order)
+        objects = objects.where(conditions).limit(limit).reorder(order)
 
         objects
       end
