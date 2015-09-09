@@ -98,6 +98,7 @@ module Noosfero
         expose :tag_list
         expose :children_count
         expose :followers_count
+        expose :slug, :documentation => {:type => "String", :desc => "Trimmed and parsed name of a article"}
       end
 
       class Article < ArticleBase
@@ -106,7 +107,6 @@ module Noosfero
         expose :children, using: ArticleBase do |article, options|
           article.children.limit(Noosfero::API::V1::Articles::MAX_PER_PAGE)
         end
-        expose :slug, :documentation => {:type => "String", :desc => "Trimmed and parsed name of a article"}
       end
 
       class Comment < Entity
