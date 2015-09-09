@@ -97,6 +97,7 @@ module Noosfero
         expose :end_date, :documentation => {type: 'DateTime', desc: 'The date of finish of the article'}
         expose :tag_list
         expose :children_count
+        expose :followers_count
       end
 
       class Article < ArticleBase
