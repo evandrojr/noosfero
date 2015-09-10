@@ -2202,6 +2202,23 @@ class ArticleTest < ActiveSupport::TestCase
     article.destroy
   end
 
+  should "increment followers count when a person follow an article" do
+    a = fast_create(Article)
+    p = fast_create(Person)
+    assert_difference "a.reload.followers_count" do
+      a.person_followers << p
+    end
+  end
+
+  should "decrement followers count when a person unfollow an article" do
+    p = fast_create(Person)
+    a = fast_create(Article, :profile_id => p)
+    a.person_followers << p
+    assert_difference "a.reload.followers_count", -1 do
+      a.person_followers.destroy_all
+    end
+  end
+
   should 'have can_display_media_panel with default false' do
     a = Article.new
     assert !a.can_display_media_panel?
