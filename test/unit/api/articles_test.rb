@@ -149,6 +149,52 @@ class ArticlesTest < ActiveSupport::TestCase
     end
   end
 
+  should "update body of article created by me" do
+    new_value = "Another body"
+    params[:article] = {:body => new_value} 
+    article = fast_create(Article, :profile_id => person.id)
+    post "/api/v1/articles/#{article.id}?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal new_value, json["article"]["body"]
+  end
+
+  should "update title of article created by me" do
+    new_value = "Another name"
+    params[:article] = {:name => new_value} 
+    article = fast_create(Article, :profile_id => person.id)
+    post "/api/v1/articles/#{article.id}?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal new_value, json["article"]["title"]
+  end
+
+  should 'not update article of another user' do
+    another_person = fast_create(Person, :environment_id => environment.id)
+    article = fast_create(Article, :profile_id => another_person.id)
+    params[:article] = {:title => 'Some title'} 
+    post "/api/v1/articles/#{article.id}?#{params.to_query}"
+    assert_equal 403, last_response.status
+  end
+
+  should 'not update article without permission in community' do
+    community = fast_create(Community, :environment_id => environment.id)
+    article = fast_create(Article, :profile_id => community.id)
+    params[:article] = {:name => 'New title'} 
+    post "/api/v1/articles/#{article.id}?#{params.to_query}"
+    assert_equal 403, last_response.status
+  end
+
+
+  should 'update article of community if user has permission' do
+    community = fast_create(Community, :environment_id => environment.id)
+    give_permission(person, 'post_content', community)
+    article = fast_create(Article, :profile_id => community.id)
+    new_value = "Another body"
+    params[:article] = {:body => new_value} 
+    post "/api/v1/articles/#{article.id}?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal new_value, json["article"]["body"]
+  end
+
   #############################
   #     Profile Articles      #
   #############################

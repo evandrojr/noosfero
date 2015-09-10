@@ -5,7 +5,7 @@ require 'grape'
     module API
       module APIHelpers
       PRIVATE_TOKEN_PARAM = :private_token
-      DEFAULT_ALLOWED_PARAMETERS = [:parent_id, :from, :until, :content_type]
+      DEFAULT_ALLOWED_PARAMETERS = [:parent_id, :from, :until, :content_type, :author_id]
 
       include SanitizeParams
       include Noosfero::Plugin::HotSpot
@@ -224,7 +224,7 @@ require 'grape'
 
         objects = object.send(method)
         objects = by_reference(objects, params)
-        objects = objects.where(conditions).limit(limit).order(order)
+        objects = objects.where(conditions).limit(limit).reorder(order)
 
         objects
       end
