@@ -55,7 +55,7 @@ require 'grape'
       end
       def multiple_search?(searches=nil)
         ['index', 'category_index'].include?(params[:action]) || (searches && searches.size > 1)
-      end      
+      end
       ####################################################################
 
       def logger
@@ -299,8 +299,10 @@ require 'grape'
       end
 
       def render_api_errors!(messages)
+        messages = messages.to_a if messages.class == ActiveModel::Errors
         render_api_error!(messages.join(','), 400)
       end
+
       protected
 
       def set_session_cookie
