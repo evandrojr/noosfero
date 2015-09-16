@@ -2,8 +2,8 @@ require File.dirname(__FILE__) + '/test_helper'
 
 class SearchTest < ActiveSupport::TestCase
 
-  def create_article_with_optional_category(name, profile, category = nil)
-    fast_create(Article, {:name => name, :profile_id => profile.id }, :search => true, :category => category, :title => name)
+  def create_article_with_optional_category(name, profile, category = nil, parent = nil)
+    fast_create(Article, {:name => name, :profile_id => profile.id }, :search => true, :category => category, :title => name, :parent => parent)
   end
 
   should 'not list unpublished articles' do
@@ -97,11 +97,24 @@ class SearchTest < ActiveSupport::TestCase
   end
 
   should 'search with fields' do
-	person = fast_create(Person)
+	  person = fast_create(Person)
   	art = create_article_with_optional_category('an article to be found', person)
     get "/api/v1/search/article?fields=title"
     json = JSON.parse(last_response.body)
     assert_not_empty json['articles']
 	assert_equal ['title'], json['articles'].first.keys
   end
+
+  should 'search with parent' do
+    person = fast_create(Person)
+    parent = fast_create(Folder, :profile_id => person.id, :name => "parent", :published => true)
+    art = fast_create(Article, :profile_id => person.id, :name => "child", :parent_id => parent.id)
+    art2 = fast_create(Article, :profile_id => person.id, :name => "child2")
+    get "/api/v1/search/article?parent_id=#{parent.id}"
+    json = JSON.parse(last_response.body)
+    assert_not_empty json['articles']
+    assert_equal art.id, json['articles'].first["id"]
+    assert_equal 1, json['articles'].count
+  end  
+
 end
