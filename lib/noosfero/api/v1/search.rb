@@ -18,6 +18,8 @@ module Noosfero
               scope = profile.nil? ? environment.articles.public : profile.articles.public
 
               scope = scope.where(:type => params[:type]) if params[:type] && !(params[:type] == 'Article')
+
+              scope = scope.where(:parent_id => params[:parent]) if params[:parent].present?
               
               category = params[:category] || ""
 
