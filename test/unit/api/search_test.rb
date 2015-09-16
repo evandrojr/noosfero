@@ -110,7 +110,7 @@ class SearchTest < ActiveSupport::TestCase
     parent = fast_create(Folder, :profile_id => person.id, :name => "parent", :published => true)
     art = fast_create(Article, :profile_id => person.id, :name => "child", :parent_id => parent.id)
     art2 = fast_create(Article, :profile_id => person.id, :name => "child2")
-    get "/api/v1/search/article?parent=#{parent.id}"
+    get "/api/v1/search/article?parent_id=#{parent.id}"
     json = JSON.parse(last_response.body)
     assert_not_empty json['articles']
     assert_equal art.id, json['articles'].first["id"]

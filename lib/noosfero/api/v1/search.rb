@@ -19,7 +19,7 @@ module Noosfero
 
               scope = scope.where(:type => params[:type]) if params[:type] && !(params[:type] == 'Article')
 
-              scope = scope.where(:parent_id => params[:parent]) if params[:parent].present?
+              scope = scope.where(:parent_id => params[:parent_id]) if params[:parent_id].present?
               
               category = params[:category] || ""
 
