@@ -11,11 +11,13 @@
   </colgroup>
   <tr>
     <th><%= _('Member') %></th>
+    <th><%= _('Email') %></th>
     <th><%= _('Actions') %></th>
   </tr>
   <% @collection.each do |p| %>
     <tr title="<%= p.name %>">
       <td><%= link_to_profile p.short_name, p.identifier, :title => p.name %> </td>
+      <td><%= link_to_profile p.email, p.identifier, :title => p.email %> </td>
       <td class='actions'>
         <div class="members-buttons-cell">
           <% if p.is_admin? %>
