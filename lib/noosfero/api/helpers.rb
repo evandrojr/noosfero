@@ -21,6 +21,17 @@ require 'grape'
         plugins
       end
 
+      def current_tmp_user
+        private_token = (params[PRIVATE_TOKEN_PARAM] || headers['Private-Token']).to_s
+        @current_tmp_user ||= User.find_by_private_token(private_token)
+        @current_tmp_user = nil if !@current_tmp_user.nil? && @current_tmp_user.private_token_expired?
+        @current_tmp_user
+      end
+
+      def logout_tmp_user
+        @current_tmp_user = nil
+      end      
+
       def current_user
         private_token = (params[PRIVATE_TOKEN_PARAM] || headers['Private-Token']).to_s
         @current_user ||= User.find_by_private_token(private_token)
@@ -307,6 +318,8 @@ require 'grape'
 
       def set_session_cookie
         cookies['_noosfero_api_session'] = { value: @current_user.private_token, httponly: true } if @current_user.present?
+        # Set also the private_token for the current_tmp_user
+        cookies['_noosfero_api_session'] = { value: @current_tmp_user.private_token, httponly: true } if @current_tmp_user.present?
       end
 
       def setup_multitenancy

@@ -4,6 +4,26 @@ module Noosfero
   module API
     class Session < Grape::API
 
+      ################################
+      # => Login with captcha only
+      # This method will attempt to login the user using only the captcha.
+      # To do this, we generate a temporary in-memory user and generate a private
+      # token to it.
+      ################################
+      post "/login-captcha" do
+        remote_ip = (request.respond_to?(:remote_ip) && request.remote_ip) || (env && env['REMOTE_ADDR'])
+        # test_captcha will render_api_error! and exit in case of any problem
+        # this return is just to improve the clarity of the execution path
+        return unless test_captcha(remote_ip, params, environment)
+
+        name = "tmp_user_#{remote_ip}"
+        user = User.new(:name => name)
+        user.generate_private_token!
+
+        @current_tmp_user = user
+        {:private_token => user.private_token}
+      end
+
       # Login to get token
       #
       # Parameters:
