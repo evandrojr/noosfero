@@ -24,6 +24,7 @@ class Environment < ActiveRecord::Base
 
   has_many :tasks, :dependent => :destroy, :as => 'target'
   has_many :search_terms, :as => :context
+  has_many :custom_fields, :dependent => :destroy
   has_many :email_templates, :foreign_key => :owner_id
 
   IDENTIFY_SCRIPTS = /(php[0-9s]?|[sp]htm[l]?|pl|py|cgi|rb)/
@@ -500,8 +501,7 @@ class Environment < ActiveRecord::Base
   end
 
   def custom_person_fields
-    self.settings[:custom_person_fields] = {} if self.settings[:custom_person_fields].nil?
-    self.settings[:custom_person_fields]
+    self.settings[:custom_person_fields].nil? ? {} : self.settings[:custom_person_fields]
   end
 
   def custom_person_fields=(values)
