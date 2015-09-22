@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150812133432) do
+ActiveRecord::Schema.define(:version => 20150918005035) do
 
   create_table "abuse_reports", :force => true do |t|
     t.integer  "reporter_id"
@@ -110,6 +110,7 @@ ActiveRecord::Schema.define(:version => 20150812133432) do
     t.integer  "spam_comments_count",  :default => 0
     t.integer  "author_id"
     t.integer  "created_by_id"
+    t.integer  "followers_count"
   end
 
   add_index "article_versions", ["article_id"], :name => "index_article_versions_on_article_id"
@@ -165,6 +166,7 @@ ActiveRecord::Schema.define(:version => 20150812133432) do
     t.boolean  "show_to_followers",    :default => true
     t.integer  "sash_id"
     t.integer  "level",                :default => 0
+    t.integer  "followers_count",      :default => 0
   end
 
   add_index "articles", ["comments_count"], :name => "index_articles_on_comments_count"
@@ -422,6 +424,7 @@ ActiveRecord::Schema.define(:version => 20150812133432) do
     t.string   "owner_type"
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
+    t.string   "title"
   end
 
   create_table "images", :force => true do |t|
@@ -693,6 +696,20 @@ ActiveRecord::Schema.define(:version => 20150812133432) do
 
   add_index "proposals_discussion_plugin_proposal_evaluations", ["evaluator_id"], :name => "index_proposals_discussion_plugin_proposal_evaluator_id"
   add_index "proposals_discussion_plugin_proposal_evaluations", ["proposal_task_id"], :name => "index_proposals_discussion_plugin_proposal_task_id"
+
+  create_table "proposals_discussion_plugin_ranking_items", :force => true do |t|
+    t.integer  "position"
+    t.string   "abstract"
+    t.integer  "votes_for"
+    t.integer  "votes_against"
+    t.integer  "hits"
+    t.decimal  "effective_support"
+    t.integer  "proposal_id"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
+  end
+
+  add_index "proposals_discussion_plugin_ranking_items", ["proposal_id"], :name => "index_proposals_discussion_plugin_ranking_proposal_id"
 
   create_table "proposals_discussion_plugin_task_categories", :id => false, :force => true do |t|
     t.integer "task_id"

@@ -10,7 +10,7 @@ class SessionTest < ActiveSupport::TestCase
     params = {:login => "testapi", :password => "testapi"}
     post "/api/v1/login?#{params.to_query}"
     json = JSON.parse(last_response.body)
-    assert !json["private_token"].blank?
+    assert !json['user']["private_token"].blank?
   end
 
   should 'return 401 when login fails' do
@@ -27,8 +27,8 @@ class SessionTest < ActiveSupport::TestCase
     assert_equal 201, last_response.status
     json = JSON.parse(last_response.body)
     assert User['newuserapi'].activated?
-    assert json['activated']
-    assert json['private_token'].present?
+    assert json['user']['activated']
+    assert json['user']['private_token'].present?
   end
 
   should 'register a user with name' do
@@ -37,8 +37,8 @@ class SessionTest < ActiveSupport::TestCase
     post "/api/v1/register?#{params.to_query}"
     assert_equal 201, last_response.status
     json = JSON.parse(last_response.body)
-    assert json['activated']
-    assert json['private_token'].present?
+    assert json['user']['activated']
+    assert json['user']['private_token'].present?
   end
 
   should 'register an inactive user' do
@@ -180,7 +180,7 @@ class SessionTest < ActiveSupport::TestCase
     assert_equal Task::Status::FINISHED, task.reload.status
     assert user.reload.authenticated?('secret')
     json = JSON.parse(last_response.body)
-    assert_equal user.id, json['id']
+    assert_equal user.id, json['user']['id']
   end
 
   should 'do not change user password when password confirmation is wrong' do

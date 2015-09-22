@@ -54,6 +54,7 @@ module Noosfero
       class Profile < Entity
         expose :identifier, :name, :id
         expose :created_at, :format_with => :timestamp
+        expose :updated_at, :format_with => :timestamp
         expose :image, :using => Image
         expose :region, :using => Region
       end
@@ -75,6 +76,8 @@ module Noosfero
       class Community < Profile
         root 'communities', 'community'
         expose :description
+        expose :categories
+        expose :members, :using => Person
       end
 
       class ArticleBase < Entity
@@ -83,12 +86,13 @@ module Noosfero
         expose :body
         expose :abstract, documentation: {type: 'String', desc: 'Teaser of the body'}
         expose :created_at, :format_with => :timestamp
+        expose :updated_at, :format_with => :timestamp
         expose :title, :documentation => {:type => "String", :desc => "Title of the article"}
         expose :created_by, :as => :author, :using => Profile, :documentation => {type: 'Profile', desc: 'The profile author that create the article'}
         expose :profile, :using => Profile, :documentation => {type: 'Profile', desc: 'The profile associated with the article'}
         expose :categories, :using => Category
         expose :image, :using => Image
-        #TODO Apply vote stuff in core and make this test
+       #TODO Apply vote stuff in core and make this test
         expose :votes_for
         expose :votes_against
         expose :setting
@@ -100,10 +104,10 @@ module Noosfero
         expose :children_count
         expose :followers_count
         expose :slug, :documentation => {:type => "String", :desc => "Trimmed and parsed name of a article"}
+        expose :path
       end
 
       class Article < ArticleBase
-        root 'articles', 'article'
         expose :parent, :using => ArticleBase
         expose :children, using: ArticleBase do |article, options|
           article.children.limit(Noosfero::API::V1::Articles::MAX_PER_PAGE)
