@@ -23,8 +23,7 @@ require 'grape'
 
       def current_tmp_user
         private_token = (params[PRIVATE_TOKEN_PARAM] || headers['Private-Token']).to_s
-        @current_tmp_user ||= User.find_by_private_token(private_token)
-        @current_tmp_user = nil if !@current_tmp_user.nil? && @current_tmp_user.private_token_expired?
+        @current_tmp_user = Noosfero::API::CaptchaSessionStore.get(private_token)
         @current_tmp_user
       end
 
@@ -242,6 +241,13 @@ require 'grape'
 
       def authenticate!
         unauthorized! unless current_user
+      end
+
+      # Allows the anonymous captcha user authentication 
+      # to pass the check. Used by the articles/vote to allow
+      # the vote without login
+      def authenticate_allow_captcha!
+        unauthorized! unless current_tmp_user || current_user
       end
 
       # Checks the occurrences of uniqueness of attributes, each attribute must be present in the params hash

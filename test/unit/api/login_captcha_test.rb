@@ -2,50 +2,72 @@ require File.dirname(__FILE__) + '/test_helper'
 
 class LoginCaptchaTest < ActiveSupport::TestCase
 
-  url = "/api/v1/login-captcha?"
-
   def setup()
-	environment = Environment.default
-    environment.api_captcha_settings = {
+    @environment = Environment.default
+    @environment.api_captcha_settings = {
         enabled: true,
         provider: 'serpro',
         serpro_client_id:  '0000000000000000',
         verify_uri:  'http://captcha.serpro.gov.br/validate',
     }
-    environment.save!
-  	
+    @environment.save!
+  	@url = "/api/v1/login-captcha?"
+  end
+
+  def create_article(name)
+    person = fast_create(Person, :environment_id => @environment.id)
+    fast_create(Article, :profile_id => person.id, :name => name)    
+  end
+
+  should 'not perform a vote without authentication' do
+    article = create_article('Article 1')
+    params = {}
+    params[:value] = 1
+
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal 401, last_response.status
+  end
+
+  should 'perform login from helpers' do
+    login_with_captcha
+    assert_not_nil @private_token
+  end
+
+
+  should 'perform a vote in an article identified by id' do
+    login_with_captcha
+    article = create_article('Article 1')
+    params[:value] = 1
+
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    
+    assert_not_equal 401, last_response.status
+    assert_equal true, json['vote']
+  end
+
+  should 'not follow any article' do
+    login_with_captcha
+    article = create_article('Article 1')
+    post "/api/v1/articles/#{article.id}/follow?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+
+    assert_equal 401, last_response.status
   end
 
   should 'not generate private token when login without captcha' do
     params = {}
-    post "#{url}#{params.to_query}"
+    post "#{@url}#{params.to_query}"
     json = JSON.parse(last_response.body)
-    puts "JSon1: #{json}"
     assert json["private_token"].blank?
   end
 
   should 'generate private token when login with captcha' do
-  	#request = mock()
-	stub_request(:post, "http://captcha.serpro.gov.br/validate").
-  		with(:body => "0000000000000000&4324343&4030320",
-       		:headers => {'Accept'=>'*/*', 'User-Agent'=>'Ruby'}).
-  				to_return(:status => 200, :body => "1", :headers => {})
-  	
-    # Mock the user to check the private_token
-    token = "private_token@1234"
-    user = mock
-    User.expects(:new).returns(user)
-    user.expects(:generate_private_token!).returns(token)
-    # To store the user session helpers.rb call the private_token method
-    user.expects(:private_token).times(2).returns(token)
-
-    params = {:txtToken_captcha_serpro_gov_br => '4324343', :captcha_text => '4030320'}  	
-    post "#{url}#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    puts "JSon2: #{json}"
-    assert !json["private_token"].blank?
+    json = login_with_captcha
     ret = json["private_token"]
-    assert ret == token
+    assert !ret.blank?
+    assert ret == @private_token
   end
 
 end
