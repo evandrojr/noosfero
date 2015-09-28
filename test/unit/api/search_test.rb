@@ -113,10 +113,26 @@ class SearchTest < ActiveSupport::TestCase
     article = fast_create(Article, :profile_id => person.id)
     category = fast_create(Category)
     article.categories<< category
-    get "/api/v1/search/article?category=#{category.id}"
+    get "/api/v1/search/article?category_ids=#{category.id}"
     json = JSON.parse(last_response.body)
     assert_equal 1, json['articles'].count
     assert_equal article.id, json['articles'].first["id"]
+  end  
+
+  should 'search filter by more than one category' do
+    Article.delete_all
+    fast_create(Article, :profile_id => person.id)
+    article1 = fast_create(Article, :profile_id => person.id)
+    article2 = fast_create(Article, :profile_id => person.id)
+    category1 = fast_create(Category)
+    category2 = fast_create(Category)
+    article1.categories<< category1
+    article2.categories<< category2
+    get "/api/v1/search/article?category_ids[]=#{category1.id}&category_ids[]=#{category2.id}"
+    json = JSON.parse(last_response.body)
+    assert_equal 2, json['articles'].count
+    assert_equal article1.id, json['articles'].first["id"]
+    assert_equal article2.id, json['articles'].last["id"]
   end  
 
 end
