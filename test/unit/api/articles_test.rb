@@ -546,7 +546,7 @@ class ArticlesTest < ActiveSupport::TestCase
     e2.categories << c2
     e1.save!
     e2.save!
-    params['categories_ids[]']=c1.id
+    params['category_ids[]']=c1.id
     params['content_type']='Event'
     get "api/v1/communities/#{co.id}/articles?#{params.to_query}"
     json = JSON.parse(last_response.body)
