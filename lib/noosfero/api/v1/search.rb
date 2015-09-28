@@ -21,7 +21,7 @@ module Noosfero
 
               scope = scope.where(:parent_id => params[:parent_id]) if params[:parent_id].present?
               
-              category = params[:category] || ""
+              category = environment.categories.find(params[:category]) unless params[:category].nil?
 
               query = params[:query] || ""             
               order = "more_recent"

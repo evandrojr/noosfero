@@ -555,6 +555,23 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equal e1.id, json['articles'][0]['id']
   end
 
+  should 'not list uncategorized event of a community if a category is given' do
+    co = Community.create(identifier: 'my-community', name: 'name-my-community')
+    c1 = Category.create(environment: Environment.default, name: 'my-category')
+    c2 = Category.create(environment: Environment.default, name: 'dont-show-me-this-category')
+    e1 = fast_create(Event, :profile_id => co.id)
+    e2 = fast_create(Event, :profile_id => co.id)
+    e3 = fast_create(Event, :profile_id => co.id)
+    e1.categories << c1
+    e2.categories << c2
+    params['category_ids[]']=c1.id
+    params['content_type']='Event'
+    get "api/v1/communities/#{co.id}/articles?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal 1, json['articles'].count
+    assert_equal e1.id, json['articles'][0]['id']
+  end
+
   should 'list events of a community in a given 2 categories' do
     co = Community.create(identifier: 'my-community', name: 'name-my-community')
     c1 = Category.create(environment: Environment.default, name: 'my-category')
