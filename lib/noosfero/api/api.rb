@@ -52,6 +52,7 @@ module Noosfero
       mount V1::Tags
       mount V1::Environments
       mount V1::Search
+      mount V1::Contacts
 
       mount Session
 
