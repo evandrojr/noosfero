@@ -143,9 +143,6 @@ require 'grape'
         else
           articles = articles.published
         end
-        if params[:categories_ids]
-          articles = articles.joins(:categories).where('category_id in (?)', params[:categories_ids])
-        end
         articles
       end
 
@@ -248,6 +245,15 @@ require 'grape'
          end
       end
 
+      def by_categories(scope, params)
+        category_ids = params[:category_ids]
+        if category_ids.nil?
+          scope
+        else
+          scope.joins(:categories).where(:categories => {:id => category_ids})
+        end
+      end
+
       def select_filtered_collection_of(object, method, params)
         conditions = make_conditions_with_parameter(params)
         order = make_order_with_parameters(object,method,params)
@@ -257,6 +263,7 @@ require 'grape'
 
         objects = object.send(method)
         objects = by_reference(objects, params)
+        objects = by_categories(objects, params)
 
         objects = objects.where(conditions).where(timestamp).page(page_number).per_page(per_page).reorder(order)
 

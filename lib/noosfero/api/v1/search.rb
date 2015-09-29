@@ -20,13 +20,13 @@ module Noosfero
               scope = scope.where(:type => params[:type]) if params[:type] && !(params[:type] == 'Article')
 
               scope = scope.where(:parent_id => params[:parent_id]) if params[:parent_id].present?
-              
-              category = params[:category] || ""
 
+              scope = scope.joins(:categories).where(:categories => {:id => params[:category_ids]}) if params[:category_ids].present?
+              
               query = params[:query] || ""             
               order = "more_recent"
 
-              options = {:filter => order, :template_id => params[:template_id], :category => category}            
+              options = {:filter => order, :template_id => params[:template_id]}
 
               search_result = find_by_contents(asset, context, scope, query, paginate_options, options)
 
