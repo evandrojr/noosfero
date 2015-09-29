@@ -139,8 +139,21 @@ module Noosfero
             # FIXME verify allowed values
             render_api_error!('Vote value not allowed', 400) unless [-1, 1].include?(value)
             article = find_article(environment.articles, params[:id])
-            vote = Vote.new(:voteable => article, :voter => current_person, :vote => value)
-            {:vote => vote.save}
+            ## If login with captcha
+            if @current_tmp_user
+              vote = (@current_tmp_user.data.include? article.id) ? false : true
+              if vote
+                @current_tmp_user.data << article.id
+                @current_tmp_user.store
+                vote = Vote.new(:voteable => article, :voter => current_person, :vote => value)
+                {:vote => vote.save}
+              else
+                {:vote => false}
+              end
+            else
+              vote = Vote.new(:voteable => article, :voter => current_person, :vote => value)
+              {:vote => vote.save}
+            end
           end
 
           desc 'Return the children of a article identified by id' do
