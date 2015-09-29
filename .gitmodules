@@ -34,3 +34,6 @@
 [submodule "rest-clients/proposal-app"]
 	path = rest-clients/proposal-app
 	url = https://gitlab.com/participa/proposal-app.git
+[submodule "plugins/serpro_captcha"]
+	path = plugins/serpro_captcha
+	url = git@gitlab.com:noosfero-plugins/serpro_captcha.git
