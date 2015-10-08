@@ -2,6 +2,8 @@
 
 set -e
 
+TIMEOUT=60
+
 if [ -e /etc/default/noosfero ]; then
   . /etc/default/noosfero
 fi
@@ -40,8 +42,10 @@ app_server_stop() {
 app_server_restart() {
   # see unicorn_rails(1) and "Signal handling" in unicorn documentation
   kill -s USR2 $(cat tmp/pids/unicorn.pid)
-  while [ ! -f tmp/pids/unicorn.pid.oldbin ]
+  count=0
+  while [ ! -f tmp/pids/unicorn.pid.oldbin || $count > $TIMEOUT ]
     do
+      echo "Waitting for $count"
       sleep 1
     done
   kill -s QUIT $(cat tmp/pids/unicorn.pid.oldbin)
