@@ -34,7 +34,6 @@ require 'grape'
       def current_user
         private_token = (params[PRIVATE_TOKEN_PARAM] || headers['Private-Token']).to_s
         @current_user ||= User.find_by_private_token(private_token)
-        @current_user = nil if !@current_user.nil? && @current_user.private_token_expired?
         @current_user
       end
 
