@@ -40,7 +40,10 @@ app_server_stop() {
 app_server_restart() {
   # see unicorn_rails(1) and "Signal handling" in unicorn documentation
   kill -s USR2 $(cat tmp/pids/unicorn.pid)
-  sleep 5
+  while [ ! -f tmp/pids/unicorn.pid.oldbin ]
+    do
+      sleep 1
+    done
   kill -s QUIT $(cat tmp/pids/unicorn.pid.oldbin)
 }
 
