@@ -216,6 +216,10 @@ class Noosfero::Plugin
     self.class.extra_blocks.keys.include?(block)
   end
 
+  def has_block?(block)
+    self.class.extra_blocks.keys.include?(block)
+  end
+
   def expanded_template(file_path, locals = {})
     views_path = Rails.root.join('plugins', "#{self.class.public_name}", 'views')
     ERB.new(File.read("#{views_path}/#{file_path}")).result(binding)

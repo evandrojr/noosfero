@@ -35,6 +35,8 @@
 *= require jquery.typewatch.js
 *= require require_login.js
 *= require email_templates.js
+*= require slick.js
+*= require block-store.js
 */
 
 // lodash configuration

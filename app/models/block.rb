@@ -151,7 +151,7 @@ class Block < ActiveRecord::Base
 
   def self.icon_path
     basename = self.name.split('::').last.underscore
-    File.join('blocks', basename, 'icon.png')
+    File.join('images', 'blocks', basename, 'icon.png')
   end
 
   def self.pretty_name
@@ -159,7 +159,7 @@ class Block < ActiveRecord::Base
   end
 
   def self.default_icon_path
-    'icon_block.png'
+    '/images/icon_block.png'
   end
 
   def self.preview_path
@@ -168,7 +168,7 @@ class Block < ActiveRecord::Base
   end
 
   def self.default_preview_path
-    "block_preview.png"
+    "/images/block_preview.png"
   end
 
   # Returns the content to be used for this block.

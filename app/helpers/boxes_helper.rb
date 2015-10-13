@@ -190,7 +190,7 @@ module BoxesHelper
       else
         "before-block-#{block.id}"
       end
-    if block.nil? || movable?(block)
+    if block.nil? or movable?(block)
       url = url_for(:action => 'move_block', :target => id)
       content_tag('div', _('Drop Here'), :id => id, :class => 'block-target' ) + drop_receiving_element(id, :accept => box.acceptable_blocks, :hoverclass => 'block-target-hover', :activeClass => 'block-target-active', :tolerance => 'pointer', :onDrop => "function(ev, ui) { dropBlock('#{url}', '#{_('loading...')}', ev, ui);}")
     else
