@@ -7,9 +7,6 @@
 [submodule "plugins/gamification"]
 	path = plugins/gamification
 	url = https://gitlab.com/noosfero-plugins/gamification.git
-[submodule "plugins/comment_paragraph"]
-	path = plugins/comment_paragraph
-	url = https://gitlab.com/noosfero-plugins/comment-paragraph.git
 [submodule "plugins/notification"]
 	path = plugins/notification
 	url = https://gitlab.com/noosfero-plugins/notification.git

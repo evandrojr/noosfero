@@ -13,6 +13,7 @@
 @import 'buttons';
 @import 'notice';
 @import 'loading';
+@import 'loading-overlay';
 @import 'table';
 @import 'clear';
 @import 'pagination';
@@ -78,3 +79,4 @@
 @import 'api-playground';
 
 // Also avoid generic and prefer class over id selectors
+@import 'block-store';
