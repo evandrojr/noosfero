@@ -134,8 +134,7 @@ module Noosfero
 
            #FIXME refactor this method
           get 'voted_by_me' do
-            present_articles_paginated(current_person.votes.collect(&:voteable))
-#            present_articles(current_person, 'following_articles')
+            present_articles_paginated(current_person.votes.where(:voteable_type => 'Article').collect(&:voteable))
           end
 
           desc 'Perform a vote on a article by id' do
