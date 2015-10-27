@@ -180,4 +180,16 @@ class PeopleTest < ActiveSupport::TestCase
     assert_equal another_name, person.name
   end
 
+  PERSON_ATTRIBUTES = %w(vote_count comments_count)
+
+  PERSON_ATTRIBUTES.map do |attribute|
+
+    define_method "test_should_expose_#{attribute}_attribute_in_person_enpoints" do
+      get "/api/v1/people/me?#{params.to_query}"
+      json = JSON.parse(last_response.body)
+      assert_not_nil json['person'][attribute]
+    end
+
+  end
+
 end
