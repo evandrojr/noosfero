@@ -47,10 +47,25 @@ class PeopleTest < ActiveSupport::TestCase
     assert_equal some_person.id, json['person']['id']
   end
 
+  should 'people endpoint filter by fields parameter' do
+    get "/api/v1/people?#{params.to_query}&fields=name"
+    json = JSON.parse(last_response.body)
+    expected = {'people' => [{'name' => person.name}]}
+    assert_equal expected, json
+  end
+
+
   should 'get logged person' do
     get "/api/v1/people/me?#{params.to_query}"
     json = JSON.parse(last_response.body)
     assert_equal person.id, json['person']['id']
+  end
+
+  should 'me endpoint filter by fields parameter' do
+    get "/api/v1/people/me?#{params.to_query}&fields=name"
+    json = JSON.parse(last_response.body)
+    expected = {'person' => {'name' => person.name}}
+    assert_equal expected, json
   end
 
   should 'not get invisible person' do

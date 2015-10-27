@@ -52,7 +52,9 @@ module Noosfero
       end
 
       class Profile < Entity
-        expose :identifier, :name, :id
+        expose :id
+        expose :identifier
+        expose :name
         expose :created_at, :format_with => :timestamp
         expose :updated_at, :format_with => :timestamp
         expose :image, :using => Image
