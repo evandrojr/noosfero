@@ -24,7 +24,7 @@
 	url = https://softwarepublico.gov.br/gitlab/noosfero-plugins/juventude.git
 [submodule "plugins/dialoga"]
 	path = plugins/dialoga
-	url = https://softwarepublico.gov.br/gitlab/noosfero-apps/dialoga-plugin.git
+	url = https://softwarepublico.gov.br/gitlab/noosfero-plugins/dialoga-plugin.git
 [submodule "rest-clients/confjuvapp"]
 	path = rest-clients/confjuvapp
 	url = https://softwarepublico.gov.br/gitlab/noosfero-apps/confjuvapp.git
