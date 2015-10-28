@@ -180,12 +180,18 @@ class PeopleTest < ActiveSupport::TestCase
     assert_equal another_name, person.name
   end
 
-  PERSON_ATTRIBUTES = %w(vote_count comments_count)
+  PERSON_ATTRIBUTES = %w(vote_count comments_count following_articles_count articles_count)
 
   PERSON_ATTRIBUTES.map do |attribute|
 
-    define_method "test_should_expose_#{attribute}_attribute_in_person_enpoints" do
+    define_method "test_should_not_expose_#{attribute}_attribute_in_person_enpoint_if_field_parameter_is_not_passed" do
       get "/api/v1/people/me?#{params.to_query}"
+      json = JSON.parse(last_response.body)
+      assert_nil json['person'][attribute]
+    end
+
+    define_method "test_should_expose_#{attribute}_attribute_in_person_enpoints_only_if_field_parameter_is_passed" do
+      get "/api/v1/people/me?#{params.to_query}&fields=#{attribute}"
       json = JSON.parse(last_response.body)
       assert_not_nil json['person'][attribute]
     end
