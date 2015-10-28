@@ -115,9 +115,11 @@ module Noosfero
         expose :end_date, :documentation => {type: 'DateTime', desc: 'The date of finish of the article'}
         expose :tag_list
         expose :children_count
-        expose :followers_count
         expose :slug, :documentation => {:type => "String", :desc => "Trimmed and parsed name of a article"}
         expose :path
+        expose :followers_count
+        expose :votes_count
+        expose :comments_count
       end
 
       class Article < ArticleBase

@@ -607,4 +607,17 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equal json['articles'].count, 2
   end
 
+  ARTICLE_ATTRIBUTES = %w(followers_count votes_count comments_count)
+
+  ARTICLE_ATTRIBUTES.map do |attribute|
+
+    define_method "test_should_expose_#{attribute}_attribute_in_article_enpoints" do
+      article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
+      get "/api/v1/articles/#{article.id}?#{params.to_query}"
+      json = JSON.parse(last_response.body)
+      assert_not_nil json['article'][attribute]
+    end
+
+  end
+
 end
