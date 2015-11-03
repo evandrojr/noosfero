@@ -50,6 +50,7 @@ gem 'api-pagination',           '~> 4.1.1'
 # asset pipeline
 gem 'uglifier', '>= 1.0.3'
 gem 'sass-rails'
+gem 'sass', '~> 3.1.19'
 
 group :production do
   gem 'dalli', '~> 2.7.0'
