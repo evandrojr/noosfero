@@ -1832,6 +1832,17 @@ class PersonTest < ActiveSupport::TestCase
     person = user.person
     person.user.expects(:save!).never
     person.save!
+  end 
+
+  should 'access comments through profile' do
+    p1 = fast_create(Person)
+    p2 = fast_create(Person)
+    article = fast_create(Article)
+    c1 = fast_create(Comment, :source_id => article.id, :author_id => p1.id)
+    c2 = fast_create(Comment, :source_id => article.id, :author_id => p2.id)
+    c3 = fast_create(Comment, :source_id => article.id, :author_id => p1.id)
+
+    assert_equivalent [c1,c3], p1.comments
   end
 
 end
