@@ -35,7 +35,7 @@ module Noosfero
               ]
           end
           get do
-            present_articles(environment)
+            present_articles_for_asset(environment)
           end
 
           desc "Return the articles followed by me"
@@ -274,7 +274,7 @@ module Noosfero
                     present article, :with => Entities::Article, :fields => params[:fields]
                   else
 
-                    present_articles(profile)
+                    present_articles_for_asset(profile)
                   end
                 end
 

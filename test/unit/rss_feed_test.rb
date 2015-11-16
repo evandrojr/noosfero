@@ -255,11 +255,38 @@ class RssFeedTest < ActiveSupport::TestCase
   should 'include only posts from some language' do
     profile = create_user('testuser').person
     blog = create(Blog, :name => 'blog-test', :profile => profile)
-    blog.feed.update_attributes! :language => 'es'
+    blog.feed.update! :language => 'es'
     blog.posts << en_post = fast_create(TextArticle, :name => "English", :profile_id => profile.id, :parent_id => blog.id, :published => true, :language => 'en')
     blog.posts << es_post = fast_create(TextArticle, :name => "Spanish", :profile_id => profile.id, :parent_id => blog.id, :published => true, :language => 'es')
 
     assert_equal [es_post], blog.feed.fetch_articles
   end
 
+  should 'a feed have the same privacy of its parent' do
+    profile = create_user('testuser').person
+    blog = create(Blog, :name => 'blog-test', :profile => profile)
+    feed = blog.feed
+
+    assert blog.published?
+    assert feed.published?
+
+    feed.published = false
+    feed.save
+
+    assert blog.published?
+    assert feed.published?
+
+    blog.published = false
+    blog.save
+    feed.reload
+
+    assert !blog.published?
+    assert !feed.published?
+
+    feed.published = true
+    feed.save
+
+    assert !blog.published?
+    assert !feed.published?
+  end
 end

@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/test_helper'
+require_relative 'test_helper'
 
 class ArticlesTest < ActiveSupport::TestCase
 
@@ -151,7 +151,7 @@ class ArticlesTest < ActiveSupport::TestCase
 
   should "update body of article created by me" do
     new_value = "Another body"
-    params[:article] = {:body => new_value} 
+    params[:article] = {:body => new_value}
     article = fast_create(Article, :profile_id => person.id)
     post "/api/v1/articles/#{article.id}?#{params.to_query}"
     json = JSON.parse(last_response.body)
@@ -160,7 +160,7 @@ class ArticlesTest < ActiveSupport::TestCase
 
   should "update title of article created by me" do
     new_value = "Another name"
-    params[:article] = {:name => new_value} 
+    params[:article] = {:name => new_value}
     article = fast_create(Article, :profile_id => person.id)
     post "/api/v1/articles/#{article.id}?#{params.to_query}"
     json = JSON.parse(last_response.body)
@@ -170,7 +170,7 @@ class ArticlesTest < ActiveSupport::TestCase
   should 'not update article of another user' do
     another_person = fast_create(Person, :environment_id => environment.id)
     article = fast_create(Article, :profile_id => another_person.id)
-    params[:article] = {:title => 'Some title'} 
+    params[:article] = {:title => 'Some title'}
     post "/api/v1/articles/#{article.id}?#{params.to_query}"
     assert_equal 403, last_response.status
   end
@@ -178,7 +178,7 @@ class ArticlesTest < ActiveSupport::TestCase
   should 'not update article without permission in community' do
     community = fast_create(Community, :environment_id => environment.id)
     article = fast_create(Article, :profile_id => community.id)
-    params[:article] = {:name => 'New title'} 
+    params[:article] = {:name => 'New title'}
     post "/api/v1/articles/#{article.id}?#{params.to_query}"
     assert_equal 403, last_response.status
   end
@@ -189,11 +189,11 @@ class ArticlesTest < ActiveSupport::TestCase
     give_permission(person, 'post_content', community)
     article = fast_create(Article, :profile_id => community.id)
     new_value = "Another body"
-    params[:article] = {:body => new_value} 
+    params[:article] = {:body => new_value}
     post "/api/v1/articles/#{article.id}?#{params.to_query}"
     json = JSON.parse(last_response.body)
     assert_equal new_value, json["article"]["body"]
-  end 
+  end
 
   should 'list articles with pagination' do
     Article.destroy_all

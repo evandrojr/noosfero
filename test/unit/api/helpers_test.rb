@@ -1,6 +1,5 @@
-require File.dirname(__FILE__) + '/test_helper';
-
-require File.expand_path(File.dirname(__FILE__) + "/../../../lib/noosfero/api/helpers")
+require_relative 'test_helper'
+require 'noosfero/api/helpers'
 
 class APIHelpersTest < ActiveSupport::TestCase
 
@@ -113,6 +112,7 @@ class APIHelpersTest < ActiveSupport::TestCase
     p = fast_create(Profile)
     a = fast_create(Article, :published => false, :profile_id => p.id)
     fast_create(Article, :profile_id => p.id)
+
     user.generate_private_token!
     User.expects(:find_by_private_token).returns(user)
     assert_equal 403, find_article(p.articles, a.id).last

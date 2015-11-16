@@ -31,13 +31,13 @@ module Noosfero
       post "/login" do
         begin
           user ||= User.authenticate(params[:login], params[:password], environment)
-        rescue User::UserNotActivated => e
+        rescue NoosferoExceptions::UserNotActivated => e
           render_api_error!(e.message, 401)
         end
 
         return unauthorized! unless user
         @current_user = user
-        present user, :with => Entities::UserLogin
+        present user, :with => Entities::UserLogin, :current_person => current_person
       end
 
       # Create user.
@@ -54,6 +54,7 @@ module Noosfero
         #requires :password, type: String, desc: _("Password")
         #requires :password_confirmation, type: String, desc: _("Password confirmation")
       end
+
       post "/register" do
         attrs = attributes_for_keys [:email, :login, :password, :password_confirmation] + environment.signup_person_fields
         remote_ip = (request.respond_to?(:remote_ip) && request.remote_ip) || (env && env['REMOTE_ADDR'])
@@ -62,12 +63,13 @@ module Noosfero
         return unless test_captcha(remote_ip, params, environment)
 
         name = params[:name].present? ? params[:name] : attrs[:email]
+        attrs[:password_confirmation] = attrs[:password] if !attrs.has_key?(:password_confirmation)
         user = User.new(attrs.merge(:name => name))
 
         begin
           user.signup!
           user.generate_private_token! if user.activated?
-          present user, :with => Entities::UserLogin
+          present user, :with => Entities::UserLogin, :current_person => user.person
         rescue ActiveRecord::RecordInvalid
           message = user.errors.as_json.merge((user.person.present? ? user.person.errors : {}).as_json).to_json
           render_api_error!(message, 400)
@@ -90,7 +92,7 @@ module Noosfero
           unless user.environment.enabled?('admin_must_approve_new_users')
             if user.activate
                 user.generate_private_token!
-                present user, :with => Entities::UserLogin
+                present user, :with => Entities::UserLogin, :current_person => current_person
             end
           else
             if user.create_moderate_task
@@ -145,7 +147,7 @@ module Noosfero
 
         if change_password.update_attributes(:password => params[:password], :password_confirmation => params[:password_confirmation])
           change_password.finish
-          present change_password.requestor.user, :with => Entities::UserLogin
+          present change_password.requestor.user, :with => Entities::UserLogin, :current_person => current_person
         else
           something_wrong!
         end
