@@ -1,14 +1,14 @@
 module Noosfero
   module API
     module V1
-      class Search < Grape::API  
+      class Search < Grape::API
 
         resource :search do
           resource :article do
             paginate per_page: 20, max_per_page: 200
             get do
               # Security checks
-              sanitize_params_hash(params) 
+              sanitize_params_hash(params)
               # APIHelpers
               asset = :articles
               context = environment
@@ -22,8 +22,8 @@ module Noosfero
               scope = scope.where(:parent_id => params[:parent_id]) if params[:parent_id].present?
 
               scope = scope.joins(:categories).where(:categories => {:id => params[:category_ids]}) if params[:category_ids].present?
-              
-              query = params[:query] || ""             
+
+              query = params[:query] || ""
               order = "more_recent"
 
               options = {:filter => order, :template_id => params[:template_id]}
@@ -33,9 +33,9 @@ module Noosfero
               articles = search_result[:results]
 
               result = present_articles_paginated(articles)
-              
+
               result
-            end            
+            end
           end
         end
 
