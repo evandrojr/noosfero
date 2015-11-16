@@ -9,7 +9,9 @@ class Article < ActiveRecord::Base
                   :highlighted, :notify_comments, :display_hits, :slug,
                   :external_feed_builder, :display_versions, :external_link,
                   :image_builder, :show_to_followers,
-                  :author, :display_preview
+                  :author, :display_preview, :archived
+
+  attr_accessor :old_parent_id
 
   acts_as_having_image
 
@@ -153,6 +155,8 @@ class Article < ActiveRecord::Base
 
   validate :no_self_reference
   validate :no_cyclical_reference, :if => 'parent_id.present?'
+
+  validate :parent_archived?
 
   def no_self_reference
     errors.add(:parent_id, _('self-reference is not allowed.')) if id && parent_id == id
@@ -482,6 +486,10 @@ class Article < ActiveRecord::Base
     else
       false
     end
+  end
+
+  def archived?
+    (self.parent && self.parent.archived) || self.archived
   end
 
   def self.folder_types
@@ -840,6 +848,12 @@ class Article < ActiveRecord::Base
   def sanitize_html(text)
     sanitizer = HTML::FullSanitizer.new
     sanitizer.sanitize(text)
+  end
+
+  def parent_archived?
+     if (self.old_parent_id != self.parent_id) && self.parent && self.parent.archived?
+       errors.add(:parent_folder, N_('is archived!!'))
+     end
   end
 
 end
