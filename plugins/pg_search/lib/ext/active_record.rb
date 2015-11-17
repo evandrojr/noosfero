@@ -4,7 +4,9 @@ class ActiveRecord::Base
   def self.pg_search_plugin_search(query)
     filtered_query = query.gsub(/[\|\(\)\\\/\s\[\]'"*%&!:]/,' ').split.map{|w| w += ":*"}.join('|')
     if defined?(self::SEARCHABLE_FIELDS)
-      where("to_tsvector('simple', #{pg_search_plugin_fields}) @@ to_tsquery('#{filtered_query}')")
+      select("*,ts_rank(to_tsvector('simple', #{pg_search_plugin_fields}), to_tsquery('#{filtered_query}')) as rank").
+        where("to_tsvector('simple', #{pg_search_plugin_fields}) @@ to_tsquery('#{filtered_query}')").
+        order("rank DESC")
     else
       raise "No searchable fields defined for #{self.name}"
     end
