@@ -156,7 +156,7 @@ module Noosfero
       end
 
       class UserLogin < User
-        expose :private_token, documentation: {type: 'String', desc: 'A valid authentication code for post/delete api actions'}
+        expose :private_token, documentation: {type: 'String', desc: 'A valid authentication code for post/delete api actions'}, if: lambda {|object, options| object.activated? }
       end
 
       class Task < Entity
