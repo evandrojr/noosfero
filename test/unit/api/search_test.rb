@@ -30,11 +30,11 @@ class SearchTest < ActiveSupport::TestCase
     assert_empty json['articles']
   end
 
-  should 'do not list articles of wrong type' do
-    article = fast_create(Article, :profile_id => person.id)
+  should 'not list articles of wrong type' do
+    fast_create(Article, :profile_id => person.id)
     get "/api/v1/search/article?type=TinyMceArticle"
     json = JSON.parse(last_response.body)
-    assert_not_includes json['articles'].map {|a| a['id']}, article.id
+    assert_empty json['articles']
   end
 
   should 'list articles of one type' do
