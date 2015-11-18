@@ -120,6 +120,7 @@ module Noosfero
         expose :followers_count
         expose :votes_count
         expose :comments_count
+        expose :archived, :documentation => {:type => "Boolean", :desc => "Defines if a article is readonly"}
       end
 
       class Article < ArticleBase

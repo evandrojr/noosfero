@@ -138,6 +138,16 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equal true, json['vote']
   end
 
+  should 'not perform a vote in a archived article' do
+    article = fast_create(Article, :profile_id => @person.id, :name => "Some thing", :archived => true)
+    @params[:value] = 1
+
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+
+    assert_equal 400, last_response.status
+  end
+
   expose_attributes = %w(id body abstract created_at title author profile categories image votes_for votes_against setting position hits start_date end_date tag_list parent children children_count)
 
   expose_attributes.each do |attr|
@@ -151,7 +161,7 @@ class ArticlesTest < ActiveSupport::TestCase
 
   should "update body of article created by me" do
     new_value = "Another body"
-    params[:article] = {:body => new_value} 
+    params[:article] = {:body => new_value}
     article = fast_create(Article, :profile_id => person.id)
     post "/api/v1/articles/#{article.id}?#{params.to_query}"
     json = JSON.parse(last_response.body)
@@ -160,7 +170,7 @@ class ArticlesTest < ActiveSupport::TestCase
 
   should "update title of article created by me" do
     new_value = "Another name"
-    params[:article] = {:name => new_value} 
+    params[:article] = {:name => new_value}
     article = fast_create(Article, :profile_id => person.id)
     post "/api/v1/articles/#{article.id}?#{params.to_query}"
     json = JSON.parse(last_response.body)
@@ -170,7 +180,7 @@ class ArticlesTest < ActiveSupport::TestCase
   should 'not update article of another user' do
     another_person = fast_create(Person, :environment_id => environment.id)
     article = fast_create(Article, :profile_id => another_person.id)
-    params[:article] = {:title => 'Some title'} 
+    params[:article] = {:title => 'Some title'}
     post "/api/v1/articles/#{article.id}?#{params.to_query}"
     assert_equal 403, last_response.status
   end
@@ -178,7 +188,7 @@ class ArticlesTest < ActiveSupport::TestCase
   should 'not update article without permission in community' do
     community = fast_create(Community, :environment_id => environment.id)
     article = fast_create(Article, :profile_id => community.id)
-    params[:article] = {:name => 'New title'} 
+    params[:article] = {:name => 'New title'}
     post "/api/v1/articles/#{article.id}?#{params.to_query}"
     assert_equal 403, last_response.status
   end
@@ -189,11 +199,11 @@ class ArticlesTest < ActiveSupport::TestCase
     give_permission(person, 'post_content', community)
     article = fast_create(Article, :profile_id => community.id)
     new_value = "Another body"
-    params[:article] = {:body => new_value} 
+    params[:article] = {:body => new_value}
     post "/api/v1/articles/#{article.id}?#{params.to_query}"
     json = JSON.parse(last_response.body)
     assert_equal new_value, json["article"]["body"]
-  end 
+  end
 
   should 'list articles with pagination' do
     Article.destroy_all
@@ -518,6 +528,14 @@ class ArticlesTest < ActiveSupport::TestCase
     get "/api/v1/articles/#{a1.id}/children/#{a2.id}?#{params.to_query}"
     json = JSON.parse(last_response.body)
     assert_equal 1, json['article']['hits']
+  end
+
+  should 'not update hit attribute of a specific child if a article is archived' do
+    folder = fast_create(Folder, :profile_id => user.person.id, :archived => true)
+    article = fast_create(Article, :parent_id => folder.id, :profile_id => user.person.id)
+    get "/api/v1/articles/#{folder.id}/children/#{article.id}?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal 0, json['article']['hits']
   end
 
   should 'list all events of a community in a given category' do
