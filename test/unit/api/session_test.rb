@@ -210,4 +210,15 @@ class SessionTest < ActiveSupport::TestCase
     assert !json['user']['private_token'].present?
   end
 
+  should 'resend activation code for an inactive user' do
+    user = create_user
+    params = {:value => user.login}
+    Delayed::Job.destroy_all
+    assert_difference 'ActionMailer::Base.deliveries.size' do
+      post "/api/v1/resend_activation_code?#{params.to_query}"
+      process_delayed_job_queue
+    end
+    assert_equal user.email, ActionMailer::Base.deliveries.last['to'].to_s
+  end
+
 end
