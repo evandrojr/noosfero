@@ -99,7 +99,6 @@ class CmsController < MyProfileController
         @article.image.save!
       end
       @article.last_changed_by = user
-      @article.old_parent_id = @article.parent_id
       if @article.update_attributes(params[:article])
         if !continue
           if @article.content_type.nil? || @article.image?

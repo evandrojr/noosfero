@@ -638,13 +638,21 @@ class Article < ActiveRecord::Base
   end
 
   def hit
-    self.class.connection.execute('update articles set hits = hits + 1 where id = %d' % self.id.to_i)
-    self.hits += 1
+    if !archived?
+      self.class.connection.execute('update articles set hits = hits + 1 where id = %d' % self.id.to_i)
+      self.hits += 1
+    end
   end
 
   def self.hit(articles)
-    Article.where(:id => articles.map(&:id)).update_all('hits = hits + 1')
-    articles.each { |a| a.hits += 1 }
+    ids = []
+    articles.each do |article|
+      if !article.archived?
+        ids << article.id
+        article.hits += 1
+      end
+    end
+    Article.where(:id => ids).update_all('hits = hits + 1') if !ids.empty?
   end
 
   def can_display_hits?
@@ -851,7 +859,7 @@ class Article < ActiveRecord::Base
   end
 
   def parent_archived?
-     if (self.old_parent_id != self.parent_id) && self.parent && self.parent.archived?
+     if self.parent_id_changed? && self.parent && self.parent.archived?
        errors.add(:parent_folder, N_('is archived!!'))
      end
   end
