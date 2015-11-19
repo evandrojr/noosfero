@@ -764,7 +764,7 @@ class UserTest < ActiveSupport::TestCase
       user.resend_activation_code
       process_delayed_job_queue
     end
-    assert_not_equal activation_code, user.activation_code
+    assert_not_equal activation_code, user.reload.activation_code
     assert_equal 'pending@activation.com', ActionMailer::Base.deliveries.last['to'].to_s
   end
 

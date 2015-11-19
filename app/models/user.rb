@@ -425,7 +425,7 @@ class User < ActiveRecord::Base
 
   def resend_activation_code
     return if self.activated?
-    self.make_activation_code
+    update_attribute(:activation_code, make_activation_code)
     self.deliver_activation_code
   end
 

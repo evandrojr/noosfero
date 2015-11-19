@@ -144,6 +144,7 @@ module Noosfero
         requestors.each do |requestor|
           requestor.user.resend_activation_code
         end
+        present requestors.map(&:user), :with => Entities::UserLogin
       end
 
       params do

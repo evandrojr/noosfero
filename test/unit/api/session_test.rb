@@ -218,7 +218,22 @@ class SessionTest < ActiveSupport::TestCase
       post "/api/v1/resend_activation_code?#{params.to_query}"
       process_delayed_job_queue
     end
+    json = JSON.parse(last_response.body)
+    assert !json['users'].first['activated']
     assert_equal user.email, ActionMailer::Base.deliveries.last['to'].to_s
+  end
+
+  should 'not resend activation code for an active user' do
+    user = create_user
+    params = {:value => user.login}
+    user.activate
+    Delayed::Job.destroy_all
+    assert_no_difference 'ActionMailer::Base.deliveries.size' do
+      post "/api/v1/resend_activation_code?#{params.to_query}"
+      process_delayed_job_queue
+    end
+    json = JSON.parse(last_response.body)
+    assert json['users'].first['activated']
   end
 
 end
