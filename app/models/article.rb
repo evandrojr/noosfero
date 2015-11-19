@@ -9,7 +9,9 @@ class Article < ActiveRecord::Base
                   :highlighted, :notify_comments, :display_hits, :slug,
                   :external_feed_builder, :display_versions, :external_link,
                   :image_builder, :show_to_followers,
-                  :author, :display_preview
+                  :author, :display_preview, :archived
+
+  attr_accessor :old_parent_id
 
   acts_as_having_image
 
@@ -153,6 +155,8 @@ class Article < ActiveRecord::Base
 
   validate :no_self_reference
   validate :no_cyclical_reference, :if => 'parent_id.present?'
+
+  validate :parent_archived?
 
   def no_self_reference
     errors.add(:parent_id, _('self-reference is not allowed.')) if id && parent_id == id
@@ -484,6 +488,10 @@ class Article < ActiveRecord::Base
     end
   end
 
+  def archived?
+    (self.parent && self.parent.archived) || self.archived
+  end
+
   def self.folder_types
     ['Folder', 'Blog', 'Forum', 'Gallery']
   end
@@ -630,13 +638,21 @@ class Article < ActiveRecord::Base
   end
 
   def hit
-    self.class.connection.execute('update articles set hits = hits + 1 where id = %d' % self.id.to_i)
-    self.hits += 1
+    if !archived?
+      self.class.connection.execute('update articles set hits = hits + 1 where id = %d' % self.id.to_i)
+      self.hits += 1
+    end
   end
 
   def self.hit(articles)
-    Article.where(:id => articles.map(&:id)).update_all('hits = hits + 1')
-    articles.each { |a| a.hits += 1 }
+    ids = []
+    articles.each do |article|
+      if !article.archived?
+        ids << article.id
+        article.hits += 1
+      end
+    end
+    Article.where(:id => ids).update_all('hits = hits + 1') if !ids.empty?
   end
 
   def can_display_hits?
@@ -840,6 +856,12 @@ class Article < ActiveRecord::Base
   def sanitize_html(text)
     sanitizer = HTML::FullSanitizer.new
     sanitizer.sanitize(text)
+  end
+
+  def parent_archived?
+     if self.parent_id_changed? && self.parent && self.parent.archived?
+       errors.add(:parent_folder, N_('is archived!!'))
+     end
   end
 
 end
