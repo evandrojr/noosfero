@@ -184,7 +184,7 @@ module FormsHelper
     datepicker_options[:year_suffix] ||= ''
 
     element_id = html_options[:id] || 'datepicker-date'
-    value_js_formatted = value.strftime('%Y-%m-%d %H:%S')
+    value_js_formatted = value.present? ? value.strftime('%Y-%m-%d %H:%S') : nil
     value = value.strftime(format) if value.present?
     method = datepicker_options[:time] ? 'datetimepicker' : 'datepicker'
     result = text_field_tag(name, value, html_options)
