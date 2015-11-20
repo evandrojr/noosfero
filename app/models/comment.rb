@@ -213,7 +213,7 @@ class Comment < ActiveRecord::Base
   end
 
   def archived?
-    self.article.archived?
+    self.article.archived? if self.article.present? && self.article.respond_to?(:archived?)
   end
 
   protected
