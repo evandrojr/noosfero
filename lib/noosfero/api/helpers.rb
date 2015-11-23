@@ -39,6 +39,20 @@ require_relative '../../find_by_contents'
         @environment
       end
 
+      def present_partial(model, options)
+        if(params[:fields].present?)
+          begin
+            fields = JSON.parse(params[:fields])
+            if fields.present?
+              options.merge!(fields.symbolize_keys.slice(:only, :except))
+            end
+          rescue
+            options[:only] = Array.wrap(params[:fields])
+          end
+        end
+        present model, options
+      end
+
       include FindByContents
 
       ####################################################################
@@ -99,12 +113,12 @@ require_relative '../../find_by_contents'
         if !article.save
           render_api_errors!(article.errors.full_messages)
         end
-        present article, :with => Entities::Article, :fields => params[:fields]
+        present_partial article, :with => Entities::Article
       end
 
       def present_article(asset)
         article = find_article(asset.articles, params[:id])
-        present article, :with => Entities::Article, :fields => params[:fields]
+        present_partial article, :with => Entities::Article
       end
 
       def present_articles_for_asset(asset, method = 'articles')
@@ -113,12 +127,12 @@ require_relative '../../find_by_contents'
       end
 
       def present_articles(articles)
-        present articles, :with => Entities::Article, :fields => params[:fields]
+        present_partial articles, :with => Entities::Article
       end
 
       def present_articles_paginated(articles, per_page=nil)
         articles = paginate(articles)
-        present articles, :with => Entities::Article, :fields => params[:fields]
+        present_partial articles, :with => Entities::Article
       end
 
       def find_articles(asset, method = 'articles')
@@ -148,19 +162,19 @@ require_relative '../../find_by_contents'
         if !task.save
           render_api_errors!(task.errors.full_messages)
         end
-        present task, :with => Entities::Task, :fields => params[:fields]
+        present_partial task, :with => Entities::Task
       end
 
       def present_task(asset)
         task = find_task(asset, params[:id])
-        present task, :with => Entities::Task, :fields => params[:fields]
+        present_partial task, :with => Entities::Task
       end
 
       def present_tasks(asset)
         tasks = select_filtered_collection_of(asset, 'tasks', params)
         tasks = tasks.select {|t| current_person.has_permission?(t.permission, asset)}
         return forbidden! if tasks.empty? && !current_person.has_permission?(:perform_task, asset)
-        present tasks, :with => Entities::Task, :fields => params[:fields]
+        present_partial tasks, :with => Entities::Task
       end
 
       def make_conditions_with_parameter(params = {})

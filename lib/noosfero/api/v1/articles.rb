@@ -58,7 +58,7 @@ module Noosfero
             article = environment.articles.find(params[:id])
             return forbidden! unless article.allow_edit?(current_person)
             article.update_attributes!(params[:article])
-            present article, :with => Entities::Article, :fields => params[:fields]
+            present_partial article, :with => Entities::Article
           end
 
           desc 'Report a abuse and/or violent content in a article by id' do
@@ -190,7 +190,7 @@ module Noosfero
             article = find_article(environment.articles, params[:id])
             child = find_article(article.children, params[:child_id])
             child.hit
-            present child, :with => Entities::Article, :fields => params[:fields]
+            present_partial child, :with => Entities::Article
           end
 
           desc 'Suggest a article to another profile' do
@@ -213,7 +213,7 @@ module Noosfero
             unless suggest_article.save
               render_api_errors!(suggest_article.article_object.errors.full_messages)
             end
-            present suggest_article, :with => Entities::Task, :fields => params[:fields]
+            present_partial suggest_article, :with => Entities::Task
           end
 
           # Example Request:
@@ -244,7 +244,7 @@ module Noosfero
             if !article.save
               render_api_errors!(article.errors.full_messages)
             end
-            present article, :with => Entities::Article, :fields => params[:fields]
+            present_partial article, :with => Entities::Article
           end
 
         end
@@ -271,7 +271,7 @@ module Noosfero
                       article = forbidden!
                     end
 
-                    present article, :with => Entities::Article, :fields => params[:fields]
+                    present_partial article, :with => Entities::Article
                   else
 
                     present_articles_for_asset(profile)

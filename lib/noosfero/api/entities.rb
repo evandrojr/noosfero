@@ -96,14 +96,14 @@ module Noosfero
       class Person < Profile
         root 'people', 'person'
         expose :user, :using => UserBasic, documentation: {type: 'User', desc: 'The user data of a person' }
-        expose :vote_count, if: lambda { |object, options| options[:fields].present? ? options[:fields].include?('vote_count') : false}
-        expose :comments_count, if: lambda { |object, options| options[:fields].present? ? options[:fields].include?('comments_count') : false}  do |person, options|
+        expose :vote_count
+        expose :comments_count do |person, options|
           person.comments.count
         end
-        expose :following_articles_count, if: lambda { |object, options| options[:fields].present? ? options[:fields].include?('following_articles_count') : false}  do |person, options|
+        expose :following_articles_count do |person, options|
           person.following_articles.count
         end
-        expose :articles_count, if: lambda { |object, options| options[:fields].present? ? options[:fields].include?('articles_count') : false}  do |person, options|
+        expose :articles_count do |person, options|
           person.articles.count
         end
 
