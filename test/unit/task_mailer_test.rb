@@ -137,7 +137,7 @@ class TaskMailerTest < ActiveSupport::TestCase
 
     environment = Environment.default
     environment.expects(:noreply_email).returns('sender@example.com')
-    environment.expects(:default_hostname).returns('example.com')
+    environment.expects(:default_hostname).returns('example.com').at_least_once
     environment.expects(:name).returns('example').at_least_once
 
     task.expects(:requestor).returns(requestor).at_least_once
@@ -165,7 +165,7 @@ class TaskMailerTest < ActiveSupport::TestCase
 
     environment = Environment.default
     environment.expects(:noreply_email).returns('sender@example.com')
-    environment.expects(:default_hostname).returns('example.com')
+    environment.expects(:default_hostname).returns('example.com').at_least_once
     environment.expects(:name).returns('example').at_least_once
 
     task.expects(:requestor).returns(requestor).at_least_once
