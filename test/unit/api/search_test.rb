@@ -10,9 +10,9 @@ class SearchTest < ActiveSupport::TestCase
   should 'not list unpublished articles' do
     Article.delete_all
     article = fast_create(Article, :profile_id => person.id, :published => false)
-    assert !article.published?  	
+    assert !article.published?
     get "/api/v1/search/article"
-    json = JSON.parse(last_response.body)    
+    json = JSON.parse(last_response.body)
     assert_empty json['articles']
   end
 
@@ -26,21 +26,21 @@ class SearchTest < ActiveSupport::TestCase
   should 'invalid search string articles' do
     fast_create(Article, :profile_id => person.id, :name => 'some article')
     get "/api/v1/search/article?query=test"
-    json = JSON.parse(last_response.body)    
+    json = JSON.parse(last_response.body)
     assert_empty json['articles']
   end
 
   should 'do not list articles of wrong type' do
-    fast_create(Article, :profile_id => person.id)
+    article = fast_create(Article, :profile_id => person.id)
     get "/api/v1/search/article?type=TinyMceArticle"
     json = JSON.parse(last_response.body)
-    assert_empty json['articles']
+    assert_not_includes json['articles'].map {|a| a['id']}, article.id
   end
 
   should 'list articles of one type' do
     fast_create(Article, :profile_id => person.id)
     article = fast_create(TinyMceArticle, :profile_id => person.id)
-  
+
     get "/api/v1/search/article?type=TinyMceArticle"
     json = JSON.parse(last_response.body)
     assert_equal article.id, json['articles'].first['id']
@@ -105,7 +105,7 @@ class SearchTest < ActiveSupport::TestCase
     json = JSON.parse(last_response.body)
     assert_equal 1, json['articles'].count
     assert_equal article.id, json['articles'].first["id"]
-  end  
+  end
 
   should 'search filter by category' do
     Article.delete_all
@@ -117,7 +117,7 @@ class SearchTest < ActiveSupport::TestCase
     json = JSON.parse(last_response.body)
     assert_equal 1, json['articles'].count
     assert_equal article.id, json['articles'].first["id"]
-  end  
+  end
 
   should 'search filter by more than one category' do
     Article.delete_all
