@@ -461,8 +461,8 @@ class TasksControllerTest < ActionController::TestCase
 
     requestor = fast_create(Person)
 
-    task_one = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Task Test'}, :tag_list => 'noosfero, test')
-    task_two = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Another Task'}, :tag_list => 'test')
+    task_one = Task.create!(:requestor => requestor, :target => profile, :data => {:name => 'Task Test'}, :tag_list => 'noosfero, test')
+    task_two = Task.create!(:requestor => requestor, :target => profile, :data => {:name => 'Another Task'}, :tag_list => 'test')
 
     get :index, :filter_tags => 'noosfero'
 
@@ -693,7 +693,7 @@ class TasksControllerTest < ActionController::TestCase
   should 'save task tags' do
     requestor = fast_create(Person)
 
-    task_one = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Task Test'})
+    task_one = Task.create!(:requestor => requestor, :target => profile, :data => {:name => 'Task Test'})
     post :save_tags, :task_id => task_one.id, :tag_list => 'test'
 
     assert_includes task_one.tags_from(nil), 'test'
@@ -702,8 +702,8 @@ class TasksControllerTest < ActionController::TestCase
   should 'tag attribution in one task not affect another' do
     requestor = fast_create(Person)
 
-    task_one = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Task Test'})
-    task_two = Task.create!(:requestor => requestor, :target => person, :data => {:name => 'Another Task'})
+    task_one = Task.create!(:requestor => requestor, :target => profile, :data => {:name => 'Task Test'})
+    task_two = Task.create!(:requestor => requestor, :target => profile, :data => {:name => 'Another Task'})
 
     post :save_tags, :task_id => task_one.id, :tag_list => 'noosfero,test'
     post :save_tags, :task_id => task_two.id, :tag_list => 'test'
@@ -715,7 +715,7 @@ class TasksControllerTest < ActionController::TestCase
     Role.delete_all
     requestor = fast_create(Person)
     community = fast_create(Community)
-    community.add_member(person)
+    community.add_member(profile)
 
     @controller.stubs(:profile).returns(community)
     task_one = Task.create!(:requestor => requestor, :target => community, :data => {:name => 'Task Test'})
@@ -744,7 +744,7 @@ class TasksControllerTest < ActionController::TestCase
     created_date = DateTime.now
     processed_date = DateTime.now
 
-    task_params = {:status => Task::Status::FINISHED, :requestor => requestor, :target => person, :created_at => created_date, :end_date => processed_date, :closed_by => closed_by, :data => {:field => 'some data field'}}
+    task_params = {:status => Task::Status::FINISHED, :requestor => requestor, :target => profile, :created_at => created_date, :end_date => processed_date, :closed_by => closed_by, :data => {:field => 'some data field'}}
 
     task = create(AnotherTask, task_params)
     create(Task, task_params)
