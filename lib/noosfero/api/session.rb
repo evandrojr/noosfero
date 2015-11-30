@@ -130,6 +130,25 @@ module Noosfero
         end
       end
 
+      # Resend activation code.
+      #
+      # Parameters:
+      #   value (required)                  - Email or login
+      # Example Request:
+      #   POST /resend_activation_code?value=some@mail.com
+      post "/resend_activation_code" do
+        requestors = fetch_requestors(params[:value])
+        not_found! if requestors.blank?
+        remote_ip = (request.respond_to?(:remote_ip) && request.remote_ip) || (env && env['REMOTE_ADDR'])
+        # test_captcha will render_api_error! and exit in case of any problem
+        # this return is just to improve the clarity of the execution path
+        return unless test_captcha(remote_ip, params, environment)
+        requestors.each do |requestor|
+          requestor.user.resend_activation_code
+        end
+        present requestors.map(&:user), :with => Entities::UserLogin
+      end
+
       params do
         requires :code, type: String, desc: _("Forgot password code")
       end

@@ -198,4 +198,40 @@ class SessionTest < ActiveSupport::TestCase
     assert_equal 404, last_response.status
   end
 
+  should 'not return private token when the registered user is inactive' do
+    params = {:login => "newuserapi", :password => "newuserapi", :password_confirmation => "newuserapi", :email => "newuserapi@email.com" }
+    post "/api/v1/register?#{params.to_query}"
+    assert_equal 201, last_response.status
+    json = JSON.parse(last_response.body)
+    assert !User['newuserapi'].activated?
+    assert !json['user']['activated']
+    assert !json['user']['private_token'].present?
+  end
+
+  should 'resend activation code for an inactive user' do
+    user = create_user
+    params = {:value => user.login}
+    Delayed::Job.destroy_all
+    assert_difference 'ActionMailer::Base.deliveries.size' do
+      post "/api/v1/resend_activation_code?#{params.to_query}"
+      process_delayed_job_queue
+    end
+    json = JSON.parse(last_response.body)
+    assert !json['users'].first['activated']
+    assert_equal user.email, ActionMailer::Base.deliveries.last['to'].to_s
+  end
+
+  should 'not resend activation code for an active user' do
+    user = create_user
+    params = {:value => user.login}
+    user.activate
+    Delayed::Job.destroy_all
+    assert_no_difference 'ActionMailer::Base.deliveries.size' do
+      post "/api/v1/resend_activation_code?#{params.to_query}"
+      process_delayed_job_queue
+    end
+    json = JSON.parse(last_response.body)
+    assert json['users'].first['activated']
+  end
+
 end

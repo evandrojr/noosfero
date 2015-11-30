@@ -138,6 +138,16 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equal true, json['vote']
   end
 
+  should 'not perform a vote in a archived article' do
+    article = fast_create(Article, :profile_id => @person.id, :name => "Some thing", :archived => true)
+    @params[:value] = 1
+
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+
+    assert_equal 400, last_response.status
+  end
+
   expose_attributes = %w(id body abstract created_at title author profile categories image votes_for votes_against setting position hits start_date end_date tag_list parent children children_count)
 
   expose_attributes.each do |attr|
@@ -518,6 +528,14 @@ class ArticlesTest < ActiveSupport::TestCase
     get "/api/v1/articles/#{a1.id}/children/#{a2.id}?#{params.to_query}"
     json = JSON.parse(last_response.body)
     assert_equal 1, json['article']['hits']
+  end
+
+  should 'not update hit attribute of a specific child if a article is archived' do
+    folder = fast_create(Folder, :profile_id => user.person.id, :archived => true)
+    article = fast_create(Article, :parent_id => folder.id, :profile_id => user.person.id)
+    get "/api/v1/articles/#{folder.id}/children/#{article.id}?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal 0, json['article']['hits']
   end
 
   should 'list all events of a community in a given category' do

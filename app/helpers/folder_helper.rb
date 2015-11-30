@@ -59,7 +59,15 @@ module FolderHelper
     @article = article
 
     visibility_options(article,tokenized_children) +
+    content_tag('h4', _('Options')) +
     content_tag('div',
+      content_tag('div',
+        check_box(:article, :archived) +
+          content_tag('span', '&nbsp;', :class => 'access-archived-icon') +
+          content_tag('label', _('Read Only'), :for => 'article_archived_true') +
+          content_tag('span', _('Archive to avoid votes and create new children articles'), :class => 'access-note'),
+          :class => 'access-item'
+      ) +
       hidden_field_tag('article[accept_comments]', 0)
     )
   end

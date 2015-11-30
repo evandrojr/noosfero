@@ -131,9 +131,8 @@ module Noosfero
             failure [[403, 'Forbidden']]
             named 'ArticleFollowers'
           end
-
-           #FIXME refactor this method
           get 'voted_by_me' do
+            #FIXME refactor this method
             present_articles_paginated(current_person.votes.where(:voteable_type => 'Article').collect(&:voteable))
           end
 
@@ -150,8 +149,14 @@ module Noosfero
             # FIXME verify allowed values
             render_api_error!('Vote value not allowed', 400) unless [-1, 1].include?(value)
             article = find_article(environment.articles, params[:id])
-            vote = Vote.new(:voteable => article, :voter => current_person, :vote => value)
-            {:vote => vote.save}
+
+            begin
+              vote = Vote.new(:voteable => article, :voter => current_person, :vote => value)
+              saved = vote.save!
+              {:vote => saved}
+            rescue ActiveRecord::RecordInvalid => e
+              render_api_error!(e.message, 400)
+            end
           end
 
           desc 'Return the children of a article identified by id' do
