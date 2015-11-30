@@ -20,6 +20,16 @@ require_relative '../../find_by_contents'
         plugins
       end
 
+      def current_tmp_user
+        private_token = (params[PRIVATE_TOKEN_PARAM] || headers['Private-Token']).to_s
+        @current_tmp_user = Noosfero::API::CaptchaSessionStore.get(private_token)
+        @current_tmp_user
+      end
+
+      def logout_tmp_user
+        @current_tmp_user = nil
+      end
+
       def current_user
         private_token = (params[PRIVATE_TOKEN_PARAM] || headers['Private-Token']).to_s
         @current_user ||= User.find_by_private_token(private_token)
@@ -273,6 +283,12 @@ require_relative '../../find_by_contents'
         unauthorized! unless current_user
       end
 
+      # Allows the anonymous captcha user authentication
+      # to pass the check. Used by the articles/vote to allow
+      # the vote without login
+      def authenticate_allow_captcha!
+        unauthorized! unless current_tmp_user || current_user
+      end
 
       # Checks the occurrences of uniqueness of attributes, each attribute must be present in the params hash
       # or a Bad Request error is invoked.
@@ -348,6 +364,8 @@ require_relative '../../find_by_contents'
 
       def set_session_cookie
         cookies['_noosfero_api_session'] = { value: @current_user.private_token, httponly: true } if @current_user.present?
+        # Set also the private_token for the current_tmp_user
+        cookies['_noosfero_api_session'] = { value: @current_tmp_user.private_token, httponly: true } if @current_tmp_user.present?
       end
 
       def setup_multitenancy
