@@ -131,8 +131,10 @@ class SearchTest < ActiveSupport::TestCase
     article2.categories<< category2
     get "/api/v1/search/article?category_ids[]=#{category1.id}&category_ids[]=#{category2.id}"
     json = JSON.parse(last_response.body)
+    ids = [article1.id, article2.id]
     assert_equal 2, json['articles'].count
-    assert_equivalent [article1.id, article2.id], json['articles'].map{|a| a['id']}
+    assert_includes ids, json['articles'].first["id"]
+    assert_includes ids, json['articles'].last["id"]
   end
 
 end
