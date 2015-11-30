@@ -74,7 +74,7 @@ class TasksControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_template 'processed'
-    assert_kind_of Array, assigns(:tasks)
+    assert_kind_of ActiveRecord::Relation, assigns(:tasks)
   end
 
   should 'display task created_at' do

@@ -316,7 +316,7 @@ class Task < ActiveRecord::Base
   scope :canceled, -> { where status: Task::Status::CANCELLED }
   scope :closed, -> { where status: [Task::Status::CANCELLED, Task::Status::FINISHED] }
   scope :opened, -> { where status: [Task::Status::ACTIVE, Task::Status::HIDDEN] }
-  scope :of, -> type { where "type LIKE ?", type if type }
+  scope :of, -> type { where "tasks.type LIKE ?", type if type }
   scope :order_by, -> attribute, ord { order "#{attribute} #{ord}" }
   scope :like, -> field, value { where "LOWER(#{field}) LIKE ?", "%#{value.downcase}%" if value }
   scope :pending_all, -> profile, filter_type, filter_text {

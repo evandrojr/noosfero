@@ -178,7 +178,7 @@ class TasksController < MyProfileController
   end
 
   def filter_tasks(filter, tasks)
-    tasks = tasks.includes(:requestor, :closed_by)
+    tasks = tasks.eager_load(:requestor, :closed_by)
     tasks = tasks.of(filter[:type].presence)
     tasks = tasks.where(:status => filter[:status]) unless filter[:status].blank?
     tasks = filter_by_creation_date(filter, tasks)
