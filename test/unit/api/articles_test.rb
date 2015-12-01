@@ -625,6 +625,16 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equal json['articles'].count, 2
   end
 
+  should 'find archived articles' do
+    article1 = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
+    article2 = fast_create(Article, :profile_id => user.person.id, :name => "Some thing", :archived => true)
+    params[:archived] = true
+    get "/api/v1/articles/?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_not_includes json["articles"].map { |a| a["id"] }, article1.id
+    assert_includes json["articles"].map { |a| a["id"] }, article2.id
+  end
+
   ARTICLE_ATTRIBUTES = %w(followers_count votes_count comments_count)
 
   ARTICLE_ATTRIBUTES.map do |attribute|
