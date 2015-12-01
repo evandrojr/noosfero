@@ -5,7 +5,7 @@ require 'grape'
     module API
       module APIHelpers
       PRIVATE_TOKEN_PARAM = :private_token
-      DEFAULT_ALLOWED_PARAMETERS = [:parent_id, :from, :until, :content_type, :author_id]
+      DEFAULT_ALLOWED_PARAMETERS = [:parent_id, :from, :until, :content_type, :author_id, :archived]
 
       include SanitizeParams
       include Noosfero::Plugin::HotSpot
