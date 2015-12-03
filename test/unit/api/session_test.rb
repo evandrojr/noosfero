@@ -89,22 +89,6 @@ class SessionTest < ActiveSupport::TestCase
     json = JSON.parse(last_response.body)
   end
 
-  should 'detected error, Name or service not known, for Serpro captcha communication' do
-    environment = Environment.default
-    environment.api_captcha_settings = {
-        enabled: true,
-        provider: 'serpro',
-        serpro_client_id:  '0000000000000000',
-        verify_uri:  'http://someserverthatdoesnotexist.mycompanythatdoesnotexist.com/validate',
-    }
-    environment.save!
-    params = {:login => "newuserapi", :password => "newuserapi", :password_confirmation => "newuserapi", :email => "newuserapi@email.com",
-              :txtToken_captcha_serpro_gov_br => '4324343', :captcha_text => '4030320'}
-    post "/api/v1/register?#{params.to_query}"
-    message = JSON.parse(last_response.body)['javascript_console_message']
-    assert_equal "Serpro captcha error: getaddrinfo: Name or service not known", message
-  end
-
   # TODO: Add another test cases to check register situations
   should 'activate a user' do
     params = {
@@ -185,7 +169,7 @@ class SessionTest < ActiveSupport::TestCase
 
   should 'do not change user password when password confirmation is wrong' do
     user = create_user
-    user.activate 
+    user.activate
     task = ChangePassword.create!(:requestor => user.person)
     params = {:code => task.code, :password => 'secret', :password_confirmation => 's3cret'}
     patch "/api/v1/new_password?#{params.to_query}"
