@@ -197,7 +197,7 @@ module Noosfero
             child.hit
             present child, :with => Entities::Article, :fields => params[:fields]
           end
-
+          
           desc 'Suggest a article to another profile' do
             detail 'Suggest a article to another profile (person, community...)'
             params Noosfero::API::Entities::Article.documentation
