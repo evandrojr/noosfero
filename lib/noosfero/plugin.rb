@@ -260,6 +260,13 @@ class Noosfero::Plugin
     end.select {|const| const.is_a?(Class) && const < Noosfero::Plugin::Macro}
   end
 
+  # New buttons actions with icons in each article on content manager page
+  # returns = proc block that creates html code to custom buttons
+  #
+  def extra_content_actions(article)
+    nil
+  end
+
   # Here the developer may specify the events to which the plugins can
   # register and must return true or false. The default value must be false.
   # Must also explicitly define its returning variables.

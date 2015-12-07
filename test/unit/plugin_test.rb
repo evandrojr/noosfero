@@ -567,4 +567,16 @@ class PluginTest < ActiveSupport::TestCase
     assert_equal [], p.article_extra_toolbar_buttons(nil)
   end
 
+  should 'get extra buttons actions on content manager grid' do
+    class Plugin1 < Noosfero::Plugin
+       def extra_content_actions
+         proc do
+           '<a href="#" class="icon">Btn</a>'
+         end
+       end
+    end
+    p = Plugin1.new
+    assert_tag_in_string  p.extra_content_actions.call(), :tag => 'a', :content => 'Btn'
+  end
+
 end

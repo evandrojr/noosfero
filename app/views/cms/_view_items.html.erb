@@ -13,6 +13,7 @@
     <%= time_ago_in_words article.updated_at %>
   </td>
     <td class="article-controls">
+      <%= @plugins.dispatch(:extra_content_actions, article).collect { |content| instance_exec(&content) }.join("") %>
       <%= expirable_button article, :edit, _('Edit'), {:action => 'edit', :id => article.id} if !remove_content_button(:edit, article) %>
       <%= button_without_text :eyes, _('Public view'), article.view_url %>
       <%= display_spread_button(article) unless remove_content_button(:spread, article) %>
