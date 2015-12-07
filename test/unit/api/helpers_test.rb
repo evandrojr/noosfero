@@ -308,20 +308,6 @@ should 'verify if Serpro\' captcha token has been sent' do
   assert_equal(_("Missing Serpro's Captcha token"), r[0][:javascript_console_message])
 end
 
-should 'captcha serpro say name or service not known' do
-    environment = Environment.new
-    environment.api_captcha_settings = {
-        enabled: true,
-        provider: 'serpro',
-        serpro_client_id:  '0000000000000000',
-        verify_uri:  'http://someserverthatdoesnotexist.mycompanythatdoesnotexist.com/validate',
-    }
-    params = {}
-    params[:txtToken_captcha_serpro_gov_br] = '4324343'
-    params[:captcha_text] = '4324343'
-    r = test_captcha('127.0.0.1', params, environment)
-    assert (r[0][:javascript_console_message]).starts_with?("Serpro captcha error: getaddrinfo")
-end
 
 ###### END Captcha tests ######
 
