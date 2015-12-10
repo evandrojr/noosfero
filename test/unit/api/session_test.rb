@@ -10,7 +10,7 @@ class SessionTest < ActiveSupport::TestCase
     params = {:login => "testapi", :password => "testapi"}
     post "/api/v1/login?#{params.to_query}"
     json = JSON.parse(last_response.body)
-    assert !json["private_token"].blank?
+    assert !json['user']["private_token"].blank?
   end
 
   should 'return 401 when login fails' do
@@ -27,8 +27,8 @@ class SessionTest < ActiveSupport::TestCase
     assert_equal 201, last_response.status
     json = JSON.parse(last_response.body)
     assert User['newuserapi'].activated?
-    assert json['activated']
-    assert json['private_token'].present?
+    assert json['user']['activated']
+    assert json['user']['private_token'].present?
   end
 
   should 'register a user with name' do
@@ -37,8 +37,8 @@ class SessionTest < ActiveSupport::TestCase
     post "/api/v1/register?#{params.to_query}"
     assert_equal 201, last_response.status
     json = JSON.parse(last_response.body)
-    assert json['activated']
-    assert json['private_token'].present?
+    assert json['user']['activated']
+    assert json['user']['private_token'].present?
   end
 
   should 'register an inactive user' do
@@ -87,22 +87,6 @@ class SessionTest < ActiveSupport::TestCase
     post "/api/v1/register?#{params.to_query}"
     assert_equal 400, last_response.status
     json = JSON.parse(last_response.body)
-  end
-
-  should 'detected error, Name or service not known, for Serpro captcha communication' do
-    environment = Environment.default
-    environment.api_captcha_settings = {
-        enabled: true,
-        provider: 'serpro',
-        serpro_client_id:  '0000000000000000',
-        verify_uri:  'http://someserverthatdoesnotexist.mycompanythatdoesnotexist.com/validate',
-    }
-    environment.save!
-    params = {:login => "newuserapi", :password => "newuserapi", :password_confirmation => "newuserapi", :email => "newuserapi@email.com",
-              :txtToken_captcha_serpro_gov_br => '4324343', :captcha_text => '4030320'}
-    post "/api/v1/register?#{params.to_query}"
-    message = JSON.parse(last_response.body)['javascript_console_message']
-    assert_equal "Serpro captcha error: getaddrinfo: Name or service not known", message
   end
 
   # TODO: Add another test cases to check register situations
@@ -180,12 +164,12 @@ class SessionTest < ActiveSupport::TestCase
     assert_equal Task::Status::FINISHED, task.reload.status
     assert user.reload.authenticated?('secret')
     json = JSON.parse(last_response.body)
-    assert_equal user.id, json['id']
+    assert_equal user.id, json['user']['id']
   end
 
   should 'do not change user password when password confirmation is wrong' do
     user = create_user
-    user.activate 
+    user.activate
     task = ChangePassword.create!(:requestor => user.person)
     params = {:code => task.code, :password => 'secret', :password_confirmation => 's3cret'}
     patch "/api/v1/new_password?#{params.to_query}"
@@ -198,6 +182,42 @@ class SessionTest < ActiveSupport::TestCase
     params = {:code => "wrongcode", :password => 'secret', :password_confirmation => 'secret'}
     patch "/api/v1/new_password?#{params.to_query}"
     assert_equal 404, last_response.status
+  end
+
+  should 'not return private token when the registered user is inactive' do
+    params = {:login => "newuserapi", :password => "newuserapi", :password_confirmation => "newuserapi", :email => "newuserapi@email.com" }
+    post "/api/v1/register?#{params.to_query}"
+    assert_equal 201, last_response.status
+    json = JSON.parse(last_response.body)
+    assert !User['newuserapi'].activated?
+    assert !json['user']['activated']
+    assert !json['user']['private_token'].present?
+  end
+
+  should 'resend activation code for an inactive user' do
+    user = create_user
+    params = {:value => user.login}
+    Delayed::Job.destroy_all
+    assert_difference 'ActionMailer::Base.deliveries.size' do
+      post "/api/v1/resend_activation_code?#{params.to_query}"
+      process_delayed_job_queue
+    end
+    json = JSON.parse(last_response.body)
+    assert !json['users'].first['activated']
+    assert_equal user.email, ActionMailer::Base.deliveries.last['to'].to_s
+  end
+
+  should 'not resend activation code for an active user' do
+    user = create_user
+    params = {:value => user.login}
+    user.activate
+    Delayed::Job.destroy_all
+    assert_no_difference 'ActionMailer::Base.deliveries.size' do
+      post "/api/v1/resend_activation_code?#{params.to_query}"
+      process_delayed_job_queue
+    end
+    json = JSON.parse(last_response.body)
+    assert json['users'].first['activated']
   end
 
 end

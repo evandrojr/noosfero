@@ -216,6 +216,10 @@ class Noosfero::Plugin
     self.class.extra_blocks.keys.include?(block)
   end
 
+  def has_block?(block)
+    self.class.extra_blocks.keys.include?(block)
+  end
+
   def expanded_template(file_path, locals = {})
     views_path = Rails.root.join('plugins', "#{self.class.public_name}", 'views')
     ERB.new(File.read("#{views_path}/#{file_path}")).result(binding)
@@ -256,6 +260,13 @@ class Noosfero::Plugin
     end.select {|const| const.is_a?(Class) && const < Noosfero::Plugin::Macro}
   end
 
+  # New buttons actions with icons in each article on content manager page
+  # returns = proc block that creates html code to custom buttons
+  #
+  def extra_content_actions(article)
+    nil
+  end
+
   # Here the developer may specify the events to which the plugins can
   # register and must return true or false. The default value must be false.
   # Must also explicitly define its returning variables.
@@ -280,6 +291,16 @@ class Noosfero::Plugin
   # (overwrites profile_image_link function)
   # returns = lambda block that creates html code.
   def profile_image_link(profile, size, tag, extra_info)
+    nil
+  end
+
+  # -> Customize the way comments are counted for Profiles and Environment
+  # considering more than just articles comments
+  # Used on statistic block
+  # Ex: a plugin may want that Communities receive comments themselves
+  # as evaluations
+  # returns = the number of comments to be sum on the statistics
+  def more_comments_count owner
     nil
   end
 

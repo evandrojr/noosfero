@@ -5,7 +5,7 @@ require 'grape'
     module API
       module APIHelpers
       PRIVATE_TOKEN_PARAM = :private_token
-      DEFAULT_ALLOWED_PARAMETERS = [:parent_id, :from, :until, :content_type, :author_id]
+      DEFAULT_ALLOWED_PARAMETERS = [:parent_id, :from, :until, :content_type, :author_id, :archived]
 
       include SanitizeParams
       include Noosfero::Plugin::HotSpot
@@ -35,7 +35,6 @@ require 'grape'
       def current_user
         private_token = (params[PRIVATE_TOKEN_PARAM] || headers['Private-Token']).to_s
         @current_user ||= User.find_by_private_token(private_token)
-        @current_user = nil if !@current_user.nil? && @current_user.private_token_expired?
         @current_user
       end
 
@@ -144,9 +143,6 @@ require 'grape'
         else
           articles = articles.published
         end
-        if params[:categories_ids]
-          articles = articles.joins(:categories).where('category_id in (?)', params[:categories_ids])
-        end
         articles
       end
 
@@ -219,6 +215,26 @@ require 'grape'
         return order
       end
 
+      def make_page_number_with_parameters(params)
+        params[:page] || 1
+      end
+
+      def make_per_page_with_parameters(params)
+        params[:per_page] ||= limit
+        params[:per_page].to_i
+      end
+
+      def make_timestamp_with_parameters_and_method(params, method)
+        timestamp = nil
+        if params[:timestamp]
+          datetime = DateTime.parse(params[:timestamp])
+          table_name = method.to_s.singularize.camelize.constantize.table_name
+          timestamp = "#{table_name}.updated_at >= '#{datetime}'"
+        end
+
+        timestamp
+      end
+
       def by_reference(scope, params)
         reference_id = params[:reference_id].to_i == 0 ? nil : params[:reference_id].to_i
         if reference_id.nil?
@@ -229,13 +245,27 @@ require 'grape'
          end
       end
 
+      def by_categories(scope, params)
+        category_ids = params[:category_ids]
+        if category_ids.nil?
+          scope
+        else
+          scope.joins(:categories).where(:categories => {:id => category_ids})
+        end
+      end
+
       def select_filtered_collection_of(object, method, params)
         conditions = make_conditions_with_parameter(params)
         order = make_order_with_parameters(object,method,params)
+        page_number = make_page_number_with_parameters(params)
+        per_page = make_per_page_with_parameters(params)
+        timestamp = make_timestamp_with_parameters_and_method(params, method)
 
         objects = object.send(method)
         objects = by_reference(objects, params)
-        objects = objects.where(conditions).limit(limit).reorder(order)
+        objects = by_categories(objects, params)
+
+        objects = objects.where(conditions).where(timestamp).page(page_number).per_page(per_page).reorder(order)
 
         objects
       end
@@ -283,12 +313,12 @@ require 'grape'
       end
 
       def cant_be_saved_request!(attribute)
-        message = _("(Invalid request) #{attribute} can't be saved")
+        message = _("(Invalid request) %s can't be saved") % attribute
         render_api_error!(message, 400)
       end
 
       def bad_request!(attribute)
-        message = _("(Bad request) #{attribute} not given")
+        message = _("(Invalid request) %s not given") % attribute
         render_api_error!(message, 400)
       end
 

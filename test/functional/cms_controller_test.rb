@@ -697,6 +697,34 @@ class CmsControllerTest < ActionController::TestCase
     end
   end
 
+  should "marks a article like archived" do
+    article = create(Article, :profile => profile, :name => 'test', :published => true, :archived => false)
+
+    post :edit, :profile => profile.identifier, :id => article.id, :article => {:archived => true}
+    get :edit, :profile => profile.identifier, :id => article.id
+    assert_tag :tag => 'input', :attributes => { :type => 'checkbox', :name => 'article[archived]', :id => 'article_archived', :checked => 'checked' }
+
+  end
+
+  should "try add children into archived folders" do
+    folder = create(Folder, :profile => profile, :name => 'test', :published => true, :archived => false)
+    article_child = create(Article, :profile => profile, :name => 'test child', :parent_id => folder.id, :published => true, :archived => false)
+
+    get :edit, :profile => profile.identifier, :id => folder.id
+    assert_tag :tag => 'input', :attributes => { :type => 'checkbox', :name => 'article[archived]', :id => 'article_archived' }
+
+    post :edit, :profile => profile.identifier, :id => folder.id, :article => {:archived => true}
+
+    get :edit, :profile => profile.identifier, :id => article_child.id
+    assert_tag :tag => 'div', :attributes => { :class => 'text-warning'}
+
+    err = assert_raises ActiveRecord::RecordInvalid do
+      another_article_child = create(Article, :profile => profile, :name => 'other test child', :parent_id => folder.id, :published => true, :archived => false)
+    end
+    assert_match 'Parent folder is archived', err.message
+
+  end
+
   should 'be able to add image with alignment' do
     post :new, :type => 'TinyMceArticle', :profile => profile.identifier, :article => { :name => 'image-alignment', :body => "the text of the article with image <img src='#' align='right'/> right align..." }
     saved = TinyMceArticle.find_by_name('image-alignment')
@@ -962,13 +990,24 @@ class CmsControllerTest < ActionController::TestCase
     assert_no_tag :tag => 'a', :attributes => { :href => "/myprofile/#{profile.identifier}/cms/edit/#{profile.blog.feed.id}" }
   end
 
-  should 'remove the image of an article' do
+  should 'remove the image of a blog' do
     blog = create(Blog, :profile_id => profile.id, :name=>'testblog', :image_builder => { :uploaded_data => fixture_file_upload('/files/rails.png', 'image/png')})
     blog.save!
-    post :edit, :profile => profile.identifier, :id => blog.id, :remove_image => 'true'
+    post :edit, :profile => profile.identifier, :id => blog.id, :article => {:image_builder => { :remove_image => 'true'}}
     blog.reload
 
     assert_nil blog.image
+  end
+
+  should 'remove the image of an article' do
+    image = fast_create(Image, :content_type => 'image/png', :filename => 'event-image.png', :label => 'test_label', :size => 1014)
+    article = fast_create(Article, :profile_id => profile.id, :name => 'test_label_article', :body => 'test_content')
+    article.image = image
+    article.save
+    post :edit, :profile => profile.identifier, :id => article.id, :article => {:image_builder => { :remove_image => 'true'}}
+    article.reload
+
+    assert_nil article.image
   end
 
   should 'update feed options by edit blog form' do
@@ -1590,11 +1629,11 @@ class CmsControllerTest < ActionController::TestCase
     assert_no_tag :tag => 'input', :attributes => { :type => 'checkbox', :name => 'article[display_posts_in_current_language]', :checked => 'checked' }
   end
 
-  should 'not display accept comments option when creating forum post' do
+  should 'display accept comments option when creating forum post' do
     profile.articles << f = Forum.new(:name => 'Forum for test')
     get :new, :profile => profile.identifier, :type => 'TinyMceArticle', :parent_id => f.id
-    assert :tag => 'input', :attributes => {:name => 'article[accept_comments]', :value => 1, :type => 'hidden'}
-    assert_no_tag :tag => 'input', :attributes => {:name => 'article[accept_comments]', :value => 1, :type => 'checkbox'}
+    assert_no_tag :tag => 'input', :attributes => {:name => 'article[accept_comments]', :value => 1, :type => 'hidden'}
+    assert_tag :tag => 'input', :attributes => {:name => 'article[accept_comments]', :value => 1, :type => 'checkbox'}
   end
 
   should 'display accept comments option when creating an article that is not a forum post' do

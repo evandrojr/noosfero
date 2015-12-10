@@ -170,6 +170,16 @@ class ArticlesTest < ActiveSupport::TestCase
 
   end
 
+  should 'not perform a vote in a archived article' do
+    article = fast_create(Article, :profile_id => @person.id, :name => "Some thing", :archived => true)
+    @params[:value] = 1
+
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+
+    assert_equal 400, last_response.status
+  end
+
   expose_attributes = %w(id body abstract created_at title author profile categories image votes_for votes_against setting position hits start_date end_date tag_list parent children children_count)
 
   expose_attributes.each do |attr|
@@ -183,7 +193,7 @@ class ArticlesTest < ActiveSupport::TestCase
 
   should "update body of article created by me" do
     new_value = "Another body"
-    params[:article] = {:body => new_value} 
+    params[:article] = {:body => new_value}
     article = fast_create(Article, :profile_id => person.id)
     post "/api/v1/articles/#{article.id}?#{params.to_query}"
     json = JSON.parse(last_response.body)
@@ -192,7 +202,7 @@ class ArticlesTest < ActiveSupport::TestCase
 
   should "update title of article created by me" do
     new_value = "Another name"
-    params[:article] = {:name => new_value} 
+    params[:article] = {:name => new_value}
     article = fast_create(Article, :profile_id => person.id)
     post "/api/v1/articles/#{article.id}?#{params.to_query}"
     json = JSON.parse(last_response.body)
@@ -202,7 +212,7 @@ class ArticlesTest < ActiveSupport::TestCase
   should 'not update article of another user' do
     another_person = fast_create(Person, :environment_id => environment.id)
     article = fast_create(Article, :profile_id => another_person.id)
-    params[:article] = {:title => 'Some title'} 
+    params[:article] = {:title => 'Some title'}
     post "/api/v1/articles/#{article.id}?#{params.to_query}"
     assert_equal 403, last_response.status
   end
@@ -210,7 +220,7 @@ class ArticlesTest < ActiveSupport::TestCase
   should 'not update article without permission in community' do
     community = fast_create(Community, :environment_id => environment.id)
     article = fast_create(Article, :profile_id => community.id)
-    params[:article] = {:name => 'New title'} 
+    params[:article] = {:name => 'New title'}
     post "/api/v1/articles/#{article.id}?#{params.to_query}"
     assert_equal 403, last_response.status
   end
@@ -221,10 +231,47 @@ class ArticlesTest < ActiveSupport::TestCase
     give_permission(person, 'post_content', community)
     article = fast_create(Article, :profile_id => community.id)
     new_value = "Another body"
-    params[:article] = {:body => new_value} 
+    params[:article] = {:body => new_value}
     post "/api/v1/articles/#{article.id}?#{params.to_query}"
     json = JSON.parse(last_response.body)
     assert_equal new_value, json["article"]["body"]
+  end
+
+  should 'list articles with pagination' do
+    Article.destroy_all
+    article_one = fast_create(Article, :profile_id => user.person.id, :name => "Another thing", :created_at => 2.days.ago)
+    article_two = fast_create(Article, :profile_id => user.person.id, :name => "Some thing", :created_at => 1.day.ago)
+
+    params[:page] = 1
+    params[:per_page] = 1
+    get "/api/v1/articles/?#{params.to_query}"
+    json_page_one = JSON.parse(last_response.body)
+
+    params[:page] = 2
+    params[:per_page] = 1
+    get "/api/v1/articles/?#{params.to_query}"
+    json_page_two = JSON.parse(last_response.body)
+
+    assert_includes json_page_one["articles"].map { |a| a["id"] }, article_two.id
+    assert_not_includes json_page_one["articles"].map { |a| a["id"] }, article_one.id
+
+    assert_includes json_page_two["articles"].map { |a| a["id"] }, article_one.id
+    assert_not_includes json_page_two["articles"].map { |a| a["id"] }, article_two.id
+  end
+
+  should 'list articles with timestamp' do
+    article_one = fast_create(Article, :profile_id => user.person.id, :name => "Another thing")
+    article_two = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
+
+    article_one.updated_at = Time.now + 3.hours
+    article_one.save!
+
+    params[:timestamp] = Time.now + 1.hours
+    get "/api/v1/articles/?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+
+    assert_includes json["articles"].map { |a| a["id"] }, article_one.id
+    assert_not_includes json["articles"].map { |a| a["id"] }, article_two.id
   end
 
   #############################
@@ -515,6 +562,14 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equal 1, json['article']['hits']
   end
 
+  should 'not update hit attribute of a specific child if a article is archived' do
+    folder = fast_create(Folder, :profile_id => user.person.id, :archived => true)
+    article = fast_create(Article, :parent_id => folder.id, :profile_id => user.person.id)
+    get "/api/v1/articles/#{folder.id}/children/#{article.id}?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal 0, json['article']['hits']
+  end
+
   should 'list all events of a community in a given category' do
     co = Community.create(identifier: 'my-community', name: 'name-my-community')
     c1 = Category.create(environment: Environment.default, name: 'my-category')
@@ -541,11 +596,28 @@ class ArticlesTest < ActiveSupport::TestCase
     e2.categories << c2
     e1.save!
     e2.save!
-    params['categories_ids[]']=c1.id
+    params['category_ids[]']=c1.id
     params['content_type']='Event'
     get "api/v1/communities/#{co.id}/articles?#{params.to_query}"
     json = JSON.parse(last_response.body)
     #should show only one article, since the other not in the same category
+    assert_equal 1, json['articles'].count
+    assert_equal e1.id, json['articles'][0]['id']
+  end
+
+  should 'not list uncategorized event of a community if a category is given' do
+    co = Community.create(identifier: 'my-community', name: 'name-my-community')
+    c1 = Category.create(environment: Environment.default, name: 'my-category')
+    c2 = Category.create(environment: Environment.default, name: 'dont-show-me-this-category')
+    e1 = fast_create(Event, :profile_id => co.id)
+    e2 = fast_create(Event, :profile_id => co.id)
+    e3 = fast_create(Event, :profile_id => co.id)
+    e1.categories << c1
+    e2.categories << c2
+    params['category_ids[]']=c1.id
+    params['content_type']='Event'
+    get "api/v1/communities/#{co.id}/articles?#{params.to_query}"
+    json = JSON.parse(last_response.body)
     assert_equal 1, json['articles'].count
     assert_equal e1.id, json['articles'][0]['id']
   end
@@ -583,6 +655,29 @@ class ArticlesTest < ActiveSupport::TestCase
     get "api/v1/communities/#{co.id}/articles?#{params.to_query}"
     json = JSON.parse(last_response.body)
     assert_equal json['articles'].count, 2
+  end
+
+  should 'find archived articles' do
+    article1 = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
+    article2 = fast_create(Article, :profile_id => user.person.id, :name => "Some thing", :archived => true)
+    params[:archived] = true
+    get "/api/v1/articles/?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_not_includes json["articles"].map { |a| a["id"] }, article1.id
+    assert_includes json["articles"].map { |a| a["id"] }, article2.id
+  end
+
+  ARTICLE_ATTRIBUTES = %w(followers_count votes_count comments_count)
+
+  ARTICLE_ATTRIBUTES.map do |attribute|
+
+    define_method "test_should_expose_#{attribute}_attribute_in_article_enpoints" do
+      article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
+      get "/api/v1/articles/#{article.id}?#{params.to_query}"
+      json = JSON.parse(last_response.body)
+      assert_not_nil json['article'][attribute]
+    end
+
   end
 
 end

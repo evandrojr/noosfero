@@ -65,4 +65,8 @@ class Folder < Article
     !self.has_posts? || self.gallery?
   end
 
+  def archived?
+    self.archived
+  end
+
 end

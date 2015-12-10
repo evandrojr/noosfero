@@ -231,6 +231,10 @@ body, th, td, input {
   border-left: 0px;
 }
 
+.menu-submenu-list>li{
+  width: 100%;
+}
+
 #navigation .menu-submenu ul{
   border: 1px solid #888a85;
   border-top: 0px;
@@ -298,10 +302,9 @@ body, th, td, input {
   border-color: #babdb6;
   border-width: 1px;
   border-radius: 10px;
-
   box-shadow: 1px 1px 2px #888888;
-
   padding: 10px 20px;
+  position: relative;
 }
 
 #content .main-block h1, #not-found h1, #access-denied h1 {
@@ -481,6 +484,7 @@ div#notice {
 #content .profile-list-block ul,
 #content .enterprises-block ul,
 #content .communities-block ul,
+#content .favorite-enterprises-block ul,
 #content .fans-block ul {
   min-width: 196px;
   width: 192px;
@@ -496,15 +500,14 @@ div#notice {
   display: block;
 }
 
+.block-footer-content {
+  text-align: center;
+  padding-top: 3px;
+}
+
 .block-footer-content a.view-all {
-  position: absolute;
-  top: 2px;
-  right: 0px;
   font-size: 11px;
   color: #000;
-  text-decoration: none;
-  padding-right: 15px;
-  background: url(imgs/arrow-right-p.png) 100% 50% no-repeat;
 }
 
 #content .profile-list-block .block-title {
@@ -639,7 +642,6 @@ div#notice {
   border-radius-topright: 0px;
   border-radius-bottomright: 0px;
   background-color: #cecece;
-  width: 100%;
   border-right: 2px solid #555753;
 }
 
@@ -1533,4 +1535,8 @@ table#recaptcha_table tr:hover td {
   margin-top: 20px;
   width: 494px;
   padding-left: 2px;
+}
+
+.profile-members-title-sort {
+  clear: both;
 }

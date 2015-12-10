@@ -9,7 +9,7 @@ module Noosfero
 
       logger = Logger.new(File.join(Rails.root, 'log', "#{ENV['RAILS_ENV'] || 'production'}_api.log"))
       logger.formatter = GrapeLogging::Formatters::Default.new
-      use GrapeLogging::Middleware::RequestLogger, { logger: logger }
+      #use GrapeLogging::Middleware::RequestLogger, { logger: logger }
 
       rescue_from :all do |e|
         puts e.inspect
@@ -35,7 +35,7 @@ module Noosfero
       after { set_session_cookie }
 
       version 'v1'
-      prefix "api"
+      prefix [ENV['RAILS_RELATIVE_URL_ROOT'], "api"].compact.join('/')
       format :json
       content_type :txt, "text/plain"
 
@@ -52,6 +52,7 @@ module Noosfero
       mount V1::Tags
       mount V1::Environments
       mount V1::Search
+      mount V1::Contacts
 
       mount Session
 

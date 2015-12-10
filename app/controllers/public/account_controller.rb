@@ -2,7 +2,7 @@ class AccountController < ApplicationController
 
   no_design_blocks
 
-  before_filter :login_required, :only => [:activation_question, :accept_terms, :activate_enterprise, :change_password]
+  before_filter :login_required, :require_login_for_environment, :only => [:activation_question, :accept_terms, :activate_enterprise, :change_password]
   before_filter :redirect_if_logged_in, :only => [:login, :signup]
   before_filter :protect_from_bots, :only => :signup
 
@@ -104,10 +104,8 @@ class AccountController < ApplicationController
     @block_bot = !!session[:may_be_a_bot]
     @invitation_code = params[:invitation_code]
     begin
-      @user = User.new(params[:user])
+      @user = User.build(params[:user], params[:profile_data], environment)
       @user.session = session
-      @user.terms_of_use = environment.terms_of_use
-      @user.environment = environment
       @terms_of_use = environment.terms_of_use
       @user.person_data = params[:profile_data]
       @user.return_to = session[:return_to]

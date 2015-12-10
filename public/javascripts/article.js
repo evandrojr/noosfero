@@ -200,4 +200,10 @@ jQuery(function($) {
 
   $(".custom_privacy_option").click(show_hide_token_input);
 
+  //Workaround to pointer-events:none CSS3  
+  $('a.disabled').click(function(e){
+    e.preventDefault();
+    return false;
+  });
+
 });

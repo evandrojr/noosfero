@@ -48,8 +48,8 @@ class User
 
   def activate_oauth_user
     self.oauth_providers.each do |provider|
-      OauthClientPlugin::UserProvider.create! do |user_provider|
-        user_provider.user = self
+      OauthClientPlugin::Auth.create! do |user_provider|
+        user_provider.profile = self.person
         user_provider.provider = provider
         user_provider.enabled = true
         user_provider.oauth_data = oauth_data

@@ -27,7 +27,7 @@ class CmsController < MyProfileController
 
   helper_method :file_types
 
-  protect_if :except => [:suggest_an_article, :set_home_page, :edit, :destroy, :publish, :upload_files, :new] do |c, user, profile|
+  protect_if :except => [:suggest_an_article, :set_home_page, :edit, :destroy, :publish, :publish_on_portal_community, :publish_on_communities, :search_communities_to_publish, :upload_files, :new] do |c, user, profile|
     user && (user.has_permission?('post_content', profile) || user.has_permission?('publish_content', profile))
   end
 
@@ -93,7 +93,6 @@ class CmsController < MyProfileController
     refuse_blocks
     record_coming
     if request.post?
-      @article.image = nil if params[:remove_image] == 'true'
       if @article.image.present? && params[:article][:image_builder] &&
         params[:article][:image_builder][:label]
         @article.image.label = params[:article][:image_builder][:label]
@@ -289,7 +288,7 @@ class CmsController < MyProfileController
          task.cancel
       end
       if @failed.blank?
-        session[:notice] = _("Your publish request was sent successfully")
+        session[:notice] = _("You published this content successfully")
         if @back_to
           redirect_to @back_to
         else

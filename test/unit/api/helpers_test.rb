@@ -26,13 +26,13 @@ class APIHelpersTest < ActiveSupport::TestCase
     assert_equal user, current_user
   end
 
-  should 'not get the current user with expired token' do
+  should 'get the current user even with expired token' do
     user = create_user('someuser')
     user.generate_private_token!
     user.private_token_generated_at = DateTime.now.prev_year
     user.save
     self.params = {:private_token => user.private_token}
-    assert_nil current_user
+    assert_equal user, current_user
   end
 
   should 'get the person of current user' do
@@ -136,6 +136,10 @@ class APIHelpersTest < ActiveSupport::TestCase
 
   should 'make_conditions_with_parameter return created_at parameter if until period is defined as string' do
     assert_not_nil make_conditions_with_parameter('until' => '2010-10-10')[:created_at]
+  end
+
+  should 'make_conditions_with_parameter return archived parameter if archived was defined' do
+    assert_not_nil make_conditions_with_parameter('archived' => true)[:archived]
   end
 
   should 'make_conditions_with_parameter return created_at as the first existent date as parameter if only until is defined' do
@@ -284,20 +288,6 @@ should 'verify if Serpro\' captcha token has been sent' do
   assert_equal(_("Missing Serpro's Captcha token"), r[0][:javascript_console_message])
 end
 
-should 'captcha serpro say name or service not known' do
-    environment = Environment.new
-    environment.api_captcha_settings = {
-        enabled: true,
-        provider: 'serpro',
-        serpro_client_id:  '0000000000000000',
-        verify_uri:  'http://someserverthatdoesnotexist.mycompanythatdoesnotexist.com/validate',
-    }
-    params = {}
-    params[:txtToken_captcha_serpro_gov_br] = '4324343'
-    params[:captcha_text] = '4324343'
-    r = test_captcha('127.0.0.1', params, environment)
-    assert (r[0][:javascript_console_message]).starts_with?("Serpro captcha error: getaddrinfo")
-end
 
 ###### END Captcha tests ######
 

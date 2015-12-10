@@ -135,9 +135,9 @@ class BoxOrganizerHelperTest < ActionView::TestCase
 
     doc = HTML::Document.new display_previews(block)
     assert_select doc.root, 'li' do |elements|
-      assert_match /\/images\/block_preview.png.*"/, elements[0].to_s
-      assert_match /\/images\/block_preview.png.*"/, elements[1].to_s
-      assert_match /\/images\/block_preview.png.*"/, elements[2].to_s
+      assert_match /img.* src="\/images\/block_preview.png.*"/, elements[0].to_s
+      assert_match /img.* src="\/images\/block_preview.png.*"/, elements[1].to_s
+      assert_match /img.* src="\/images\/block_preview.png.*"/, elements[2].to_s
     end
   end
 

@@ -15,6 +15,13 @@ module ArticleHelper
     topic_creation(@article) +
     content_tag('h4', _('Options')) +
     content_tag('div',
+      content_tag('div',
+        check_box(:article, :archived) +
+          content_tag('span', '&nbsp;', :class => 'access-archived-icon') +
+          content_tag('label', _('Read Only'), :for => 'article_archived_true') +
+          content_tag('span', _('Archive to avoid create comments, votes, actions in children articles...'), :class => 'access-note'),
+          :class => 'access-item'
+      ) +
       (article.profile.has_members? ?
       content_tag(
         'div',
@@ -23,13 +30,11 @@ module ArticleHelper
       ) :
       '') +
 
-      (article.parent && article.parent.forum? && controller.action_name == 'new' ?
-      hidden_field_tag('article[accept_comments]', 1) :
       content_tag(
         'div',
         check_box(:article, :accept_comments) +
         content_tag('label', (article.parent && article.parent.forum? ? _('This topic is opened for replies') : _('I want to receive comments about this article')), :for => 'article_accept_comments')
-      )) +
+      ) +
 
       content_tag(
         'div',
@@ -65,13 +70,20 @@ module ArticleHelper
     content_tag('div',
       content_tag('div',
         radio_button(:article, :published, true) +
-          content_tag('label', _('Public (visible to other people)'), :for => 'article_published_true')
+          content_tag('span', '&nbsp;', :class => 'access-public-icon') +
+          content_tag('label', _('Public'), :for => 'article_published_true') +
+          content_tag('span', _('Visible to other people'), :class => 'access-note'),
+          :class => 'access-item'
            ) +
       content_tag('div',
         radio_button(:article, :published, false) +
-          content_tag('label', _('Private'), :for => 'article_published_false', :id => "label_private")
+          content_tag('span', '&nbsp;', :class => 'access-private-icon') +
+          content_tag('label', _('Private'), :for => 'article_published_false', :id => "label_private") +
+          content_tag('span', _('Limit visibility of this article'), :class => 'access-note'),
+          :class => 'access-item'
       ) +
-      privacity_exceptions(article, tokenized_children)
+      privacity_exceptions(article, tokenized_children),
+      :class => 'access-itens'
     )
   end
 

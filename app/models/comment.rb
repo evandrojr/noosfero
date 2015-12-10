@@ -34,7 +34,9 @@ class Comment < ActiveRecord::Base
       rec.errors.add(:name, _('{fn} can only be informed for unauthenticated authors').fix_i18n)
     end
   end
-  
+
+  validate :article_archived?
+
   acts_as_having_settings
 
   xss_terminate :only => [ :body, :title, :name ], :on => 'validation'
@@ -208,6 +210,16 @@ class Comment < ActiveRecord::Base
 
   def can_be_updated_by?(user)
     user.present? && user == author
+  end
+
+  def archived?
+    self.article.archived? if self.article.present? && self.article.respond_to?(:archived?)
+  end
+
+  protected
+
+  def article_archived?
+    errors.add(:article, N_('associated with this comment is achived!')) if archived?
   end
 
 end

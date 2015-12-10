@@ -90,6 +90,7 @@ class Person < Profile
   #Article followers relation
   has_many :article_followers, :dependent => :destroy
   has_many :following_articles, :class_name => 'Article', :through => :article_followers, :source => :article
+  has_many :comments, :foreign_key => :author_id
 
   has_many :friendships, :dependent => :destroy
   has_many :friends, :class_name => 'Person', :through => :friendships

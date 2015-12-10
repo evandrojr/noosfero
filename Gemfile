@@ -10,8 +10,10 @@ gem 'RedCloth',                 '~> 4.2.9'
 gem 'will_paginate',            '~> 3.0.3'
 gem 'ruby-feedparser',          '~> 0.7'
 gem 'daemons',                  '~> 1.1.5'
-gem 'thin',                     '~> 1.3.1'
+#gem 'thin',                     '~> 1.3.1'
 gem 'nokogiri',                 '~> 1.6.0'
+gem 'unicorn',                  '~> 4.8'
+#gem 'nokogiri',                 '~> 1.5.5'
 gem 'rake', :require => false
 gem 'rest-client',              '~> 1.6.7'
 gem 'exception_notification',   '~> 4.0.1'
@@ -30,6 +32,7 @@ gem 'kramdown'
 #FIXME Get the Grape Loggin from master yo solve this issue https://github.com/intridea/grape/issues/1059
 #We have to remove this commit referenve code when update the next release of grape_logging. Actualy we are using (1.1.2)
 gem 'grape_logging', :git => 'https://github.com/aceunreal/grape_logging.git', :ref => 'f1755ae'
+#gem 'grape_logging'
 gem 'rack-cors'
 gem 'rack-contrib'
 gem 'liquid',                    '~> 3.0.3'
@@ -47,6 +50,7 @@ gem 'api-pagination',           '~> 4.1.1'
 # asset pipeline
 gem 'uglifier', '>= 1.0.3'
 gem 'sass-rails'
+gem 'sass', '~> 3.1.19'
 
 group :production do
   gem 'dalli', '~> 2.7.0'
@@ -63,7 +67,7 @@ group :cucumber do
   gem 'capybara',               '~> 2.1.0'
   gem 'cucumber',               '~> 1.0.6'
   gem 'database_cleaner',       '~> 1.2.0'
-  gem 'selenium-webdriver',     '~> 2.39.0'
+  gem 'selenium-webdriver',     '~> 2.47.0'
 end
 
 # Requires custom dependencies

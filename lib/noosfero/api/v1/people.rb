@@ -33,12 +33,12 @@ module Noosfero
           get do
             people = select_filtered_collection_of(environment, 'people', params)
             people = people.visible_for_person(current_person)
-            present people, :with => Entities::Person
+            present people, :with => Entities::Person, :fields => params[:fields]
           end
 
           desc "Return the logged user information"
           get "/me" do
-            present current_person, :with => Entities::Person
+            present current_person, :with => Entities::Person, :fields => params[:fields]
           end
 
           desc "Return the person information"

@@ -670,7 +670,7 @@ class ProfileDesignControllerTest < ActionController::TestCase
     end
 
     Noosfero::Plugin::Manager.any_instance.stubs(:enabled_plugins).returns([TestBlockPlugin.new])
-    refute @controller.available_blocks.include?(CustomBlock1)
+    assert !@controller.available_blocks.include?(CustomBlock1)
   end
 
   should 'clone a block' do
@@ -702,8 +702,8 @@ class ProfileDesignControllerTest < ActionController::TestCase
   should 'guarantee main block is always visible to everybody' do
     get :edit, :profile => 'designtestuser', :id => @b4.id
     %w[logged not_logged followers].each do |option|
-    assert_no_tag :select, :attributes => {:name => 'block[display_user]'},
-     :descendant => {:tag => 'option', :attributes => {:value => option}}
+      assert_no_tag :select, :attributes => {:name => 'block[display_user]'},
+        :descendant => {:tag => 'option', :attributes => {:value => option}}
     end
   end
 

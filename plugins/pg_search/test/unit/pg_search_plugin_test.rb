@@ -21,6 +21,13 @@ class PgSearchPluginTest < ActiveSupport::TestCase
     assert_includes search(Profile, 'admin deb'), profile2
   end
 
+  should 'rank profiles based on the search entry' do
+    profile1 = fast_create(Profile, :identifier => 'profile1', :name => 'debugger')
+    profile2 = fast_create(Profile, :identifier => 'profile2', :name => 'profile admin debugger')
+    profile3 = fast_create(Profile, :identifier => 'profile3', :name => 'admin debugger')
+    assert_equal [profile2, profile3, profile1], search(Profile, 'profile admin deb')
+  end
+
   should 'locate profile escaping special characters' do
     profile = fast_create(Profile, :name => 'John', :identifier => 'waterfall')
     assert_includes search(Profile, ') ( /\/\/\/\/\ o_o oOo o_o /\/\/\/\/\ ) ((tx waterfall)'), profile

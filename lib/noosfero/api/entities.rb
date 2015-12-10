@@ -52,8 +52,11 @@ module Noosfero
       end
 
       class Profile < Entity
-        expose :identifier, :name, :id
+        expose :id
+        expose :identifier
+        expose :name
         expose :created_at, :format_with => :timestamp
+        expose :updated_at, :format_with => :timestamp
         expose :image, :using => Image
         expose :region, :using => Region
       end
@@ -66,6 +69,17 @@ module Noosfero
       class Person < Profile
         root 'people', 'person'
         expose :user, :using => UserBasic, documentation: {type: 'User', desc: 'The user data of a person' }
+        expose :vote_count, if: lambda { |object, options| options[:fields].present? ? options[:fields].include?('vote_count') : false}
+        expose :comments_count, if: lambda { |object, options| options[:fields].present? ? options[:fields].include?('comments_count') : false}  do |person, options|
+          person.comments.count
+        end
+        expose :following_articles_count, if: lambda { |object, options| options[:fields].present? ? options[:fields].include?('following_articles_count') : false}  do |person, options|
+          person.following_articles.count
+        end
+        expose :articles_count, if: lambda { |object, options| options[:fields].present? ? options[:fields].include?('articles_count') : false}  do |person, options|
+          person.articles.count
+        end
+
       end
 
       class Enterprise < Profile
@@ -75,6 +89,8 @@ module Noosfero
       class Community < Profile
         root 'communities', 'community'
         expose :description
+        expose :categories
+        expose :members, :using => Person
       end
 
       class ArticleBase < Entity
@@ -83,12 +99,13 @@ module Noosfero
         expose :body
         expose :abstract, documentation: {type: 'String', desc: 'Teaser of the body'}
         expose :created_at, :format_with => :timestamp
+        expose :updated_at, :format_with => :timestamp
         expose :title, :documentation => {:type => "String", :desc => "Title of the article"}
         expose :created_by, :as => :author, :using => Profile, :documentation => {type: 'Profile', desc: 'The profile author that create the article'}
         expose :profile, :using => Profile, :documentation => {type: 'Profile', desc: 'The profile associated with the article'}
         expose :categories, :using => Category
         expose :image, :using => Image
-        #TODO Apply vote stuff in core and make this test
+       #TODO Apply vote stuff in core and make this test
         expose :votes_for
         expose :votes_against
         expose :setting
@@ -98,12 +115,15 @@ module Noosfero
         expose :end_date, :documentation => {type: 'DateTime', desc: 'The date of finish of the article'}
         expose :tag_list
         expose :children_count
-        expose :followers_count
         expose :slug, :documentation => {:type => "String", :desc => "Trimmed and parsed name of a article"}
+        expose :path
+        expose :followers_count
+        expose :votes_count
+        expose :comments_count
+        expose :archived, :documentation => {:type => "Boolean", :desc => "Defines if a article is readonly"}
       end
 
       class Article < ArticleBase
-        root 'articles', 'article'
         expose :parent, :using => ArticleBase
         expose :children, using: ArticleBase do |article, options|
           article.children.limit(Noosfero::API::V1::Articles::MAX_PER_PAGE)
@@ -137,7 +157,7 @@ module Noosfero
       end
 
       class UserLogin < User
-        expose :private_token, documentation: {type: 'String', desc: 'A valid authentication code for post/delete api actions'}
+        expose :private_token, documentation: {type: 'String', desc: 'A valid authentication code for post/delete api actions'}, if: lambda {|object, options| object.activated? }
       end
 
       class Task < Entity

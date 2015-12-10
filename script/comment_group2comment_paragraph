@@ -1,0 +1,70 @@
+#!/usr/bin/env ruby
+require File.dirname(__FILE__) + '/../config/environment'
+
+#http://ruby.bastardsbook.com/chapters/html-parsing/
+
+puts "Runing script"
+
+article = Article.find(410)
+new_article = TinyMceArticle.new
+
+doc =  Nokogiri::HTML(article.body)
+html_body = ''
+doc.css("p").map do |element|
+  html_body += '<p>' + element.text + '</p>'
+end
+
+comments = article.comments.reorder(:group_id)
+comment_association = {}
+
+puts 'antes'
+comments.map do |c|
+  comment_association[c.id] = c.group_id
+  puts c.group_id.inspect
+end
+
+puts "Set comment group to nil"
+article.comments.map do |comment|
+  comment.group_id = nil
+  comment.save
+end
+
+puts "Change article body"
+article.body = html_body
+article.save
+puts article.body
+article.comment_paragraph_plugin_activate = !article.comment_paragraph_plugin_activate
+article.save!
+puts article.body
+
+
+
+puts 'depois'
+comments.map do |c|
+  puts c.group_id.inspect
+end
+puts 'Migrating comments'
+
+doc = Nokogiri::HTML(article.body)
+group = 0
+doc.css("[data-macro-paragraph_uuid]").map do |paragraph|
+  uid = paragraph.attributes['data-macro-paragraph_uuid'].value
+  puts "Paragraph: #{uid}"
+  puts "Cheking paragraph group #{group} in comment #{comments[0].inspect}"
+  comment = comments.shift if !comments.empty? && comments[0].group_id.to_s == group.to_s
+  group += 1 
+  next if comment.nil?
+  puts "Change coment #{comment.id} to paragraph_uuid #{uid}"
+  comment.paragraph_uuid = uid
+  comment.save
+  comment = nil
+end
+
+#<Comment id: 4, title: "", body: "teste 1", source_id: 410, author_id: 54, name: nil, email: nil, created_at: "2015-09-29 18:54:32", reply_of_id: nil, ip_address: "127.0.0.1", spam: nil, source_type: "Article", user_agent: "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (K...", referrer: "http://localhost:3000/adminuser/coment-group-plugin...", settings: {:comment_paragraph_selected_area=>nil, :comment_paragraph_selected_content=>nil}, paragraph_id: nil, paragraph_uuid: nil, group_id: 0>
+
+#<Comment id: 2, title: "", body: "teste", source_id: 409, author_id: 54, name: nil, email: nil, created_at: "2015-09-29 18:54:11", reply_of_id: nil, ip_address: "127.0.0.1", spam: nil, source_type: "Article", user_agent: "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (K...", referrer: "http://localhost:3000/adminuser/comentario-por-para...", settings: {:comment_paragraph_selected_area=>nil, :comment_paragraph_selected_content=>nil}, paragraph_id: nil, paragraph_uuid: "9445dee8-0a65-4d5b-a654-5dd0e68b1db3", group_id: nil>
+
+
+
+puts new_article.body
+#

@@ -47,10 +47,25 @@ class PeopleTest < ActiveSupport::TestCase
     assert_equal some_person.id, json['person']['id']
   end
 
+  should 'people endpoint filter by fields parameter' do
+    get "/api/v1/people?#{params.to_query}&fields=name"
+    json = JSON.parse(last_response.body)
+    expected = {'people' => [{'name' => person.name}]}
+    assert_equal expected, json
+  end
+
+
   should 'get logged person' do
     get "/api/v1/people/me?#{params.to_query}"
     json = JSON.parse(last_response.body)
     assert_equal person.id, json['person']['id']
+  end
+
+  should 'me endpoint filter by fields parameter' do
+    get "/api/v1/people/me?#{params.to_query}&fields=name"
+    json = JSON.parse(last_response.body)
+    expected = {'person' => {'name' => person.name}}
+    assert_equal expected, json
   end
 
   should 'not get invisible person' do
@@ -163,6 +178,24 @@ class PeopleTest < ActiveSupport::TestCase
     post "/api/v1/people/#{person.id}?#{params.to_query}"
     person.reload
     assert_equal another_name, person.name
+  end
+
+  PERSON_ATTRIBUTES = %w(vote_count comments_count following_articles_count articles_count)
+
+  PERSON_ATTRIBUTES.map do |attribute|
+
+    define_method "test_should_not_expose_#{attribute}_attribute_in_person_enpoint_if_field_parameter_is_not_passed" do
+      get "/api/v1/people/me?#{params.to_query}"
+      json = JSON.parse(last_response.body)
+      assert_nil json['person'][attribute]
+    end
+
+    define_method "test_should_expose_#{attribute}_attribute_in_person_enpoints_only_if_field_parameter_is_passed" do
+      get "/api/v1/people/me?#{params.to_query}&fields=#{attribute}"
+      json = JSON.parse(last_response.body)
+      assert_not_nil json['person'][attribute]
+    end
+
   end
 
 end

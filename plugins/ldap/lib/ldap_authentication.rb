@@ -15,10 +15,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require 'rubygems'
 require 'iconv'
 require 'net/ldap'
 require 'net/ldap/dn'
+require 'magic'
 
 class LdapAuthentication
 
@@ -134,7 +134,18 @@ class LdapAuthentication
 
   def self.get_attr(entry, attr_name)
     if !attr_name.blank?
-      entry[attr_name].is_a?(Array) ? entry[attr_name].first : entry[attr_name]
+      val = entry[attr_name].is_a?(Array) ? entry[attr_name].first : entry[attr_name]
+      if val.nil?
+        Rails.logger.warn "LDAP entry #{entry.dn} has no attr #{attr_name}."
+        nil
+      elsif val == '' || val == ' '
+        Rails.logger.warn "LDAP entry #{entry.dn} has attr #{attr_name} empty."
+        ''
+      else
+        charset = Magic.guess_string_mime_encoding(val)
+        val.encode 'utf-8', charset, invalid: :replace, undef: :replace
+      end
     end
   end
+
 end

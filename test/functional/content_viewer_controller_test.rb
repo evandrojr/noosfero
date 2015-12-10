@@ -1600,4 +1600,43 @@ class ContentViewerControllerTest < ActionController::TestCase
     assert_tag :tag => 'div', :attributes => { :class => 'article-compact-image' }
     assert_tag :tag => 'div', :attributes => { :class => 'article-compact-abstract-with-image' }
   end
+
+  should 'not count a visit twice for the same user' do
+    profile = create_user('someone').person
+    login_as(@profile.identifier)
+    page = profile.articles.build(:name => 'myarticle', :body => 'the body of the text')
+    page.save!
+
+    get :view_page, :profile => profile.identifier, :page => 'myarticle'
+    page.reload
+    assert_equal 1, page.hits
+
+    get :view_page, :profile => profile.identifier, :page => 'myarticle'
+    page.reload
+    assert_equal 1, page.hits
+  end
+
+  should 'not count a visit twice for unlogged users' do
+     profile = create_user('someone').person
+     page = profile.articles.build(:name => 'myarticle', :body => 'the body of the text')
+     page.save!
+
+     get :view_page, :profile => profile.identifier, :page => 'myarticle'
+     page.reload
+     assert_equal 1, page.hits
+
+     get :view_page, :profile => profile.identifier, :page => 'myarticle'
+     page.reload
+     assert_equal 1, page.hits
+  end
+
+  should 'show blog image only inside blog cover' do
+    blog = create(Blog, :profile_id => profile.id, :name=>'testblog', :image_builder => { :uploaded_data => fixture_file_upload('/files/rails.png', 'image/png')})
+    blog.save!
+    get :view_page, :profile => profile.identifier, :page => [blog.path]
+
+    assert_select '.blog-cover > img', 1
+    assert_select '.article-body-img > img', 0
+  end
+
 end

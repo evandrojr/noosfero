@@ -126,6 +126,16 @@ module Noosfero
             end
           end
 
+          desc "Returns the articles I voted" do
+            detail 'Get the Articles I make a vote'
+            failure [[403, 'Forbidden']]
+            named 'ArticleFollowers'
+          end
+          get 'voted_by_me' do
+            #FIXME refactor this method
+            present_articles_paginated(current_person.votes.where(:voteable_type => 'Article').collect(&:voteable))
+          end
+
           desc 'Perform a vote on a article by id' do
             detail 'Vote on a specific article with values: 1 (if you like) or -1 (if not)'
             params Noosfero::API::Entities::UserLogin.documentation
@@ -139,20 +149,31 @@ module Noosfero
             # FIXME verify allowed values
             render_api_error!('Vote value not allowed', 400) unless [-1, 1].include?(value)
             article = find_article(environment.articles, params[:id])
+
             ## If login with captcha
             if @current_tmp_user
               vote = (@current_tmp_user.data.include? article.id) ? false : true
               if vote
                 @current_tmp_user.data << article.id
                 @current_tmp_user.store
-                vote = Vote.new(:voteable => article, :voter => current_person, :vote => value)
-                {:vote => vote.save}
+                begin
+                  vote = Vote.new(:voteable => article, :voter => current_person, :vote => value)
+                  saved = vote.save!
+                  {:vote => saved}
+                rescue ActiveRecord::RecordInvalid => e
+                  render_api_error!(e.message, 400)
+                end
               else
                 {:vote => false}
               end
             else
-              vote = Vote.new(:voteable => article, :voter => current_person, :vote => value)
-              {:vote => vote.save}
+              begin
+                vote = Vote.new(:voteable => article, :voter => current_person, :vote => value)
+                saved = vote.save!
+                {:vote => saved}
+              rescue ActiveRecord::RecordInvalid => e
+                render_api_error!(e.message, 400)
+              end
             end
           end
 

@@ -251,7 +251,15 @@ EOF
   end
 
   desc "finishes the release"
-  task 'release:finish' => ['noosfero:upload_packages', 'noosfero:tag', 'noosfero:pushtag']
+  task 'release:finish', :target do |t, args|
+    target = args[:target]
+    unless target
+      abort "E: usage: rake noosfero:release:finish[TARGET]"
+    end
+    Rake::Task['noosfero:upload_packages'].invoke(target)
+    Rake::Task['noosfero:tag'].invoke
+    Rake::Task['noosfero:pushtag'].invoke
+  end
 
   desc 'Build Debian packages'
   task :debian_packages => :package do
@@ -267,6 +275,15 @@ EOF
 
   desc "Build Debian packages (shorcut)"
   task :deb => :debian_packages
+
+  desc 'Build Debian snapshot packages (for local testing)'
+  task 'deb:snapshot' => :package do
+    target = "pkg/noosfero-#{$version}"
+    Dir.chdir target do
+      sh 'dch', '-v', $version.gsub('-', '.'), 'snapshot'
+    end
+    Rake::Task['noosfero:deb'].invoke
+  end
 
   desc 'Test Debian package'
   task 'debian:test' => :debian_packages do

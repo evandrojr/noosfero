@@ -5,6 +5,7 @@ module ActsAsHavingImage
       belongs_to :image, dependent: :destroy
       scope :with_image, :conditions => [ "#{table_name}.image_id IS NOT NULL" ]
       scope :without_image, :conditions => [ "#{table_name}.image_id IS NULL" ]
+      attr_accessible :image_builder
       self.send(:include, ActsAsHavingImage)
     end
   end
@@ -15,6 +16,9 @@ module ActsAsHavingImage
     else
       build_image(img)
     end unless img[:uploaded_data].blank?
+    if img[:remove_image] == 'true'
+      self.image_id = nil
+    end
   end
 
 end

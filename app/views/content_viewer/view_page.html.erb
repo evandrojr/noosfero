@@ -31,7 +31,7 @@
 <% cache(@page.cache_key(params, user, language)) do %>
   <div class="<%="article-body article-body-" + @page.css_class_name %>">
     <% options = @page.image? ? {:gallery_view => true} : {} %>
-    <% if @page.image.present? && !@page.event? %>
+    <% if @page.image.present? && !@page.event? && !@page.blog? %>
       <div class="article-body-img">
         <%= image_tag(@page.image.public_filename) %>
         <p><%= @page.image.label%></p>
@@ -85,7 +85,7 @@
       <% end %>
     </ul>
 
-    <% if @page.accept_comments? %>
+    <% if !@page.archived? || @page.accept_comments? %>
       <div id='page-comment-form' class='page-comment-form'><%= render :partial => 'comment/comment_form', :locals =>{:url => {:controller => :comment, :action => :create}, :display_link => true, :cancel_triggers_hide => true}%></div>
     <% end %>
   </div><!-- end class="comments" -->

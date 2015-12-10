@@ -30,8 +30,14 @@ module Noosfero
           #  POST api/v1/articles/12/comments?private_token=2298743290432&body=new comment&title=New
           post ":id/comments" do
             article = find_article(environment.articles, params[:id])
-            options = params.select { |key,v| !['id','private_token'].include?(key) }.merge(:author => current_person)
-            present article.comments.create(options), :with => Entities::Comment
+            options = params.select { |key,v| !['id','private_token'].include?(key) }.merge(:author => current_person, :source => article)
+            begin
+              comment = Comment.create(options)
+              comment.save!
+            rescue ActiveRecord::RecordInvalid => e
+              render_api_error!(e.message, 400)
+            end
+            present comment, :with => Entities::Comment
           end
         end
 

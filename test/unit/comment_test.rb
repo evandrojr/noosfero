@@ -94,6 +94,17 @@ class CommentTest < ActiveSupport::TestCase
     assert_equal cc + 1, ActionTracker::Record.find(activity.id).comments_count
   end
 
+  should 'try add a comment to a archived article' do
+    person = fast_create(Person)
+    article = Article.create!(:name => 'Test', :profile => person, :archived => true)
+
+    err = assert_raises ActiveRecord::RecordInvalid do
+      comment = create(Comment, :source => article, :author_id => person.id)
+    end
+
+    assert_match 'Article associated with this comment is achived', err.message
+  end
+
   should 'provide author name for authenticated authors' do
     owner = create_user('testuser').person
     assert_equal 'testuser', build(Comment, :author => owner).author_name
@@ -199,17 +210,6 @@ class CommentTest < ActiveSupport::TestCase
 
     assert comment.errors[:name.to_s].present?
     assert comment.errors[:body.to_s].present?
-  end
-
-  should 'escape malformed html tags' do
-    owner = create_user('testuser').person
-    article = owner.articles.create(:name => 'test', :body => '...')
-    comment = build(Comment, :article => article, :title => '<h1 title </h1>>> sd f <<', :body => '<h1>> sdf><asd>< body </h1>', :name => '<h1 name </h1>>><<dfsf<sd', :email => 'cracker@test.org')
-    comment.valid?
-
-    assert_no_match /[<>]/, comment.title
-    assert_no_match /[<>]/, comment.body
-    assert_no_match /[<>]/, comment.name
   end
 
   should 'use an existing image for deleted comments' do
@@ -747,6 +747,18 @@ class CommentTest < ActiveSupport::TestCase
     person = create_user('voter').person
     person.vote(comment, 5)
     comment.destroy
+  end
+
+  should 'not double escape html content after validation' do
+    comment = create_comment
+    body = 'Comment with "quotes"'
+    comment.body = body
+
+    comment.valid?
+    assert_equal body, comment.body
+
+    comment.valid?
+    assert_equal body, comment.body
   end
 
   private

@@ -364,22 +364,22 @@ class BlockTest < ActiveSupport::TestCase
 
   should 'return the icon block path' do
     class NewBlock < Block; end
-    assert_equal 'blocks/new_block/icon.png', NewBlock.icon_path
+    assert_equal 'images/blocks/new_block/icon.png', NewBlock.icon_path
   end
 
   should 'return the icon block path for blocks inside modules' do
     module SomeModule class NewBlock < Block; end; end
-    assert_equal 'blocks/new_block/icon.png', SomeModule::NewBlock.icon_path
+    assert_equal 'images/blocks/new_block/icon.png', SomeModule::NewBlock.icon_path
   end
 
   should 'return the default icon for blocks without icon' do
     class NewBlock < Block; end
-    assert_equal 'icon_block.png', NewBlock.default_icon_path
+    assert_equal '/images/icon_block.png', NewBlock.default_icon_path
   end
 
   should 'return the default preview path for blocks without preview images' do
     class NewBlock < Block; end
-    assert_equal 'block_preview.png', NewBlock.default_preview_path
+    assert_equal '/images/block_preview.png', NewBlock.default_preview_path
   end
 
   should 'get limit as a number when limit is string' do

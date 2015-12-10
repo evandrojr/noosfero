@@ -127,6 +127,7 @@ class User < ActiveRecord::Base
   validates_uniqueness_of   :email, :case_sensitive => false, :scope => :environment_id
   before_save :encrypt_password
   before_save :normalize_email, if: proc{ |u| u.email.present? }
+  before_save :generate_private_token_if_not_exist
   validates_format_of :email, :with => Noosfero::Constants::EMAIL_FORMAT, :if => (lambda {|user| !user.email.blank?})
 
   validates_inclusion_of :terms_accepted, :in => [ '1' ], :if => lambda { |u| ! u.terms_of_use.blank? }, :message => N_('{fn} must be checked in order to signup.').fix_i18n
@@ -142,17 +143,32 @@ class User < ActiveRecord::Base
 
     u = self.has_login?(login, login, environment.id)
     u = u.first if u.is_a?(ActiveRecord::Relation)
-    u && u.authenticated?(password) ? u : nil
+
+    if u && u.authenticated?(password)
+      u.generate_private_token_if_not_exist
+      return u
+    end
+    return nil
   end
 
   def register_login
     self.update_attribute :last_login_at, Time.now
   end
 
-  def generate_private_token!
+  def generate_private_token
     self.private_token = SecureRandom.hex
     self.private_token_generated_at = DateTime.now
+  end
+
+  def generate_private_token!
+    self.generate_private_token
     save(:validate => false)
+  end
+
+  def generate_private_token_if_not_exist
+    unless self.private_token
+      self.generate_private_token
+    end
   end
 
   TOKEN_VALIDITY = 2.weeks
@@ -405,6 +421,12 @@ class User < ActiveRecord::Base
 
   def not_require_password!
     @is_password_required = false
+  end
+
+  def resend_activation_code
+    return if self.activated?
+    update_attribute(:activation_code, make_activation_code)
+    self.deliver_activation_code
   end
 
   protected
