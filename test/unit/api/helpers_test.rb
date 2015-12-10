@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/test_helper';
+  require File.dirname(__FILE__) + '/test_helper';
 
 require File.expand_path(File.dirname(__FILE__) + "/../../../lib/noosfero/api/helpers")
 
@@ -31,6 +31,7 @@ class APIHelpersTest < ActiveSupport::TestCase
     user.generate_private_token!
     user.private_token_generated_at = DateTime.now.prev_year
     user.save
+    binding.pry
     self.params = {:private_token => user.private_token}
     assert_equal user, current_user
   end

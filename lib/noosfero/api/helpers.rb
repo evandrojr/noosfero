@@ -51,6 +51,19 @@ require 'grape'
       end
 
       ####################################################################
+      #### VOTE
+      ####################################################################
+      def do_vote(article, current_person, value)
+        begin
+          vote = Vote.new(:voteable => article, :voter => current_person, :vote => value)
+          return vote.save!
+        rescue ActiveRecord::RecordInvalid => e
+          render_api_error!(e.message, 400)
+          return false
+        end
+      end
+
+      ####################################################################
       #### SEARCH
       ####################################################################
       def find_by_contents(asset, context, scope, query, paginate_options={:page => 1}, options={})
