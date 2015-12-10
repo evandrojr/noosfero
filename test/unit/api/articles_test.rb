@@ -154,7 +154,7 @@ class ArticlesTest < ActiveSupport::TestCase
     post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
     json = JSON.parse(last_response.body)
     ## The api should not allow to save this vote
-    assert_equal false, json['vote']
+    assert_equal 400, last_response.status
   end
 
 
