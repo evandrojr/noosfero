@@ -5,6 +5,7 @@ module Noosfero
 
         resource :search do
           resource :article do
+            paginate per_page: 20, max_per_page: 200
             get do
               # Security checks
               sanitize_params_hash(params)
@@ -30,7 +31,7 @@ module Noosfero
 
               articles = search_result[:results]
 
-              result = present_articles(articles)
+              result = present_articles_paginated(articles)
 
               result
             end
