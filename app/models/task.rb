@@ -53,7 +53,7 @@ class Task < ActiveRecord::Base
   before_validation(:on => :create) do |task|
     if task.code.nil?
       task.code = Task.generate_code(task.code_length)
-      while (Task.find_by_code(task.code))
+      while Task.from_code(task.code).first
         task.code = Task.generate_code(task.code_length)
       end
     end
@@ -74,7 +74,7 @@ class Task < ActiveRecord::Base
             TaskMailer.target_notification(task, target_msg).deliver
           end
         end
-      rescue Exception => ex
+      rescue NotImplementedError => ex
         Rails.logger.info ex.to_s
       end
     end
@@ -153,6 +153,28 @@ class Task < ActiveRecord::Base
           record.errors[attribute] << (options[:message] || "should be "+ klass.to_s.downcase)
         end
       end
+    end
+  end
+
+  def requestor_is_of_kind(klass, message = nil)
+    error_message = message ||= _('Task requestor must be '+klass.to_s.downcase)
+    group = klass.to_s.downcase.pluralize
+    if environment.respond_to?(group) and requestor_id
+      requestor = requestor ||= environment.send(klass.to_s.downcase.pluralize).find_by_id(requestor_id)
+    end
+    unless requestor.class == klass
+      errors.add(error_message)
+    end
+  end
+
+  def target_is_of_kind(klass, message = nil)
+    error_message = message ||= _('Task target must be '+klass.to_s.downcase)
+    group = klass.to_s.downcase.pluralize
+    if environment.respond_to?(group) and target_id
+      target = target ||= environment.send(klass.to_s.downcase.pluralize).find_by_id(target_id)
+    end
+    unless target.class == klass
+      errors.add(error_message)
     end
   end
 
@@ -288,58 +310,29 @@ class Task < ActiveRecord::Base
     })
   end
 
-  scope :pending, :conditions => { :status =>  Task::Status::ACTIVE }
-  scope :hidden, :conditions => { :status =>  Task::Status::HIDDEN }
-  scope :finished, :conditions => { :status =>  Task::Status::FINISHED }
-  scope :canceled, :conditions => { :status =>  Task::Status::CANCELLED }
-  scope :closed, :conditions => { :status =>  [Task::Status::CANCELLED, Task::Status::FINISHED] }
-  scope :opened, :conditions => { :status =>  [Task::Status::ACTIVE, Task::Status::HIDDEN] }
-
-  # # updated scope method to avoid sql injection vunerabillity (http://brakemanscanner.org/docs/warning_types/sql_injection/)
-  # def self.of type
-  #   if type
-  #     where  "type LIKE ?", type
-  #   else
-  #     all
-  #   end
-  # end
-  #
-  # # updated scope method to avoid sql injection vunerabillity (http://brakemanscanner.org/docs/warning_types/sql_injection/)
-  # def self.order_by attribute_name, sort_order
-  #   if Task.column_names.include? attribute_name
-  #     # TODO  future versions of rails accepts a hash as param to order method
-  #     # which helps to prevent sql injection in an shorter way
-  #     sort_order_filtered = ("ASC".eql? "#{sort_order}".upcase) ? 'asc' : 'desc'
-  #     sort_expression = Task.column_names.collect {|column_name| "#{column_name} #{sort_order_filtered}" if column_name.eql? attribute_name}
-  #     order(sort_expression.join) unless sort_expression.join.empty?
-  #   end
-  # end
-  #
-  # # updated scope method to avoid sql injection vunerabillity (http://brakemanscanner.org/docs/warning_types/sql_injection/)
-  # def self.like field, value
-  #   if value and Tasks.column_names.include? field
-  #     where("LOWER(?) LIKE ?", "#{field}", "%#{value.downcase}%")
-  #   end
-  # end
-
-  scope :of, lambda { |type| conditions = type ? "tasks.type LIKE '#{type}'" : "1=1"; {:conditions =>  [conditions]} }
-  scope :order_by, lambda { |attribute, ord| {:order => "#{attribute} #{ord}"} }
-  scope :like, lambda { |field, value| where("LOWER(#{field}) LIKE ?", "%#{value.downcase}%") if value}
-
-  scope :pending_all, lambda { |profile, filter_type, filter_text|
+  scope :pending, -> { where status: Task::Status::ACTIVE }
+  scope :hidden, -> { where status: Task::Status::HIDDEN }
+  scope :finished, -> { where status: Task::Status::FINISHED }
+  scope :canceled, -> { where status: Task::Status::CANCELLED }
+  scope :closed, -> { where status: [Task::Status::CANCELLED, Task::Status::FINISHED] }
+  scope :opened, -> { where status: [Task::Status::ACTIVE, Task::Status::HIDDEN] }
+  scope :of, -> type { where "tasks.type LIKE ?", type if type }
+  scope :order_by, -> attribute, ord { order "#{attribute} #{ord}" }
+  scope :like, -> field, value { where "LOWER(#{field}) LIKE ?", "%#{value.downcase}%" if value }
+  scope :pending_all, -> profile, filter_type, filter_text {
     self.to(profile).without_spam.pending.of(filter_type).like('data', filter_text)
   }
 
   scope :to, lambda { |profile|
     environment_condition = nil
     if profile.person?
-      envs_ids = Environment.find(:all).select{ |env| profile.is_admin?(env) }.map { |env| "target_id = #{env.id}"}.join(' OR ')
+      envs_ids = Environment.all.select{ |env| profile.is_admin?(env) }.map{ |env| "target_id = #{env.id}"}.join(' OR ')
       environment_condition = envs_ids.blank? ? nil : "(target_type = 'Environment' AND (#{envs_ids}))"
     end
     profile_condition = "(target_type = 'Profile' AND target_id = #{profile.id})"
-    { :conditions => [environment_condition, profile_condition].compact.join(' OR ') }
-  }
 
+    where [environment_condition, profile_condition].compact.join(' OR ')
+  }
 
   def self.pending_types_for(profile)
     Task.to(profile).pending.select('distinct type').map { |t| [t.class.name, t.title] }
@@ -399,6 +392,12 @@ class Task < ActiveRecord::Base
       end
     end
   end
+
+  # finds a task by its (generated) code. Only returns a task with the
+  # specified code AND with status = Task::Status::ACTIVE.
+  #
+  # Can be used in subclasses to find only their instances.
+  scope :from_code, -> code { where code: code, status: Task::Status::ACTIVE }
 
   class << self
 

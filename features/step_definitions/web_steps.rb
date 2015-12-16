@@ -55,6 +55,10 @@ When /^(?:|I )fill in "([^"]*)" for "([^"]*)"(?: within "([^"]*)")?$/ do |value,
   end
 end
 
+When /^(?:|I )move the cursor over "([^"]*)"/ do |selector|
+  find(selector).hover if Capybara.default_driver == :selenium
+end
+
 # Use this to fill in an entire form with data from a table. Example:
 #
 #   When I fill in the following:
@@ -69,7 +73,7 @@ end
 When /^(?:|I )fill in the following(?: within "([^"]*)")?:$/ do |selector, fields|
   with_scope(selector) do
     fields.rows_hash.each do |name, value|
-      When %{I fill in "#{name}" with "#{value}"}
+      step %{I fill in "#{name}" with "#{value}"}
     end
   end
 end
@@ -114,11 +118,7 @@ end
 
 Then /^(?:|I )should see "([^"]*)"(?: within "([^"]*)")?$/ do |text, selector|
   with_scope(selector) do
-    if page.respond_to? :should
-      page.should have_content(text)
-    else
-      assert page.has_content?(text)
-    end
+    expect(page).to have_content(text)
   end
 end
 
@@ -199,7 +199,7 @@ Then /^the "([^"]*)" checkbox(?: within "([^"]*)")? should be checked$/ do |labe
   with_scope(selector) do
     field_checked = find_field(label)['checked']
     if field_checked.respond_to? :should
-      field_checked.should be_true
+      field_checked.should be_truthy
     else
       assert field_checked
     end
@@ -210,7 +210,7 @@ Then /^the "([^"]*)" checkbox(?: within "([^"]*)")? should not be checked$/ do |
   with_scope(selector) do
     field_checked = find_field(label)['checked']
     if field_checked.respond_to? :should
-      field_checked.should be_false
+      field_checked.should be_falsey
     else
       assert !field_checked
     end

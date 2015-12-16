@@ -7,6 +7,7 @@ class ProfileController < PublicController
 
   helper TagsHelper
   helper ActionTrackerHelper
+  helper CustomFieldsHelper
 
   protect 'send_mail_to_members', :profile, :only => [:send_mail]
 
@@ -37,7 +38,7 @@ class ProfileController < PublicController
 
   def tag_feed
     @tag = params[:id]
-    tagged = profile.articles.paginate(:per_page => 20, :page => 1, :order => 'published_at DESC', :include => :tags, :conditions => ['tags.name LIKE ?', @tag])
+    tagged = profile.articles.paginate(:per_page => 20, :page => 1).order('published_at DESC').joins(:tags).where('tags.name LIKE ?', @tag)
     feed_writer = FeedWriter.new
     data = feed_writer.write(
       tagged,
@@ -228,7 +229,7 @@ class ProfileController < PublicController
   end
 
   def more_replies
-    activity = Scrap.find(:first, :conditions => {:id => params[:activity], :receiver_id => @profile, :scrap_id => nil})
+    activity = Scrap.where(:id => params[:activity], :receiver_id => @profile, :scrap_id => nil).first
     comments_count = activity.replies.count
     comment_page = (params[:comment_page] || 1).to_i
     comments_per_page = 5
@@ -275,7 +276,7 @@ class ProfileController < PublicController
   def remove_notification
     begin
       raise if !can_edit_profile
-      notification = ActionTrackerNotification.find(:first, :conditions => {:profile_id => profile.id, :action_tracker_id => params[:activity_id]})
+      notification = ActionTrackerNotification.where(profile_id: profile.id, action_tracker_id: params[:activity_id]).first
       notification.destroy
       render :text => _('Notification successfully removed.')
     rescue

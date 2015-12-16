@@ -14,7 +14,12 @@
 }
 
 #newsletter-moderation-preview {
-  margin-left: 25px;
+  margin-left: 10px;
+}
+
+#newsletter-moderation-preview th {
+  padding: 0px;
+  border: 0px;
 }
 
 #newsletter-moderation-preview input[type=checkbox] {

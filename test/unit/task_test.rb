@@ -29,9 +29,7 @@ class TaskTest < ActiveSupport::TestCase
   end
 
   def test_should_call_perform_in_finish
-    mail = mock
-    mail.expects(:deliver)
-    TaskMailer.expects(:generic_message).with('task_finished', anything).returns(mail)
+    TaskMailer.expects(:generic_message).with('task_finished', anything)
     t = Task.create
     t.requestor = sample_user
     t.expects(:perform)
@@ -40,9 +38,7 @@ class TaskTest < ActiveSupport::TestCase
   end
 
   def test_should_have_cancelled_status_after_cancel
-    mail = mock
-    mail.expects(:deliver)
-    TaskMailer.expects(:generic_message).with('task_cancelled', anything).returns(mail)
+    TaskMailer.expects(:generic_message).with('task_cancelled', anything)
     t = Task.create
     t.requestor = sample_user
     t.cancel
@@ -58,9 +54,7 @@ class TaskTest < ActiveSupport::TestCase
     t = Task.create
     t.requestor = sample_user
 
-    mail = mock
-    mail.expects(:deliver)
-    TaskMailer.expects(:generic_message).with('task_finished', t).returns(mail)
+    TaskMailer.expects(:generic_message).with('task_finished', t)
 
     t.finish
   end
@@ -69,9 +63,7 @@ class TaskTest < ActiveSupport::TestCase
     t = Task.create
     t.requestor = sample_user
 
-    mail = mock
-    mail.expects(:deliver)
-    TaskMailer.expects(:generic_message).with('task_cancelled', t).returns(mail)
+    TaskMailer.expects(:generic_message).with('task_cancelled', t)
 
     t.cancel
   end
@@ -101,9 +93,7 @@ class TaskTest < ActiveSupport::TestCase
     task = Task.new
     task.requestor = sample_user
 
-    mail = mock
-    mail.expects(:deliver)
-    TaskMailer.expects(:generic_message).with('task_created', task).returns(mail)
+    TaskMailer.expects(:generic_message).with('task_created', task)
     task.save!
   end
 
@@ -141,7 +131,7 @@ class TaskTest < ActiveSupport::TestCase
 
     task.cancel
 
-    assert_nil Task.find_by_code(task.code)
+    assert_equal [], Task.from_code(task.code)
   end
 
   should 'be able to find active tasks' do
@@ -149,7 +139,7 @@ class TaskTest < ActiveSupport::TestCase
     task.requestor = sample_user
     task.save!
 
-    assert_not_nil Task.find_by_code(task.code)
+    assert_not_nil Task.from_code(task.code)
   end
 
   should 'use 36-chars codes by default' do
@@ -317,9 +307,7 @@ class TaskTest < ActiveSupport::TestCase
     task.requestor = sample_user
     task.save!
 
-    mail = mock
-    mail.expects(:deliver)
-    TaskMailer.expects(:generic_message).with('task_activated', task).returns(mail)
+    TaskMailer.expects(:generic_message).with('task_activated', task)
     task.activate
   end
 
@@ -355,7 +343,7 @@ class TaskTest < ActiveSupport::TestCase
     assert_includes Task.to(another_person), t4
   end
 
-  should 'filter tasks by type with named scope' do
+  should 'filter tasks by type with scope' do
     class CleanHouse < Task; end
     class FeedDog < Task; end
     requestor = fast_create(Person)

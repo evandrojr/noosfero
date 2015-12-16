@@ -18,12 +18,12 @@ module Noosfero
             article = find_article(environment.articles, params[:id])
             comments = select_filtered_collection_of(article, :comments, params)
 
-            present comments, :with => Entities::Comment
+            present comments, :with => Entities::Comment, :current_person => current_person
           end
 
           get ":id/comments/:comment_id" do
             article = find_article(environment.articles, params[:id])
-            present article.comments.find(params[:comment_id]), :with => Entities::Comment
+            present article.comments.find(params[:comment_id]), :with => Entities::Comment, :current_person => current_person
           end
 
           # Example Request:
@@ -37,7 +37,7 @@ module Noosfero
             rescue ActiveRecord::RecordInvalid => e
               render_api_error!(e.message, 400)
             end
-            present comment, :with => Entities::Comment
+            present comment, :with => Entities::Comment, :current_person => current_person
           end
         end
 
