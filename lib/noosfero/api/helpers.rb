@@ -22,7 +22,8 @@ require_relative '../../find_by_contents'
 
       def current_tmp_user
         private_token = (params[PRIVATE_TOKEN_PARAM] || headers['Private-Token']).to_s
-        @current_tmp_user = Noosfero::API::CaptchaSessionStore.get(private_token)
+        ## Get the "captcha" session store
+        @current_tmp_user = Noosfero::API::SessionStore.get("captcha##{private_token}")
         @current_tmp_user
       end
 
@@ -64,6 +65,19 @@ require_relative '../../find_by_contents'
       end
 
       include FindByContents
+
+      ####################################################################
+      #### VOTE
+      ####################################################################
+      def do_vote(article, current_person, value)
+        begin
+          vote = Vote.new(:voteable => article, :voter => current_person, :vote => value)
+          return vote.save!
+        rescue ActiveRecord::RecordInvalid => e
+          render_api_error!(e.message, 400)
+          return false
+        end
+      end
 
       ####################################################################
       #### SEARCH

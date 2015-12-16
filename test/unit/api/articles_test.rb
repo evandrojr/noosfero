@@ -127,6 +127,37 @@ class ArticlesTest < ActiveSupport::TestCase
     assert_equal 1, json['total_followers']
   end
 
+  should 'not perform a vote twice in same article' do
+    article = fast_create(Article, :profile_id => @person.id, :name => "Some thing")
+    @params[:value] = 1
+    ## Perform a vote twice in API should compute only one vote
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+
+    total = article.votes_total
+
+    assert_equal 1, total
+  end
+
+  should 'not perform a vote in favor and against a proposal' do
+    article = fast_create(Article, :profile_id => @person.id, :name => "Some thing")
+    @params[:value] = 1
+    ## Perform a vote in favor a proposal
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal 201, last_response.status
+    ## Perform a vote against a proposal
+    @params[:value] = -1
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    ## The api should not allow to save this vote
+    assert_equal 400, last_response.status
+  end
+
+
   should 'perform a vote in a article identified by id' do
     article = fast_create(Article, :profile_id => @person.id, :name => "Some thing")
     @params[:value] = 1
@@ -136,6 +167,7 @@ class ArticlesTest < ActiveSupport::TestCase
 
     assert_not_equal 401, last_response.status
     assert_equal true, json['vote']
+
   end
 
   should 'not perform a vote in a archived article' do

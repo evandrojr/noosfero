@@ -16,7 +16,11 @@ module Noosfero
         # this return is just to improve the clarity of the execution path
         return unless test_captcha(remote_ip, params, environment)
         ## Creates and caches a captcha session store
-        store = Noosfero::API::CaptchaSessionStore.create
+        store = Noosfero::API::SessionStore.create("captcha")
+        ## Initialize the data for the session store
+        store.data = []
+        ## Put it back in cache
+        store.store
         { "private_token" => "#{store.private_token}" }
       end
 
