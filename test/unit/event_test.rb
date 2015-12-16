@@ -277,8 +277,8 @@ class EventTest < ActiveSupport::TestCase
     event.address = '<p><!-- <asdf> << aasdfa >>> --> <h1> Wellformed html code </h1>'
     event.valid?
 
-    assert_match  /<!-- .* --> <h1> Wellformed html code <\/h1>/, event.body
-    assert_match  /<!-- .* --> <h1> Wellformed html code <\/h1>/, event.address
+    assert_match  /<p><!-- .* --> <\/p><h1> Wellformed html code <\/h1>/, event.body
+    assert_match  /<p><!-- .* --> <\/p><h1> Wellformed html code <\/h1>/, event.address
   end
 
   should 'be translatable' do
@@ -321,6 +321,16 @@ class EventTest < ActiveSupport::TestCase
   should 'have can_display_media_panel with default true' do
     a = Event.new
     assert a.can_display_media_panel?
+  end
+
+  should 'calculate duration of events with start and end date' do
+    e = build(Event, :start_date => DateTime.new(2015, 1, 1), :end_date => DateTime.new(2015, 1, 5))
+    assert_equal 5, e.duration
+  end
+
+  should 'calculate duration of event with only start_date' do
+    e = build(Event, :start_date => DateTime.new(2015, 1, 1))
+    assert_equal 1, e.duration
   end
 
 end

@@ -2,11 +2,11 @@ module Noosfero
   module API
     module V1
       class Contacts < Grape::API
-  
+
         resource :communities do
 
           resource ':id/contact' do
-            #contaxt => {:name => 'some name', :email => 'test@mail.com', :subject => 'some title', :message => 'some message'}
+            #contact => {:name => 'some name', :email => 'test@mail.com', :subject => 'some title', :message => 'some message'}
             desc "Send a contact message"
             post do
               profile = environment.communities.find(params[:id])
@@ -18,10 +18,10 @@ module Noosfero
                 {:success => false}
               end
             end
-    
+
           end
         end
-  
+
       end
     end
   end

@@ -47,6 +47,26 @@ class LoginCaptchaTest < ActiveSupport::TestCase
     assert_equal true, json['vote']
   end
 
+  should 'not perform a vote twice in same article' do
+    login_with_captcha
+    article = create_article('Article 1')
+    params[:value] = 1
+
+    ## Perform a vote twice in API should compute only one vote
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal true, json['vote']
+
+    post "/api/v1/articles/#{article.id}/vote?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    ## Should not allow vote again
+    assert_equal false, json['vote']
+
+    total = article.votes_total
+
+    assert_equal 1, total
+  end
+
   should 'not follow any article' do
     login_with_captcha
     article = create_article('Article 1')

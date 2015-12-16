@@ -21,17 +21,15 @@ def disabled_plugins
   @all_plugins - enabled_plugins
 end
 
-def enable_plugins(plugins = nil)
-  if plugins == '*' || plugins.nil?
-    sh './script/noosfero-plugins', '-q', 'enableall'
-  else
-    plugins = Array(plugins)
-    sh './script/noosfero-plugins', '-q', 'enable', *plugins
-  end
+def enable_plugins(plugins)
+  plugins = Array(plugins)
+  command = ['./script/noosfero-plugins', '-q', 'enable', *plugins]
+  puts plugins.join(' ')
+  system *command
 end
 
-def disable_plugins(plugins = nil)
-  if plugins == '*' || plugins.nil?
+def disable_plugins(plugins = '*')
+  if plugins == '*'
     sh './script/noosfero-plugins', '-q', 'disableall'
   else
     plugins = Array(plugins)
@@ -108,12 +106,12 @@ def run_test(name, files)
   if name == :cucumber || name == :selenium
     run_cucumber task2profile(name, plugin), files
   else
-    run_testrb files
+    run_minitest files
   end
 end
 
-def run_testrb(files)
-  sh 'testrb', '-I.:test', *files
+def run_minitest files
+  sh 'ruby', '-Itest', *files
 end
 
 def run_cucumber(profile, files)

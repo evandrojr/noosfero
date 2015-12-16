@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/test_helper'
+require_relative 'test_helper'
 
 class PeopleTest < ActiveSupport::TestCase
 
@@ -51,6 +51,14 @@ class PeopleTest < ActiveSupport::TestCase
     get "/api/v1/people?#{params.to_query}&fields=name"
     json = JSON.parse(last_response.body)
     expected = {'people' => [{'name' => person.name}]}
+    assert_equal expected, json
+  end
+
+  should 'people endpoint filter by fields parameter with hierarchy' do
+    fields = {only: [:name, {user: [:login]}]}.to_json
+    get "/api/v1/people?#{params.to_query}&fields=#{fields}"
+    json = JSON.parse(last_response.body)
+    expected = {'people' => [{'name' => person.name, 'user' => {'login' => 'testapi'}}]}
     assert_equal expected, json
   end
 
@@ -180,17 +188,57 @@ class PeopleTest < ActiveSupport::TestCase
     assert_equal another_name, person.name
   end
 
+  should 'display public custom fields' do
+    CustomField.create!(:name => "Custom Blog", :format => "string", :customized_type => "Person", :active => true, :environment => Environment.default)
+    some_person = create_user('some-person').person
+    some_person.custom_values = { "Custom Blog" => { "value" => "www.blog.org", "public" => "true"} }
+    some_person.save!
+
+    get "/api/v1/people/#{some_person.id}?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert json['person']['additional_data'].has_key?('Custom Blog')
+    assert_equal "www.blog.org", json['person']['additional_data']['Custom Blog']
+  end
+
+  should 'not display non-public custom fields' do
+    CustomField.create!(:name => "Custom Blog", :format => "string", :customized_type => "Person", :active => true, :environment => Environment.default)
+    some_person = create_user('some-person').person
+    some_person.custom_values = { "Custom Blog" => { "value" => "www.blog.org", "public" => "0"} }
+    some_person.save!
+
+    get "/api/v1/people/#{some_person.id}?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert_equal json['person']['additional_data'], {}
+  end
+
+  should 'display non-public custom fields to friend' do
+    CustomField.create!(:name => "Custom Blog", :format => "string", :customized_type => "Person", :active => true, :environment => Environment.default)
+    some_person = create_user('some-person').person
+    some_person.custom_values = { "Custom Blog" => { "value" => "www.blog.org", "public" => "0"} }
+    some_person.save!
+
+    f = Friendship.new
+    f.friend = some_person
+    f.person = person
+    f.save!
+
+    get "/api/v1/people/#{some_person.id}?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert json['person']['additional_data'].has_key?("Custom Blog")
+    assert_equal "www.blog.org", json['person']['additional_data']['Custom Blog']
+  end
+
   PERSON_ATTRIBUTES = %w(vote_count comments_count following_articles_count articles_count)
 
   PERSON_ATTRIBUTES.map do |attribute|
 
-    define_method "test_should_not_expose_#{attribute}_attribute_in_person_enpoint_if_field_parameter_is_not_passed" do
-      get "/api/v1/people/me?#{params.to_query}"
+    define_method "test_should_not_expose_#{attribute}_attribute_in_person_enpoint_if_field_parameter_does_not_contain_the_attribute" do
+      get "/api/v1/people/me?#{params.to_query}&fields=name"
       json = JSON.parse(last_response.body)
       assert_nil json['person'][attribute]
     end
 
-    define_method "test_should_expose_#{attribute}_attribute_in_person_enpoints_only_if_field_parameter_is_passed" do
+    define_method "test_should_expose_#{attribute}_attribute_in_person_enpoints_if_field_parameter_is_passed" do
       get "/api/v1/people/me?#{params.to_query}&fields=#{attribute}"
       json = JSON.parse(last_response.body)
       assert_not_nil json['person'][attribute]

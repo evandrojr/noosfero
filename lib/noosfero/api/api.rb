@@ -15,6 +15,7 @@ module Noosfero
         puts e.inspect
         puts e.backtrace.inspect
         logger.error e
+        error! e.message, 500
       end
 
       @@NOOSFERO_CONF = nil

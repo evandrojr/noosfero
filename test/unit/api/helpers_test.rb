@@ -1,6 +1,5 @@
-require File.dirname(__FILE__) + '/test_helper';
-
-require File.expand_path(File.dirname(__FILE__) + "/../../../lib/noosfero/api/helpers")
+require_relative 'test_helper'
+require 'noosfero/api/helpers'
 
 class APIHelpersTest < ActiveSupport::TestCase
 
@@ -113,6 +112,7 @@ class APIHelpersTest < ActiveSupport::TestCase
     p = fast_create(Profile)
     a = fast_create(Article, :published => false, :profile_id => p.id)
     fast_create(Article, :profile_id => p.id)
+
     user.generate_private_token!
     User.expects(:find_by_private_token).returns(user)
     assert_equal 403, find_article(p.articles, a.id).last
@@ -216,6 +216,26 @@ class APIHelpersTest < ActiveSupport::TestCase
     #assert_equal 403, find_article(p.articles, a.id).last
 
     #assert_equals [article1, article2], present_articles
+  end
+
+  should 'not touch in options when no fields parameter is passed' do
+    model = mock
+    expects(:present).with(model, {})
+    present_partial(model, {})
+  end
+
+  should 'fallback to array when fields parameter is not a json when calling present partial' do
+    model = mock
+    params[:fields] = 'name'
+    expects(:present).with(model, {:only => ['name']})
+    present_partial(model, {})
+  end
+
+  should 'accept json as fields parameter when calling present partial' do
+    model = mock
+    params[:fields] = {only: [:name, {user: [:login]}]}.to_json
+    expects(:present).with(model, {:only => ['name', {'user' => ['login']}]})
+    present_partial(model, {})
   end
 
 ###### Captcha tests ######

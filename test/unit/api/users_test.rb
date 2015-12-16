@@ -1,5 +1,5 @@
 # encoding: UTF-8
-require File.dirname(__FILE__) + '/test_helper'
+require_relative 'test_helper'
 
 class UsersTest < ActiveSupport::TestCase
 
@@ -11,32 +11,6 @@ class UsersTest < ActiveSupport::TestCase
     get "/api/v1/users/?#{params.to_query}"
     json = JSON.parse(last_response.body)
     assert_includes json["users"].map { |a| a["login"] }, user.login
-  end
-
-  should 'create a user' do
-    params[:user] = {:login => 'some', :password => '123456', :password_confirmation => '123456', :email => 'some@some.com'}
-    post "/api/v1/users?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_equal 'some', json['user']['login']
-  end
-
-  should 'not create duplicate user' do
-    params[:lang] = :"pt-BR"
-    params[:user] = {:login => 'some', :password => '123456', :password_confirmation => '123456', :email => 'some@some.com'}
-    post "/api/v1/users?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_equal 'some', json['user']['login']
-    params[:user] = {:login => 'some', :password => '123456', :password_confirmation => '123456', :email => 'some@some.com'}
-    post "/api/v1/users?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_equal 'Username / Email já está em uso,e-Mail já está em uso', json['message']
-  end
-
-  should 'return 400 status for invalid user creation' do
-    params[:user] = {:login => 'some'}
-    post "/api/v1/users?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_equal 400, last_response.status
   end
 
   should 'get user' do
@@ -57,6 +31,75 @@ class UsersTest < ActiveSupport::TestCase
     get "/api/v1/users/me?#{params.to_query}"
     json = JSON.parse(last_response.body)
     assert_equal user.id, json['user']['id']
+  end
+
+  should 'not show permissions to logged user' do
+    target_person = create_user('some-user').person
+    get "/api/v1/users/#{target_person.user.id}/?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    refute json["user"].has_key?("permissions")
+  end
+
+  should 'show permissions to self' do
+    get "/api/v1/users/#{user.id}/?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert json["user"].has_key?("permissions")
+  end
+
+  should 'not show permissions to friend' do
+    target_person = create_user('some-user').person
+
+    f = Friendship.new
+    f.friend = target_person
+    f.person = person
+    f.save!
+
+    get "/api/v1/users/#{target_person.user.id}/?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    refute json["user"].has_key?("permissions")
+  end
+
+  should 'not show private attribute to logged user' do
+    target_person = create_user('some-user').person
+    get "/api/v1/users/#{target_person.user.id}/?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    refute json["user"].has_key?("email")
+  end
+
+  should 'show private attr to friend' do
+    target_person = create_user('some-user').person
+    f = Friendship.new
+    f.friend = target_person
+    f.person = person
+    f.save!
+    get "/api/v1/users/#{target_person.user.id}/?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert json["user"].has_key?("email")
+    assert_equal target_person.email, json["user"]["email"]
+  end
+
+  should 'show public attribute to logged user' do
+    target_person = create_user('some-user').person
+    target_person.fields_privacy={:email=> 'public'}
+    target_person.save!
+    get "/api/v1/users/#{target_person.user.id}/?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert json["user"].has_key?("email")
+    assert_equal json["user"]["email"],target_person.email
+  end
+
+  should 'show public and private field to admin' do
+    Environment.default.add_admin(person)
+
+    target_person = create_user('some-user').person
+    target_person.fields_privacy={:email=> 'public'}
+    target_person.save!
+
+    get "/api/v1/users/#{target_person.user.id}/?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    assert json["user"].has_key?("email")
+    assert json["user"].has_key?("permissions")
+    assert json["user"].has_key?("activated")
   end
 
 end

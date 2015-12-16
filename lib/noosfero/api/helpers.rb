@@ -1,7 +1,7 @@
 require 'grape'
+require_relative '../../find_by_contents'
 
   module Noosfero;
-
     module API
       module APIHelpers
       PRIVATE_TOKEN_PARAM = :private_token
@@ -16,24 +16,25 @@ require 'grape'
         I18n.locale = (params[:lang] || request.env['HTTP_ACCEPT_LANGUAGE'] || 'en')
       end
 
-      # FIXME this filter just loads @plugins
       def init_noosfero_plugins
         plugins
       end
 
       def current_tmp_user
         private_token = (params[PRIVATE_TOKEN_PARAM] || headers['Private-Token']).to_s
-        @current_tmp_user = Noosfero::API::CaptchaSessionStore.get(private_token)
+        ## Get the "captcha" session store
+        @current_tmp_user = Noosfero::API::SessionStore.get("captcha##{private_token}")
         @current_tmp_user
       end
 
       def logout_tmp_user
         @current_tmp_user = nil
-      end      
+      end
 
       def current_user
         private_token = (params[PRIVATE_TOKEN_PARAM] || headers['Private-Token']).to_s
         @current_user ||= User.find_by_private_token(private_token)
+        @current_user = nil if !@current_user.nil? && @current_user.private_token_expired?
         @current_user
       end
 
@@ -49,19 +50,38 @@ require 'grape'
         @environment
       end
 
+      def present_partial(model, options)
+        if(params[:fields].present?)
+          begin
+            fields = JSON.parse(params[:fields])
+            if fields.present?
+              options.merge!(fields.symbolize_keys.slice(:only, :except))
+            end
+          rescue
+            options[:only] = Array.wrap(params[:fields])
+          end
+        end
+        present model, options
+      end
+
+      include FindByContents
+
+      ####################################################################
+      #### VOTE
+      ####################################################################
+      def do_vote(article, current_person, value)
+        begin
+          vote = Vote.new(:voteable => article, :voter => current_person, :vote => value)
+          return vote.save!
+        rescue ActiveRecord::RecordInvalid => e
+          render_api_error!(e.message, 400)
+          return false
+        end
+      end
+
       ####################################################################
       #### SEARCH
       ####################################################################
-      def find_by_contents(asset, context, scope, query, paginate_options={:page => 1}, options={})
-        scope = scope.with_templates(options[:template_id]) unless options[:template_id].blank?
-        search = plugins.dispatch_first(:find_by_contents, asset, scope, query, paginate_options, options)
-        register_search_term(query, scope.count, search[:results].count, context, asset)
-        search
-      end
-      def paginate_options(page = params[:page])
-        page = 1 if multiple_search?(@searches) || params[:display] == 'map'
-        { :per_page => limit, :page => page }
-      end
       def multiple_search?(searches=nil)
         ['index', 'category_index'].include?(params[:action]) || (searches && searches.size > 1)
       end
@@ -117,22 +137,26 @@ require 'grape'
         if !article.save
           render_api_errors!(article.errors.full_messages)
         end
-        present article, :with => Entities::Article, :fields => params[:fields]
+        present_partial article, :with => Entities::Article
       end
 
       def present_article(asset)
         article = find_article(asset.articles, params[:id])
-        present article, :with => Entities::Article, :fields => params[:fields]
+        present_partial article, :with => Entities::Article
       end
 
-      def present_articles(asset, method = 'articles')
+      def present_articles_for_asset(asset, method = 'articles')
         articles = find_articles(asset, method)
-        present_articles_paginated(articles)
+        present_articles(articles)
+      end
+
+      def present_articles(articles)
+        present_partial articles, :with => Entities::Article
       end
 
       def present_articles_paginated(articles, per_page=nil)
         articles = paginate(articles)
-        present articles, :with => Entities::Article, :fields => params[:fields]
+        present_partial articles, :with => Entities::Article
       end
 
       def find_articles(asset, method = 'articles')
@@ -162,19 +186,19 @@ require 'grape'
         if !task.save
           render_api_errors!(task.errors.full_messages)
         end
-        present task, :with => Entities::Task, :fields => params[:fields]
+        present_partial task, :with => Entities::Task
       end
 
       def present_task(asset)
         task = find_task(asset, params[:id])
-        present task, :with => Entities::Task, :fields => params[:fields]
+        present_partial task, :with => Entities::Task
       end
 
       def present_tasks(asset)
         tasks = select_filtered_collection_of(asset, 'tasks', params)
         tasks = tasks.select {|t| current_person.has_permission?(t.permission, asset)}
         return forbidden! if tasks.empty? && !current_person.has_permission?(:perform_task, asset)
-        present tasks, :with => Entities::Task, :fields => params[:fields]
+        present_partial tasks, :with => Entities::Task
       end
 
       def make_conditions_with_parameter(params = {})
@@ -273,7 +297,7 @@ require 'grape'
         unauthorized! unless current_user
       end
 
-      # Allows the anonymous captcha user authentication 
+      # Allows the anonymous captcha user authentication
       # to pass the check. Used by the articles/vote to allow
       # the vote without login
       def authenticate_allow_captcha!

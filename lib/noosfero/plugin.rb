@@ -149,7 +149,7 @@ class Noosfero::Plugin
 
     def load_plugin_extensions(dir)
       ActionDispatch::Reloader.to_prepare do
-        Dir[File.join(dir, 'lib', 'ext', '*.rb')].each {|file| require_dependency file }
+        Dir[File.join(dir, 'lib', 'ext', '*.rb')].each{ |file| require_dependency file }
       end
     end
 
@@ -258,6 +258,13 @@ class Noosfero::Plugin
     self.class.constants.map do |constant_name|
       self.class.const_get(constant_name)
     end.select {|const| const.is_a?(Class) && const < Noosfero::Plugin::Macro}
+  end
+
+  # New buttons actions with icons in each article on content manager page
+  # returns = proc block that creates html code to custom buttons
+  #
+  def extra_content_actions(article)
+    nil
   end
 
   # Here the developer may specify the events to which the plugins can
@@ -769,6 +776,4 @@ end
 
 require 'noosfero/plugin/hot_spot'
 require 'noosfero/plugin/manager'
-require 'noosfero/plugin/active_record'
-require 'noosfero/plugin/mailer_base'
 require 'noosfero/plugin/settings'

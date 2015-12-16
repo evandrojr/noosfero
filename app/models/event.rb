@@ -13,14 +13,14 @@ class Event < Article
   settings_items :presenter, :type => :string
 
   def link=(value)
-    self.setting[:link] = maybe_add_http(value)
+    self.setting[:link] = maybe_add_http(URI.escape value.to_s)
   end
 
   def link
     maybe_add_http(self.setting[:link])
   end
 
-  xss_terminate :only => [ :name, :body, :link, :address ], :with => 'white_list', :on => 'validation'
+  xss_terminate :only => [ :name, :body, :address ], :with => 'white_list', :on => 'validation'
 
   def initialize(*args)
     super(*args)
@@ -35,23 +35,21 @@ class Event < Article
     end
   end
 
-  scope :by_day, lambda { |date|
-    { :conditions => [' start_date >= :start_date AND start_date <= :end_date AND end_date IS NULL OR (start_date <= :end_date  AND end_date >= :start_date)', {:start_date => date.beginning_of_day, :end_date => date.end_of_day}],
-      :order => 'start_date ASC'
-    }
+  scope :by_day, -> date {
+    where('start_date >= :start_date AND start_date <= :end_date AND end_date IS NULL OR (start_date <= :end_date  AND end_date >= :start_date)',
+          start_date: date.beginning_of_day, end_date: date.end_of_day).
+    order('start_date ASC')
   }
 
-  scope :next_events_from_month, lambda { |date|
+  scope :next_events_from_month, -> date {
     date_temp = date.strftime("%Y-%m-%d")
-    { :conditions => ["start_date >= ?","#{date_temp}"],
-      :order => 'start_date ASC'
-    }
+    order('start_date ASC')
+    .where("start_date >= ?","#{date_temp}")
   }
 
-  scope :by_month, lambda { |date|
-    { :conditions => ["EXTRACT(YEAR FROM start_date) = ? AND EXTRACT(MONTH FROM start_date) = ?",date.year,date.month],
-      :order => 'start_date ASC'
-    }
+  scope :by_month, -> date {
+    order('start_date ASC')
+    .where("EXTRACT(YEAR FROM start_date) = ? AND EXTRACT(MONTH FROM start_date) = ?", date.year, date.month)
   }
 
   include WhiteListFilter
@@ -72,12 +70,10 @@ class Event < Article
     'event'
   end
 
-  scope :by_range, lambda { |range| {
-    :conditions => [
-      'start_date BETWEEN :start_day AND :end_day OR end_date BETWEEN :start_day AND :end_day',
-      { :start_day => range.first, :end_day => range.last }
-    ]
-  }}
+  scope :by_range, -> range {
+    where('start_date BETWEEN :start_day AND :end_day OR end_date BETWEEN :start_day AND :end_day',
+      {:start_day => range.first, :end_day => range.last})
+  }
 
   def self.date_range(year, month)
     if year.nil? || month.nil?
@@ -92,11 +88,11 @@ class Event < Article
     first_day = DateTime.new(year, month, 1)
     last_day = first_day + 1.month - 1.day
 
-    first_day..last_day
+    first_day.to_date..last_day.to_date
   end
 
   def date_range
-    start_date..(end_date||start_date)
+    start_date.to_date..(end_date||start_date).to_date
   end
 
   def first_paragraph
@@ -115,7 +111,7 @@ class Event < Article
   end
 
   def duration
-    (((self.end_date || self.start_date) - self.start_date).to_i/60/60/24)
+    (((self.end_date || self.start_date) - self.start_date).to_i/60/60/24) + 1
   end
 
   alias_method :article_lead, :lead
