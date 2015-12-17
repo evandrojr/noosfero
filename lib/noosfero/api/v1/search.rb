@@ -18,6 +18,7 @@ module Noosfero
               scope = scope.where(:type => params[:type]) if params[:type] && !(params[:type] == 'Article')
               scope = scope.where(:parent_id => params[:parent_id]) if params[:parent_id].present?
               scope = scope.joins(:categories).where(:categories => {:id => params[:category_ids]}) if params[:category_ids].present?
+              scope = scope.where('children_count > 0') if params[:has_children].present?
               query = params[:query] || ""
               order = "more_recent"
 

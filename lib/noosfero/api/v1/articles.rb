@@ -203,7 +203,7 @@ module Noosfero
             child.hit
             present_partial child, :with => Entities::Article
           end
-
+          
           desc 'Suggest a article to another profile' do
             detail 'Suggest a article to another profile (person, community...)'
             params Noosfero::API::Entities::Article.documentation
