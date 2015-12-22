@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150921140802) do
+ActiveRecord::Schema.define(version: 20151221105330) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,6 +23,11 @@ ActiveRecord::Schema.define(version: 20150921140802) do
     t.text     "reason"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "academic_infos", force: :cascade do |t|
+    t.integer "person_id"
+    t.string  "lattes_url"
   end
 
   create_table "action_tracker", force: :cascade do |t|
@@ -50,6 +55,50 @@ ActiveRecord::Schema.define(version: 20150921140802) do
   add_index "action_tracker_notifications", ["action_tracker_id"], name: "index_action_tracker_notifications_on_action_tracker_id", using: :btree
   add_index "action_tracker_notifications", ["profile_id", "action_tracker_id"], name: "index_action_tracker_notif_on_prof_id_act_tracker_id", unique: true, using: :btree
   add_index "action_tracker_notifications", ["profile_id"], name: "index_action_tracker_notifications_on_profile_id", using: :btree
+
+  create_table "analytics_plugin_page_views", force: :cascade do |t|
+    t.string   "type"
+    t.integer  "visit_id"
+    t.integer  "track_id"
+    t.integer  "referer_page_view_id"
+    t.string   "request_id"
+    t.integer  "user_id"
+    t.integer  "session_id"
+    t.integer  "profile_id"
+    t.text     "url"
+    t.text     "referer_url"
+    t.text     "user_agent"
+    t.string   "remote_ip"
+    t.datetime "request_started_at"
+    t.datetime "request_finished_at"
+    t.datetime "page_loaded_at"
+    t.integer  "time_on_page",         default: 0
+    t.text     "data",                 default: "--- {}\n"
+  end
+
+  add_index "analytics_plugin_page_views", ["profile_id"], name: "index_analytics_plugin_page_views_on_profile_id", using: :btree
+  add_index "analytics_plugin_page_views", ["referer_page_view_id"], name: "index_analytics_plugin_page_views_on_referer_page_view_id", using: :btree
+  add_index "analytics_plugin_page_views", ["request_id"], name: "index_analytics_plugin_page_views_on_request_id", using: :btree
+  add_index "analytics_plugin_page_views", ["session_id"], name: "index_analytics_plugin_page_views_on_session_id", using: :btree
+  add_index "analytics_plugin_page_views", ["url"], name: "index_analytics_plugin_page_views_on_url", using: :btree
+  add_index "analytics_plugin_page_views", ["user_id", "session_id", "profile_id", "url"], name: "analytics_plugin_referer_find", using: :btree
+  add_index "analytics_plugin_page_views", ["user_id"], name: "index_analytics_plugin_page_views_on_user_id", using: :btree
+
+  create_table "analytics_plugin_visits", force: :cascade do |t|
+    t.integer "profile_id"
+  end
+
+  create_table "article_followers", force: :cascade do |t|
+    t.integer  "person_id",  null: false
+    t.integer  "article_id", null: false
+    t.datetime "since"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "article_followers", ["article_id"], name: "index_article_followers_on_article_id", using: :btree
+  add_index "article_followers", ["person_id", "article_id"], name: "index_article_followers_on_person_id_and_article_id", unique: true, using: :btree
+  add_index "article_followers", ["person_id"], name: "index_article_followers_on_person_id", using: :btree
 
   create_table "article_privacy_exceptions", id: false, force: :cascade do |t|
     t.integer "article_id"
@@ -101,6 +150,7 @@ ActiveRecord::Schema.define(version: 20150921140802) do
     t.integer  "spam_comments_count",  default: 0
     t.integer  "author_id"
     t.integer  "created_by_id"
+    t.integer  "followers_count"
   end
 
   add_index "article_versions", ["article_id"], name: "index_article_versions_on_article_id", using: :btree
@@ -154,6 +204,10 @@ ActiveRecord::Schema.define(version: 20150921140802) do
     t.integer  "author_id"
     t.integer  "created_by_id"
     t.boolean  "show_to_followers",    default: true
+    t.integer  "followers_count",      default: 0
+    t.boolean  "archived",             default: false
+    t.integer  "sash_id"
+    t.integer  "level",                default: 0
   end
 
   add_index "articles", ["comments_count"], name: "index_articles_on_comments_count", using: :btree
@@ -179,6 +233,17 @@ ActiveRecord::Schema.define(version: 20150921140802) do
 
   add_index "articles_categories", ["article_id"], name: "index_articles_categories_on_article_id", using: :btree
   add_index "articles_categories", ["category_id"], name: "index_articles_categories_on_category_id", using: :btree
+
+  create_table "badges_sashes", force: :cascade do |t|
+    t.integer  "badge_id"
+    t.integer  "sash_id"
+    t.boolean  "notified_user", default: false
+    t.datetime "created_at"
+  end
+
+  add_index "badges_sashes", ["badge_id", "sash_id"], name: "index_badges_sashes_on_badge_id_and_sash_id", using: :btree
+  add_index "badges_sashes", ["badge_id"], name: "index_badges_sashes_on_badge_id", using: :btree
+  add_index "badges_sashes", ["sash_id"], name: "index_badges_sashes_on_sash_id", using: :btree
 
   create_table "blocks", force: :cascade do |t|
     t.string   "title"
@@ -274,8 +339,12 @@ ActiveRecord::Schema.define(version: 20150921140802) do
     t.string   "user_agent"
     t.string   "referrer"
     t.text     "settings"
+    t.integer  "paragraph_id"
+    t.integer  "group_id"
+    t.string   "paragraph_uuid"
   end
 
+  add_index "comments", ["paragraph_uuid"], name: "index_comments_on_paragraph_uuid", using: :btree
   add_index "comments", ["source_id", "spam"], name: "index_comments_on_source_id_and_spam", using: :btree
 
   create_table "contact_lists", force: :cascade do |t|
@@ -314,6 +383,56 @@ ActiveRecord::Schema.define(version: 20150921140802) do
 
   add_index "custom_fields", ["customized_type", "name", "environment_id"], name: "index_custom_field", unique: true, using: :btree
 
+  create_table "custom_forms_plugin_alternatives", force: :cascade do |t|
+    t.string  "label"
+    t.integer "field_id"
+    t.boolean "selected_by_default", default: false, null: false
+    t.integer "position",            default: 0
+  end
+
+  create_table "custom_forms_plugin_answers", force: :cascade do |t|
+    t.text    "value"
+    t.integer "field_id"
+    t.integer "submission_id"
+  end
+
+  create_table "custom_forms_plugin_fields", force: :cascade do |t|
+    t.string  "name"
+    t.string  "slug"
+    t.string  "type"
+    t.string  "default_value"
+    t.float   "minimum"
+    t.float   "maximum"
+    t.integer "form_id"
+    t.boolean "mandatory",         default: false
+    t.integer "position",          default: 0
+    t.string  "select_field_type", default: "radio", null: false
+  end
+
+  create_table "custom_forms_plugin_forms", force: :cascade do |t|
+    t.string   "name"
+    t.string   "slug"
+    t.text     "description"
+    t.integer  "profile_id"
+    t.datetime "begining"
+    t.datetime "ending"
+    t.boolean  "report_submissions", default: false
+    t.boolean  "on_membership",      default: false
+    t.string   "access"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.boolean  "for_admission",      default: false
+  end
+
+  create_table "custom_forms_plugin_submissions", force: :cascade do |t|
+    t.string   "author_name"
+    t.string   "author_email"
+    t.integer  "profile_id"
+    t.integer  "form_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer  "priority",   default: 0
     t.integer  "attempts",   default: 0
@@ -330,6 +449,42 @@ ActiveRecord::Schema.define(version: 20150921140802) do
 
   add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
 
+  create_table "delivery_plugin_methods", force: :cascade do |t|
+    t.integer  "profile_id"
+    t.string   "name"
+    t.text     "description"
+    t.string   "recipient"
+    t.string   "address_line1"
+    t.string   "address_line2"
+    t.string   "postal_code"
+    t.string   "state"
+    t.string   "country"
+    t.string   "delivery_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.decimal  "fixed_cost"
+    t.decimal  "free_over_price"
+    t.decimal  "distribution_margin_fixed"
+    t.decimal  "distribution_margin_percentage"
+  end
+
+  add_index "delivery_plugin_methods", ["delivery_type"], name: "index_delivery_plugin_methods_on_delivery_type", using: :btree
+  add_index "delivery_plugin_methods", ["profile_id"], name: "index_delivery_plugin_methods_on_profile_id", using: :btree
+
+  create_table "delivery_plugin_options", force: :cascade do |t|
+    t.integer  "delivery_method_id"
+    t.integer  "owner_id"
+    t.string   "owner_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "delivery_plugin_options", ["delivery_method_id"], name: "index_delivery_plugin_options_on_delivery_method_id", using: :btree
+  add_index "delivery_plugin_options", ["owner_id", "delivery_method_id"], name: "index_delivery_plugin_owner_id_delivery_method_id", using: :btree
+  add_index "delivery_plugin_options", ["owner_id", "owner_type"], name: "index_delivery_plugin_options_on_owner_id_and_owner_type", using: :btree
+  add_index "delivery_plugin_options", ["owner_id"], name: "index_delivery_plugin_options_on_owner_id", using: :btree
+  add_index "delivery_plugin_options", ["owner_type"], name: "index_delivery_plugin_options_on_owner_type", using: :btree
+
   create_table "domains", force: :cascade do |t|
     t.string  "name"
     t.string  "owner_type"
@@ -342,6 +497,50 @@ ActiveRecord::Schema.define(version: 20150921140802) do
   add_index "domains", ["name"], name: "index_domains_on_name", using: :btree
   add_index "domains", ["owner_id", "owner_type", "is_default"], name: "index_domains_on_owner_id_and_owner_type_and_is_default", using: :btree
   add_index "domains", ["owner_id", "owner_type"], name: "index_domains_on_owner_id_and_owner_type", using: :btree
+
+  create_table "driven_signup_plugin_auths", force: :cascade do |t|
+    t.integer  "environment_id"
+    t.string   "name"
+    t.string   "token"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "driven_signup_plugin_auths", ["environment_id", "token"], name: "index_driven_signup_plugin_auths_on_environment_id_and_token", using: :btree
+  add_index "driven_signup_plugin_auths", ["environment_id"], name: "index_driven_signup_plugin_auths_on_environment_id", using: :btree
+  add_index "driven_signup_plugin_auths", ["token"], name: "index_driven_signup_plugin_auths_on_token", using: :btree
+
+  create_table "email_templates", force: :cascade do |t|
+    t.string   "name"
+    t.string   "template_type"
+    t.string   "subject"
+    t.text     "body"
+    t.integer  "owner_id"
+    t.string   "owner_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "environment_notifications", force: :cascade do |t|
+    t.text     "message"
+    t.integer  "environment_id"
+    t.string   "type"
+    t.string   "title"
+    t.boolean  "active"
+    t.boolean  "display_only_in_homepage", default: false
+    t.boolean  "display_to_all_users",     default: false
+    t.boolean  "display_popup",            default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "environment_notifications_users", id: false, force: :cascade do |t|
+    t.integer "environment_notification_id"
+    t.integer "user_id"
+  end
+
+  add_index "environment_notifications_users", ["environment_notification_id"], name: "index_Zaem6uuw", using: :btree
+  add_index "environment_notifications_users", ["user_id"], name: "index_ap3nohR9", using: :btree
 
   create_table "environments", force: :cascade do |t|
     t.string   "name"
@@ -363,6 +562,7 @@ ActiveRecord::Schema.define(version: 20150921140802) do
     t.string   "noreply_email"
     t.string   "redirection_after_signup",     default: "keep_on_same_page"
     t.string   "date_format",                  default: "month_name_with_year"
+    t.text     "send_email_plugin_allow_to"
   end
 
   create_table "external_feeds", force: :cascade do |t|
@@ -393,6 +593,10 @@ ActiveRecord::Schema.define(version: 20150921140802) do
   add_index "favorite_enterprise_people", ["person_id", "enterprise_id"], name: "index_favorite_enterprise_people_on_person_id_and_enterprise_id", using: :btree
   add_index "favorite_enterprise_people", ["person_id"], name: "index_favorite_enterprise_people_on_person_id", using: :btree
 
+  create_table "foo_plugin_bars", force: :cascade do |t|
+    t.string "name"
+  end
+
   create_table "friendships", force: :cascade do |t|
     t.integer  "person_id"
     t.integer  "friend_id"
@@ -403,6 +607,43 @@ ActiveRecord::Schema.define(version: 20150921140802) do
   add_index "friendships", ["friend_id"], name: "index_friendships_on_friend_id", using: :btree
   add_index "friendships", ["person_id", "friend_id"], name: "index_friendships_on_person_id_and_friend_id", using: :btree
   add_index "friendships", ["person_id"], name: "index_friendships_on_person_id", using: :btree
+
+  create_table "gamification_plugin_badges", force: :cascade do |t|
+    t.string   "name"
+    t.integer  "level"
+    t.string   "description"
+    t.text     "custom_fields"
+    t.integer  "owner_id"
+    t.string   "owner_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "title"
+  end
+
+  create_table "gamification_plugin_points_categorizations", force: :cascade do |t|
+    t.integer  "profile_id"
+    t.integer  "point_type_id"
+    t.integer  "weight"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "gamification_plugin_points_categorizations", ["point_type_id"], name: "index_points_categorizations_on_point_type_id", using: :btree
+  add_index "gamification_plugin_points_categorizations", ["profile_id"], name: "index_gamification_plugin_points_categorizations_on_profile_id", using: :btree
+
+  create_table "gamification_plugin_points_types", force: :cascade do |t|
+    t.string   "name"
+    t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "gravatar_provider_plugin_user_email_hashes", force: :cascade do |t|
+    t.integer "user_id"
+    t.string  "email_md5_hash"
+  end
+
+  add_index "gravatar_provider_plugin_user_email_hashes", ["email_md5_hash"], name: "index_gravatar_provider_plugin_md5_hash", using: :btree
 
   create_table "images", force: :cascade do |t|
     t.integer "parent_id"
@@ -460,6 +701,47 @@ ActiveRecord::Schema.define(version: 20150921140802) do
     t.datetime "updated_at"
   end
 
+  create_table "mark_comment_as_read_plugin", force: :cascade do |t|
+    t.integer "comment_id"
+    t.integer "person_id"
+  end
+
+  add_index "mark_comment_as_read_plugin", ["comment_id", "person_id"], name: "index_mark_comment_as_read_plugin_on_comment_id_and_person_id", unique: true, using: :btree
+
+  create_table "merit_actions", force: :cascade do |t|
+    t.integer  "user_id"
+    t.string   "action_method"
+    t.integer  "action_value"
+    t.boolean  "had_errors",    default: false
+    t.string   "target_model"
+    t.integer  "target_id"
+    t.text     "target_data"
+    t.boolean  "processed",     default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "merit_activity_logs", force: :cascade do |t|
+    t.integer  "action_id"
+    t.string   "related_change_type"
+    t.integer  "related_change_id"
+    t.string   "description"
+    t.datetime "created_at"
+  end
+
+  create_table "merit_score_points", force: :cascade do |t|
+    t.integer  "score_id"
+    t.integer  "num_points", default: 0
+    t.string   "log"
+    t.datetime "created_at"
+    t.integer  "action_id"
+  end
+
+  create_table "merit_scores", force: :cascade do |t|
+    t.integer "sash_id"
+    t.string  "category", default: "default"
+  end
+
   create_table "national_region_types", force: :cascade do |t|
     t.string "name"
   end
@@ -475,6 +757,119 @@ ActiveRecord::Schema.define(version: 20150921140802) do
 
   add_index "national_regions", ["name"], name: "name_index", using: :btree
   add_index "national_regions", ["national_region_code"], name: "code_index", using: :btree
+
+  create_table "newsletter_plugin_newsletters", force: :cascade do |t|
+    t.integer "environment_id",                        null: false
+    t.integer "person_id",                             null: false
+    t.boolean "enabled",               default: false
+    t.string  "subject"
+    t.integer "periodicity",           default: 0
+    t.integer "posts_per_blog",        default: 0
+    t.integer "image_id"
+    t.text    "footer"
+    t.text    "blog_ids"
+    t.text    "additional_recipients"
+    t.boolean "moderated"
+    t.text    "unsubscribers"
+  end
+
+  add_index "newsletter_plugin_newsletters", ["environment_id"], name: "index_newsletter_plugin_newsletters_on_environment_id", unique: true, using: :btree
+
+  create_table "oauth_access_grants", force: :cascade do |t|
+    t.integer  "resource_owner_id", null: false
+    t.integer  "application_id",    null: false
+    t.string   "token",             null: false
+    t.integer  "expires_in",        null: false
+    t.text     "redirect_uri",      null: false
+    t.datetime "created_at",        null: false
+    t.datetime "revoked_at"
+    t.string   "scopes"
+  end
+
+  add_index "oauth_access_grants", ["token"], name: "index_oauth_access_grants_on_token", unique: true, using: :btree
+
+  create_table "oauth_access_tokens", force: :cascade do |t|
+    t.integer  "resource_owner_id"
+    t.integer  "application_id"
+    t.string   "token",             null: false
+    t.string   "refresh_token"
+    t.integer  "expires_in"
+    t.datetime "revoked_at"
+    t.datetime "created_at",        null: false
+    t.string   "scopes"
+  end
+
+  add_index "oauth_access_tokens", ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true, using: :btree
+  add_index "oauth_access_tokens", ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id", using: :btree
+  add_index "oauth_access_tokens", ["token"], name: "index_oauth_access_tokens_on_token", unique: true, using: :btree
+
+  create_table "oauth_applications", force: :cascade do |t|
+    t.string   "name",         null: false
+    t.string   "uid",          null: false
+    t.string   "secret",       null: false
+    t.text     "redirect_uri", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true, using: :btree
+
+  create_table "oauth_client_plugin_auths", force: :cascade do |t|
+    t.integer  "provider_id"
+    t.boolean  "enabled"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "oauth_data"
+    t.string   "type"
+    t.string   "provider_user_id"
+    t.text     "access_token"
+    t.datetime "expires_at"
+    t.text     "scope"
+    t.text     "data",             default: "--- {}\n"
+    t.integer  "profile_id"
+  end
+
+  add_index "oauth_client_plugin_auths", ["profile_id"], name: "index_oauth_client_plugin_auths_on_profile_id", using: :btree
+  add_index "oauth_client_plugin_auths", ["provider_id"], name: "index_oauth_client_plugin_auths_on_provider_id", using: :btree
+  add_index "oauth_client_plugin_auths", ["provider_user_id"], name: "index_oauth_client_plugin_auths_on_provider_user_id", using: :btree
+  add_index "oauth_client_plugin_auths", ["type"], name: "index_oauth_client_plugin_auths_on_type", using: :btree
+
+  create_table "oauth_client_plugin_providers", force: :cascade do |t|
+    t.integer  "environment_id"
+    t.string   "strategy"
+    t.string   "name"
+    t.text     "options"
+    t.boolean  "enabled"
+    t.integer  "image_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "client_id"
+    t.text     "client_secret"
+  end
+
+  add_index "oauth_client_plugin_providers", ["client_id"], name: "index_oauth_client_plugin_providers_on_client_id", using: :btree
+
+  create_table "organization_ratings", force: :cascade do |t|
+    t.integer  "organization_id"
+    t.integer  "person_id"
+    t.integer  "comment_id"
+    t.integer  "value"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "organization_ratings_configs", force: :cascade do |t|
+    t.integer "environment_id"
+    t.integer "cooldown",       default: 24
+    t.integer "integer",        default: 10
+    t.integer "default_rating", default: 1
+    t.string  "order",          default: "recent"
+    t.string  "string",         default: "recent"
+    t.integer "per_page",       default: 10
+    t.boolean "vote_once",      default: false
+    t.boolean "boolean",        default: true
+    t.boolean "are_moderated",  default: true
+  end
 
   create_table "price_details", force: :cascade do |t|
     t.decimal  "price",              default: 0.0
@@ -595,6 +990,10 @@ ActiveRecord::Schema.define(version: 20150921140802) do
     t.boolean  "allow_members_to_invite",            default: true
     t.boolean  "invite_friends_only",                default: false
     t.boolean  "secret",                             default: false
+    t.integer  "bar_id"
+    t.integer  "comments_count"
+    t.integer  "sash_id"
+    t.integer  "level",                              default: 0
   end
 
   add_index "profiles", ["activities_count"], name: "index_profiles_on_activities_count", using: :btree
@@ -606,6 +1005,39 @@ ActiveRecord::Schema.define(version: 20150921140802) do
   add_index "profiles", ["region_id"], name: "index_profiles_on_region_id", using: :btree
   add_index "profiles", ["user_id", "type"], name: "index_profiles_on_user_id_and_type", using: :btree
   add_index "profiles", ["user_id"], name: "index_profiles_on_user_id", using: :btree
+
+  create_table "proposals_discussion_plugin_proposal_evaluations", force: :cascade do |t|
+    t.integer  "proposal_task_id"
+    t.integer  "evaluator_id"
+    t.integer  "flagged_status"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "proposals_discussion_plugin_proposal_evaluations", ["evaluator_id"], name: "index_proposals_discussion_plugin_proposal_evaluator_id", using: :btree
+  add_index "proposals_discussion_plugin_proposal_evaluations", ["proposal_task_id"], name: "index_proposals_discussion_plugin_proposal_task_id", using: :btree
+
+  create_table "proposals_discussion_plugin_ranking_items", force: :cascade do |t|
+    t.integer  "position"
+    t.string   "abstract"
+    t.integer  "votes_for"
+    t.integer  "votes_against"
+    t.integer  "hits"
+    t.decimal  "effective_support"
+    t.integer  "proposal_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "proposals_discussion_plugin_ranking_items", ["proposal_id"], name: "index_proposals_discussion_plugin_ranking_proposal_id", using: :btree
+
+  create_table "proposals_discussion_plugin_task_categories", id: false, force: :cascade do |t|
+    t.integer "task_id"
+    t.integer "category_id"
+  end
+
+  add_index "proposals_discussion_plugin_task_categories", ["category_id"], name: "proposals_discussion_plugin_tc_cat_index", using: :btree
+  add_index "proposals_discussion_plugin_task_categories", ["task_id"], name: "proposals_discussion_plugin_tc_task_index", using: :btree
 
   create_table "qualifier_certifiers", force: :cascade do |t|
     t.integer "qualifier_id"
@@ -656,6 +1088,11 @@ ActiveRecord::Schema.define(version: 20150921140802) do
     t.integer "profile_id"
   end
 
+  create_table "sashes", force: :cascade do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "scraps", force: :cascade do |t|
     t.text     "content"
     t.integer  "sender_id"
@@ -703,6 +1140,40 @@ ActiveRecord::Schema.define(version: 20150921140802) do
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
   add_index "sessions", ["user_id"], name: "index_sessions_on_user_id", using: :btree
 
+  create_table "sniffer_plugin_opportunities", force: :cascade do |t|
+    t.integer  "profile_id"
+    t.integer  "opportunity_id"
+    t.string   "opportunity_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "sniffer_plugin_profiles", force: :cascade do |t|
+    t.integer  "profile_id"
+    t.boolean  "enabled"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "sub_organizations_plugin_approve_paternity_relations", force: :cascade do |t|
+    t.integer  "task_id"
+    t.integer  "parent_id"
+    t.string   "parent_type"
+    t.integer  "child_id"
+    t.string   "child_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "sub_organizations_plugin_relations", force: :cascade do |t|
+    t.integer  "parent_id"
+    t.string   "parent_type"
+    t.integer  "child_id"
+    t.string   "child_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "suggestion_connections", force: :cascade do |t|
     t.integer "suggestion_id",   null: false
     t.integer "connection_id",   null: false
@@ -736,7 +1207,7 @@ ActiveRecord::Schema.define(version: 20150921140802) do
   create_table "tasks", force: :cascade do |t|
     t.text     "data"
     t.integer  "status"
-    t.date     "end_date"
+    t.datetime "end_date"
     t.integer  "requestor_id"
     t.integer  "target_id"
     t.string   "code",           limit: 40
@@ -775,6 +1246,21 @@ ActiveRecord::Schema.define(version: 20150921140802) do
 
   add_index "thumbnails", ["parent_id"], name: "index_thumbnails_on_parent_id", using: :btree
 
+  create_table "tolerance_time_plugin_publications", force: :cascade do |t|
+    t.integer  "target_id"
+    t.string   "target_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "tolerance_time_plugin_tolerances", force: :cascade do |t|
+    t.integer  "profile_id"
+    t.integer  "content_tolerance"
+    t.integer  "comment_tolerance"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "units", force: :cascade do |t|
     t.string  "singular",       null: false
     t.string  "plural",         null: false
@@ -812,6 +1298,43 @@ ActiveRecord::Schema.define(version: 20150921140802) do
     t.text    "restrictions"
     t.integer "organization_id"
   end
+
+  create_table "virtuoso_plugin_custom_queries", force: :cascade do |t|
+    t.integer  "environment_id",                null: false
+    t.string   "name"
+    t.text     "query"
+    t.text     "template"
+    t.text     "stylesheet"
+    t.boolean  "enabled",        default: true
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "volunteers_plugin_assignments", force: :cascade do |t|
+    t.integer  "profile_id"
+    t.integer  "period_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "volunteers_plugin_assignments", ["period_id"], name: "index_volunteers_plugin_assignments_on_period_id", using: :btree
+  add_index "volunteers_plugin_assignments", ["profile_id", "period_id"], name: "index_volunteers_plugin_assignments_on_profile_id_and_period_id", using: :btree
+  add_index "volunteers_plugin_assignments", ["profile_id"], name: "index_volunteers_plugin_assignments_on_profile_id", using: :btree
+
+  create_table "volunteers_plugin_periods", force: :cascade do |t|
+    t.integer  "owner_id"
+    t.string   "owner_type"
+    t.text     "name"
+    t.datetime "start"
+    t.datetime "end"
+    t.integer  "minimum_assigments"
+    t.integer  "maximum_assigments"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "volunteers_plugin_periods", ["owner_id", "owner_type"], name: "index_volunteers_plugin_periods_on_owner_id_and_owner_type", using: :btree
+  add_index "volunteers_plugin_periods", ["owner_type"], name: "index_volunteers_plugin_periods_on_owner_type", using: :btree
 
   create_table "votes", force: :cascade do |t|
     t.integer  "vote",          null: false
