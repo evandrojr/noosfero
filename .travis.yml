@@ -1,8 +1,7 @@
 notifications:
   irc:
     channels:
-      - "chat.freenode.net#noosfero"
-      - "chat.freenode.net#noosfero-br"
+      - "chat.freenode.net#noosferogov"
     template:
       - "%{repository_slug} %{branch} %{commit} %{commit_subject} - %{result} %{build_url}"
 
@@ -48,7 +47,8 @@ env:
   - TASK=cucumber LANG=en
   - TASK=selenium
   - TASK=test:noosfero_plugins BUNDLE_OPTS=install
+  # Redundant, but makes life easier instead of counting each failling test, this summarizes everything
+  - TASK=test
 
 script:
   - bundle exec rake $TASK
-
