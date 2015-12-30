@@ -146,10 +146,6 @@ GEM
       actionpack (>= 4.0.0, < 5)
       activerecord (>= 4.0.0, < 5)
       railties (>= 4.0.0, < 5)
-    activeresource (4.0.0)
-      activemodel (~> 4.0)
-      activesupport (~> 4.0)
-      rails-observers (~> 0.1.1)
     activesupport (4.2.5)
       i18n (~> 0.7)
       json (~> 1.7, >= 1.7.7)
@@ -159,18 +155,13 @@ GEM
     acts-as-taggable-on (3.5.0)
       activerecord (>= 3.2, < 5)
     addressable (2.4.0)
-    ambry (0.3.1)
     ansi (1.5.0)
     api-pagination (4.1.1)
-    api_smith (1.3.0)
-      hashie (>= 1.0, < 3.0)
-      httparty
     arel (6.0.3)
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
-    buftok (0.2.0)
     builder (3.2.2)
     capybara (2.5.0)
       mime-types (>= 1.16)
@@ -184,10 +175,6 @@ GEM
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     concurrent-ruby (1.0.0)
-    crack (0.4.3)
-      safe_yaml (~> 1.0.0)
-    css_parser (1.3.7)
-      addressable
     cucumber (1.3.20)
       builder (>= 2.1.2)
       diff-lcs (>= 1.1.3)
@@ -214,8 +201,6 @@ GEM
     diffy (3.1.0)
     domain_name (0.5.25)
       unf (>= 0.0.5, < 1.0.0)
-    doorkeeper (1.4.2)
-      railties (>= 3.1)
     eita-jrails (0.10.0)
       actionpack (>= 3.1.0)
       activesupport (>= 3.0.0)
@@ -225,13 +210,9 @@ GEM
       actionmailer (>= 3.0.4)
       activesupport (>= 3.0.4)
     execjs (2.6.0)
-    faraday (0.9.2)
-      multipart-post (>= 1.2, < 3)
-    faraday_middleware (0.10.0)
-      faraday (>= 0.7.4, < 0.10)
     fast_gettext (0.9.2)
     ffi (1.9.10)
-    gettext (3.1.7)
+    gettext (3.1.9)
       locale (>= 2.0.5)
       text (>= 1.3.0)
     gherkin (2.12.2)
@@ -249,33 +230,24 @@ GEM
       rack-accept
       rack-mount
       virtus (>= 1.0.0)
-    grape-entity (0.4.8)
+    grape-entity (0.5.0)
       activesupport
       multi_json (>= 1.3.2)
-    grape-swagger (0.10.4)
+    grape-swagger (0.10.2)
       grape (>= 0.8.0)
-      grape-entity (< 0.5.0)
+      grape-entity
     grape_logging (1.1.2)
       grape
-    hashdiff (0.2.3)
-    hashie (2.1.2)
-    http (0.5.1)
-      http_parser.rb
+    hashie (3.4.3)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
-    http_parser.rb (0.6.0)
-    httparty (0.12.0)
-      json (~> 1.8)
-      multi_xml (>= 0.5.2)
     i18n (0.7.0)
     ice_nine (0.11.1)
     json (1.8.3)
-    jwt (1.5.2)
     kgio (2.10.0)
     kramdown (1.9.0)
     launchy (2.4.3)
       addressable (~> 2.3)
-    link_header (0.0.8)
     liquid (3.0.6)
     locale (2.1.2)
     loofah (2.0.3)
@@ -284,10 +256,6 @@ GEM
       ffi (>= 0.6.3)
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
-    memoizable (0.4.2)
-      thread_safe (~> 0.3, >= 0.3.1)
-    merit (2.3.2)
-      ambry (~> 0.3.0)
     metaclass (0.0.4)
     mime-types (2.99)
     mini_portile2 (2.0.0)
@@ -302,39 +270,14 @@ GEM
     multi_json (1.11.2)
     multi_test (0.1.2)
     multi_xml (0.5.5)
-    multipart-post (2.0.0)
-    naught (1.1.0)
-    net-ldap (0.12.1)
     netrc (0.11.0)
     nokogiri (1.6.7.1)
       mini_portile2 (~> 2.0.0.rc2)
-    oai (0.3.1)
-      builder (>= 2.0.0)
-      faraday
-      faraday_middleware
-    oauth2 (1.0.0)
-      faraday (>= 0.8, < 0.10)
-      jwt (~> 1.0)
-      multi_json (~> 1.3)
-      multi_xml (~> 0.5)
-      rack (~> 1.2)
-    omniauth (1.2.2)
-      hashie (>= 1.2, < 4)
-      rack (~> 1.0)
-    omniauth-facebook (2.0.1)
-      omniauth-oauth2 (~> 1.2)
-    omniauth-google-oauth2 (0.2.6)
-      omniauth (> 1.0)
-      omniauth-oauth2 (~> 1.1)
-    omniauth-oauth2 (1.3.1)
-      oauth2 (~> 1.0)
-      omniauth (~> 1.2)
     pg (0.18.4)
     pothoven-attachment_fu (3.2.16)
     power_assert (0.2.6)
     protected_attributes (1.1.3)
       activemodel (>= 4.0.1, < 5.0)
-    proxifier (1.0.3)
     rack (1.6.4)
     rack-accept (0.4.5)
       rack (>= 0.4)
@@ -376,25 +319,11 @@ GEM
       thor (>= 0.18.1, < 2.0)
     raindrops (0.15.0)
     rake (10.4.2)
-    rdf (1.1.17.1)
-      link_header (~> 0.0, >= 0.0.8)
-    rdf-virtuoso (0.1.6)
-      api_smith (~> 1.3.0)
-      httparty (~> 0.12.0)
-      rdf (~> 1.1.0)
-    responders (2.1.1)
-      railties (>= 4.2.0, < 5.1)
     rest-client (1.8.0)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
     rmagick (2.15.4)
-    roadie (3.1.1)
-      css_parser (~> 1.3.4)
-      nokogiri (>= 1.5.0, < 1.7.0)
-    roadie-rails (1.1.0)
-      railties (>= 3.0, < 4.3)
-      roadie (~> 3.1)
     rspec (3.4.0)
       rspec-core (~> 3.4.0)
       rspec-expectations (~> 3.4.0)
@@ -420,7 +349,6 @@ GEM
       magic
     ruby-progressbar (1.7.5)
     rubyzip (1.1.7)
-    safe_yaml (1.0.4)
     sass (3.4.20)
     sass-rails (5.0.4)
       railties (>= 4.0.0, < 5.0)
@@ -433,12 +361,11 @@ GEM
       multi_json (~> 1.0)
       rubyzip (~> 1.0)
       websocket (~> 1.0)
-    simple_oauth (0.2.0)
     slim (3.0.6)
       temple (~> 0.7.3)
       tilt (>= 1.3.3, < 2.1)
     spring (1.6.1)
-    sprockets (3.4.0)
+    sprockets (3.5.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
     sprockets-rails (2.3.3)
@@ -453,17 +380,6 @@ GEM
     thor (0.19.1)
     thread_safe (0.3.5)
     tilt (2.0.1)
-    twitter (5.8.0)
-      addressable (~> 2.3)
-      buftok (~> 0.2.0)
-      equalizer (~> 0.0.9)
-      faraday (~> 0.9.0)
-      http (~> 0.5.0)
-      http_parser.rb (~> 0.6.0)
-      json (~> 1.8)
-      memoizable (~> 0.4.0)
-      naught (~> 1.0)
-      simple_oauth (~> 0.2.0)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
     uglifier (2.7.2)
@@ -476,16 +392,11 @@ GEM
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
-    vcr (3.0.1)
     virtus (1.0.5)
       axiom-types (~> 0.1)
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
       equalizer (~> 0.0, >= 0.0.9)
-    webmock (1.22.3)
-      addressable (>= 2.3.6)
-      crack (>= 0.3.2)
-      hashdiff
     websocket (1.2.2)
     whenever (0.9.4)
       chronic (>= 0.6.3)
@@ -506,7 +417,6 @@ DEPENDENCIES
   activerecord-deprecated_finders
   activerecord-jdbcpostgresql-adapter
   activerecord-session_store
-  activeresource
   acts-as-taggable-on (~> 3.5)
   acts_as_list (= 0.0.0)!
   acts_as_tree (= 0.0.0)!
@@ -522,7 +432,6 @@ DEPENDENCIES
   delayed_job
   delayed_job_active_record
   diffy (~> 3.0)
-  doorkeeper (~> 1.4.0)
   eita-jrails (~> 0.10.0)
   exception_notification (~> 4.0.1)
   ezcrypto (= 0.0.0)!
@@ -540,24 +449,15 @@ DEPENDENCIES
   launchy
   liquid (~> 3.0.3)
   locale (~> 2.1)
-  magic (>= 0.2.8)
-  merit (~> 2.3.1)
   minitest
   minitest-reporters
   mocha (~> 1.1.0)
   monkey_patches (= 0.0.0)!
-  net-ldap (~> 0.12.1)
   nokogiri (~> 1.6.0)
   noosfero_caching (= 0.0.0)!
-  oai (= 0.3.1)
-  omniauth (~> 1.2.2)
-  omniauth-facebook (~> 2.0.0)
-  omniauth-google-oauth2 (= 0.2.6)
-  omniauth-oauth2 (~> 1.3.1)
   pg (~> 0.17)
   pothoven-attachment_fu (~> 3.2.16)
   protected_attributes
-  proxifier (~> 1.0.3)
   rack-contrib
   rack-cors
   rails (~> 4.2.4)
@@ -565,15 +465,10 @@ DEPENDENCIES
   rails_autolink (~> 1.1.5)
   rails_rcov (= 0.0.0)!
   rake
-  rdf
-  rdf-virtuoso
   recaptcha (> 0.0.0)!
-  responders (~> 2.0)
   rest-client (~> 1.6)
   rmagick (~> 2.13)
   rmagick4j
-  roadie (~> 3.1)
-  roadie-rails
   rspec (~> 3.3)
   rspec-rails (~> 3.2)
   ruby-feedparser (~> 0.7)
@@ -582,15 +477,13 @@ DEPENDENCIES
   selenium-webdriver
   slim
   spring
+  sprockets-rails (~> 2.3)
   swagger-ui_rails
   test-unit
-  twitter (~> 5.8.0)
   uglifier (>= 1.0.3)
   unicorn (~> 4.8)
   validates_as_cnpj (= 0.0.0)!
   validates_multiparameter_assignments (= 0.0.0)!
-  vcr
-  webmock
   whenever
   will_paginate
   xss_terminate (= 0.0.0)!
