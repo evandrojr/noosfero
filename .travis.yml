@@ -1,7 +1,7 @@
 notifications:
   irc:
     channels:
-      - "chat.freenode.net#noosferogov"
+      - "chat.freenode.net#noosfero-serpro"
     template:
       - "%{repository_slug} %{branch} %{commit} %{commit_subject} - %{result} %{build_url}"
 
