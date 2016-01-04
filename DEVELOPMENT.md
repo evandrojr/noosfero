@@ -61,6 +61,10 @@
 
   * Committers must respect the release schedule and feature freezes.
 
+  * Every change to the project dependencies (i.e. `Gemfile`) must be
+    explicitly approved by the release managers, and are not subject to the "1
+    week" exception above.
+
 ## Maintainance process
 
 ### Not all feature releases will be maintained as a stable release
