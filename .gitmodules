@@ -37,4 +37,6 @@
 [submodule "plugins/insight"]
 	path = plugins/insight
 	url = ./../../noosfero-plugins/insight.git
-	
+[submodule "plugins/community_hub"]
+	path = plugins/community_hub
+	url = ./../../noosfero-plugins/community_hub.git
