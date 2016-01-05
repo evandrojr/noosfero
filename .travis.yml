@@ -29,6 +29,7 @@ git:
 
 # workaround for https://github.com/travis-ci/travis-ci/issues/4536
 before_install:
+  - rm Gemfile.lock
   - export GEM_HOME=$PWD/vendor/bundle/ruby/2.2.0
   - gem install bundler
   - sed -i 's/softwarepublico.gov.br\/gitlab/github.com/' .gitmodules
