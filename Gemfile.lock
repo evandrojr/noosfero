@@ -230,7 +230,7 @@ GEM
       rack-accept
       rack-mount
       virtus (>= 1.0.0)
-    grape-entity (0.5.0)
+    grape-entity (0.4.8)
       activesupport
       multi_json (>= 1.3.2)
     grape-swagger (0.10.2)
@@ -439,7 +439,7 @@ DEPENDENCIES
   gdata (> 0.0.0)!
   gettext (~> 3.1)
   grape (~> 0.12)
-  grape-entity
+  grape-entity (~> 0.4.8)
   grape-swagger
   grape_logging
   honeypot (= 0.0.0)!
@@ -477,7 +477,7 @@ DEPENDENCIES
   selenium-webdriver
   slim
   spring
-  sprockets-rails (~> 2.3)
+  sprockets-rails (~> 2.1)
   swagger-ui_rails
   test-unit
   uglifier (>= 1.0.3)
