@@ -536,7 +536,6 @@ class UserTest < ActiveSupport::TestCase
   should 'deliver e-mail with activation code after creation' do
     assert_difference 'ActionMailer::Base.deliveries.size', 1 do
       new_user :email => 'pending@activation.com'
-      process_delayed_job_queue
     end
     assert_equal 'pending@activation.com', ActionMailer::Base.deliveries.last['to'].to_s
   end
@@ -667,7 +666,6 @@ class UserTest < ActiveSupport::TestCase
     env.save
 
     user = new_user :email => 'pending@activation.com'
-    process_delayed_job_queue
     assert_difference 'ActionMailer::Base.deliveries.size', 1 do
       user.activate
       process_delayed_job_queue
@@ -688,7 +686,6 @@ class UserTest < ActiveSupport::TestCase
     env.save
 
     user = new_user :email => 'pending@activation.com'
-    process_delayed_job_queue
     assert_difference 'ActionMailer::Base.deliveries.size', 1 do
       user.activate
       process_delayed_job_queue
@@ -708,7 +705,6 @@ class UserTest < ActiveSupport::TestCase
     env.save
 
     user = new_user :name => 'John Doe', :email => 'pending@activation.com'
-    process_delayed_job_queue
     assert_difference 'ActionMailer::Base.deliveries.size', 1 do
       user.activate
       process_delayed_job_queue
@@ -754,6 +750,14 @@ class UserTest < ActiveSupport::TestCase
     user = User.new( :login => 'quire', :email => 'quire@example.com', :password => 'quire', :password_confirmation => 'quire' )
     user.save
     assert_equal 'quire', user.person.name
+  end
+
+  should 'generate private token' do
+    user = User.new
+    SecureRandom.stubs(:hex).returns('token')
+    user.generate_private_token!
+
+    assert user.private_token, 'token'
   end
 
   should 'deliver e-mail with activation code when resend was requested and user was not activated' do
