@@ -34,7 +34,7 @@ gem 'slim'
 
 # API dependencies
 gem 'grape',                    '~> 0.12'
-gem 'grape-entity',             '~> 0.4.8'
+gem 'grape-entity',             '= 0.4.8'
 gem 'grape_logging'
 gem 'grape-swagger'
 gem 'swagger-ui_rails'
