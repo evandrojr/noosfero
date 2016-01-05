@@ -477,7 +477,7 @@ DEPENDENCIES
   selenium-webdriver
   slim
   spring
-  sprockets-rails (~> 2.3)
+  sprockets-rails (~> 2.1)
   swagger-ui_rails
   test-unit
   uglifier (>= 1.0.3)
