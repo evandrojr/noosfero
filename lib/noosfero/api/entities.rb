@@ -79,6 +79,18 @@ module Noosfero
         expose :parent_id
       end
 
+      class Block < Entity
+        root 'blocks', 'block'
+        expose :id, :type, :settings, :position, :enabled
+        expose :mirror, :mirror_block_id, :title
+      end
+
+      class Box < Entity
+        root 'boxes', 'box'
+        expose :id, :position
+        expose :blocks, :using => Block
+      end
+
       class Profile < Entity
         expose :identifier, :name, :id
         expose :created_at, :format_with => :timestamp
@@ -99,6 +111,7 @@ module Noosfero
         end
         expose :image, :using => Image
         expose :region, :using => Region
+        expose :boxes, :using => Box
       end
 
       class UserBasic < Entity
