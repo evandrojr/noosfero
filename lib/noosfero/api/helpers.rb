@@ -5,7 +5,7 @@ require_relative '../../find_by_contents'
     module API
       module APIHelpers
       PRIVATE_TOKEN_PARAM = :private_token
-      DEFAULT_ALLOWED_PARAMETERS = [:parent_id, :from, :until, :content_type, :author_id, :archived]
+      DEFAULT_ALLOWED_PARAMETERS = [:parent_id, :from, :until, :content_type, :author_id, :archived, :identifier]
 
       include SanitizeParams
       include Noosfero::Plugin::HotSpot
