@@ -177,6 +177,7 @@ module Noosfero
         expose :votes_count
         expose :comments_count
         expose :archived, :documentation => {:type => "Boolean", :desc => "Defines if a article is readonly"}
+        expose :type
       end
 
       class Article < ArticleBase
