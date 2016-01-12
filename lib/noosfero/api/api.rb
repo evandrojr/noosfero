@@ -54,6 +54,7 @@ module Noosfero
       mount V1::Environments
       mount V1::Search
       mount V1::Contacts
+      mount V1::Boxes
 
       mount Session
 
