@@ -44,6 +44,13 @@ module Noosfero
         present user, :with => Entities::UserLogin, :current_person => current_person
       end
 
+      post "/login_from_cookie" do
+        user = User.where(remember_token: cookies[:auth_token]).first
+        return unauthorized! unless user && user.activated?
+        @current_user = user
+        present user, :with => Entities::UserLogin, :current_person => current_person
+      end
+
       # Create user.
       #
       # Parameters:
