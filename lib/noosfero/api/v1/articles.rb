@@ -260,7 +260,7 @@ module Noosfero
 
         end
 
-        kinds = %w[community person enterprise]
+        kinds = %w[profile community person enterprise]
         kinds.each do |kind|
           resource kind.pluralize.to_sym do
             segment "/:#{kind}_id" do
