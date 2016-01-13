@@ -236,6 +236,15 @@ module Noosfero
         expose :name
       end
 
+      class Activity < Entity
+        root 'activities', 'activity'
+        expose :id, :params, :verb, :created_at, :updated_at, :comments_count, :visible
+        expose :user, :using => Profile
+        expose :target do |activity, opts|
+          type_map = {Profile => ::Profile, ArticleBase => ::Article}.find {|h| activity.target.kind_of?(h.last)}
+          type_map.first.represent(activity.target) unless type_map.nil?
+        end
+      end
 
     end
   end
