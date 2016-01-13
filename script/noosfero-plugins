@@ -85,6 +85,9 @@ _install(){
 
 _enable(){
   plugin="$1"
+  # Make sure a plugin is properly disabled before enabling it
+  enabling_plugin=true
+  _disable $plugin
 
   if [ -d "$available_plugins_dir/$plugin" ]; then
     source="$available_plugins_dir/$plugin"
@@ -160,7 +163,9 @@ _disable(){
   plugins_features_dir="$NOOSFERO_DIR/features/plugins"
 
   if [ -h "$base_plugins_dir/$plugin" ]; then
-    _say "$plugin is a base plugin and cannot be disabled"
+    if [ ! "$enabling_plugin" = "true" ]; then
+      _say "$plugin is a base plugin and cannot be disabled"
+    fi
     return
   fi
 
@@ -168,10 +173,14 @@ _disable(){
     rm "$target"
     test -h "$plugins_public_dir/$plugin" && rm "$plugins_public_dir/$plugin"
     test -h "$plugins_features_dir/$plugin" && rm "$plugins_features_dir/$plugin"
-    _say "$plugin disabled"
+    if [ ! "$enabling_plugin" = "true" ]; then
+      _say "$plugin disabled"
+    fi
     run "$source/after_disable.rb"
   else
-    _say "$plugin already disabled"
+    if [ ! "$enabling_plugin" = "true" ]; then
+      _say "$plugin already disabled"
+    fi
   fi
 }
 
