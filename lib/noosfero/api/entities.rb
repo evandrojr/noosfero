@@ -236,6 +236,10 @@ module Noosfero
         expose :name
       end
 
+      class Activity < Entity
+        root 'activities', 'activity'
+        expose :id, :params, :verb, :created_at, :updated_at, :comments_count, :visible
+      end
 
     end
   end
