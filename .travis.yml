@@ -24,11 +24,16 @@ addons:
       - libsqlite3-dev
       - libxslt1-dev
 
+git:
+  submodules: false
+
 # workaround for https://github.com/travis-ci/travis-ci/issues/4536
 before_install:
-  - rm -f Gemfile.lock 
+  - rm -f Gemfile.lock
   - export GEM_HOME=$PWD/vendor/bundle/ruby/2.2.0
   - gem install bundler
+  - sed -i 's/softwarepublico.gov.br\/gitlab/github.com/' .gitmodules
+  - git submodule update --init --recursive
 cache: bundler
 
 before_script:
