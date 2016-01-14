@@ -1,8 +1,7 @@
 notifications:
   irc:
     channels:
-      - "chat.freenode.net#noosfero"
-      - "chat.freenode.net#noosfero-br"
+      - "chat.freenode.net#noosfero-serpro"
     template:
       - "%{repository_slug} %{branch} %{commit} %{commit_subject} - %{result} %{build_url}"
 
@@ -27,6 +26,7 @@ addons:
 
 # workaround for https://github.com/travis-ci/travis-ci/issues/4536
 before_install:
+  - rm -f Gemfile.lock
   - export GEM_HOME=$PWD/vendor/bundle/ruby/2.2.0
   - gem install bundler
 cache: bundler
@@ -48,7 +48,8 @@ env:
   - TASK=cucumber LANG=en
   - TASK=selenium
   - TASK=test:noosfero_plugins BUNDLE_OPTS=install
+  # Redundant, but makes life easier instead of counting each failling test, this summarizes everything
+  - TASK=rake test:all:db
 
 script:
   - bundle exec rake $TASK
-
