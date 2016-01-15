@@ -47,14 +47,14 @@ before_script:
   - bundle exec rake db:migrate &>/dev/null
 
 env:
-  - TASK=test:units
-  - TASK=test:functionals
-  - TASK=test:integration
-  - TASK=cucumber LANG=en
-  - TASK=selenium
-  - TASK=test:noosfero_plugins BUNDLE_OPTS=install
+  # - TASK=test:units
+  # - TASK=test:functionals
+  # - TASK=test:integration
+  # - TASK=cucumber LANG=en
+  # - TASK=selenium
+  # - TASK=test:noosfero_plugins BUNDLE_OPTS=install
   # Redundant, but makes life easier instead of counting each failling test, this summarizes everything
-  - TASK=rake test:all:db
+  - ./script/ci
 
 script:
   - bundle exec rake $TASK
