@@ -54,7 +54,8 @@ env:
   # - TASK=selenium
   # - TASK=test:noosfero_plugins BUNDLE_OPTS=install
   #  Redundant, but makes life easier instead of counting each failling test, this summarizes everything
-  - ./script/ci
+  # - ./script/ci
 
 script:
-  - bundle exec rake $TASK
+  #- bundle exec rake $TASK
+  - ./script/ci
