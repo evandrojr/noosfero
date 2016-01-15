@@ -53,7 +53,7 @@ env:
   # - TASK=cucumber LANG=en
   # - TASK=selenium
   # - TASK=test:noosfero_plugins BUNDLE_OPTS=install
-  # Redundant, but makes life easier instead of counting each failling test, this summarizes everything
+  #  Redundant, but makes life easier instead of counting each failling test, this summarizes everything
   - ./script/ci
 
 script:
