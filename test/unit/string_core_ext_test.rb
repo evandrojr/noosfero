@@ -38,4 +38,14 @@ class StringCoreExtTest < ActiveSupport::TestCase
     assert_equal 'spaceship-propulsion_warp-core', "SpaceshipPropulsion::WarpCore".to_css_class
   end
 
+  should 'downcase accented strings' do
+    assert_equal 'vatapá com dendê da moça', 'VATAPÁ COM DENDÊ DA MOÇA'.downcase
+    assert_equal 'vatapá com dendê da moça', 'VATAPÁ COM dendê da moça'.downcase
+  end
+
+  should 'upcase accented strings' do
+    assert_equal 'VATAPÁ COM DENDÊ DA MOÇA', 'vatapá com dendê da moça'.upcase
+    assert_equal 'VATAPÁ COM DENDÊ DA MOÇA', 'VATAPÁ COM dendê da MOÇA'.upcase
+  end
+
 end
