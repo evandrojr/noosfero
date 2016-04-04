@@ -2,7 +2,6 @@ module Noosfero
   module API
     module V1
       class Comments < Grape::API
-        before { authenticate! }
 
         resource :articles do
           # Collect comments from articles
@@ -29,6 +28,7 @@ module Noosfero
           # Example Request:
           #  POST api/v1/articles/12/comments?private_token=2298743290432&body=new comment&title=New
           post ":id/comments" do
+            authenticate!
             article = find_article(environment.articles, params[:id])
             options = params.select { |key,v| !['id','private_token'].include?(key) }.merge(:author => current_person, :source => article)
             begin
