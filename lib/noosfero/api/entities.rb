@@ -226,6 +226,7 @@ module Noosfero
 
       class Environment < Entity
         expose :name
+        expose :id
       end
 
       class Tag < Entity
