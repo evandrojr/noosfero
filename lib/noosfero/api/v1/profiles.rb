@@ -15,8 +15,8 @@ module Noosfero
           get ':id' do
             profiles = environment.profiles
             profiles = profiles.visible
-            profile = profiles.find_by_id(params[:id])
-            present profile, :with => Entities::Profile, :current_person => current_person
+            profile = profiles.find_by(id: params[:id])
+              present profile, :with => Entities::Profile, :current_person => current_person
           end
         end
       end

@@ -1,11 +1,9 @@
 class Block < ActiveRecord::Base
 
-  attr_accessible :title, :display, :limit, :box_id, :posts_per_page,
+  attr_accessible :title, :subtitle, :display, :limit, :box_id, :posts_per_page,
                   :visualization_format, :language, :display_user,
                   :box, :edit_modes, :move_modes, :mirror
 
-  # to be able to generate HTML
-  include ActionView::Helpers::UrlHelper
   include ActionView::Helpers::TagHelper
 
   # Block-specific stuff
@@ -13,7 +11,8 @@ class Block < ActiveRecord::Base
 
   delegate :environment, :to => :box, :allow_nil => true
 
-  acts_as_list :scope => :box
+  acts_as_list scope: -> block { where box_id: block.box_id }
+
   belongs_to :box
   belongs_to :mirror_block, :class_name => "Block"
   has_many :observers, :class_name => "Block", :foreign_key => "mirror_block_id"

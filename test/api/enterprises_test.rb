@@ -39,7 +39,7 @@ class EnterprisesTest < ActiveSupport::TestCase
 
     get "/api/v1/enterprises?#{params.to_query}"
     json = JSON.parse(last_response.body)
-    assert_equal [enterprise1.id, enterprise2.id], json['enterprises'].map {|c| c['id']}
+    assert_equivalent [enterprise1.id, enterprise2.id], json['enterprises'].map {|c| c['id']}
   end
 
   should 'list private enterprise for members' do

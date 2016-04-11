@@ -30,37 +30,29 @@ class ProfileDesignControllerTest < ActionController::TestCase
     ###### BOX 1
     @b1 = ArticleBlock.new
     @box1.blocks << @b1
-    @b1.save!
 
     @b2 = Block.new
     @box1.blocks << @b2
-    @b2.save!
 
     ###### BOX 2
     @b3 = Block.new
     @box2.blocks << @b3
-    @b3.save!
 
     @b4 = MainBlock.new
     @box2.blocks << @b4
-    @b4.save!
 
     @b5 = Block.new
     @box2.blocks << @b5
-    @b5.save!
 
     @b6 = Block.new
     @box2.blocks << @b6
-    @b6.save!
 
     ###### BOX 3
     @b7 = Block.new
     @box3.blocks << @b7
-    @b7.save!
 
     @b8 = Block.new
     @box3.blocks << @b8
-    @b8.save!
 
     @request.env['HTTP_REFERER'] = '/editor'
 
@@ -424,7 +416,7 @@ class ProfileDesignControllerTest < ActionController::TestCase
   should 'be able to save FeedReaderBlock configurations' do
     @box1.blocks << FeedReaderBlock.new(:address => 'feed address')
     holder.blocks(true)
-    block = @box1.blocks.last
+    block = @box1.blocks.find_by(type: FeedReaderBlock)
 
     post :save, :profile => 'designtestuser', :id => block.id, :block => {:address => 'new feed address', :limit => '20'}
 
@@ -709,6 +701,19 @@ class ProfileDesignControllerTest < ActionController::TestCase
       assert_no_tag :select, :attributes => {:name => 'block[display_user]'},
         :descendant => {:tag => 'option', :attributes => {:value => option}}
     end
+  end
+
+  should 'update selected categories in blocks' do
+    env = Environment.default
+    c1 = env.categories.build(:name => "Test category 1"); c1.save!
+
+    block = profile.blocks.last
+
+    Block.any_instance.expects(:accept_category?).at_least_once.returns true
+
+    xhr :get, :update_categories, :profile => profile.identifier, :id => block.id, :category_id => c1.id
+
+    assert_equal assigns(:current_category), c1
   end
 
 end

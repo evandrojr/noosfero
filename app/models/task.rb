@@ -31,6 +31,8 @@ class Task < ActiveRecord::Base
     end
   end
 
+  include Noosfero::Plugin::HotSpot
+
   belongs_to :requestor, :class_name => 'Profile', :foreign_key => :requestor_id
   belongs_to :target, :foreign_key => :target_id, :polymorphic => true
   belongs_to :responsible, :class_name => 'Person', :foreign_key => :responsible_id
@@ -135,9 +137,9 @@ class Task < ActiveRecord::Base
       group = klass.to_s.downcase.pluralize
       id = attribute.to_s + "_id"
       if environment.respond_to?(group)
-        attrb = value || environment.send(group).find_by_id(record.send(id))
+        attrb = value || environment.send(group).find_by(id: record.send(id))
       else
-        attrb = value || klass.find_by_id(record.send(id))
+        attrb = value || klass.find_by(id: record.send(id))
       end
       if attrb.respond_to?(klass.to_s.downcase + "?")
         unless attrb.send(klass.to_s.downcase + "?")
@@ -253,6 +255,7 @@ class Task < ActiveRecord::Base
   end
 
   def environment
+    return target if target.kind_of?(Environment)
     self.target.environment unless self.target.nil?
   end
 
