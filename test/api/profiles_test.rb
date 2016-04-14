@@ -80,5 +80,4 @@ class ProfilesTest < ActiveSupport::TestCase
     refute json.has_key?('Rating')
   end
 
-
 end

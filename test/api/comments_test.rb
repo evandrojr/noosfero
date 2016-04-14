@@ -81,7 +81,7 @@ class CommentsTest < ActiveSupport::TestCase
       assert_not_nil comment.source
   end
 
-  should 'not anonymous list comments if has no permission to view the source article' do
+  should 'not, anonymous list comments if has no permission to view the source article' do
     anonymous_setup
     person = fast_create(Person)
     article = fast_create(Article, :profile_id => person.id, :name => "Some thing", :published => false)
@@ -116,7 +116,7 @@ class CommentsTest < ActiveSupport::TestCase
     assert_equal comment.id, json['comment']['id']
   end
 
-  should 'not anonymous comment an article (at least so far...)' do
+  should 'not, anonymous comment an article (at least so far...)' do
     anonymous_setup
     person = fast_create(Person)
     article = fast_create(Article, :profile_id => person.id, :name => "Some thing")
@@ -130,6 +130,7 @@ class CommentsTest < ActiveSupport::TestCase
   end
 
   should 'paginate comments' do
+    login_api
     article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
     5.times { article.comments.create!(:body => "some comment", :author => user.person) }
     params[:per_page] = 3
@@ -141,6 +142,7 @@ class CommentsTest < ActiveSupport::TestCase
   end
 
   should 'return only root comments' do
+    login_api
     article = fast_create(Article, :profile_id => user.person.id, :name => "Some thing")
     comment1 = article.comments.create!(:body => "some comment", :author => user.person)
     comment2 = article.comments.create!(:body => "another comment", :author => user.person, :reply_of_id => comment1.id)
