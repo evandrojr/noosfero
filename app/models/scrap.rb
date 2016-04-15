@@ -1,5 +1,7 @@
 class Scrap < ActiveRecord::Base
 
+  include SanitizeHelper
+
   attr_accessible :content, :sender_id, :receiver_id, :scrap_id
 
   SEARCHABLE_FIELDS = {
@@ -13,7 +15,9 @@ class Scrap < ActiveRecord::Base
   has_many :replies, :class_name => 'Scrap', :foreign_key => 'scrap_id', :dependent => :destroy
   belongs_to :root, :class_name => 'Scrap', :foreign_key => 'scrap_id'
 
-  has_many :profile_activities, foreign_key: :activity_id, conditions: {profile_activities: {activity_type: 'Scrap'}}, dependent: :destroy
+  has_many :profile_activities, -> {
+    where profile_activities: {activity_type: 'Scrap'}
+  }, foreign_key: :activity_id, dependent: :destroy
 
   after_create :create_activity
   after_update :update_activity
@@ -39,8 +43,7 @@ class Scrap < ActiveRecord::Base
   end
 
   def strip_all_html_tags
-    sanitizer = HTML::WhiteListSanitizer.new
-    self.content = sanitizer.sanitize(self.content, :tags => [])
+    self.content = sanitize_html(self.content)
   end
 
   def action_tracker_target

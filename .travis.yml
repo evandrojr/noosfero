@@ -6,24 +6,25 @@ notifications:
     template:
       - "%{repository_slug} %{branch} %{commit} %{commit_subject} - %{result} %{build_url}"
 
-#dist: trusty
+# Ensure Container-based environment, as others can have some random failures
+# specially with different Firefox versions and selenium tests.
+# E.g. https://travis-ci.org/noosfero/noosfero/jobs/122918772#L1308
+#
+# Also container-based environments have the fatest boot times and
+# are the only one with cache available for public projects.
+# See https://docs.travis-ci.com/user/ci-environment/#Virtualization-environments
+sudo: false
+cache: bundler
+
 language: ruby
 rvm:
-  - 2.2
-  # ruby 2.3 works but isn't stable on travis
+  - 2.3.0
 
 addons:
   apt:
     packages:
-      - po4a
-      - iso-codes
       - tango-icon-theme
       - pidgin-data
-      # for gem extensions
-      - libmagickwand-dev
-      - libpq-dev
-      - libreadline-dev
-      - libxslt1-dev
   artifacts:
     paths:
       - $(ls tmp/artifact* | tr "\n" ":")
@@ -32,7 +33,6 @@ addons:
 before_install:
   - export GEM_HOME=$PWD/vendor/bundle/ruby/2.2.0
   - gem install bundler
-cache: bundler
 
 before_script:
   - mkdir -p tmp/{pids,cache} log cache
@@ -49,14 +49,17 @@ env:
   - TASK=test:units
   - TASK=test:functionals
   - TASK=test:integration
-  - TASK=cucumber LANG=en
-  - SLICE=1/3 TASK=selenium
-  - SLICE=2/3 TASK=selenium
-  - SLICE=3/3 TASK=selenium
-  - SLICE=1/4 TASK=test:noosfero_plugins BUNDLE_OPTS=install
-  - SLICE=2/4 TASK=test:noosfero_plugins BUNDLE_OPTS=install
-  - SLICE=3/4 TASK=test:noosfero_plugins BUNDLE_OPTS=install
-  - SLICE=4/4 TASK=test:noosfero_plugins BUNDLE_OPTS=install
+  - SLICE=1/2 TASK=cucumber LANG=en
+  - SLICE=2/2 TASK=cucumber LANG=en
+  - SLICE=1/4 TASK=selenium
+  - SLICE=2/4 TASK=selenium
+  - SLICE=3/4 TASK=selenium
+  - SLICE=4/4 TASK=selenium
+  - SLICE=1/5 TASK=test:noosfero_plugins BUNDLE_OPTS=install
+  - SLICE=2/5 TASK=test:noosfero_plugins BUNDLE_OPTS=install
+  - SLICE=3/5 TASK=test:noosfero_plugins BUNDLE_OPTS=install
+  - SLICE=4/5 TASK=test:noosfero_plugins BUNDLE_OPTS=install
+  - SLICE=5/5 TASK=test:noosfero_plugins BUNDLE_OPTS=install
 
 script:
   - bundle exec rake $TASK

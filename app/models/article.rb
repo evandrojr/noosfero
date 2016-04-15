@@ -1,6 +1,8 @@
 
 class Article < ActiveRecord::Base
 
+  include SanitizeHelper
+
   attr_accessible :name, :body, :abstract, :profile, :tag_list, :parent,
                   :allow_members_to_edit, :translation_of_id, :language,
                   :license_id, :parent_id, :display_posts_in_current_language,
@@ -8,7 +10,7 @@ class Article < ActiveRecord::Base
                   :accept_comments, :feed, :published, :source, :source_name,
                   :highlighted, :notify_comments, :display_hits, :slug,
                   :external_feed_builder, :display_versions, :external_link,
-                  :image_builder, :show_to_followers,
+                  :image_builder, :show_to_followers, :archived,
                   :author, :display_preview, :published_at, :person_followers
 
   acts_as_having_image
@@ -54,6 +56,7 @@ class Article < ActiveRecord::Base
   track_actions :create_article, :after_create, :keep_params => [:name, :url, :lead, :first_image], :if => Proc.new { |a| a.is_trackable? && !a.image? }
 
   # xss_terminate plugin can't sanitize array fields
+  # sanitize_tag_list is used with SanitizeHelper
   before_save :sanitize_tag_list
 
   before_create do |article|
@@ -74,11 +77,11 @@ class Article < ActiveRecord::Base
   belongs_to :last_changed_by, :class_name => 'Person', :foreign_key => 'last_changed_by_id'
   belongs_to :created_by, :class_name => 'Person', :foreign_key => 'created_by_id'
 
-  has_many :comments, :class_name => 'Comment', :as => 'source', :dependent => :destroy, :order => 'created_at asc'
+  has_many :comments, -> { order 'created_at asc' }, class_name: 'Comment', as: 'source', dependent: :destroy
 
   has_many :article_followers, :dependent => :destroy
   has_many :person_followers, :class_name => 'Person', :through => :article_followers, :source => :person
-  has_many :person_followers_emails, :class_name => 'User', :through => :person_followers, :source => :user, :select => :email
+  has_many :person_followers_emails, -> { select :email }, class_name: 'User', through: :person_followers, source: :user
 
   has_many :article_categorizations, -> { where 'articles_categories.virtual = ?', false }
   has_many :categories, :through => :article_categorizations
@@ -151,6 +154,8 @@ class Article < ActiveRecord::Base
 
   validate :no_self_reference
   validate :no_cyclical_reference, :if => 'parent_id.present?'
+
+  validate :parent_archived?
 
   def no_self_reference
     errors.add(:parent_id, _('self-reference is not allowed.')) if id && parent_id == id
@@ -279,7 +284,7 @@ class Article < ActiveRecord::Base
   # retrives the most commented articles, sorted by the comment count (largest
   # first)
   def self.most_commented(limit)
-    paginate(:order => 'comments_count DESC', :page => 1, :per_page => limit)
+    order('comments_count DESC').paginate(page: 1, per_page: limit)
   end
 
   scope :more_popular, -> { order 'hits DESC' }
@@ -288,7 +293,7 @@ class Article < ActiveRecord::Base
   }
 
   def self.recent(limit = nil, extra_conditions = {}, pagination = true)
-    result = scoped({:conditions => extra_conditions}).
+    result = where(extra_conditions).
       is_public.
       relevant_as_recent.
       limit(limit).
@@ -470,7 +475,7 @@ class Article < ActiveRecord::Base
 
   def rotate_translations
     unless self.translations.empty?
-      rotate = self.translations.all
+      rotate = self.translations.to_a
       root = rotate.shift
       root.update_attribute(:translation_of_id, nil)
       root.translations = rotate
@@ -497,6 +502,10 @@ class Article < ActiveRecord::Base
     else
       false
     end
+  end
+
+  def archived?
+    (self.parent && self.parent.archived) || self.archived
   end
 
   def self.folder_types
@@ -645,13 +654,21 @@ class Article < ActiveRecord::Base
   end
 
   def hit
-    self.class.connection.execute('update articles set hits = hits + 1 where id = %d' % self.id.to_i)
-    self.hits += 1
+    if !archived?
+      self.class.connection.execute('update articles set hits = hits + 1 where id = %d' % self.id.to_i)
+      self.hits += 1
+    end
   end
 
   def self.hit(articles)
-    Article.where(:id => articles.map(&:id)).update_all('hits = hits + 1')
-    articles.each { |a| a.hits += 1 }
+    ids = []
+    articles.each do |article|
+      if !article.archived?
+        ids << article.id
+        article.hits += 1
+      end
+    end
+    Article.where(:id => ids).update_all('hits = hits + 1') if !ids.empty?
   end
 
   def can_display_hits?
@@ -752,7 +769,7 @@ class Article < ActiveRecord::Base
 
   def version_license(version_number = nil)
     return license if version_number.nil?
-    profile.environment.licenses.find_by_id(get_version(version_number).license_id)
+    profile.environment.licenses.find_by(id: get_version(version_number).license_id)
   end
 
   alias :active_record_cache_key :cache_key
@@ -856,9 +873,10 @@ class Article < ActiveRecord::Base
     tag_name.gsub(/[<>]/, '')
   end
 
-  def sanitize_html(text)
-    sanitizer = HTML::FullSanitizer.new
-    sanitizer.sanitize(text)
+  def parent_archived?
+     if self.parent_id_changed? && self.parent && self.parent.archived?
+       errors.add(:parent_folder, N_('is archived!!'))
+     end
   end
 
 end
